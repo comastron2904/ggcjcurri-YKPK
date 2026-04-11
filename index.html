@@ -2938,14 +2938,22 @@ function saveInfo() {
 }
 
 /* ── 블록 시스템 ── */
-function getBlocks() { return subjects[currentSubjectIdx].blocks || []; }
-function setBlocks(arr) { subjects[currentSubjectIdx].blocks = arr; save(); }
+function getBlocks() {
+  if (currentSubjectIdx < 0 || !subjects[currentSubjectIdx]) return [];
+  return subjects[currentSubjectIdx].blocks || [];
+}
+function setBlocks(arr) {
+  if (currentSubjectIdx < 0 || !subjects[currentSubjectIdx]) return;
+  subjects[currentSubjectIdx].blocks = arr;
+  save();
+}
 
 function renderBlocks() {
   const container = document.getElementById('blocks-container');
+  if (!container) return;
   const blocks = getBlocks();
   container.innerHTML = '';
-  const ro = (detailFrom === 'semester');
+  const ro = (detailFrom === 'semester' || detailFrom === 'catsubj');
   if (blocks.length === 0) {
     container.innerHTML = ro
       ? '<div class="blocks-empty">등록된 내용이 없습니다</div>'
@@ -2956,13 +2964,14 @@ function renderBlocks() {
 }
 
 function addBlock(type) {
+  if (currentSubjectIdx < 0) return;
   const blocks = getBlocks();
   blocks.push({ type, title: '', data: type === '자료' ? [] : '' });
   setBlocks(blocks);
   renderBlocks();
   setTimeout(() => {
     const d = document.getElementById('subject-detail');
-    d.scrollTop = d.scrollHeight;
+    if (d) d.scrollTop = d.scrollHeight;
   }, 60);
 }
 
