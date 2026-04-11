@@ -786,7 +786,7 @@
   .sem-col-header-row {
     flex-shrink: 0;
     display: grid;
-    grid-template-columns: 120px 1fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 120px 1.6fr 2.4fr 1fr 1fr 1fr;
     border-bottom: 2px solid rgba(201,168,76,0.22);
     background: rgba(10,22,40,0.97);
   }
@@ -822,7 +822,7 @@
   /* 학기 한 행 */
   .sem-row {
     display: grid;
-    grid-template-columns: 120px 1fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 120px 1.6fr 2.4fr 1fr 1fr 1fr;
     border-bottom: 1px solid rgba(255,255,255,0.07);
     min-height: 160px;
     flex: 1;
@@ -916,6 +916,8 @@
 
   /* 패널 내 과목 목록 */
   .sem-subject-list { flex: 1; overflow-y: auto; padding: 8px 6px; }
+  .cell-사회과학 .sem-subject-list { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; align-content: start; }
+  .cell-사회과학 .sem-subject-list .sem-subj-card { margin-bottom: 0; }
   .sem-subject-list::-webkit-scrollbar { width: 2px; }
   .sem-subject-list::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.2); }
 
@@ -1001,13 +1003,14 @@
 
   @media (max-width:860px) {
     .sem-col-header-row,
-    .sem-row { grid-template-columns: 80px 1fr 1fr 1fr 1fr 1fr; }
+    .sem-row { grid-template-columns: 80px 1.6fr 2.4fr 1fr 1fr 1fr; }
     .sem-row-title { font-size: 11px; }
   }
   @media (max-width:500px) {
     .sem-col-header-row,
-    .sem-row { grid-template-columns: 60px repeat(5,1fr); }
+    .sem-row { grid-template-columns: 60px 1.4fr 2fr 0.9fr 0.9fr 0.9fr; }
     .sem-header { padding:16px 18px 14px; }
+    .cell-사회과학 .sem-subject-list { grid-template-columns: 1fr; }
   }
 
   /* ══════════════════════════════════════
@@ -1892,7 +1895,7 @@
           <div class="info-field-label">등급산출여부</div>
           <input class="info-field-input" id="info-grade" placeholder="예) 성취평가제" />
         </div>
-        <div class="info-field">
+        <div class="info-field" style="grid-column:1/-1;">
           <div class="info-field-label">같은 선택교과군</div>
           <input class="info-field-input" id="info-group" placeholder="예) 수학Ⅱ, 미적분" />
         </div>
