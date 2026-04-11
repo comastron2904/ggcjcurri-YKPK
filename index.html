@@ -2858,7 +2858,30 @@ function openDetail(s, from, semColIdx) {
     if (foundCol >= 0) semesterValue = SEM_NAMES[foundCol];
   }
   document.getElementById('info-semester').value = semesterValue;
-  document.getElementById('info-credit').value   = info.credit   || '';
+
+  // 학점 자동 설정: 저장된 값이 없을 때, 배치된 과목군 타입으로 자동 결정
+  let autoCredit = info.credit || '';
+  if (!autoCredit) {
+    // semColIdx로 직접 접근하거나, 전체 semesterData에서 역조회
+    let foundType = '';
+    if (from === 'semester' && semColIdx !== undefined) {
+      const entry = (semesterData[semColIdx] || []).find(x => x.name === s.name);
+      if (entry) foundType = entry.type;
+    }
+    if (!foundType) {
+      for (let ci = 0; ci < semesterData.length; ci++) {
+        const entry = semesterData[ci].find(x => x.name === s.name);
+        if (entry) { foundType = entry.type; break; }
+      }
+    }
+    // 과목군에 따라 학점 자동 설정
+    if (['사회&과학', '사회&과학&예술', '국&수&영', '외국어&교양'].includes(foundType)) {
+      autoCredit = '3학점';
+    } else if (foundType === '음악&미술') {
+      autoCredit = '2학점';
+    }
+  }
+  document.getElementById('info-credit').value   = autoCredit;
   document.getElementById('info-grade').value    = info.grade    || '';
 
   // 같은 선택교과군 자동 계산 (저장된 값 없을 때만)
