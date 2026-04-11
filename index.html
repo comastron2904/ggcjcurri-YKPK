@@ -564,6 +564,13 @@
 
   /* 영상 자료 */
   .media-video-block {}
+  .media-pdf-block { margin-bottom: 4px; }
+  .media-pdf-label {
+    font-size: 11px; letter-spacing: 1px; color: rgba(201,168,76,0.7);
+    margin-bottom: 8px; padding: 6px 10px;
+    background: rgba(201,168,76,0.06); border: 1px solid rgba(201,168,76,0.15);
+  }
+  .media-pdf-frame { width: 100%; background: #fff; }
   .media-video-url-row {
     display: flex; gap: 8px; margin-bottom: 12px;
   }
@@ -3049,6 +3056,7 @@ function createSubjectBlockEl(block, idx, ro) {
           <button class="btn-media-add" onclick="addMedia(${idx},'text')">＋ 텍스트 자료</button>
           <button class="btn-media-add" onclick="addMedia(${idx},'image')">🖼 사진 자료</button>
           <button class="btn-media-add" onclick="addMedia(${idx},'video')">▶ 영상 자료</button>
+          <button class="btn-media-add" onclick="addMedia(${idx},'pdf')">📄 PDF 자료</button>
         </div>
         <input type="file" id="img-input-${idx}" accept="image/*" style="display:none" onchange="handleImgUpload(event,${idx})">`}
       </div>`;
@@ -3117,6 +3125,27 @@ function buildMediaEl(blockIdx, mi, m, ro) {
         ${ro ? '' : `<button class="btn-media-del-top" style="top:48px" onclick="deleteMedia(${blockIdx},${mi})">× 삭제</button>`}
       </div>`;
   }
+  if (m.type === 'pdf') {
+    const hasFile = !!m.src;
+    return `
+      <div class="media-pdf-block" style="position:relative">
+        ${hasFile ? `
+          <div class="media-pdf-label">📄 ${escHtml(m.name || 'PDF 파일')}</div>
+          <div class="media-pdf-frame">
+            <iframe src="${m.src}" width="100%" height="600px" style="border:none;display:block;"></iframe>
+          </div>` : `
+          <div class="media-video-placeholder" style="border-color:rgba(201,168,76,0.22);color:rgba(201,168,76,0.45);">
+            📄 PDF 파일을 업로드하면 바로 표시됩니다
+          </div>`}
+        ${ro ? '' : `
+          <button class="btn-media-add" style="margin-top:10px;width:100%;" onclick="document.getElementById('pdf-input-${blockIdx}-${mi}').click()">
+            📄 ${hasFile ? 'PDF 교체' : 'PDF 업로드'}
+          </button>
+          <input type="file" id="pdf-input-${blockIdx}-${mi}" accept="application/pdf" style="display:none"
+            onchange="handlePdfUpload(event,${blockIdx},${mi})">
+          <button class="btn-media-del-top" onclick="deleteMedia(${blockIdx},${mi})">× 삭제</button>`}
+      </div>`;
+  }
   return '';
 }
 
@@ -3144,11 +3173,35 @@ function embedVideo(blockIdx, mi) {
 
 function addMedia(blockIdx, type) {
   if (type === 'image') { document.getElementById(`img-input-${blockIdx}`).click(); return; }
+  if (type === 'pdf') {
+    const blocks = getBlocks();
+    if (!Array.isArray(blocks[blockIdx].data)) blocks[blockIdx].data = [];
+    blocks[blockIdx].data.push({ type: 'pdf', src: '', name: '' });
+    setBlocks(blocks);
+    rerenderMediaArea(blockIdx);
+    return;
+  }
   const blocks = getBlocks();
   if (!Array.isArray(blocks[blockIdx].data)) blocks[blockIdx].data = [];
   blocks[blockIdx].data.push(type === 'text' ? { type, text: '' } : { type, url: '' });
   setBlocks(blocks);
   rerenderMediaArea(blockIdx);
+}
+
+function handlePdfUpload(event, blockIdx, mi) {
+  const file = event.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const blocks = getBlocks();
+    if (blocks[blockIdx] && blocks[blockIdx].data[mi]) {
+      blocks[blockIdx].data[mi].src  = ev.target.result;
+      blocks[blockIdx].data[mi].name = file.name;
+      setBlocks(blocks);
+      rerenderMediaArea(blockIdx);
+    }
+  };
+  reader.readAsDataURL(file);
+  event.target.value = '';
 }
 
 function handleImgUpload(event, blockIdx) {
