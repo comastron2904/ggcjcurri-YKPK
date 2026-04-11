@@ -2532,7 +2532,7 @@ function showLoadingOverlay(msg) {
   if (!el) {
     el = document.createElement('div');
     el.id = 'sb-loading';
-    el.style.cssText = 'position:fixed;inset:0;background:rgba(10,22,40,0.92);z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;font-family:'Noto Sans KR',sans-serif;color:rgba(255,255,255,0.7);font-size:13px;letter-spacing:2px;';
+    el.style.cssText = "position:fixed;inset:0;background:rgba(10,22,40,0.92);z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;font-family:'Noto Sans KR',sans-serif;color:rgba(255,255,255,0.7);font-size:13px;letter-spacing:2px;";
     el.innerHTML = '<div id="sb-spinner" style="width:32px;height:32px;border:2px solid rgba(201,168,76,0.2);border-top-color:#c9a84c;border-radius:50%;animation:spin 0.7s linear infinite;"></div><span id="sb-loading-msg"></span>';
     document.body.appendChild(el);
     if (!document.getElementById('sb-spin-style')) {
@@ -3976,13 +3976,13 @@ function closeEnrollScreen() {
   document.getElementById('enroll-screen').classList.remove('open');
 }
 
-function loadEnrollBlocks() {
+async function loadEnrollBlocks() {
   try { const _e = await sbGet(ENROLL_KEY); enrollBlocks = Array.isArray(_e) ? _e : []; }
   catch(e) { enrollBlocks = []; }
   renderEnrollBlocks();
 }
 
-function saveEnrollBlocks() {
+async function saveEnrollBlocks() {
   enrollBlocks.forEach(b => {
     if (b.type === 'text' || b.type === 'title') {
       const ta = document.getElementById('eta-' + b.id);
@@ -4188,13 +4188,13 @@ function closeSuneungScreen() {
   document.getElementById('suneung-screen').classList.remove('open');
 }
 
-function loadSuneungBlocks() {
+async function loadSuneungBlocks() {
   try { const _s = await sbGet(SUNEUNG_KEY); suneungBlocks = Array.isArray(_s) ? _s : []; }
   catch(e) { suneungBlocks = []; }
   renderSuneungBlocks();
 }
 
-function saveSuneungBlocks() {
+async function saveSuneungBlocks() {
   suneungBlocks.forEach(b => {
     if (b.type === 'text' || b.type === 'title') {
       const ta = document.getElementById('sta-' + b.id);
