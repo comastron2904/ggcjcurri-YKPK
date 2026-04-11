@@ -3,6 +3,6 @@
   "version": "1.0.0",
   "description": "경기창조고 교육과정 박람회",
   "engines": {
-    "node": "18.x"
+    "node": "24.x"
   }
 }
