@@ -412,6 +412,16 @@
   .info-field-input:focus { border-color: var(--gold); background: rgba(201,168,76,0.06); }
   .info-field-input::placeholder { color: rgba(255,255,255,0.2); font-size: 12px; }
 
+  /* 선택교과군 자동높이 textarea */
+  textarea.info-group-textarea {
+    resize: none;
+    overflow: hidden;
+    min-height: 42px;
+    line-height: 1.65;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
   /* 저장 버튼 */
   .info-save-bar { display: flex; justify-content: flex-end; margin-top: 18px; }
   .btn-info-save {
@@ -781,6 +791,24 @@
   .sem-header-label { font-size: 10px; letter-spacing: 4px; color: var(--gold); margin-bottom: 4px; }
   .sem-header-title { font-family: 'Noto Serif KR', serif; font-size: clamp(18px,2.5vw,28px); font-weight: 900; color: var(--white); }
 
+  .graded-notice {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11px; color: rgba(255,255,255,0.38);
+    letter-spacing: 0.3px; white-space: nowrap;
+    margin-top: 6px;
+  }
+  .graded-notice .graded-notice-em {
+    color: rgba(255,255,255,0.92);
+    font-weight: 700;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.22);
+    padding: 1px 7px;
+    letter-spacing: 0.2px;
+  }
+  @media (max-width: 700px) {
+    .graded-notice { font-size: 10px; }
+  }
+
   /* ── 새 레이아웃: 학기(행) × 과목군(열) ── */
   /* 고정 열 헤더 행 */
   .sem-col-header-row {
@@ -810,6 +838,17 @@
   .sem-col-header-label.hd-국수영       { color: #7eb8e0; }
   .sem-col-header-label.hd-외국어정보   { color: #7ee0b0; }
   .sem-col-header-label.hd-음악미술     { color: #e07eb8; }
+
+  .sem-col-select-hint {
+    display: block;
+    font-size: 9px; letter-spacing: 1px; font-weight: 500;
+    font-family: 'Noto Sans KR', sans-serif;
+    opacity: 0.55; margin-top: 3px;
+  }
+  .sem-col-select-hint.hint-사회과학  { color: #e0b87e; }
+  .sem-col-select-hint.hint-국수영    { color: #7eb8e0; }
+  .sem-col-select-hint.hint-외국어정보 { color: #7ee0b0; }
+  .sem-col-select-hint.hint-음악미술  { color: #e07eb8; }
 
   /* 스크롤 가능한 학기 행 목록 */
   .sem-grid {
@@ -928,6 +967,13 @@
     display: flex; align-items: center; gap: 7px;
   }
   .sem-subj-card:hover { background: rgba(255,255,255,0.06); transform: translateX(2px); }
+  /* 등급산출 O — 학기별 카드 강조 */
+  .sem-subj-card.graded {
+    background: rgba(255,255,255,0.072);
+    border-color: rgba(255,255,255,0.22);
+  }
+  .sem-subj-card.graded .sem-subj-name { color: #fff; font-weight: 700; }
+  .sem-subj-card.graded:hover { background: rgba(255,255,255,0.11); }
   .sem-subj-info { flex: 1; min-width: 0; }
   .sem-subj-name { font-size: 11px; font-weight: 600; color: var(--white); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .sem-subj-cat { font-size: 9px; letter-spacing: 0.5px; margin-top: 1px; opacity: 0.5; }
@@ -1064,6 +1110,15 @@
     cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 12px;
   }
   .catsubj-card:hover { background: rgba(255,255,255,0.06); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.25); }
+  /* 등급산출 O — 교과별 카드 강조 */
+  .catsubj-card.graded {
+    background: rgba(255,255,255,0.072);
+    border-top-color: rgba(255,255,255,0.18);
+    border-right-color: rgba(255,255,255,0.18);
+    border-bottom-color: rgba(255,255,255,0.18);
+  }
+  .catsubj-card.graded .catsubj-card-name { color: #fff; font-weight: 700; }
+  .catsubj-card.graded:hover { background: rgba(255,255,255,0.11); }
   .catsubj-card-info { flex: 1; min-width: 0; }
   .catsubj-card-name { font-size: 14px; font-weight: 600; color: var(--white); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .catsubj-card-meta { font-size: 11px; color: rgba(255,255,255,0.3); letter-spacing: 0.5px; }
@@ -1892,12 +1947,12 @@
           <input class="info-field-input" id="info-credit" placeholder="예) 4학점" />
         </div>
         <div class="info-field">
-          <div class="info-field-label">등급산출여부</div>
+          <div class="info-field-label">등급산출여부 <span style="color:rgba(201,168,76,0.5);font-size:9px;letter-spacing:1px;">(O/X)</span></div>
           <input class="info-field-input" id="info-grade" placeholder="예) 성취평가제" />
         </div>
         <div class="info-field" style="grid-column:1/-1;">
           <div class="info-field-label">같은 선택교과군</div>
-          <input class="info-field-input" id="info-group" placeholder="예) 수학Ⅱ, 미적분" />
+          <textarea class="info-field-input info-group-textarea" id="info-group" placeholder="예) 수학Ⅱ, 미적분" rows="1"></textarea>
         </div>
       </div>
       <div class="info-save-bar">
@@ -2022,6 +2077,7 @@
     <div class="sem-header-info">
       <div class="sem-header-label">CURRICULUM · 학기별 개설과목</div>
       <div class="sem-header-title">학기별 개설과목 안내</div>
+      <div class="graded-notice">더 진하게 표시된 과목은 <span class="graded-notice-em">등급이 산출되는 과목</span>입니다</div>
     </div>
     <div class="sem-grade-tabs">
       <button class="sem-grade-tab" id="sem-tab-2학년" onclick="setSemGrade('2학년')">2학년</button>
@@ -2039,10 +2095,12 @@
     <div class="sem-col-header-cell" id="hd-사회과학-0"></div>
     <div class="sem-col-header-cell">
       <span class="sem-col-header-label hd-국수영">국&amp;수&amp;영</span>
+      <span class="sem-col-select-hint hint-국수영">1개 선택</span>
     </div>
     <div class="sem-col-header-cell" id="hd-외국어정보-0"></div>
     <div class="sem-col-header-cell">
       <span class="sem-col-header-label hd-음악미술">음악&amp;미술</span>
+      <span class="sem-col-select-hint hint-음악미술">1개 선택</span>
     </div>
   </div>
 
@@ -2251,6 +2309,7 @@
     <div class="sem-header-info">
       <div class="sem-header-label">CURRICULUM · 교과별 선택과목</div>
       <div class="sem-header-title">교과별 선택과목 안내</div>
+      <div class="graded-notice">더 진하게 표시된 과목은 <span class="graded-notice-em">등급이 산출되는 과목</span>입니다</div>
     </div>
   </div>
   <div class="catsubj-body">
@@ -2826,6 +2885,7 @@ function openDetail(s, from, semColIdx) {
     }
   }
   document.getElementById('info-group').value = autoGroup;
+  autoResizeGroupTextarea();
   document.getElementById('info-save-ok').classList.remove('show');
 
   // 블록 렌더
@@ -3260,7 +3320,8 @@ function renderCatSubjList() {
     // 실제 배치된 학기를 우선, 없으면 저장된 값, 둘 다 없으면 미정
     const semesterLabel = foundCol >= 0 ? SEM_NAMES[foundCol] : (info.semester || '개설시기 미정');
     const card = document.createElement('div');
-    card.className = 'catsubj-card';
+    const graded = /^[oO0]$/.test((info.grade || '').trim());
+    card.className = 'catsubj-card' + (graded ? ' graded' : '');
     card.style.borderLeftColor = color;
     card.innerHTML = `
       <div class="catsubj-card-info">
@@ -3299,7 +3360,7 @@ function saveSemester() { sbSetQ('cg_semester', semesterData); }
 function openSemesterScreen() {
   // 열 헤더 라벨 세팅 (2학년/3학년 라벨이 다름 — 대표로 2학년 기준 표시, 변동 열만 동적으로)
   const hdWL = document.getElementById('hd-외국어정보-0');
-  if (hdWL) hdWL.innerHTML = '<span class="sem-col-header-label hd-외국어정보">외국어&amp;교양</span>';
+  if (hdWL) hdWL.innerHTML = '<span class="sem-col-header-label hd-외국어정보">외국어&amp;교양</span><span class="sem-col-select-hint hint-외국어정보">1개 선택</span>';
   renderAllSemCols();
   document.getElementById('semester-screen').classList.add('open');
   document.getElementById('semester-screen').scrollTop = 0;
@@ -3322,9 +3383,9 @@ function setSemGrade(grade) {
   const hdSS = document.getElementById('hd-사회과학-0');
   if (hdSS) {
     if (grade === '2학년') {
-      hdSS.innerHTML = '<span class="sem-col-header-label hd-사회과학">사회&amp;과학</span>';
+      hdSS.innerHTML = '<span class="sem-col-header-label hd-사회과학">사회&amp;과학</span><span class="sem-col-select-hint hint-사회과학">3개 선택</span>';
     } else {
-      hdSS.innerHTML = '<span class="sem-col-header-label hd-사회과학">사회&amp;과학&amp;예술</span>';
+      hdSS.innerHTML = '<span class="sem-col-header-label hd-사회과학">사회&amp;과학&amp;예술</span><span class="sem-col-select-hint hint-사회과학">3개 선택</span>';
     }
   }
   // 행 보이기/숨기기
@@ -3369,8 +3430,9 @@ function renderSemCol(colIdx) {
     const itemIdx = items.indexOf(item);
     const s = subjects.find(x => x.name === name);
     const cat = s ? s.cat : '기타';
+    const graded = s && /^[oO0]$/.test((s.info && s.info.grade || '').trim());
     const card = document.createElement('div');
-    card.className = 'sem-subj-card sem-bc-' + cat;
+    card.className = 'sem-subj-card sem-bc-' + cat + (graded ? ' graded' : '');
     card.innerHTML = `
       <div class="sem-subj-info">
         <div class="sem-subj-name">${escHtml(name)}</div>
@@ -4646,6 +4708,23 @@ async function initApp() {
 }
 
 document.addEventListener('DOMContentLoaded', () => { initApp(); });
+
+/* ══════════════════════════════════════
+   선택교과군 textarea 자동 높이 조절
+══════════════════════════════════════ */
+function autoResizeGroupTextarea() {
+  const el = document.getElementById('info-group');
+  if (!el) return;
+  el.style.height = 'auto';
+  el.style.height = el.scrollHeight + 'px';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const groupEl = document.getElementById('info-group');
+  if (groupEl) {
+    groupEl.addEventListener('input', autoResizeGroupTextarea);
+  }
+});
 
 /* ══════════════════════════════════════
    휠로 PDF 페이지 넘기기
