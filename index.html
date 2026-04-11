@@ -2960,7 +2960,7 @@ function renderBlocks() {
       : '<div class="blocks-empty" id="blocks-empty">📌 주제 &nbsp;·&nbsp; 📝 내용 &nbsp;·&nbsp; 📎 자료<br>버튼을 눌러 블록을 추가하세요</div>';
     return;
   }
-  blocks.forEach((block, idx) => container.appendChild(createBlockEl(block, idx, ro)));
+  blocks.forEach((block, idx) => container.appendChild(createSubjectBlockEl(block, idx, ro)));
 }
 
 function addBlock(type) {
@@ -3013,7 +3013,7 @@ function saveBlock(idx) {
 }
 
 /* ── 블록 HTML 생성 ── */
-function createBlockEl(block, idx, ro) {
+function createSubjectBlockEl(block, idx, ro) {
   const wrap = document.createElement('div');
   wrap.className = 'content-block';
 
