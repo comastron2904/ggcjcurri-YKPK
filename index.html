@@ -567,10 +567,17 @@
   .media-pdf-block { margin-bottom: 4px; }
   .media-pdf-label {
     font-size: 11px; letter-spacing: 1px; color: rgba(201,168,76,0.7);
-    margin-bottom: 8px; padding: 6px 10px;
+    margin-bottom: 0; padding: 6px 10px;
     background: rgba(201,168,76,0.06); border: 1px solid rgba(201,168,76,0.15);
+    border-bottom: none;
   }
-  .media-pdf-frame { width: 100%; background: #fff; }
+  .media-pdf-viewer {
+    min-height: 200px; background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(201,168,76,0.12);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+  .media-pdf-viewer canvas { display: block; max-width: 100%; }
   .media-video-url-row {
     display: flex; gap: 8px; margin-bottom: 12px;
   }
@@ -3072,13 +3079,21 @@ function createSubjectBlockEl(block, idx, ro) {
     </div>`}
     ${cardHtml}`;
 
-  // textarea 자동 높이 조절
+  // textarea 자동 높이 조절 + PDF 뷰어 초기화
   setTimeout(() => {
     wrap.querySelectorAll('textarea').forEach(ta => {
       const resize = () => { ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; };
       resize();
       ta.addEventListener('input', resize);
     });
+    if (block.type === '자료') {
+      (block.data || []).forEach((m, mi) => {
+        if (m.type === 'pdf' && m.src) {
+          const vid = `mpdf-${idx}-${mi}`;
+          initMediaPdf(vid, m.src);
+        }
+      });
+    }
   }, 0);
 
   return wrap;
@@ -3127,12 +3142,18 @@ function buildMediaEl(blockIdx, mi, m, ro) {
   }
   if (m.type === 'pdf') {
     const hasFile = !!m.src;
+    const vid = `mpdf-${blockIdx}-${mi}`;
     return `
-      <div class="media-pdf-block" style="position:relative">
+      <div class="media-pdf-block" id="wrap-${vid}" style="position:relative">
         ${hasFile ? `
           <div class="media-pdf-label">📄 ${escHtml(m.name || 'PDF 파일')}</div>
-          <div class="media-pdf-frame">
-            <iframe src="${m.src}" width="100%" height="600px" style="border:none;display:block;"></iframe>
+          <div class="media-pdf-viewer" id="viewer-${vid}">
+            <div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>PDF 불러오는 중...</span></div>
+          </div>
+          <div class="gb-panel-nav" id="nav-${vid}" style="display:flex">
+            <button class="gb-nav-btn" id="prev-${vid}" onclick="mediaPdfGo('${vid}',-1)" disabled>‹</button>
+            <span class="gb-page-info" id="pi-${vid}">- / -</span>
+            <button class="gb-nav-btn" id="next-${vid}" onclick="mediaPdfGo('${vid}',1)" disabled>›</button>
           </div>` : `
           <div class="media-video-placeholder" style="border-color:rgba(201,168,76,0.22);color:rgba(201,168,76,0.45);">
             📄 PDF 파일을 업로드하면 바로 표시됩니다
@@ -3204,6 +3225,76 @@ function handlePdfUpload(event, blockIdx, mi) {
   event.target.value = '';
 }
 
+/* ── 자료 블록 PDF 뷰어 ── */
+const mediaPdfState = {}; // vid → { pdfDoc, curPage, totalPages, rendering }
+
+async function initMediaPdf(vid, src) {
+  if (!src) return;
+  mediaPdfState[vid] = { pdfDoc: null, curPage: 1, totalPages: 0, rendering: false };
+  const viewerEl = document.getElementById('viewer-' + vid);
+  if (!viewerEl) return;
+  viewerEl.innerHTML = '<div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>PDF 불러오는 중...</span></div>';
+  try {
+    const pdf = await pdfjsLib.getDocument(src).promise;
+    mediaPdfState[vid].pdfDoc     = pdf;
+    mediaPdfState[vid].totalPages = pdf.numPages;
+    mediaPdfState[vid].curPage    = 1;
+    await renderMediaPdfPage(vid);
+    // 스크롤로 페이지 넘기기
+    viewerEl.addEventListener('wheel', function(e) {
+      const atBottom = viewerEl.scrollHeight - viewerEl.scrollTop - viewerEl.clientHeight < 4;
+      const atTop    = viewerEl.scrollTop < 4;
+      if (e.deltaY > 0 && !atBottom) return;
+      if (e.deltaY < 0 && !atTop)    return;
+      e.preventDefault();
+      mediaPdfGo(vid, e.deltaY > 0 ? 1 : -1);
+    }, { passive: false });
+  } catch(e) {
+    if (viewerEl) viewerEl.innerHTML = '<div class="gb-pdf-loading"><span>⚠️ PDF를 불러오지 못했습니다</span></div>';
+  }
+}
+
+async function renderMediaPdfPage(vid) {
+  const st = mediaPdfState[vid];
+  if (!st || !st.pdfDoc || st.rendering) return;
+  st.rendering = true;
+  const viewerEl = document.getElementById('viewer-' + vid);
+  const prevBtn  = document.getElementById('prev-' + vid);
+  const nextBtn  = document.getElementById('next-' + vid);
+  const piEl     = document.getElementById('pi-' + vid);
+  if (!viewerEl) { st.rendering = false; return; }
+  viewerEl.innerHTML = '<div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>' + st.curPage + ' / ' + st.totalPages + ' 페이지</span></div>';
+  try {
+    const page     = await st.pdfDoc.getPage(st.curPage);
+    const vw       = viewerEl.clientWidth - 4;
+    const viewport = page.getViewport({ scale: 1 });
+    const scale    = Math.max(vw / viewport.width, 0.5);
+    const vp       = page.getViewport({ scale });
+    const canvas   = document.createElement('canvas');
+    canvas.className = 'gb-pdf-canvas';
+    canvas.width  = vp.width;
+    canvas.height = vp.height;
+    await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
+    viewerEl.innerHTML = '';
+    viewerEl.appendChild(canvas);
+    if (piEl) piEl.textContent = st.curPage + ' / ' + st.totalPages;
+    if (prevBtn) prevBtn.disabled = (st.curPage <= 1);
+    if (nextBtn) nextBtn.disabled = (st.curPage >= st.totalPages);
+  } catch(e) {
+    if (viewerEl) viewerEl.innerHTML = '<div class="gb-pdf-loading"><span>페이지 렌더링 실패</span></div>';
+  }
+  st.rendering = false;
+}
+
+async function mediaPdfGo(vid, dir) {
+  const st = mediaPdfState[vid];
+  if (!st || !st.pdfDoc) return;
+  const np = st.curPage + dir;
+  if (np < 1 || np > st.totalPages) return;
+  st.curPage = np;
+  await renderMediaPdfPage(vid);
+}
+
 function handleImgUpload(event, blockIdx) {
   const file = event.target.files[0]; if (!file) return;
   const reader = new FileReader();
@@ -3234,8 +3325,15 @@ function rerenderMediaArea(blockIdx) {
   const area = document.getElementById(`media-area-${blockIdx}`);
   if (!area) return;
   const blocks = getBlocks();
-  const ro = (detailFrom === 'semester');
+  const ro = (detailFrom === 'semester' || detailFrom === 'catsubj');
   area.innerHTML = (blocks[blockIdx].data || []).map((m, mi) => buildMediaEl(blockIdx, mi, m, ro)).join('');
+  // PDF 뷰어 초기화
+  (blocks[blockIdx].data || []).forEach((m, mi) => {
+    if (m.type === 'pdf' && m.src) {
+      const vid = `mpdf-${blockIdx}-${mi}`;
+      initMediaPdf(vid, m.src);
+    }
+  });
 }
 
 /* ──────────────────────────────
