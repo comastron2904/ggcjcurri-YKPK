@@ -467,18 +467,9 @@
 
   /* 블록 컨트롤 툴바 (편집 모드) */
   .block-toolbar {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 10px;
+    display: flex; align-items: center; justify-content: flex-end;
+    margin-bottom: 8px;
   }
-  .block-type-pill {
-    display: inline-flex; align-items: center; gap: 6px;
-    font-size: 11px; letter-spacing: 2px; font-weight: 700;
-    padding: 4px 14px; border: 1px solid;
-  }
-  .block-type-pill.type-주제 { color: #7eb8e0; border-color: rgba(126,184,224,0.35); background: rgba(126,184,224,0.07); }
-  .block-type-pill.type-내용 { color: #b07ee0; border-color: rgba(176,126,224,0.35); background: rgba(176,126,224,0.07); }
-  .block-type-pill.type-자료 { color: #7ee0b0; border-color: rgba(126,224,176,0.35); background: rgba(126,224,176,0.07); }
-
   .block-toolbar-actions { display: flex; gap: 6px; }
   .btn-block-save {
     padding: 5px 16px; background: rgba(255,255,255,0.05);
@@ -517,7 +508,8 @@
   .card-body-input {
     width: 100%; background: transparent; border: none; outline: none;
     font-family: 'Noto Sans KR', sans-serif; font-size: 15px; line-height: 1.9;
-    color: rgba(255,255,255,0.82); resize: vertical; min-height: 90px;
+    color: rgba(255,255,255,0.82); resize: none;
+    min-height: 60px; overflow: hidden;
     padding: 0;
   }
   .card-body-input::placeholder { color: rgba(255,255,255,0.2); }
@@ -527,7 +519,7 @@
   .card-heading-input.color-내용 { color: #b07ee0; border-bottom-color: rgba(176,126,224,0.18); }
   .card-heading-input.color-내용:focus { border-color: rgba(176,126,224,0.55); }
   .card-heading-input.color-내용::placeholder { color: rgba(176,126,224,0.3); }
-  .card-body-input.body-내용 { min-height: 140px; font-size: 14px; }
+  .card-body-input.body-내용 { min-height: 60px; font-size: 14px; }
 
   /* 자료 카드 */
   .block-card.card-자료 { border-left: 3px solid rgba(126,224,176,0.5); padding: 28px 36px; }
@@ -553,7 +545,7 @@
   .media-text-area {
     width: 100%; background: transparent; border: none; outline: none;
     color: rgba(255,255,255,0.8); font-family: 'Noto Sans KR', sans-serif;
-    font-size: 13px; line-height: 1.85; resize: vertical; min-height: 80px; padding: 0;
+    font-size: 13px; line-height: 1.85; resize: none; min-height: 60px; overflow: hidden; padding: 0;
   }
   .media-text-area::placeholder { color: rgba(255,255,255,0.2); }
 
@@ -3063,15 +3055,23 @@ function createSubjectBlockEl(block, idx, ro) {
   }
 
   wrap.innerHTML = `
-    ${ro ? `<div class="block-toolbar"><span class="block-type-pill type-${block.type}">${typeLabel}</span></div>` : `
+    ${ro ? '' : `
     <div class="block-toolbar">
-      <span class="block-type-pill type-${block.type}">${typeLabel}</span>
       <div class="block-toolbar-actions">
         <button class="btn-block-save" data-bsave="${idx}" onclick="saveBlock(${idx})">저장</button>
         <button class="btn-block-del" onclick="deleteBlock(${idx})">× 삭제</button>
       </div>
     </div>`}
     ${cardHtml}`;
+
+  // textarea 자동 높이 조절
+  setTimeout(() => {
+    wrap.querySelectorAll('textarea').forEach(ta => {
+      const resize = () => { ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; };
+      resize();
+      ta.addEventListener('input', resize);
+    });
+  }, 0);
 
   return wrap;
 }
