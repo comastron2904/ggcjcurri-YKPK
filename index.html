@@ -794,6 +794,30 @@
     border-color: rgba(176,126,224,0.7);
     color: rgb(176,126,224);
   }
+  .btn-sem-col-edit {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 14px; height: 38px;
+    background: rgba(10,22,40,0.7);
+    border: 1px solid rgba(201,168,76,0.35);
+    color: rgba(201,168,76,0.8);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.5px;
+    cursor: pointer; transition: all 0.22s; margin-left: 4px;
+  }
+  .btn-sem-col-edit:hover {
+    background: rgba(201,168,76,0.13); border-color: var(--gold);
+    color: var(--gold); transform: translateY(-1px);
+  }
+
+  /* 학기별 편집 모달 */
+  #sem-col-edit-modal .modal-box {
+    max-width: 560px; max-height: 88vh;
+    padding: 32px 32px 24px;
+    display: flex; flex-direction: column;
+  }
+  .sem-col-edit-scroll { flex: 1; overflow-y: auto; min-height: 0; padding-right: 4px; margin-right: -4px; }
+  .sem-col-edit-scroll::-webkit-scrollbar { width: 4px; }
+  .sem-col-edit-scroll::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.25); border-radius: 2px; }
   .sem-header-label { font-size: 10px; letter-spacing: 4px; color: var(--gold); margin-bottom: 4px; }
   .sem-header-title { font-family: 'Noto Serif KR', serif; font-size: clamp(18px,2.5vw,28px); font-weight: 900; color: var(--white); }
 
@@ -820,9 +844,10 @@
   .sem-col-header-row {
     flex-shrink: 0;
     display: grid;
-    grid-template-columns: 120px 1.6fr 2.4fr 1fr 1fr 1fr;
+    grid-template-columns: 120px 1fr 1fr 1fr 1fr 1fr;
     border-bottom: 2px solid rgba(201,168,76,0.22);
     background: rgba(10,22,40,0.97);
+    transition: grid-template-columns 0.3s ease;
   }
   .sem-col-header-cell {
     padding: 12px 10px 10px;
@@ -867,10 +892,11 @@
   /* 학기 한 행 */
   .sem-row {
     display: grid;
-    grid-template-columns: 120px 1.6fr 2.4fr 1fr 1fr 1fr;
+    grid-template-columns: 120px 1fr 1fr 1fr 1fr 1fr;
     border-bottom: 1px solid rgba(255,255,255,0.07);
     min-height: 160px;
     flex: 1;
+    transition: grid-template-columns 0.3s ease;
   }
   /* 2학년↔3학년 사이 강조선 */
   .sem-row.row-grade-break {
@@ -961,8 +987,9 @@
 
   /* 패널 내 과목 목록 */
   .sem-subject-list { flex: 1; overflow-y: auto; padding: 8px 6px; }
-  .cell-사회과학 .sem-subject-list { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; align-content: start; }
-  .cell-사회과학 .sem-subject-list .sem-subj-card { margin-bottom: 0; }
+  /* 과목 6개 이상 → JS가 .wide 클래스 추가 → 2열 그리드 */
+  .sem-subject-list.wide { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; align-content: start; }
+  .sem-subject-list.wide .sem-subj-card { margin-bottom: 0; }
   .sem-subject-list::-webkit-scrollbar { width: 2px; }
   .sem-subject-list::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.2); }
 
@@ -1051,14 +1078,14 @@
 
   @media (max-width:860px) {
     .sem-col-header-row,
-    .sem-row { grid-template-columns: 80px 1.6fr 2.4fr 1fr 1fr 1fr; }
+    .sem-row { grid-template-columns: 80px 1fr 1fr 1fr 1fr 1fr; }
     .sem-row-title { font-size: 11px; }
   }
   @media (max-width:500px) {
     .sem-col-header-row,
-    .sem-row { grid-template-columns: 60px 1.4fr 2fr 0.9fr 0.9fr 0.9fr; }
+    .sem-row { grid-template-columns: 60px 1fr 1fr 0.9fr 0.9fr 0.9fr; }
     .sem-header { padding:16px 18px 14px; }
-    .cell-사회과학 .sem-subject-list { grid-template-columns: 1fr; }
+    .sem-subject-list.wide { grid-template-columns: 1fr; }
   }
 
   /* ══════════════════════════════════════
@@ -2077,6 +2104,7 @@
     <div class="sem-grade-tabs">
       <button class="sem-grade-tab" id="sem-tab-2학년" onclick="setSemGrade('2학년')">2학년</button>
       <button class="sem-grade-tab" id="sem-tab-3학년" onclick="setSemGrade('3학년')">3학년</button>
+      <button class="btn-sem-col-edit" onclick="openSemColEditPw()" title="열 헤더 · 학점 편집">✏️ 편집</button>
     </div>
   </div>
   <!-- 고정 열 헤더 -->
@@ -2085,17 +2113,17 @@
       <span class="sem-col-header-label" style="color:rgba(255,255,255,0.3);letter-spacing:1.5px">학기</span>
     </div>
     <div class="sem-col-header-cell hd-req">
-      <span class="sem-col-header-label hd-req-label">필수과목</span>
+      <span class="sem-col-header-label hd-req-label" id="hd-label-req">필수과목</span>
     </div>
     <div class="sem-col-header-cell" id="hd-사회과학-0"></div>
     <div class="sem-col-header-cell">
-      <span class="sem-col-header-label hd-국수영">국&amp;수&amp;영</span>
-      <span class="sem-col-select-hint hint-국수영">1개 선택</span>
+      <span class="sem-col-header-label hd-국수영" id="hd-label-국수영">국&amp;수&amp;영</span>
+      <span class="sem-col-select-hint hint-국수영" id="hd-hint-국수영">1개 선택</span>
     </div>
     <div class="sem-col-header-cell" id="hd-외국어정보-0"></div>
     <div class="sem-col-header-cell">
-      <span class="sem-col-header-label hd-음악미술">음악&amp;미술</span>
-      <span class="sem-col-select-hint hint-음악미술">1개 선택</span>
+      <span class="sem-col-header-label hd-음악미술" id="hd-label-음악미술">음악&amp;미술</span>
+      <span class="sem-col-select-hint hint-음악미술" id="hd-hint-음악미술">1개 선택</span>
     </div>
   </div>
 
@@ -2273,6 +2301,101 @@
       </div>
     </div>
 
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     학기별 개설과목 열 헤더·학점 편집 모달
+═══════════════════════════════════════ -->
+<div class="modal-backdrop" id="sem-col-edit-modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeSemColEdit()">×</button>
+    <div class="modal-label">SEMESTER EDITOR</div>
+    <div class="modal-title" style="margin-bottom:20px">열 헤더 &amp; 학점 편집</div>
+
+    <div class="sem-col-edit-scroll">
+
+      <!-- 열 헤더 -->
+      <div class="pe-section">
+        <div class="pe-section-label">HEADER · 열 이름 &amp; 선택 힌트</div>
+        <div class="pe-field">
+          <div class="pe-field-label">필수과목 열 이름</div>
+          <input class="pe-input" id="pe-hd-req" placeholder="필수과목" />
+        </div>
+        <div class="pe-field">
+          <div class="pe-field-label">사회&amp;과학 열 이름 (2학년)</div>
+          <input class="pe-input" id="pe-hd-사회과학-2" placeholder="사회&amp;과학" />
+        </div>
+        <div class="pe-field">
+          <div class="pe-field-label">사회&amp;과학 선택 힌트 (2학년)</div>
+          <input class="pe-input" id="pe-hd-사회과학-hint-2" placeholder="3개 선택" />
+        </div>
+        <div class="pe-field">
+          <div class="pe-field-label">사회&amp;과학 열 이름 (3학년)</div>
+          <input class="pe-input" id="pe-hd-사회과학-3" placeholder="사회&amp;과학&amp;예술" />
+        </div>
+        <div class="pe-field">
+          <div class="pe-field-label">사회&amp;과학 선택 힌트 (3학년)</div>
+          <input class="pe-input" id="pe-hd-사회과학-hint-3" placeholder="3개 선택" />
+        </div>
+        <div class="pe-field">
+          <div class="pe-field-label">국&amp;수&amp;영 열 이름</div>
+          <input class="pe-input" id="pe-hd-국수영" placeholder="국&amp;수&amp;영" />
+        </div>
+        <div class="pe-field">
+          <div class="pe-field-label">국&amp;수&amp;영 선택 힌트</div>
+          <input class="pe-input" id="pe-hd-국수영-hint" placeholder="1개 선택" />
+        </div>
+        <div class="pe-field">
+          <div class="pe-field-label">외국어&amp;교양 열 이름</div>
+          <input class="pe-input" id="pe-hd-외국어" placeholder="외국어&amp;교양" />
+        </div>
+        <div class="pe-field">
+          <div class="pe-field-label">외국어&amp;교양 선택 힌트</div>
+          <input class="pe-input" id="pe-hd-외국어-hint" placeholder="1개 선택" />
+        </div>
+        <div class="pe-field">
+          <div class="pe-field-label">음악&amp;미술 열 이름</div>
+          <input class="pe-input" id="pe-hd-음악미술" placeholder="음악&amp;미술" />
+        </div>
+        <div class="pe-field">
+          <div class="pe-field-label">음악&amp;미술 선택 힌트</div>
+          <input class="pe-input" id="pe-hd-음악미술-hint" placeholder="1개 선택" />
+        </div>
+      </div>
+
+      <!-- 학점 기본값 -->
+      <div class="pe-section">
+        <div class="pe-section-label">CREDITS · 열별 학점 기본값</div>
+        <p style="font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:14px;line-height:1.7;letter-spacing:0.5px">과목 상세에서 학점을 별도 입력하지 않은 경우 아래 값이 자동 적용됩니다.</p>
+        <div class="pe-field">
+          <div class="pe-field-label">필수과목 기본 학점</div>
+          <input class="pe-input" id="pe-credit-req" placeholder="예) 3학점" />
+        </div>
+        <div class="pe-field">
+          <div class="pe-field-label">사회&amp;과학 기본 학점</div>
+          <input class="pe-input" id="pe-credit-사회과학" placeholder="예) 3학점" />
+        </div>
+        <div class="pe-field">
+          <div class="pe-field-label">국&amp;수&amp;영 기본 학점</div>
+          <input class="pe-input" id="pe-credit-국수영" placeholder="예) 3학점" />
+        </div>
+        <div class="pe-field">
+          <div class="pe-field-label">외국어&amp;교양 기본 학점</div>
+          <input class="pe-input" id="pe-credit-외국어" placeholder="예) 3학점" />
+        </div>
+        <div class="pe-field">
+          <div class="pe-field-label">음악&amp;미술 기본 학점</div>
+          <input class="pe-input" id="pe-credit-음악미술" placeholder="예) 2학점" />
+        </div>
+      </div>
+
+    </div><!-- /scroll -->
+
+    <div class="pe-save-bar">
+      <span class="pe-save-ok" id="sem-col-edit-ok">✓ 저장되었습니다</span>
+      <button class="btn-pe-save" onclick="saveSemColEdit()">저장 적용</button>
+    </div>
   </div>
 </div>
 
@@ -2683,6 +2806,25 @@ function applyPageTexts() {
       btn07.title = 'URL이 설정되지 않았습니다';
     }
   }
+  // 학기별 개설과목 열 헤더 적용
+  const hdReq = document.getElementById('hd-label-req');
+  if (hdReq && p.hdReq) hdReq.textContent = p.hdReq;
+  const hdKns = document.getElementById('hd-label-국수영');
+  if (hdKns && p.hdKns) hdKns.textContent = p.hdKns;
+  const hdKnsHint = document.getElementById('hd-hint-국수영');
+  if (hdKnsHint && p.hdKnsHint) hdKnsHint.textContent = p.hdKnsHint;
+  const hdMus = document.getElementById('hd-label-음악미술');
+  if (hdMus && p.hdMus) hdMus.textContent = p.hdMus;
+  const hdMusHint = document.getElementById('hd-hint-음악미술');
+  if (hdMusHint && p.hdMusHint) hdMusHint.textContent = p.hdMusHint;
+  // 동적 열 헤더(사회과학, 외국어)도 현재 학년에 맞게 갱신
+  if (typeof currentSemGrade !== 'undefined') setSemGrade(currentSemGrade);
+  const hdWLEl = document.getElementById('hd-외국어정보-0');
+  if (hdWLEl) {
+    const lbl = p.hdForeign || '외국어&amp;교양';
+    const hnt = p.hdForeignHint || '1개 선택';
+    hdWLEl.innerHTML = `<span class="sem-col-header-label hd-외국어정보">${lbl}</span><span class="sem-col-select-hint hint-외국어정보">${hnt}</span>`;
+  }
 }
 // applyPageTexts() — Supabase 로드 후 호출됨
 
@@ -2741,6 +2883,7 @@ function checkPw() {
     else if (pwTarget === 'enrollEdit') enterEnrollEdit();
     else if (pwTarget === 'suneungEdit') enterSuneungEdit();
     else if (pwTarget === 'gbEdit') enterGbEdit();
+    else if (pwTarget === 'semColEdit') openSemColEdit();
     else openAdminModal();
   } else {
     for (let i = 0; i < 4; i++) document.getElementById('dot-' + i).classList.add('error');
@@ -2874,11 +3017,18 @@ function openDetail(s, from, semColIdx) {
         if (entry) { foundType = entry.type; break; }
       }
     }
-    // 과목군에 따라 학점 자동 설정
-    if (['사회&과학', '사회&과학&예술', '국&수&영', '외국어&교양'].includes(foundType)) {
-      autoCredit = '3학점';
+    // 과목군에 따라 학점 자동 설정 (pageTexts 커스텀 값 우선)
+    const pt = pageTexts;
+    if (['사회&과학', '사회&과학&예술'].includes(foundType)) {
+      autoCredit = pt.creditSS || '3학점';
+    } else if (foundType === '국&수&영') {
+      autoCredit = pt.creditKns || '3학점';
+    } else if (foundType === '외국어&교양') {
+      autoCredit = pt.creditForeign || '3학점';
     } else if (foundType === '음악&미술') {
-      autoCredit = '2학점';
+      autoCredit = pt.creditMus || '2학점';
+    } else if (foundType === '필수') {
+      autoCredit = pt.creditReq || '';
     }
   }
   document.getElementById('info-credit').value   = autoCredit;
@@ -3403,6 +3553,7 @@ function savePageEdit() {
     pageTexts[k] = document.getElementById('pe-menu-' + String(i).padStart(2,'0')).value.trim();
   }
   pageTexts.menu07url = document.getElementById('pe-menu-07-url').value.trim();
+  // 열 헤더·학점 값은 saveSemColEdit() 에서 별도 저장 (pageTexts에 보존)
   savePage();
   applyPageTexts();
   const ok = document.getElementById('pe-save-ok');
@@ -3434,6 +3585,7 @@ document.getElementById('pw-modal').addEventListener('click', function(e) { if (
 document.getElementById('admin-modal').addEventListener('click', function(e) { if (e.target === this) closeAdminModal(); });
 document.getElementById('page-edit-modal').addEventListener('click', function(e) { if (e.target === this) closePageEdit(); });
 document.getElementById('subj-pick-modal').addEventListener('click', function(e) { if (e.target === this) closeSubjPick(); });
+document.getElementById('sem-col-edit-modal').addEventListener('click', function(e) { if (e.target === this) closeSemColEdit(); });
 
 /* ──────────────────────────────
    교과별 선택과목 화면
@@ -3547,7 +3699,11 @@ function saveSemester() { sbSetQ('cg_semester', semesterData); }
 function openSemesterScreen() {
   // 열 헤더 라벨 세팅 (2학년/3학년 라벨이 다름 — 대표로 2학년 기준 표시, 변동 열만 동적으로)
   const hdWL = document.getElementById('hd-외국어정보-0');
-  if (hdWL) hdWL.innerHTML = '<span class="sem-col-header-label hd-외국어정보">외국어&amp;교양</span><span class="sem-col-select-hint hint-외국어정보">1개 선택</span>';
+  if (hdWL) {
+    const label = (pageTexts.hdForeign) || '외국어&amp;교양';
+    const hint  = (pageTexts.hdForeignHint) || '1개 선택';
+    hdWL.innerHTML = `<span class="sem-col-header-label hd-외국어정보">${label}</span><span class="sem-col-select-hint hint-외국어정보">${hint}</span>`;
+  }
   renderAllSemCols();
   document.getElementById('semester-screen').classList.add('open');
   document.getElementById('semester-screen').scrollTop = 0;
@@ -3570,9 +3726,13 @@ function setSemGrade(grade) {
   const hdSS = document.getElementById('hd-사회과학-0');
   if (hdSS) {
     if (grade === '2학년') {
-      hdSS.innerHTML = '<span class="sem-col-header-label hd-사회과학">사회&amp;과학</span><span class="sem-col-select-hint hint-사회과학">3개 선택</span>';
+      const label = (pageTexts.hdSS2) || '사회&amp;과학';
+      const hint  = (pageTexts.hdSS2Hint) || '3개 선택';
+      hdSS.innerHTML = `<span class="sem-col-header-label hd-사회과학">${label}</span><span class="sem-col-select-hint hint-사회과학">${hint}</span>`;
     } else {
-      hdSS.innerHTML = '<span class="sem-col-header-label hd-사회과학">사회&amp;과학&amp;예술</span><span class="sem-col-select-hint hint-사회과학">3개 선택</span>';
+      const label = (pageTexts.hdSS3) || '사회&amp;과학&amp;예술';
+      const hint  = (pageTexts.hdSS3Hint) || '3개 선택';
+      hdSS.innerHTML = `<span class="sem-col-header-label hd-사회과학">${label}</span><span class="sem-col-select-hint hint-사회과학">${hint}</span>`;
     }
   }
   // 행 보이기/숨기기
@@ -3590,8 +3750,70 @@ function closeSemesterScreen() {
   document.getElementById('semester-screen').classList.remove('open');
 }
 
+/* ── 학기별 열 헤더·학점 편집 모달 ── */
+function openSemColEditPw() {
+  pwTarget = 'semColEdit';
+  pwBuffer = '';
+  updateDots();
+  document.getElementById('pw-error').textContent = '';
+  document.getElementById('pw-modal').classList.add('open');
+}
+
+function openSemColEdit() {
+  const p = pageTexts;
+  const g = id => document.getElementById(id);
+  g('pe-hd-req').value              = p.hdReq          ?? '필수과목';
+  g('pe-hd-사회과학-2').value       = p.hdSS2          ?? '사회&과학';
+  g('pe-hd-사회과학-hint-2').value  = p.hdSS2Hint      ?? '3개 선택';
+  g('pe-hd-사회과학-3').value       = p.hdSS3          ?? '사회&과학&예술';
+  g('pe-hd-사회과학-hint-3').value  = p.hdSS3Hint      ?? '3개 선택';
+  g('pe-hd-국수영').value           = p.hdKns          ?? '국&수&영';
+  g('pe-hd-국수영-hint').value      = p.hdKnsHint      ?? '1개 선택';
+  g('pe-hd-외국어').value           = p.hdForeign      ?? '외국어&교양';
+  g('pe-hd-외국어-hint').value      = p.hdForeignHint  ?? '1개 선택';
+  g('pe-hd-음악미술').value         = p.hdMus          ?? '음악&미술';
+  g('pe-hd-음악미술-hint').value    = p.hdMusHint      ?? '1개 선택';
+  g('pe-credit-req').value          = p.creditReq      ?? '3학점';
+  g('pe-credit-사회과학').value     = p.creditSS       ?? '3학점';
+  g('pe-credit-국수영').value       = p.creditKns      ?? '3학점';
+  g('pe-credit-외국어').value       = p.creditForeign  ?? '3학점';
+  g('pe-credit-음악미술').value     = p.creditMus      ?? '2학점';
+  document.getElementById('sem-col-edit-ok').classList.remove('show');
+  document.getElementById('sem-col-edit-modal').classList.add('open');
+}
+
+function closeSemColEdit() {
+  document.getElementById('sem-col-edit-modal').classList.remove('open');
+}
+
+function saveSemColEdit() {
+  const g = id => document.getElementById(id).value.trim();
+  pageTexts.hdReq         = g('pe-hd-req');
+  pageTexts.hdSS2         = g('pe-hd-사회과학-2');
+  pageTexts.hdSS2Hint     = g('pe-hd-사회과학-hint-2');
+  pageTexts.hdSS3         = g('pe-hd-사회과학-3');
+  pageTexts.hdSS3Hint     = g('pe-hd-사회과학-hint-3');
+  pageTexts.hdKns         = g('pe-hd-국수영');
+  pageTexts.hdKnsHint     = g('pe-hd-국수영-hint');
+  pageTexts.hdForeign     = g('pe-hd-외국어');
+  pageTexts.hdForeignHint = g('pe-hd-외국어-hint');
+  pageTexts.hdMus         = g('pe-hd-음악미술');
+  pageTexts.hdMusHint     = g('pe-hd-음악미술-hint');
+  pageTexts.creditReq     = g('pe-credit-req');
+  pageTexts.creditSS      = g('pe-credit-사회과학');
+  pageTexts.creditKns     = g('pe-credit-국수영');
+  pageTexts.creditForeign = g('pe-credit-외국어');
+  pageTexts.creditMus     = g('pe-credit-음악미술');
+  savePage();
+  applyPageTexts();
+  const ok = document.getElementById('sem-col-edit-ok');
+  ok.classList.add('show');
+  setTimeout(() => ok.classList.remove('show'), 2200);
+}
+
 function renderAllSemCols() {
   for (let i = 0; i < 4; i++) renderSemCol(i);
+  updateSemGridColumns();
 }
 
 const ELEC_KEYS = ['사회과학', '국수영', '외국어정보', '음악미술']; // ID용
@@ -3666,6 +3888,86 @@ function renderSemCol(colIdx) {
         elective.forEach(item => elecWrap.appendChild(makeCard(item)));
       }
     }
+  });
+
+  // ── Wide 자동 조절 ──────────────────────────────────────────
+  // 열별 과목 수 집계 → 6개 이상이면 wide(2fr), 미만이면 표준(1fr)
+  // grid col 순서: [학기명, req, 사회과학, 국수영, 외국어정보, 음악미술]
+  // colIdx(행) 는 0~3 이지만, wide 판단은 같은 행 내 각 타입별 합산
+  // → renderSemCol이 특정 colIdx 한 행만 그리므로 해당 행 기준으로 처리
+  const wideThreshold = 6;
+  const reqCount  = items.filter(x => x.type === '필수').length;
+  const counts = {
+    req:      reqCount,
+    사회과학: items.filter(x => ['사회&과학','사회&과학&예술'].includes(x.type)).length,
+    국수영:   items.filter(x => x.type === '국&수&영').length,
+    외국어정보: items.filter(x => x.type === '외국어&교양').length,
+    음악미술: items.filter(x => x.type === '음악&미술').length,
+  };
+
+  // 목록 래퍼에 .wide 클래스 토글
+  const listIds = {
+    req:       `sem-list-req-${colIdx}`,
+    사회과학:  `sem-list-elec-사회과학-${colIdx}`,
+    국수영:    `sem-list-elec-국수영-${colIdx}`,
+    외국어정보:`sem-list-elec-외국어정보-${colIdx}`,
+    음악미술:  `sem-list-elec-음악미술-${colIdx}`,
+  };
+  Object.entries(counts).forEach(([key, cnt]) => {
+    const el = document.getElementById(listIds[key]);
+    if (el) el.classList.toggle('wide', cnt >= wideThreshold);
+  });
+
+  // 그리드 컬럼 폭 재계산 (모든 4개 행 + 헤더에 동시 적용)
+  // 각 타입별로 어느 colIdx 행이든 wide 여부가 같아야 하므로
+  // 전체 semesterData 기준으로 열 폭을 결정
+  updateSemGridColumns();
+}
+
+/* ── 그리드 컬럼 폭 동적 조절 ──────────────────────────────────
+   전체 semesterData를 기준으로 각 과목군별 최대 과목 수를 계산하고
+   6개 이상이면 해당 열을 2fr(와이드), 미만이면 1fr(표준)로 설정.
+   sem-col-header-row 와 모든 .sem-row 에 동시 적용.
+────────────────────────────────────────────────────────────── */
+function updateSemGridColumns() {
+  const threshold = 6;
+
+  // 각 열의 최대 과목 수 (4개 학기 행 중 가장 많은 행 기준)
+  const maxReq = Math.max(...semesterData.map(col =>
+    col.filter(x => x.type === '필수').length));
+  const maxSS = Math.max(...semesterData.map(col =>
+    col.filter(x => ['사회&과학','사회&과학&예술'].includes(x.type)).length));
+  const maxKns = Math.max(...semesterData.map(col =>
+    col.filter(x => x.type === '국&수&영').length));
+  const maxFor = Math.max(...semesterData.map(col =>
+    col.filter(x => x.type === '외국어&교양').length));
+  const maxMus = Math.max(...semesterData.map(col =>
+    col.filter(x => x.type === '음악&미술').length));
+
+  const w = (cnt) => cnt >= threshold ? '2fr' : '1fr';
+  const colTemplate = `120px ${w(maxReq)} ${w(maxSS)} ${w(maxKns)} ${w(maxFor)} ${w(maxMus)}`;
+
+  // 헤더 행
+  const hdr = document.querySelector('.sem-col-header-row');
+  if (hdr) hdr.style.gridTemplateColumns = colTemplate;
+
+  // 모든 학기 행
+  document.querySelectorAll('.sem-row').forEach(row => {
+    row.style.gridTemplateColumns = colTemplate;
+  });
+
+  // 각 열 목록 전체에 .wide 토글 (모든 colIdx 행에 적용)
+  [0,1,2,3].forEach(ci => {
+    const reqEl  = document.getElementById(`sem-list-req-${ci}`);
+    const ssEl   = document.getElementById(`sem-list-elec-사회과학-${ci}`);
+    const knsEl  = document.getElementById(`sem-list-elec-국수영-${ci}`);
+    const forEl  = document.getElementById(`sem-list-elec-외국어정보-${ci}`);
+    const musEl  = document.getElementById(`sem-list-elec-음악미술-${ci}`);
+    if (reqEl)  reqEl.classList.toggle('wide',  maxReq >= threshold);
+    if (ssEl)   ssEl.classList.toggle('wide',   maxSS  >= threshold);
+    if (knsEl)  knsEl.classList.toggle('wide',  maxKns >= threshold);
+    if (forEl)  forEl.classList.toggle('wide',  maxFor >= threshold);
+    if (musEl)  musEl.classList.toggle('wide',  maxMus >= threshold);
   });
 }
 
