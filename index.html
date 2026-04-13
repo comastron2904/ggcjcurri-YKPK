@@ -12,6 +12,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;900&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
   // worker 파일을 fetch → Blob URL로 변환해 workerSrc에 설정
   // 이 방법은 same-origin 제약 없이 worker를 확실히 로드함
@@ -1281,8 +1282,149 @@
   .dept-btn.wide {
     grid-column: span 1;
   }
+  .dept-btn-wide {
+    grid-column: 1 / -1;
+  }
+  .dept-btn-search {
+    background: linear-gradient(135deg, rgba(42,138,138,0.15), rgba(26,58,110,0.2));
+    border-color: rgba(42,138,138,0.45);
+  }
+  .dept-btn-search:hover {
+    background: linear-gradient(135deg, rgba(42,138,138,0.28), rgba(26,58,110,0.32));
+    border-color: var(--accent-teal);
+  }
+  .dept-btn-search .dept-btn-icon { color: var(--accent-teal); }
+  .dept-btn-search .dept-btn-name { color: #7ee0e0; }
 
-  /* 학과 상세 패널 */
+  /* ══════════════════════════════════════
+     권장과목 검색 화면
+  ══════════════════════════════════════ */
+  #subject-search-screen {
+    position: fixed; inset: 0; background: var(--deep-navy); z-index: 760;
+    display: flex; flex-direction: column;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+    overflow: hidden;
+  }
+  #subject-search-screen.open { opacity: 1; pointer-events: all; }
+
+  .ss-header {
+    flex-shrink: 0; padding: 24px 36px 20px;
+    display: flex; align-items: center; gap: 20px;
+    border-bottom: 1px solid rgba(201,168,76,0.15);
+    background: rgba(10,22,40,0.6); backdrop-filter: blur(10px);
+  }
+  .ss-back {
+    background: none; border: 1px solid rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.6); font-family: 'Noto Sans KR', sans-serif;
+    font-size: 13px; padding: 8px 16px; cursor: pointer; transition: all 0.2s;
+  }
+  .ss-back:hover { border-color: var(--gold); color: var(--gold); }
+  .ss-header-info .ss-label { font-size: 9px; letter-spacing: 4px; color: var(--accent-teal); margin-bottom: 4px; }
+  .ss-header-info .ss-title { font-family: 'Noto Serif KR', serif; font-size: 20px; font-weight: 900; color: var(--white); }
+
+  .ss-body { flex: 1; overflow-y: auto; padding: 28px 36px 40px; }
+  .ss-body::-webkit-scrollbar { width: 5px; }
+  .ss-body::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.25); border-radius: 3px; }
+
+  /* 파일 업로드 영역 */
+  .ss-upload-zone {
+    border: 2px dashed rgba(42,138,138,0.4);
+    padding: 40px; text-align: center;
+    cursor: pointer; transition: all 0.2s;
+    margin-bottom: 28px;
+  }
+  .ss-upload-zone:hover { border-color: var(--accent-teal); background: rgba(42,138,138,0.06); }
+  .ss-upload-zone.has-data { border-color: rgba(42,138,138,0.6); background: rgba(42,138,138,0.08); }
+  .ss-upload-icon { font-size: 32px; margin-bottom: 12px; }
+  .ss-upload-title { font-size: 15px; font-weight: 700; color: var(--white); margin-bottom: 6px; }
+  .ss-upload-desc { font-size: 12px; color: rgba(255,255,255,0.4); letter-spacing: 0.5px; }
+  .ss-upload-file-input { display: none; }
+
+  /* 선택 단계 */
+  .ss-steps { display: flex; flex-direction: column; gap: 18px; margin-bottom: 28px; }
+  .ss-step {
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(255,255,255,0.07);
+    padding: 20px 24px;
+    transition: border-color 0.2s;
+  }
+  .ss-step.active { border-color: rgba(201,168,76,0.3); }
+  .ss-step-label {
+    font-size: 9px; letter-spacing: 3px; color: rgba(201,168,76,0.6);
+    margin-bottom: 12px; display: flex; align-items: center; gap: 10px;
+  }
+  .ss-step-label::after { content:''; flex:1; height:1px; background: rgba(201,168,76,0.1); }
+  .ss-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .ss-chip {
+    padding: 8px 16px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.65);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 13px; cursor: pointer; transition: all 0.18s;
+  }
+  .ss-chip:hover { background: rgba(201,168,76,0.1); border-color: rgba(201,168,76,0.35); color: var(--white); }
+  .ss-chip.selected { background: rgba(201,168,76,0.18); border-color: var(--gold); color: var(--gold); font-weight: 700; }
+
+  /* 결과 카드 */
+  .ss-result {
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(42,138,138,0.35);
+    padding: 28px 28px 24px;
+  }
+  .ss-result-header {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    margin-bottom: 22px; padding-bottom: 18px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+  .ss-result-univ { font-size: 10px; letter-spacing: 3px; color: var(--accent-teal); margin-bottom: 6px; }
+  .ss-result-dept { font-family: 'Noto Serif KR', serif; font-size: 20px; font-weight: 900; color: var(--white); }
+  .ss-result-region { font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 4px; }
+
+  .ss-subject-section { margin-bottom: 20px; }
+  .ss-subject-section:last-child { margin-bottom: 0; }
+  .ss-subject-section-title {
+    font-size: 9px; letter-spacing: 3px; font-weight: 700;
+    margin-bottom: 10px; display: flex; align-items: center; gap: 10px;
+  }
+  .ss-subject-section-title.core { color: #e8c97a; }
+  .ss-subject-section-title.rec { color: #7ee0e0; }
+  .ss-subject-section-title.integrated { color: #b0c4ff; }
+  .ss-subject-section-title::after { content:''; flex:1; height:1px; background: currentColor; opacity: 0.2; }
+
+  .ss-subject-text {
+    font-size: 14px; line-height: 1.85; color: rgba(255,255,255,0.82);
+    padding: 14px 16px;
+    background: rgba(255,255,255,0.03);
+    border-left: 3px solid;
+  }
+  .ss-subject-text.core { border-color: #c9a84c; }
+  .ss-subject-text.rec { border-color: var(--accent-teal); }
+  .ss-subject-text.integrated { border-color: #7088d0; }
+
+  .ss-note {
+    margin-top: 16px; padding: 12px 16px;
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(255,255,255,0.07);
+    font-size: 12px; color: rgba(255,255,255,0.4); line-height: 1.7;
+  }
+  .ss-note-label { font-size: 9px; letter-spacing: 2px; color: rgba(255,255,255,0.25); margin-bottom: 6px; }
+
+  .ss-no-data { text-align: center; padding: 40px; color: rgba(255,255,255,0.3); font-size: 13px; letter-spacing: 1px; }
+
+  .ss-reset-btn {
+    margin-top: 24px; padding: 12px 28px;
+    background: none; border: 1px solid rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.45); font-family: 'Noto Sans KR', sans-serif;
+    font-size: 12px; cursor: pointer; transition: all 0.2s; letter-spacing: 1px;
+  }
+  .ss-reset-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+  @media (max-width: 600px) {
+    .ss-header { padding: 18px 18px 16px; }
+    .ss-body { padding: 20px 18px 32px; }
+    .dept-btn-wide { grid-column: 1 / -1; }
+  }
   #dept-detail-panel {
     position: fixed; inset: 0; background: var(--deep-navy); z-index: 750;
     display: flex; flex-direction: column;
@@ -2504,6 +2646,72 @@
         <div class="dept-btn-desc">계열 무관 자유 선택</div>
         <div class="dept-btn-arrow">↓</div>
       </button>
+      <button class="dept-btn dept-btn-wide dept-btn-search" onclick="openSubjectSearch()">
+        <div class="dept-btn-icon">🔍</div>
+        <div class="dept-btn-name">권장과목 검색</div>
+        <div class="dept-btn-desc">대학별 권역·모집단위별 권장과목 확인</div>
+        <div class="dept-btn-arrow">→</div>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     권장과목 검색 화면
+═══════════════════════════════════════ -->
+<div id="subject-search-screen">
+  <div class="ss-header">
+    <button class="ss-back" onclick="closeSubjectSearch()">← 뒤로</button>
+    <div class="ss-header-info">
+      <div class="ss-label">RECOMMENDED SUBJECTS · 2028학년도</div>
+      <div class="ss-title">권장과목 검색</div>
+    </div>
+    <button class="detail-home" onclick="closeSubjectSearch();closeDeptScreen();" title="메인화면으로">🏠</button>
+  </div>
+  <div class="ss-body">
+    <!-- 파일 업로드 영역 -->
+    <div class="ss-upload-zone" id="ss-upload-zone" onclick="document.getElementById('ss-file-input').click()">
+      <div class="ss-upload-icon">📊</div>
+      <div class="ss-upload-title" id="ss-upload-title">엑셀 파일을 업로드하세요</div>
+      <div class="ss-upload-desc" id="ss-upload-desc">2028학년도_권역별_대학별_권장과목.xlsx 파일을 클릭하여 선택</div>
+      <input class="ss-upload-file-input" id="ss-file-input" type="file" accept=".xlsx,.xls" onchange="handleSSFileUpload(this)">
+    </div>
+
+    <!-- 선택 단계들 -->
+    <div class="ss-steps" id="ss-steps" style="display:none">
+
+      <!-- 1단계: 권역 선택 -->
+      <div class="ss-step" id="ss-step-region">
+        <div class="ss-step-label">STEP 1 · 권역 선택</div>
+        <div class="ss-chips" id="ss-chips-region"></div>
+      </div>
+
+      <!-- 2단계: 지역 선택 -->
+      <div class="ss-step" id="ss-step-area" style="display:none">
+        <div class="ss-step-label">STEP 2 · 지역 선택</div>
+        <div class="ss-chips" id="ss-chips-area"></div>
+      </div>
+
+      <!-- 3단계: 대학명 선택 -->
+      <div class="ss-step" id="ss-step-univ" style="display:none">
+        <div class="ss-step-label">STEP 3 · 대학명 선택</div>
+        <div class="ss-chips" id="ss-chips-univ"></div>
+      </div>
+
+      <!-- 4단계: 모집단위 선택 -->
+      <div class="ss-step" id="ss-step-dept" style="display:none">
+        <div class="ss-step-label">STEP 4 · 모집단위 선택</div>
+        <div class="ss-chips" id="ss-chips-dept"></div>
+      </div>
+
+    </div>
+
+    <!-- 결과 표시 -->
+    <div id="ss-result-area" style="display:none"></div>
+
+    <!-- 초기화 버튼 -->
+    <div id="ss-reset-wrap" style="display:none;text-align:center">
+      <button class="ss-reset-btn" onclick="resetSSSelection()">↺ 다시 선택하기</button>
     </div>
   </div>
 </div>
@@ -4207,7 +4415,230 @@ function createBlockEl(b, idx) {
   return div;
 }
 
-/* ── PDF.js worker는 head에서 초기화 완료 ── */
+/* ──────────────────────────────
+   권장과목 검색 기능
+────────────────────────────── */
+let ssData = [];       // 업로드된 엑셀 데이터
+let ssSelected = { region: null, area: null, univ: null, dept: null };
+
+function openSubjectSearch() {
+  document.getElementById('subject-search-screen').classList.add('open');
+}
+function closeSubjectSearch() {
+  document.getElementById('subject-search-screen').classList.remove('open');
+}
+
+// 엑셀 파일 업로드 처리
+function handleSSFileUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data, { type: 'array' });
+      const ws = workbook.Sheets[workbook.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: null });
+
+      ssData = [];
+      let prevRegion = null, prevArea = null, prevUniv = null;
+
+      for (let i = 4; i < rows.length; i++) {
+        const row = rows[i];
+        if (!row || row.length < 4) continue;
+
+        const region = row[0] || prevRegion;
+        const area   = row[1] || prevArea;
+        const univ   = row[2] || prevUniv;
+        const dept   = row[3] ? String(row[3]).replace(/\n/g, ' ').trim() : null;
+
+        if (!region || !dept) continue;
+
+        prevRegion = region;
+        prevArea   = area;
+        prevUniv   = univ;
+
+        const core = row[5] ? String(row[5]).replace(/\n/g, '\n').trim() : '';
+        const rec  = row[6] ? String(row[6]).replace(/\n/g, '\n').trim() : '';
+        const note = row[7] ? String(row[7]).replace(/\n/g, '\n').trim() : '';
+        const integrated = (!rec || rec === '-');
+
+        ssData.push({ r: region, a: area, u: univ, d: dept, c: core, rec, n: note, int: integrated });
+      }
+
+      if (ssData.length === 0) {
+        alert('데이터를 읽지 못했습니다. 올바른 엑셀 파일인지 확인해주세요.');
+        return;
+      }
+
+      // 업로드 UI 업데이트
+      const zone = document.getElementById('ss-upload-zone');
+      zone.classList.add('has-data');
+      document.getElementById('ss-upload-title').textContent = `✓ ${file.name}`;
+      document.getElementById('ss-upload-desc').textContent = `총 ${ssData.length}개 모집단위 로드 완료 · 클릭하여 파일 변경`;
+
+      // 선택 초기화 후 1단계 표시
+      ssSelected = { region: null, area: null, univ: null, dept: null };
+      document.getElementById('ss-result-area').style.display = 'none';
+      document.getElementById('ss-reset-wrap').style.display = 'none';
+      renderSSStep('region');
+      document.getElementById('ss-steps').style.display = 'flex';
+
+    } catch(err) {
+      alert('파일을 읽는 중 오류가 발생했습니다.\n' + err.message);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+// 고유값 추출 (순서 유지)
+function ssUnique(arr) {
+  return [...new Set(arr.filter(v => v))];
+}
+
+// 각 단계 칩 렌더링
+function renderSSStep(step) {
+  const steps = ['region', 'area', 'univ', 'dept'];
+  const labels = { region: 'STEP 1 · 권역 선택', area: 'STEP 2 · 지역 선택', univ: 'STEP 3 · 대학명 선택', dept: 'STEP 4 · 모집단위 선택' };
+  const stepIdx = steps.indexOf(step);
+
+  // 해당 단계 이후 숨기기
+  steps.forEach((s, idx) => {
+    const el = document.getElementById('ss-step-' + s);
+    if (idx < stepIdx) {
+      el.style.display = '';
+      el.classList.add('active');
+    } else if (idx === stepIdx) {
+      el.style.display = '';
+      el.classList.add('active');
+    } else {
+      el.style.display = 'none';
+      el.classList.remove('active');
+      ssSelected[s] = null;
+    }
+  });
+
+  // 필터링
+  let filtered = ssData;
+  if (ssSelected.region) filtered = filtered.filter(d => d.r === ssSelected.region);
+  if (ssSelected.area)   filtered = filtered.filter(d => d.a === ssSelected.area);
+  if (ssSelected.univ)   filtered = filtered.filter(d => d.u === ssSelected.univ);
+
+  const keyMap = { region: 'r', area: 'a', univ: 'u', dept: 'd' };
+  const values = ssUnique(filtered.map(d => d[keyMap[step]]));
+
+  const chipsEl = document.getElementById('ss-chips-' + step);
+  chipsEl.innerHTML = '';
+  values.forEach(val => {
+    const chip = document.createElement('button');
+    chip.className = 'ss-chip';
+    if (ssSelected[step] === val) chip.classList.add('selected');
+    chip.textContent = val;
+    chip.onclick = () => selectSSChip(step, val);
+    chipsEl.appendChild(chip);
+  });
+}
+
+function selectSSChip(step, val) {
+  ssSelected[step] = val;
+
+  // 칩 selected 표시 갱신
+  document.querySelectorAll('#ss-chips-' + step + ' .ss-chip').forEach(c => {
+    c.classList.toggle('selected', c.textContent === val);
+  });
+
+  const steps = ['region', 'area', 'univ', 'dept'];
+  const nextIdx = steps.indexOf(step) + 1;
+
+  if (nextIdx < steps.length) {
+    renderSSStep(steps[nextIdx]);
+    document.getElementById('ss-result-area').style.display = 'none';
+    document.getElementById('ss-reset-wrap').style.display = 'none';
+  } else {
+    // 모집단위까지 선택 완료 → 결과 표시
+    showSSResult();
+  }
+}
+
+function showSSResult() {
+  const match = ssData.find(d =>
+    d.r === ssSelected.region &&
+    d.a === ssSelected.area &&
+    d.u === ssSelected.univ &&
+    d.d === ssSelected.dept
+  );
+
+  const area = document.getElementById('ss-result-area');
+  area.style.display = 'block';
+  document.getElementById('ss-reset-wrap').style.display = 'block';
+
+  if (!match) {
+    area.innerHTML = '<div class="ss-no-data">해당 모집단위의 데이터를 찾을 수 없습니다.</div>';
+    return;
+  }
+
+  // 핵심·권장 통합 여부 판단
+  const isIntegrated = match.int || (!match.rec || match.rec === '-' || match.rec === '');
+  const hasNote = match.n && match.n !== '-' && match.n !== 'None' && match.n.trim() !== '';
+  const noteHtml = hasNote ? `
+    <div class="ss-note">
+      <div class="ss-note-label">비 고</div>
+      ${escHtml(match.n)}
+    </div>` : '';
+
+  let subjectHtml = '';
+  if (isIntegrated) {
+    // 통합: 핵심+권장 구분 없이 하나로
+    subjectHtml = `
+      <div class="ss-subject-section">
+        <div class="ss-subject-section-title integrated">반영과목</div>
+        <div class="ss-subject-text integrated">${escHtml(match.c || '정보 없음')}</div>
+      </div>`;
+  } else {
+    // 분리: 핵심과목 / 권장과목 따로
+    subjectHtml = `
+      <div class="ss-subject-section">
+        <div class="ss-subject-section-title core">핵심과목</div>
+        <div class="ss-subject-text core">${escHtml(match.c || '-')}</div>
+      </div>
+      <div class="ss-subject-section">
+        <div class="ss-subject-section-title rec">권장과목</div>
+        <div class="ss-subject-text rec">${escHtml(match.rec)}</div>
+      </div>`;
+  }
+
+  area.innerHTML = `
+    <div class="ss-result">
+      <div class="ss-result-header">
+        <div>
+          <div class="ss-result-univ">${escHtml(match.u)}</div>
+          <div class="ss-result-dept">${escHtml(match.d)}</div>
+          <div class="ss-result-region">${escHtml(match.r)} · ${escHtml(match.a)}</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.25);letter-spacing:1px;text-align:right">
+          ${isIntegrated ? '통합 표기' : '구분 표기'}
+        </div>
+      </div>
+      ${subjectHtml}
+      ${noteHtml}
+    </div>`;
+
+  // 결과로 스크롤
+  setTimeout(() => area.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+}
+
+function resetSSSelection() {
+  ssSelected = { region: null, area: null, univ: null, dept: null };
+  document.getElementById('ss-result-area').style.display = 'none';
+  document.getElementById('ss-reset-wrap').style.display = 'none';
+  renderSSStep('region');
+
+  // 스크롤 위로
+  document.querySelector('#subject-search-screen .ss-body').scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+
 
 /* PDF 뷰어 상태 (blockId+fileIdx → {pdfDoc, currentPage, totalPages, canvases[]}) */
 const pdfViewerState = {};
