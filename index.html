@@ -1282,9 +1282,6 @@
   .dept-btn.wide {
     grid-column: span 1;
   }
-  .dept-btn-wide {
-    grid-column: 1 / -1;
-  }
   .dept-btn-search {
     background: linear-gradient(135deg, rgba(42,138,138,0.15), rgba(26,58,110,0.2));
     border-color: rgba(42,138,138,0.45);
@@ -1378,6 +1375,7 @@
     border-bottom: 1px solid rgba(255,255,255,0.07);
   }
   .ss-result-univ { font-size: 10px; letter-spacing: 3px; color: var(--accent-teal); margin-bottom: 6px; }
+  .ss-result-dept-group { font-size: 11px; color: rgba(201,168,76,0.55); letter-spacing: 1px; margin-bottom: 3px; }
   .ss-result-dept { font-family: 'Noto Serif KR', serif; font-size: 20px; font-weight: 900; color: var(--white); }
   .ss-result-region { font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 4px; }
 
@@ -2646,7 +2644,7 @@
         <div class="dept-btn-desc">계열 무관 자유 선택</div>
         <div class="dept-btn-arrow">↓</div>
       </button>
-      <button class="dept-btn dept-btn-wide dept-btn-search" onclick="openSubjectSearch()">
+      <button class="dept-btn dept-btn-search" onclick="openSubjectSearch()">
         <div class="dept-btn-icon">🔍</div>
         <div class="dept-btn-name">권장과목 검색</div>
         <div class="dept-btn-desc">대학별 권역·모집단위별 권장과목 확인</div>
@@ -2698,10 +2696,16 @@
         <div class="ss-chips" id="ss-chips-univ"></div>
       </div>
 
-      <!-- 4단계: 모집단위 선택 -->
-      <div class="ss-step" id="ss-step-dept" style="display:none">
+      <!-- 4단계: 모집단위(계열/그룹) 선택 -->
+      <div class="ss-step" id="ss-step-dept1" style="display:none">
         <div class="ss-step-label">STEP 4 · 모집단위 선택</div>
-        <div class="ss-chips" id="ss-chips-dept"></div>
+        <div class="ss-chips" id="ss-chips-dept1"></div>
+      </div>
+
+      <!-- 5단계: 세부 모집단위 선택 (분리형일 때만 표시) -->
+      <div class="ss-step" id="ss-step-dept2" style="display:none">
+        <div class="ss-step-label">STEP 5 · 세부 모집단위 선택</div>
+        <div class="ss-chips" id="ss-chips-dept2"></div>
       </div>
 
     </div>
@@ -4418,8 +4422,9 @@ function createBlockEl(b, idx) {
 /* ──────────────────────────────
    권장과목 검색 기능
 ────────────────────────────── */
-let ssData = [];       // 업로드된 엑셀 데이터
-let ssSelected = { region: null, area: null, univ: null, dept: null };
+let ssData = [];
+// ssSelected: region, area, univ, dept1(col3), dept2(col4 or null)
+let ssSelected = { region: null, area: null, univ: null, dept1: null, dept2: null };
 
 function openSubjectSearch() {
   document.getElementById('subject-search-screen').classList.add('open');
@@ -4432,7 +4437,6 @@ function closeSubjectSearch() {
 function handleSSFileUpload(input) {
   const file = input.files[0];
   if (!file) return;
-
   const reader = new FileReader();
   reader.onload = function(e) {
     try {
@@ -4448,23 +4452,28 @@ function handleSSFileUpload(input) {
         const row = rows[i];
         if (!row || row.length < 4) continue;
 
-        const region = row[0] || prevRegion;
-        const area   = row[1] || prevArea;
-        const univ   = row[2] || prevUniv;
-        const dept   = row[3] ? String(row[3]).replace(/\n/g, ' ').trim() : null;
+        const region = row[0] ? String(row[0]).trim() : prevRegion;
+        const area   = row[1] ? String(row[1]).trim() : prevArea;
+        const univ   = row[2] ? String(row[2]).trim() : prevUniv;
+        const col3   = row[3] ? String(row[3]).replace(/\n/g, ' ').trim() : null;
+        const col4   = row[4] ? String(row[4]).replace(/\n/g, ' ').trim() : null;
 
-        if (!region || !dept) continue;
-
-        prevRegion = region;
-        prevArea   = area;
-        prevUniv   = univ;
+        if (!region || !col3) continue;
+        prevRegion = region; prevArea = area; prevUniv = univ;
 
         const core = row[5] ? String(row[5]).replace(/\n/g, '\n').trim() : '';
         const rec  = row[6] ? String(row[6]).replace(/\n/g, '\n').trim() : '';
         const note = row[7] ? String(row[7]).replace(/\n/g, '\n').trim() : '';
         const integrated = (!rec || rec === '-');
 
-        ssData.push({ r: region, a: area, u: univ, d: dept, c: core, rec, n: note, int: integrated });
+        // col4가 있으면 분리형, 없으면 단일형
+        ssData.push({
+          r: region, a: area, u: univ,
+          d1: col3,               // 계열/그룹 (항상 존재)
+          d2: col4 || null,       // 세부 모집단위 (없으면 null → 단일형)
+          split: !!col4,          // 분리형 여부
+          c: core, rec, n: note, int: integrated
+        });
       }
 
       if (ssData.length === 0) {
@@ -4472,19 +4481,16 @@ function handleSSFileUpload(input) {
         return;
       }
 
-      // 업로드 UI 업데이트
       const zone = document.getElementById('ss-upload-zone');
       zone.classList.add('has-data');
       document.getElementById('ss-upload-title').textContent = `✓ ${file.name}`;
       document.getElementById('ss-upload-desc').textContent = `총 ${ssData.length}개 모집단위 로드 완료 · 클릭하여 파일 변경`;
 
-      // 선택 초기화 후 1단계 표시
-      ssSelected = { region: null, area: null, univ: null, dept: null };
+      ssSelected = { region: null, area: null, univ: null, dept1: null, dept2: null };
       document.getElementById('ss-result-area').style.display = 'none';
       document.getElementById('ss-reset-wrap').style.display = 'none';
-      renderSSStep('region');
+      renderSSSteps();
       document.getElementById('ss-steps').style.display = 'flex';
-
     } catch(err) {
       alert('파일을 읽는 중 오류가 발생했습니다.\n' + err.message);
     }
@@ -4492,82 +4498,138 @@ function handleSSFileUpload(input) {
   reader.readAsArrayBuffer(file);
 }
 
-// 고유값 추출 (순서 유지)
 function ssUnique(arr) {
   return [...new Set(arr.filter(v => v))];
 }
 
-// 각 단계 칩 렌더링
-function renderSSStep(step) {
-  const steps = ['region', 'area', 'univ', 'dept'];
-  const labels = { region: 'STEP 1 · 권역 선택', area: 'STEP 2 · 지역 선택', univ: 'STEP 3 · 대학명 선택', dept: 'STEP 4 · 모집단위 선택' };
-  const stepIdx = steps.indexOf(step);
-
-  // 해당 단계 이후 숨기기
-  steps.forEach((s, idx) => {
-    const el = document.getElementById('ss-step-' + s);
-    if (idx < stepIdx) {
-      el.style.display = '';
-      el.classList.add('active');
-    } else if (idx === stepIdx) {
-      el.style.display = '';
-      el.classList.add('active');
-    } else {
-      el.style.display = 'none';
-      el.classList.remove('active');
-      ssSelected[s] = null;
-    }
-  });
-
-  // 필터링
-  let filtered = ssData;
-  if (ssSelected.region) filtered = filtered.filter(d => d.r === ssSelected.region);
-  if (ssSelected.area)   filtered = filtered.filter(d => d.a === ssSelected.area);
-  if (ssSelected.univ)   filtered = filtered.filter(d => d.u === ssSelected.univ);
-
-  const keyMap = { region: 'r', area: 'a', univ: 'u', dept: 'd' };
-  const values = ssUnique(filtered.map(d => d[keyMap[step]]));
-
-  const chipsEl = document.getElementById('ss-chips-' + step);
-  chipsEl.innerHTML = '';
-  values.forEach(val => {
-    const chip = document.createElement('button');
-    chip.className = 'ss-chip';
-    if (ssSelected[step] === val) chip.classList.add('selected');
-    chip.textContent = val;
-    chip.onclick = () => selectSSChip(step, val);
-    chipsEl.appendChild(chip);
-  });
+// 현재 선택 상태에 맞게 필터링된 데이터 반환
+function ssFiltered() {
+  let f = ssData;
+  if (ssSelected.region) f = f.filter(d => d.r === ssSelected.region);
+  if (ssSelected.area)   f = f.filter(d => d.a === ssSelected.area);
+  if (ssSelected.univ)   f = f.filter(d => d.u === ssSelected.univ);
+  if (ssSelected.dept1)  f = f.filter(d => d.d1 === ssSelected.dept1);
+  return f;
 }
 
-function selectSSChip(step, val) {
-  ssSelected[step] = val;
-
-  // 칩 selected 표시 갱신
-  document.querySelectorAll('#ss-chips-' + step + ' .ss-chip').forEach(c => {
-    c.classList.toggle('selected', c.textContent === val);
-  });
-
-  const steps = ['region', 'area', 'univ', 'dept'];
-  const nextIdx = steps.indexOf(step) + 1;
-
-  if (nextIdx < steps.length) {
-    renderSSStep(steps[nextIdx]);
-    document.getElementById('ss-result-area').style.display = 'none';
-    document.getElementById('ss-reset-wrap').style.display = 'none';
+// 전체 단계 재렌더링
+function renderSSSteps() {
+  // STEP 1~3: 권역/지역/대학 (항상 표시)
+  renderChips('region', ssUnique(ssFiltered_upTo('univ').map(d => d.r)), ssSelected.region);
+  if (ssSelected.region) {
+    renderChips('area', ssUnique(ssFiltered_upTo('area').map(d => d.a)), ssSelected.area);
+    showStep('area');
   } else {
-    // 모집단위까지 선택 완료 → 결과 표시
-    showSSResult();
+    hideStep('area'); hideStep('univ'); hideStep('dept1'); hideStep('dept2');
+    return;
+  }
+  if (ssSelected.area) {
+    renderChips('univ', ssUnique(ssFiltered_upTo('univ').map(d => d.u)), ssSelected.univ);
+    showStep('univ');
+  } else {
+    hideStep('univ'); hideStep('dept1'); hideStep('dept2');
+    return;
+  }
+  if (ssSelected.univ) {
+    // STEP 4: d1(계열/모집단위)
+    const d1vals = ssUnique(ssFiltered_upTo('dept1').map(d => d.d1));
+    renderChips('dept1', d1vals, ssSelected.dept1);
+    showStep('dept1');
+  } else {
+    hideStep('dept1'); hideStep('dept2');
+    return;
+  }
+  if (ssSelected.dept1) {
+    // d1 선택 후: 해당 d1에 분리형 데이터가 있는지 확인
+    const afterD1 = ssFiltered();
+    const hasSplit = afterD1.some(d => d.split);
+    const allSingle = afterD1.every(d => !d.split);
+
+    if (allSingle) {
+      // 단일형만 있으면 바로 결과 (d2 단계 불필요)
+      hideStep('dept2');
+      showSSResult();
+    } else if (hasSplit) {
+      // 분리형 있음 → STEP 5: d2 선택
+      const d2vals = ssUnique(afterD1.filter(d => d.split).map(d => d.d2));
+      renderChips('dept2', d2vals, ssSelected.dept2);
+      showStep('dept2');
+      if (ssSelected.dept2) showSSResult();
+      else { document.getElementById('ss-result-area').style.display = 'none'; document.getElementById('ss-reset-wrap').style.display = 'none'; }
+    }
+  } else {
+    hideStep('dept2');
   }
 }
 
+// 특정 단계까지의 필터 (선택값 누적)
+function ssFiltered_upTo(upTo) {
+  let f = ssData;
+  if (upTo === 'area' || upTo === 'univ' || upTo === 'dept1') {
+    if (ssSelected.region) f = f.filter(d => d.r === ssSelected.region);
+  }
+  if (upTo === 'univ' || upTo === 'dept1') {
+    if (ssSelected.area) f = f.filter(d => d.a === ssSelected.area);
+  }
+  if (upTo === 'dept1') {
+    if (ssSelected.univ) f = f.filter(d => d.u === ssSelected.univ);
+  }
+  return f;
+}
+
+function renderChips(stepId, values, selectedVal) {
+  const el = document.getElementById('ss-chips-' + stepId);
+  el.innerHTML = '';
+  values.forEach(val => {
+    const chip = document.createElement('button');
+    chip.className = 'ss-chip' + (selectedVal === val ? ' selected' : '');
+    chip.textContent = val;
+    chip.onclick = () => selectSSChip(stepId, val);
+    el.appendChild(chip);
+  });
+}
+
+function showStep(id) { document.getElementById('ss-step-' + id).style.display = ''; }
+function hideStep(id) {
+  document.getElementById('ss-step-' + id).style.display = 'none';
+  // 선택값도 초기화
+  if (id === 'region') ssSelected.region = null;
+  if (id === 'area')   ssSelected.area   = null;
+  if (id === 'univ')   ssSelected.univ   = null;
+  if (id === 'dept1')  ssSelected.dept1  = null;
+  if (id === 'dept2')  ssSelected.dept2  = null;
+}
+
+function selectSSChip(stepId, val) {
+  // 선택값 저장 및 하위 초기화
+  if (stepId === 'region') { ssSelected.region = val; ssSelected.area = null; ssSelected.univ = null; ssSelected.dept1 = null; ssSelected.dept2 = null; }
+  if (stepId === 'area')   { ssSelected.area   = val; ssSelected.univ = null; ssSelected.dept1 = null; ssSelected.dept2 = null; }
+  if (stepId === 'univ')   { ssSelected.univ   = val; ssSelected.dept1 = null; ssSelected.dept2 = null; }
+  if (stepId === 'dept1')  { ssSelected.dept1  = val; ssSelected.dept2 = null; }
+  if (stepId === 'dept2')  { ssSelected.dept2  = val; }
+
+  document.getElementById('ss-result-area').style.display = 'none';
+  document.getElementById('ss-reset-wrap').style.display = 'none';
+  renderSSSteps();
+}
+
 function showSSResult() {
-  const match = ssData.find(d =>
-    d.r === ssSelected.region &&
-    d.a === ssSelected.area &&
-    d.u === ssSelected.univ &&
-    d.d === ssSelected.dept
-  );
+  // 매칭 데이터 찾기
+  let match = null;
+  if (ssSelected.dept2) {
+    // 분리형: d1+d2 모두 일치
+    match = ssData.find(d =>
+      d.r === ssSelected.region && d.a === ssSelected.area &&
+      d.u === ssSelected.univ   && d.d1 === ssSelected.dept1 &&
+      d.split && d.d2 === ssSelected.dept2
+    );
+  } else {
+    // 단일형: d1만 일치하며 split=false
+    match = ssData.find(d =>
+      d.r === ssSelected.region && d.a === ssSelected.area &&
+      d.u === ssSelected.univ   && d.d1 === ssSelected.dept1 && !d.split
+    );
+  }
 
   const area = document.getElementById('ss-result-area');
   area.style.display = 'block';
@@ -4578,25 +4640,21 @@ function showSSResult() {
     return;
   }
 
-  // 핵심·권장 통합 여부 판단
   const isIntegrated = match.int || (!match.rec || match.rec === '-' || match.rec === '');
   const hasNote = match.n && match.n !== '-' && match.n !== 'None' && match.n.trim() !== '';
-  const noteHtml = hasNote ? `
-    <div class="ss-note">
-      <div class="ss-note-label">비 고</div>
-      ${escHtml(match.n)}
-    </div>` : '';
+  const noteHtml = hasNote ? `<div class="ss-note"><div class="ss-note-label">비 고</div>${escHtml(match.n)}</div>` : '';
+
+  // 표시할 모집단위명: 분리형이면 d2, 단일형이면 d1
+  const deptDisplay = match.split ? match.d2 : match.d1;
+  const deptSub = match.split ? `<div class="ss-result-dept-group">${escHtml(match.d1)}</div>` : '';
 
   let subjectHtml = '';
   if (isIntegrated) {
-    // 통합: 핵심+권장 구분 없이 하나로
-    subjectHtml = `
-      <div class="ss-subject-section">
-        <div class="ss-subject-section-title integrated">반영과목</div>
-        <div class="ss-subject-text integrated">${escHtml(match.c || '정보 없음')}</div>
-      </div>`;
+    subjectHtml = `<div class="ss-subject-section">
+      <div class="ss-subject-section-title integrated">반영과목</div>
+      <div class="ss-subject-text integrated">${escHtml(match.c || '정보 없음')}</div>
+    </div>`;
   } else {
-    // 분리: 핵심과목 / 권장과목 따로
     subjectHtml = `
       <div class="ss-subject-section">
         <div class="ss-subject-section-title core">핵심과목</div>
@@ -4613,7 +4671,8 @@ function showSSResult() {
       <div class="ss-result-header">
         <div>
           <div class="ss-result-univ">${escHtml(match.u)}</div>
-          <div class="ss-result-dept">${escHtml(match.d)}</div>
+          ${deptSub}
+          <div class="ss-result-dept">${escHtml(deptDisplay)}</div>
           <div class="ss-result-region">${escHtml(match.r)} · ${escHtml(match.a)}</div>
         </div>
         <div style="font-size:11px;color:rgba(255,255,255,0.25);letter-spacing:1px;text-align:right">
@@ -4624,17 +4683,14 @@ function showSSResult() {
       ${noteHtml}
     </div>`;
 
-  // 결과로 스크롤
   setTimeout(() => area.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
 }
 
 function resetSSSelection() {
-  ssSelected = { region: null, area: null, univ: null, dept: null };
+  ssSelected = { region: null, area: null, univ: null, dept1: null, dept2: null };
   document.getElementById('ss-result-area').style.display = 'none';
   document.getElementById('ss-reset-wrap').style.display = 'none';
-  renderSSStep('region');
-
-  // 스크롤 위로
+  renderSSSteps();
   document.querySelector('#subject-search-screen .ss-body').scrollTo({ top: 0, behavior: 'smooth' });
 }
 
