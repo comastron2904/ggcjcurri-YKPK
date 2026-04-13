@@ -1388,6 +1388,7 @@
   .ss-subject-section-title.core { color: #e8c97a; }
   .ss-subject-section-title.rec { color: #7ee0e0; }
   .ss-subject-section-title.integrated { color: #b0c4ff; }
+  .ss-subject-section-title.note { color: var(--gold); opacity: 0.8; }
   .ss-subject-section-title::after { content:''; flex:1; height:1px; background: currentColor; opacity: 0.2; }
 
   .ss-subject-text {
@@ -1399,14 +1400,22 @@
   .ss-subject-text.core { border-color: #c9a84c; }
   .ss-subject-text.rec { border-color: var(--accent-teal); }
   .ss-subject-text.integrated { border-color: #7088d0; }
+  .ss-subject-text.note { border-color: rgba(201,168,76,0.5); color: rgba(255,255,255,0.65); font-size: 13px; }
 
   .ss-note {
-    margin-top: 16px; padding: 12px 16px;
-    background: rgba(255,255,255,0.025);
-    border: 1px solid rgba(255,255,255,0.07);
-    font-size: 12px; color: rgba(255,255,255,0.4); line-height: 1.7;
+    margin-top: 20px; padding: 14px 16px;
+    background: rgba(201,168,76,0.05);
+    border: 1px solid rgba(201,168,76,0.22);
+    border-left: 3px solid rgba(201,168,76,0.6);
+    font-size: 13px; color: rgba(255,255,255,0.72); line-height: 1.8;
+    white-space: pre-line;
   }
-  .ss-note-label { font-size: 9px; letter-spacing: 2px; color: rgba(255,255,255,0.25); margin-bottom: 6px; }
+  .ss-note-label {
+    font-size: 9px; letter-spacing: 3px; color: var(--gold);
+    margin-bottom: 8px; font-weight: 700;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .ss-note-label::after { content:''; flex:1; height:1px; background: rgba(201,168,76,0.2); }
 
   .ss-no-data { text-align: center; padding: 40px; color: rgba(255,255,255,0.3); font-size: 13px; letter-spacing: 1px; }
 
@@ -4665,7 +4674,12 @@ function showSSResult() {
 
   const isIntegrated = match.int || (!match.rec || match.rec === '-' || match.rec === '');
   const hasNote = match.n && match.n !== '-' && match.n !== 'None' && match.n.trim() !== '';
-  const noteHtml = hasNote ? `<div class="ss-note"><div class="ss-note-label">비 고</div>${escHtml(match.n)}</div>` : '';
+  const noteHtml = hasNote
+    ? `<div class="ss-subject-section">
+        <div class="ss-subject-section-title note">비고</div>
+        <div class="ss-subject-text note">${escHtml(match.n).replace(/\n/g, '<br>')}</div>
+      </div>`
+    : '';
 
   // 표시할 모집단위명: 분리형이면 d2, 단일형이면 d1
   const deptDisplay = match.split ? match.d2 : match.d1;
