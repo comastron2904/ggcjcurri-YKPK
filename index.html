@@ -4423,17 +4423,55 @@ function createBlockEl(b, idx) {
    권장과목 검색 기능
 ────────────────────────────── */
 let ssData = [];
-// ssSelected: region, area, univ, dept1(col3), dept2(col4 or null)
 let ssSelected = { region: null, area: null, univ: null, dept1: null, dept2: null };
+
+const SS_KEY = 'cg_excel_subjects';
+
+async function ssLoadFromDB() {
+  try {
+    const raw = await sbGet(SS_KEY);
+    if (raw && Array.isArray(raw) && raw.length > 0) { ssData = raw; return true; }
+  } catch(e) { console.warn('ssLoad failed', e); }
+  return false;
+}
+
+async function ssSaveToDB(data) {
+  try { await sbSet(SS_KEY, data); } catch(e) { console.warn('ssSave failed', e); }
+}
+
+function ssShowLoaded() {
+  document.getElementById('ss-upload-zone').classList.add('has-data');
+  document.getElementById('ss-upload-title').textContent = `✓ 데이터 로드 완료`;
+  document.getElementById('ss-upload-desc').textContent = `총 ${ssData.length}개 모집단위 · 다른 파일로 변경하려면 클릭`;
+  ssSelected = { region: null, area: null, univ: null, dept1: null, dept2: null };
+  document.getElementById('ss-result-area').style.display = 'none';
+  document.getElementById('ss-reset-wrap').style.display = 'none';
+  renderSSSteps();
+  document.getElementById('ss-steps').style.display = 'flex';
+}
 
 function openSubjectSearch() {
   document.getElementById('subject-search-screen').classList.add('open');
+  if (ssData.length > 0) {
+    ssShowLoaded();
+  } else {
+    document.getElementById('ss-upload-title').textContent = '데이터 불러오는 중...';
+    document.getElementById('ss-upload-desc').textContent = 'Supabase에서 저장된 데이터를 확인하고 있습니다';
+    ssLoadFromDB().then(ok => {
+      if (ok) {
+        ssShowLoaded();
+      } else {
+        document.getElementById('ss-upload-title').textContent = '엑셀 파일을 업로드하세요';
+        document.getElementById('ss-upload-desc').textContent = '2028학년도_권역별_대학별_권장과목.xlsx 파일을 클릭하여 선택';
+      }
+    });
+  }
 }
+
 function closeSubjectSearch() {
   document.getElementById('subject-search-screen').classList.remove('open');
 }
 
-// 엑셀 파일 업로드 처리
 function handleSSFileUpload(input) {
   const file = input.files[0];
   if (!file) return;
@@ -4445,55 +4483,40 @@ function handleSSFileUpload(input) {
       const ws = workbook.Sheets[workbook.SheetNames[0]];
       const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: null });
 
-      ssData = [];
+      const parsed = [];
       let prevRegion = null, prevArea = null, prevUniv = null;
 
       for (let i = 4; i < rows.length; i++) {
         const row = rows[i];
         if (!row || row.length < 4) continue;
-
         const region = row[0] ? String(row[0]).trim() : prevRegion;
         const area   = row[1] ? String(row[1]).trim() : prevArea;
         const univ   = row[2] ? String(row[2]).trim() : prevUniv;
         const col3   = row[3] ? String(row[3]).replace(/\n/g, ' ').trim() : null;
         const col4   = row[4] ? String(row[4]).replace(/\n/g, ' ').trim() : null;
-
         if (!region || !col3) continue;
         prevRegion = region; prevArea = area; prevUniv = univ;
-
         const core = row[5] ? String(row[5]).replace(/\n/g, '\n').trim() : '';
         const rec  = row[6] ? String(row[6]).replace(/\n/g, '\n').trim() : '';
         const note = row[7] ? String(row[7]).replace(/\n/g, '\n').trim() : '';
-        const integrated = (!rec || rec === '-');
-
-        // col4가 있으면 분리형, 없으면 단일형
-        ssData.push({
-          r: region, a: area, u: univ,
-          d1: col3,               // 계열/그룹 (항상 존재)
-          d2: col4 || null,       // 세부 모집단위 (없으면 null → 단일형)
-          split: !!col4,          // 분리형 여부
-          c: core, rec, n: note, int: integrated
-        });
+        parsed.push({ r: region, a: area, u: univ, d1: col3, d2: col4 || null, split: !!col4, c: core, rec, n: note, int: (!rec || rec === '-') });
       }
 
-      if (ssData.length === 0) {
-        alert('데이터를 읽지 못했습니다. 올바른 엑셀 파일인지 확인해주세요.');
-        return;
-      }
+      if (parsed.length === 0) { alert('데이터를 읽지 못했습니다. 올바른 엑셀 파일인지 확인해주세요.'); return; }
 
-      const zone = document.getElementById('ss-upload-zone');
-      zone.classList.add('has-data');
+      ssData = parsed;
+      ssSaveToDB(ssData); // Supabase에 저장
+
+      document.getElementById('ss-upload-zone').classList.add('has-data');
       document.getElementById('ss-upload-title').textContent = `✓ ${file.name}`;
-      document.getElementById('ss-upload-desc').textContent = `총 ${ssData.length}개 모집단위 로드 완료 · 클릭하여 파일 변경`;
+      document.getElementById('ss-upload-desc').textContent = `총 ${ssData.length}개 모집단위 저장 완료 · 클릭하여 파일 변경`;
 
       ssSelected = { region: null, area: null, univ: null, dept1: null, dept2: null };
       document.getElementById('ss-result-area').style.display = 'none';
       document.getElementById('ss-reset-wrap').style.display = 'none';
       renderSSSteps();
       document.getElementById('ss-steps').style.display = 'flex';
-    } catch(err) {
-      alert('파일을 읽는 중 오류가 발생했습니다.\n' + err.message);
-    }
+    } catch(err) { alert('파일을 읽는 중 오류가 발생했습니다.\n' + err.message); }
   };
   reader.readAsArrayBuffer(file);
 }
