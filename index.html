@@ -2979,6 +2979,46 @@ async function sbSet(key, value) {
   if (!res.ok) throw new Error('sbSet failed ' + res.status);
 }
 
+/* ──────────────────────────────
+   Supabase Storage 파일 업로드
+   - PDF/이미지를 base64 대신 Storage에 올리고 공개 URL 반환
+   - 버킷 이름: dept-files (Supabase 대시보드에서 public으로 생성 필요)
+────────────────────────────── */
+async function uploadToStorage(file) {
+  const ext      = file.name.split('.').pop();
+  const filename = Date.now() + '_' + Math.random().toString(36).slice(2) + '.' + ext;
+  const res = await fetch(
+    SUPABASE_URL + '/storage/v1/object/dept-files/' + encodeURIComponent(filename),
+    {
+      method: 'POST',
+      headers: {
+        apikey: SUPABASE_ANON,
+        Authorization: 'Bearer ' + SUPABASE_ANON,
+        'Content-Type': file.type || 'application/octet-stream',
+        'x-upsert': 'true'
+      },
+      body: file
+    }
+  );
+  if (!res.ok) {
+    const err = await res.text().catch(() => res.status);
+    throw new Error('Storage 업로드 실패: ' + err);
+  }
+  return SUPABASE_URL + '/storage/v1/object/public/dept-files/' + encodeURIComponent(filename);
+}
+
+async function deleteFromStorage(url) {
+  if (!url || !url.includes('/storage/v1/object/public/dept-files/')) return;
+  const filename = url.split('/dept-files/').pop();
+  await fetch(
+    SUPABASE_URL + '/storage/v1/object/dept-files/' + filename,
+    {
+      method: 'DELETE',
+      headers: { apikey: SUPABASE_ANON, Authorization: 'Bearer ' + SUPABASE_ANON }
+    }
+  ).catch(() => {});
+}
+
 // 연속 저장 방지 디바운스
 const _sq = {};
 function sbSetQ(key, value, ms) {
@@ -4763,10 +4803,23 @@ function renderDeptFileItems(b) {
     item.className = 'dept-file-item';
     item.style.position = 'relative';
 
+    // 업로드 중인 경우
+    if (f._tmpId || !f.url) {
+      item.innerHTML = `<div class="dept-generic-file" style="opacity:0.5">
+        <div class="dept-generic-file-icon">⏳</div>
+        <div class="dept-generic-file-info">
+          <div class="dept-generic-file-name">${escHtml(f.name)}</div>
+          <div class="dept-generic-file-size">업로드 중...</div>
+        </div>
+      </div>`;
+      wrap.appendChild(item);
+      return;
+    }
+
     const delBtn = `<button class="dept-file-item-del" onclick="deleteDeptFile('${b.id}',${fi})">✕ 삭제</button>`;
 
     if (f.type === 'image') {
-      item.innerHTML = `${delBtn}<img class="dept-img-preview" src="${f.data}" alt="${escHtml(f.name)}"><div class="dept-img-caption">${escHtml(f.name)}</div>`;
+      item.innerHTML = `${delBtn}<img class="dept-img-preview" src="${f.url}" alt="${escHtml(f.name)}"><div class="dept-img-caption">${escHtml(f.name)}</div>`;
     } else if (f.type === 'pdf') {
       const vid = 'pdfv-' + b.id + '-' + fi;
       item.innerHTML = `${delBtn}
@@ -4787,8 +4840,7 @@ function renderDeptFileItems(b) {
           <div class="dept-pdf-botbar" id="${vid}-dots"></div>
         </div>`;
       wrap.appendChild(item);
-      // 비동기 PDF 렌더
-      setTimeout(() => initPdfViewer(vid, f.data), 0);
+      setTimeout(() => initPdfViewer(vid, f.url), 0);
       return;
     } else {
       item.innerHTML = `${delBtn}
@@ -4961,37 +5013,40 @@ function setupPdfSwipe(vid) {
   stage.addEventListener('mouseleave', () => { mDown = false; });
 }
 
-function handleDeptFiles(blockId, input) {
+async function handleDeptFiles(blockId, input) {
   const b = deptBlocks.find(x => x.id === blockId);
   if (!b) return;
   if (!b.files) b.files = [];
   const files = Array.from(input.files);
-  let loaded = 0;
-  files.forEach(file => {
-    const reader = new FileReader();
-    reader.onload = e => {
-      const data = e.target.result;
-      const size = file.size > 1024*1024
-        ? (file.size/1024/1024).toFixed(1) + ' MB'
-        : (file.size/1024).toFixed(0) + ' KB';
-      let type = 'other';
-      if (file.type.startsWith('image/')) type = 'image';
-      else if (file.type === 'application/pdf') type = 'pdf';
-      b.files.push({ name: file.name, type, data, size });
-      loaded++;
-      if (loaded === files.length) {
-        renderDeptFileItems(b);
-        input.value = '';
-      }
-    };
-    reader.readAsDataURL(file);
-  });
+  input.value = '';
+  for (const file of files) {
+    const size = file.size > 1024*1024
+      ? (file.size/1024/1024).toFixed(1) + ' MB'
+      : (file.size/1024).toFixed(0) + ' KB';
+    let type = 'other';
+    if (file.type.startsWith('image/')) type = 'image';
+    else if (file.type === 'application/pdf') type = 'pdf';
+    // 임시 로딩 표시
+    const tmpId = 'tmp-' + Date.now();
+    b.files.push({ name: file.name, type, url: null, size, _tmpId: tmpId });
+    renderDeptFileItems(b);
+    try {
+      const url = await uploadToStorage(file);
+      const entry = b.files.find(f => f._tmpId === tmpId);
+      if (entry) { entry.url = url; delete entry._tmpId; }
+    } catch(err) {
+      b.files = b.files.filter(f => f._tmpId !== tmpId);
+      alert('파일 업로드 실패: ' + file.name + '\n' + err.message);
+    }
+    renderDeptFileItems(b);
+  }
 }
 
 function deleteDeptFile(blockId, fileIdx) {
   const b = deptBlocks.find(x => x.id === blockId);
   if (!b || !b.files) return;
-  b.files.splice(fileIdx, 1);
+  const removed = b.files.splice(fileIdx, 1)[0];
+  if (removed && removed.url) deleteFromStorage(removed.url);
   renderDeptFileItems(b);
 }
 
@@ -5167,9 +5222,20 @@ function renderEnrollFileItems(b) {
     const item = document.createElement('div');
     item.className = 'dept-file-item';
     item.style.position = 'relative';
+    if (f._tmpId || !f.url) {
+      item.innerHTML = `<div class="dept-generic-file" style="opacity:0.5">
+        <div class="dept-generic-file-icon">⏳</div>
+        <div class="dept-generic-file-info">
+          <div class="dept-generic-file-name">${escHtml(f.name)}</div>
+          <div class="dept-generic-file-size">업로드 중...</div>
+        </div>
+      </div>`;
+      wrap.appendChild(item);
+      return;
+    }
     const delBtn = `<button class="dept-file-item-del" onclick="deleteEnrollFile('${b.id}',${fi})">✕ 삭제</button>`;
     if (f.type === 'image') {
-      item.innerHTML = `${delBtn}<img class="dept-img-preview" src="${f.data}" alt="${escHtml(f.name)}"><div class="dept-img-caption">${escHtml(f.name)}</div>`;
+      item.innerHTML = `${delBtn}<img class="dept-img-preview" src="${f.url}" alt="${escHtml(f.name)}"><div class="dept-img-caption">${escHtml(f.name)}</div>`;
     } else if (f.type === 'pdf') {
       const vid = 'epdfv-' + b.id + '-' + fi;
       item.innerHTML = `${delBtn}
@@ -5187,7 +5253,7 @@ function renderEnrollFileItems(b) {
           <div class="dept-pdf-botbar" id="${vid}-dots"></div>
         </div>`;
       wrap.appendChild(item);
-      setTimeout(() => initPdfViewer(vid, f.data), 0);
+      setTimeout(() => initPdfViewer(vid, f.url), 0);
       return;
     } else {
       item.innerHTML = `${delBtn}
@@ -5203,29 +5269,37 @@ function renderEnrollFileItems(b) {
   });
 }
 
-function handleEnrollFiles(blockId, input) {
+async function handleEnrollFiles(blockId, input) {
   const b = enrollBlocks.find(x => x.id === blockId);
   if (!b) return;
   if (!b.files) b.files = [];
-  Array.from(input.files).forEach(file => {
-    const reader = new FileReader();
-    reader.onload = e => {
-      const size = file.size > 1024*1024 ? (file.size/1024/1024).toFixed(1)+' MB' : (file.size/1024).toFixed(0)+' KB';
-      let type = 'other';
-      if (file.type.startsWith('image/')) type = 'image';
-      else if (file.type === 'application/pdf') type = 'pdf';
-      b.files.push({ name: file.name, type, data: e.target.result, size });
-      renderEnrollFileItems(b);
-      input.value = '';
-    };
-    reader.readAsDataURL(file);
-  });
+  const files = Array.from(input.files);
+  input.value = '';
+  for (const file of files) {
+    const size = file.size > 1024*1024 ? (file.size/1024/1024).toFixed(1)+' MB' : (file.size/1024).toFixed(0)+' KB';
+    let type = 'other';
+    if (file.type.startsWith('image/')) type = 'image';
+    else if (file.type === 'application/pdf') type = 'pdf';
+    const tmpId = 'tmp-' + Date.now();
+    b.files.push({ name: file.name, type, url: null, size, _tmpId: tmpId });
+    renderEnrollFileItems(b);
+    try {
+      const url = await uploadToStorage(file);
+      const entry = b.files.find(f => f._tmpId === tmpId);
+      if (entry) { entry.url = url; delete entry._tmpId; }
+    } catch(err) {
+      b.files = b.files.filter(f => f._tmpId !== tmpId);
+      alert('파일 업로드 실패: ' + file.name + '\n' + err.message);
+    }
+    renderEnrollFileItems(b);
+  }
 }
 
 function deleteEnrollFile(blockId, fi) {
   const b = enrollBlocks.find(x => x.id === blockId);
   if (!b || !b.files) return;
-  b.files.splice(fi, 1);
+  const removed = b.files.splice(fi, 1)[0];
+  if (removed && removed.url) deleteFromStorage(removed.url);
   renderEnrollFileItems(b);
 }
 
@@ -5389,9 +5463,20 @@ function renderSuneungFileItems(b) {
     const item = document.createElement('div');
     item.className = 'dept-file-item';
     item.style.position = 'relative';
+    if (f._tmpId || !f.url) {
+      item.innerHTML = `<div class="dept-generic-file" style="opacity:0.5">
+        <div class="dept-generic-file-icon">⏳</div>
+        <div class="dept-generic-file-info">
+          <div class="dept-generic-file-name">${escHtml(f.name)}</div>
+          <div class="dept-generic-file-size">업로드 중...</div>
+        </div>
+      </div>`;
+      wrap.appendChild(item);
+      return;
+    }
     const delBtn = `<button class="dept-file-item-del" onclick="deleteSuneungFile('${b.id}',${fi})">✕ 삭제</button>`;
     if (f.type === 'image') {
-      item.innerHTML = `${delBtn}<img class="dept-img-preview" src="${f.data}" alt="${escHtml(f.name)}"><div class="dept-img-caption">${escHtml(f.name)}</div>`;
+      item.innerHTML = `${delBtn}<img class="dept-img-preview" src="${f.url}" alt="${escHtml(f.name)}"><div class="dept-img-caption">${escHtml(f.name)}</div>`;
     } else if (f.type === 'pdf') {
       const vid = 'spdfv-' + b.id + '-' + fi;
       item.innerHTML = `${delBtn}
@@ -5409,7 +5494,7 @@ function renderSuneungFileItems(b) {
           <div class="dept-pdf-botbar" id="${vid}-dots"></div>
         </div>`;
       wrap.appendChild(item);
-      setTimeout(() => initPdfViewer(vid, f.data), 0);
+      setTimeout(() => initPdfViewer(vid, f.url), 0);
       return;
     } else {
       item.innerHTML = `${delBtn}
@@ -5425,29 +5510,37 @@ function renderSuneungFileItems(b) {
   });
 }
 
-function handleSuneungFiles(blockId, input) {
+async function handleSuneungFiles(blockId, input) {
   const b = suneungBlocks.find(x => x.id === blockId);
   if (!b) return;
   if (!b.files) b.files = [];
-  Array.from(input.files).forEach(file => {
-    const reader = new FileReader();
-    reader.onload = e => {
-      const size = file.size > 1024*1024 ? (file.size/1024/1024).toFixed(1)+' MB' : (file.size/1024).toFixed(0)+' KB';
-      let type = 'other';
-      if (file.type.startsWith('image/')) type = 'image';
-      else if (file.type === 'application/pdf') type = 'pdf';
-      b.files.push({ name: file.name, type, data: e.target.result, size });
-      renderSuneungFileItems(b);
-      input.value = '';
-    };
-    reader.readAsDataURL(file);
-  });
+  const files = Array.from(input.files);
+  input.value = '';
+  for (const file of files) {
+    const size = file.size > 1024*1024 ? (file.size/1024/1024).toFixed(1)+' MB' : (file.size/1024).toFixed(0)+' KB';
+    let type = 'other';
+    if (file.type.startsWith('image/')) type = 'image';
+    else if (file.type === 'application/pdf') type = 'pdf';
+    const tmpId = 'tmp-' + Date.now();
+    b.files.push({ name: file.name, type, url: null, size, _tmpId: tmpId });
+    renderSuneungFileItems(b);
+    try {
+      const url = await uploadToStorage(file);
+      const entry = b.files.find(f => f._tmpId === tmpId);
+      if (entry) { entry.url = url; delete entry._tmpId; }
+    } catch(err) {
+      b.files = b.files.filter(f => f._tmpId !== tmpId);
+      alert('파일 업로드 실패: ' + file.name + '\n' + err.message);
+    }
+    renderSuneungFileItems(b);
+  }
 }
 
 function deleteSuneungFile(blockId, fi) {
   const b = suneungBlocks.find(x => x.id === blockId);
   if (!b || !b.files) return;
-  b.files.splice(fi, 1);
+  const removed = b.files.splice(fi, 1)[0];
+  if (removed && removed.url) deleteFromStorage(removed.url);
   renderSuneungFileItems(b);
 }
 
