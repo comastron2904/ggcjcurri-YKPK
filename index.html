@@ -1569,7 +1569,7 @@
     border: 1px solid rgba(201,168,76,0.25);
     color: var(--white); font-family: 'Noto Sans KR', sans-serif;
     font-size: 14px; line-height: 1.9; padding: 14px 16px;
-    outline: none; resize: vertical; min-height: 120px;
+    outline: none; resize: none; min-height: 48px; overflow: hidden;
     transition: border-color 0.2s;
     box-sizing: border-box;
   }
@@ -1598,7 +1598,7 @@
     font-size: 20px; font-weight: 900; line-height: 1.5;
     padding: 12px 14px 12px 19px;
     border-left: 3px solid rgba(201,168,76,0.45);
-    outline: none; resize: vertical; min-height: 60px;
+    outline: none; resize: none; min-height: 48px; overflow: hidden;
     transition: border-color 0.2s; box-sizing: border-box;
   }
   .dept-title-edit:focus { border-color: var(--gold); }
@@ -2748,6 +2748,7 @@
   <div class="dd-toolbar" id="dd-toolbar">
     <div class="dd-toolbar-inner">
       <span class="dd-toolbar-label">편집 모드</span>
+      <button class="dd-tool-btn" onclick="deptAddBlock('title')">＋ 제목</button>
       <button class="dd-tool-btn" onclick="deptAddBlock('text')">＋ 텍스트</button>
       <button class="dd-tool-btn" onclick="deptAddBlock('file')">＋ 파일/사진/PDF</button>
       <button class="dd-tool-btn dd-save-btn" onclick="saveDeptBlocks()">💾 저장</button>
@@ -4347,7 +4348,7 @@ async function loadDeptBlocks() {
 async function saveDeptBlocks() {
   // textarea → 블록 데이터 동기화
   deptBlocks.forEach(b => {
-    if (b.type === 'text') {
+    if (b.type === 'text' || b.type === 'title') {
       const ta = document.getElementById('dta-' + b.id);
       if (ta) b.text = ta.value;
     }
@@ -4396,7 +4397,7 @@ function createBlockEl(b, idx) {
   // 핸들 (편집 모드)
   div.innerHTML = `
     <div class="dept-block-handle">
-      <span class="dept-block-type-badge">${b.type === 'text' ? 'TEXT' : 'FILE'}</span>
+      <span class="dept-block-type-badge">${b.type === 'text' ? 'TEXT' : b.type === 'title' ? 'TITLE' : 'FILE'}</span>
       <div class="dept-block-actions">
         ${idx > 0 ? `<button class="dept-block-action-btn" onclick="moveDeptBlock('${b.id}',-1)">▲</button>` : ''}
         ${idx < deptBlocks.length-1 ? `<button class="dept-block-action-btn" onclick="moveDeptBlock('${b.id}',1)">▼</button>` : ''}
@@ -4404,13 +4405,30 @@ function createBlockEl(b, idx) {
       </div>
     </div>`;
 
-  if (b.type === 'text') {
+  if (b.type === 'title') {
+    const inner = document.createElement('div');
+    inner.className = 'dept-title-block';
+    inner.innerHTML = `
+      <div class="dept-title-view">${escHtml(b.text || '')}</div>
+      <textarea class="dept-title-edit" id="dta-${b.id}" placeholder="제목을 입력하세요...">${escHtml(b.text || '')}</textarea>`;
+    div.appendChild(inner);
+    setTimeout(() => {
+      const ta = document.getElementById('dta-' + b.id);
+      if (ta) { ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; }
+      if (ta) ta.addEventListener('input', function(){ this.style.height='auto'; this.style.height=this.scrollHeight+'px'; });
+    }, 0);
+  } else if (b.type === 'text') {
     const inner = document.createElement('div');
     inner.className = 'dept-text-block';
     inner.innerHTML = `
       <div class="dept-text-view">${escHtml(b.text || '')}</div>
       <textarea class="dept-text-edit" id="dta-${b.id}" placeholder="내용을 입력하세요...">${escHtml(b.text || '')}</textarea>`;
     div.appendChild(inner);
+    setTimeout(() => {
+      const ta = document.getElementById('dta-' + b.id);
+      if (ta) { ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; }
+      if (ta) ta.addEventListener('input', function(){ this.style.height='auto'; this.style.height=this.scrollHeight+'px'; });
+    }, 0);
   } else if (b.type === 'file') {
     const inner = document.createElement('div');
     inner.className = 'dept-file-block';
@@ -4979,7 +4997,7 @@ function deleteDeptFile(blockId, fileIdx) {
 
 function deptAddBlock(type) {
   const id = 'b' + Date.now();
-  if (type === 'text') deptBlocks.push({ id, type, text: '' });
+  if (type === 'text' || type === 'title') deptBlocks.push({ id, type, text: '' });
   else deptBlocks.push({ id, type, files: [] });
   renderDeptBlocks();
   // 새 블록으로 스크롤
@@ -4997,7 +5015,7 @@ function deleteDeptBlock(blockId) {
 function moveDeptBlock(blockId, dir) {
   // textarea 동기화
   deptBlocks.forEach(b => {
-    if (b.type === 'text') {
+    if (b.type === 'text' || b.type === 'title') {
       const ta = document.getElementById('dta-' + b.id);
       if (ta) b.text = ta.value;
     }
@@ -5029,7 +5047,7 @@ function enterDeptEdit() {
 function exitDeptEdit() {
   // textarea 동기화 후 렌더
   deptBlocks.forEach(b => {
-    if (b.type === 'text') {
+    if (b.type === 'text' || b.type === 'title') {
       const ta = document.getElementById('dta-' + b.id);
       if (ta) b.text = ta.value;
     }
@@ -5109,6 +5127,11 @@ function createEnrollBlockEl(b, idx) {
       <div class="dept-title-view">${escHtml(b.text || '')}</div>
       <textarea class="dept-title-edit" id="eta-${b.id}" placeholder="제목을 입력하세요...">${escHtml(b.text || '')}</textarea>`;
     div.appendChild(inner);
+    setTimeout(() => {
+      const ta = document.getElementById('eta-' + b.id);
+      if (ta) { ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; }
+      if (ta) ta.addEventListener('input', function(){ this.style.height='auto'; this.style.height=this.scrollHeight+'px'; });
+    }, 0);
   } else if (b.type === 'text') {
     const inner = document.createElement('div');
     inner.className = 'dept-text-block';
@@ -5116,6 +5139,11 @@ function createEnrollBlockEl(b, idx) {
       <div class="dept-text-view">${escHtml(b.text || '')}</div>
       <textarea class="dept-text-edit" id="eta-${b.id}" placeholder="내용을 입력하세요...">${escHtml(b.text || '')}</textarea>`;
     div.appendChild(inner);
+    setTimeout(() => {
+      const ta = document.getElementById('eta-' + b.id);
+      if (ta) { ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; }
+      if (ta) ta.addEventListener('input', function(){ this.style.height='auto'; this.style.height=this.scrollHeight+'px'; });
+    }, 0);
   } else {
     const inner = document.createElement('div');
     inner.className = 'dept-file-block';
@@ -5321,6 +5349,11 @@ function createSuneungBlockEl(b, idx) {
       <div class="dept-title-view">${escHtml(b.text || '')}</div>
       <textarea class="dept-title-edit" id="sta-${b.id}" placeholder="제목을 입력하세요...">${escHtml(b.text || '')}</textarea>`;
     div.appendChild(inner);
+    setTimeout(() => {
+      const ta = document.getElementById('sta-' + b.id);
+      if (ta) { ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; }
+      if (ta) ta.addEventListener('input', function(){ this.style.height='auto'; this.style.height=this.scrollHeight+'px'; });
+    }, 0);
   } else if (b.type === 'text') {
     const inner = document.createElement('div');
     inner.className = 'dept-text-block';
@@ -5328,6 +5361,11 @@ function createSuneungBlockEl(b, idx) {
       <div class="dept-text-view">${escHtml(b.text || '')}</div>
       <textarea class="dept-text-edit" id="sta-${b.id}" placeholder="내용을 입력하세요...">${escHtml(b.text || '')}</textarea>`;
     div.appendChild(inner);
+    setTimeout(() => {
+      const ta = document.getElementById('sta-' + b.id);
+      if (ta) { ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; }
+      if (ta) ta.addEventListener('input', function(){ this.style.height='auto'; this.style.height=this.scrollHeight+'px'; });
+    }, 0);
   } else {
     const inner = document.createElement('div');
     inner.className = 'dept-file-block';
