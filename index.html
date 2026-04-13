@@ -5051,6 +5051,13 @@ function deleteDeptFile(blockId, fileIdx) {
 }
 
 function deptAddBlock(type) {
+  // 기존 textarea 내용 동기화
+  deptBlocks.forEach(b => {
+    if (b.type === 'text' || b.type === 'title') {
+      const ta = document.getElementById('dta-' + b.id);
+      if (ta) b.text = ta.value;
+    }
+  });
   const id = 'b' + Date.now();
   if (type === 'text' || type === 'title') deptBlocks.push({ id, type, text: '' });
   else deptBlocks.push({ id, type, files: [] });
@@ -5063,6 +5070,13 @@ function deptAddBlock(type) {
 }
 
 function deleteDeptBlock(blockId) {
+  // 기존 textarea 내용 동기화
+  deptBlocks.forEach(b => {
+    if (b.type === 'text' || b.type === 'title') {
+      const ta = document.getElementById('dta-' + b.id);
+      if (ta) b.text = ta.value;
+    }
+  });
   deptBlocks = deptBlocks.filter(b => b.id !== blockId);
   renderDeptBlocks();
 }
@@ -5304,6 +5318,13 @@ function deleteEnrollFile(blockId, fi) {
 }
 
 function enrollAddBlock(type) {
+  // 기존 textarea 내용 동기화
+  enrollBlocks.forEach(b => {
+    if (b.type === 'text' || b.type === 'title') {
+      const ta = document.getElementById('eta-' + b.id);
+      if (ta) b.text = ta.value;
+    }
+  });
   const id = 'e' + Date.now();
   enrollBlocks.push(type === 'file' ? { id, type, files: [] } : { id, type, text: '' });
   renderEnrollBlocks();
@@ -5314,6 +5335,13 @@ function enrollAddBlock(type) {
 }
 
 function deleteEnrollBlock(blockId) {
+  // 기존 textarea 내용 동기화
+  enrollBlocks.forEach(b => {
+    if (b.type === 'text' || b.type === 'title') {
+      const ta = document.getElementById('eta-' + b.id);
+      if (ta) b.text = ta.value;
+    }
+  });
   enrollBlocks = enrollBlocks.filter(b => b.id !== blockId);
   renderEnrollBlocks();
 }
@@ -5545,6 +5573,13 @@ function deleteSuneungFile(blockId, fi) {
 }
 
 function suneungAddBlock(type) {
+  // 기존 textarea 내용 동기화
+  suneungBlocks.forEach(b => {
+    if (b.type === 'text' || b.type === 'title') {
+      const ta = document.getElementById('sta-' + b.id);
+      if (ta) b.text = ta.value;
+    }
+  });
   const id = 's' + Date.now();
   suneungBlocks.push(type === 'file' ? { id, type, files: [] } : { id, type, text: '' });
   renderSuneungBlocks();
@@ -5555,6 +5590,13 @@ function suneungAddBlock(type) {
 }
 
 function deleteSuneungBlock(blockId) {
+  // 기존 textarea 내용 동기화
+  suneungBlocks.forEach(b => {
+    if (b.type === 'text' || b.type === 'title') {
+      const ta = document.getElementById('sta-' + b.id);
+      if (ta) b.text = ta.value;
+    }
+  });
   suneungBlocks = suneungBlocks.filter(b => b.id !== blockId);
   renderSuneungBlocks();
 }
