@@ -31,12 +31,12 @@
 </script>
 <style>
   :root {
-    --deep-navy: #0a1628;
-    --royal-blue: #1a3a6e;
-    --gold: #c9a84c;
-    --gold-light: #e8c97a;
+    --deep-navy: #0f1f3a;
+    --royal-blue: #1e4480;
+    --gold: #d4b05a;
+    --gold-light: #f0d888;
     --white: #ffffff;
-    --accent-teal: #2a8a8a;
+    --accent-teal: #2fa8a8;
     --danger: #e05555;
   }
 
@@ -172,8 +172,8 @@
   .modal-backdrop.open { opacity: 1; pointer-events: all; }
 
   .modal-box {
-    background: #0d1e36;
-    border: 1px solid rgba(201,168,76,0.32);
+    background: #112540;
+    border: 1px solid rgba(201,168,76,0.40);
     padding: 44px 38px 36px;
     width: 100%; max-width: 400px;
     position: relative;
@@ -360,11 +360,14 @@
     display: flex; align-items: center; gap: 20px;
   }
   .detail-back {
-    display: inline-flex; align-items: center; gap: 8px; padding: 9px 18px;
-    background: none; border: 1px solid rgba(201,168,76,0.28); color: rgba(201,168,76,0.7);
-    font-family: 'Noto Sans KR', sans-serif; font-size: 12px; cursor: pointer; letter-spacing: 1px; transition: all 0.25s; flex-shrink: 0;
+    display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px;
+    background: linear-gradient(135deg, rgba(212,176,90,0.18), rgba(160,120,40,0.10));
+    border: 1.5px solid rgba(201,168,76,0.65); color: var(--gold);
+    font-family: 'Noto Sans KR', sans-serif; font-size: 13px; font-weight: 700;
+    cursor: pointer; letter-spacing: 1px; transition: all 0.2s; flex-shrink: 0;
+    border-radius: 3px; box-shadow: 0 2px 10px rgba(201,168,76,0.18);
   }
-  .detail-back:hover { background: rgba(201,168,76,0.1); border-color: var(--gold); color: var(--gold); }
+  .detail-back:hover { background: rgba(201,168,76,0.28); border-color: var(--gold); box-shadow: 0 3px 16px rgba(201,168,76,0.35); transform: translateX(-2px); }
   .detail-home {
     display: inline-flex; align-items: center; justify-content: center;
     width: 38px; height: 38px; flex-shrink: 0;
@@ -566,7 +569,7 @@
   /* 영상 자료 */
   .media-video-block {}
   .media-pdf-block { margin-bottom: 4px; }
-  .media-pdf-label {
+  .media-pdf-label { /* 구버전 호환 */
     font-size: 11px; letter-spacing: 1px; color: rgba(201,168,76,0.7);
     margin-bottom: 0; padding: 6px 10px;
     background: rgba(201,168,76,0.06); border: 1px solid rgba(201,168,76,0.15);
@@ -645,7 +648,7 @@
     position: relative; width: 100%; min-height: 52vh;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     overflow: hidden; cursor: pointer;
-    background: linear-gradient(160deg, #0a1628 0%, #1a3a6e 50%, #0d2244 100%);
+    background: linear-gradient(160deg, #0f2040 0%, #1e4a88 50%, #122a55 100%);
     user-select: none;
   }
   #hero-bg {
@@ -656,7 +659,7 @@
   #hero-bg.active { opacity: 1; }
   #hero-overlay {
     position: absolute; inset: 0;
-    background: linear-gradient(180deg, rgba(10,22,40,0.50) 0%, rgba(10,22,40,0.72) 100%); z-index: 1;
+    background: linear-gradient(180deg, rgba(10,22,40,0.32) 0%, rgba(10,22,40,0.52) 100%); z-index: 1;
   }
   .geo-circle { position: absolute; border-radius: 50%; border: 1px solid rgba(201,168,76,0.17); z-index: 1; pointer-events: none; }
   .geo-circle.c1 { width: 520px; height: 520px; top: -160px; right: -110px; }
@@ -678,13 +681,13 @@
     animation: fadeSlideUp 0.9s ease 0.1s both; text-shadow: 0 4px 30px rgba(0,0,0,0.4);
   }
   .main-title span { color: var(--gold-light); }
-  .subtitle { margin-top: 14px; font-size: 12px; letter-spacing: 4px; color: rgba(255,255,255,0.42); animation: fadeSlideUp 0.9s ease 0.22s both; }
+  .subtitle { margin-top: 14px; font-size: 12px; letter-spacing: 4px; color: rgba(255,255,255,0.62); animation: fadeSlideUp 0.9s ease 0.22s both; }
   .click-hint {
     margin-top: 30px; display: flex; align-items: center; justify-content: center; gap: 10px;
-    font-size: 11px; color: rgba(201,168,76,0.52); letter-spacing: 2px;
+    font-size: 11px; color: rgba(201,168,76,0.80); letter-spacing: 2px;
     animation: pulseFade 2.8s ease infinite 1.8s;
   }
-  .click-hint::before, .click-hint::after { content: ''; height: 1px; width: 36px; background: rgba(201,168,76,0.35); }
+  .click-hint::before, .click-hint::after { content: ''; height: 1px; width: 36px; background: rgba(201,168,76,0.55); }
   #file-input { display: none; }
 
   #toast {
@@ -705,30 +708,31 @@
   .divider-text { font-size: 10px; letter-spacing: 4px; color: var(--gold); white-space: nowrap; }
 
   #nav-section { background: var(--deep-navy); padding: 8px 40px 56px; }
-  .section-label { text-align: center; font-size: 10px; letter-spacing: 4px; color: rgba(255,255,255,0.22); margin-bottom: 28px; }
+  .section-label { text-align: center; font-size: 10px; letter-spacing: 4px; color: rgba(255,255,255,0.40); margin-bottom: 28px; }
   .buttons-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 13px; max-width: 1100px; margin: 0 auto; }
 
   .nav-btn {
     position: relative; display: flex; align-items: center; gap: 18px; padding: 22px 26px;
-    background: rgba(255,255,255,0.03); border: 1px solid rgba(201,168,76,0.17);
+    background: rgba(255,255,255,0.07); border: 1px solid rgba(201,168,76,0.35);
     color: var(--white); cursor: pointer; font-family: 'Noto Sans KR', sans-serif; text-align: left;
     transition: all 0.32s cubic-bezier(0.25,0.46,0.45,0.94); overflow: hidden;
     animation: fadeSlideUp 0.6s ease both;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.25);
   }
-  .nav-btn::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(201,168,76,0.07), rgba(42,138,138,0.06)); opacity: 0; transition: opacity 0.3s; }
+  .nav-btn::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(201,168,76,0.13), rgba(42,138,138,0.10)); opacity: 0; transition: opacity 0.3s; }
   .nav-btn::after  { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: linear-gradient(180deg, var(--gold), var(--accent-teal)); transform: scaleY(0); transition: transform 0.32s cubic-bezier(0.25,0.46,0.45,0.94); transform-origin: bottom; }
   .nav-btn:hover::before { opacity: 1; }
   .nav-btn:hover::after  { transform: scaleY(1); }
-  .nav-btn:hover { border-color: rgba(201,168,76,0.46); transform: translateX(5px); background: rgba(255,255,255,0.05); }
+  .nav-btn:hover { border-color: rgba(201,168,76,0.75); transform: translateX(5px); background: rgba(255,255,255,0.11); box-shadow: 0 4px 22px rgba(201,168,76,0.18); }
   .nav-btn:nth-child(1){animation-delay:.10s} .nav-btn:nth-child(2){animation-delay:.15s}
   .nav-btn:nth-child(3){animation-delay:.20s} .nav-btn:nth-child(4){animation-delay:.25s}
   .nav-btn:nth-child(5){animation-delay:.30s} .nav-btn:nth-child(6){animation-delay:.35s}
   .nav-btn:nth-child(7){animation-delay:.40s}
-  .btn-number { font-family: 'Noto Serif KR', serif; font-size: 22px; font-weight: 900; color: var(--gold); opacity: 0.52; min-width: 32px; line-height: 1; transition: opacity 0.3s; }
+  .btn-number { font-family: 'Noto Serif KR', serif; font-size: 22px; font-weight: 900; color: var(--gold); opacity: 0.75; min-width: 32px; line-height: 1; transition: opacity 0.3s; }
   .nav-btn:hover .btn-number { opacity: 1; }
-  .btn-title { flex: 1; font-size: 15px; font-weight: 700; color: var(--white); letter-spacing: 0.3px; line-height: 1.4; transition: color 0.3s; }
+  .btn-title { flex: 1; font-size: 15px; font-weight: 700; color: rgba(255,255,255,0.95); letter-spacing: 0.3px; line-height: 1.4; transition: color 0.3s; }
   .nav-btn:hover .btn-title { color: var(--gold-light); }
-  .btn-arrow { font-size: 18px; color: rgba(201,168,76,0.26); transition: all 0.32s; flex-shrink: 0; }
+  .btn-arrow { font-size: 18px; color: rgba(201,168,76,0.55); transition: all 0.32s; flex-shrink: 0; }
   .nav-btn:hover .btn-arrow { color: var(--gold); transform: translateX(4px); }
 
   .footer { text-align: center; padding: 22px; font-size: 10px; letter-spacing: 2px; color: rgba(255,255,255,0.17); border-top: 1px solid rgba(255,255,255,0.06); }
@@ -742,6 +746,8 @@
     .buttons-grid { grid-template-columns: 1fr; }
     #hero { min-height: 44vh; }
     #admin-modal .modal-box { margin: 10px; }
+    .sem-grade-tabs { gap: 4px; }
+    .sem-grade-tab { padding: 7px 10px; font-size: 11px; letter-spacing: 0.5px; }
   }
 
   /* ══════════════════════════════════════
@@ -763,34 +769,41 @@
     display: flex; align-items: center; gap: 20px;
   }
   .sem-back {
-    display: inline-flex; align-items: center; gap: 8px; padding: 9px 18px;
-    background: none; border: 1px solid rgba(201,168,76,0.28); color: rgba(201,168,76,0.7);
-    font-family: 'Noto Sans KR', sans-serif; font-size: 12px; cursor: pointer;
-    letter-spacing: 1px; transition: all 0.25s; flex-shrink: 0;
+    display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px;
+    background: linear-gradient(135deg, rgba(212,176,90,0.18), rgba(160,120,40,0.10));
+    border: 1.5px solid rgba(201,168,76,0.65); color: var(--gold);
+    font-family: 'Noto Sans KR', sans-serif; font-size: 13px; font-weight: 700;
+    cursor: pointer; letter-spacing: 1px; transition: all 0.2s; flex-shrink: 0;
+    border-radius: 3px; box-shadow: 0 2px 10px rgba(201,168,76,0.18);
   }
-  .sem-back:hover { background: rgba(201,168,76,0.1); border-color: var(--gold); color: var(--gold); }
+  .sem-back:hover { background: rgba(201,168,76,0.28); border-color: var(--gold); box-shadow: 0 3px 16px rgba(201,168,76,0.35); transform: translateX(-2px); }
   .sem-header-info { flex: 1; }
 
-  /* 학년 선택 탭 */
+  /* 학기 선택 탭 */
   .sem-grade-tabs {
-    display: flex; gap: 6px; flex-shrink: 0;
+    display: flex; gap: 6px; flex-shrink: 0; flex-wrap: wrap;
   }
   .sem-grade-tab {
-    padding: 8px 18px;
+    padding: 8px 16px;
     background: rgba(255,255,255,0.04);
     border: 1px solid rgba(201,168,76,0.18);
     color: rgba(255,255,255,0.45);
     font-family: 'Noto Sans KR', sans-serif;
-    font-size: 12px; font-weight: 700; letter-spacing: 1.5px;
+    font-size: 12px; font-weight: 700; letter-spacing: 1px;
     cursor: pointer; transition: all 0.22s;
   }
   .sem-grade-tab:hover { border-color: rgba(201,168,76,0.5); color: var(--white); }
-  .sem-grade-tab.active-2학년 {
+  .sem-grade-tab.active-sem {
+    background: rgba(201,168,76,0.18);
+    border-color: rgba(201,168,76,0.8);
+    color: var(--gold-light);
+  }
+  .sem-grade-tab.active-sem[data-grade="2"] {
     background: rgba(106,189,232,0.15);
     border-color: rgba(106,189,232,0.7);
     color: rgb(106,189,232);
   }
-  .sem-grade-tab.active-3학년 {
+  .sem-grade-tab.active-sem[data-grade="3"] {
     background: rgba(176,126,224,0.15);
     border-color: rgba(176,126,224,0.7);
     color: rgb(176,126,224);
@@ -895,7 +908,7 @@
     display: grid;
     grid-template-columns: 120px 1fr 1fr 1fr 1fr 1fr;
     border-bottom: 1px solid rgba(255,255,255,0.07);
-    min-height: 160px;
+    min-height: 100%;
     flex: 1;
     transition: grid-template-columns 0.3s ease;
   }
@@ -1073,6 +1086,44 @@
   .sem-bc-영어{border-left-color:#7ee0b0} .sem-bc-사회{border-left-color:#e0b87e}
   .sem-bc-과학{border-left-color:#a07ee0} .sem-bc-예체능{border-left-color:#e07e7e}
   .sem-bc-직업{border-left-color:#7ec8e0} .sem-bc-기타{border-left-color:rgba(255,255,255,0.2)}
+
+  /* 등급산출 여부 아이콘 — 학기별 과목 카드 */
+  .grade-icon {
+    display: inline-flex; align-items: center; justify-content: center;
+    flex-shrink: 0; width: 18px; height: 18px;
+    border-radius: 3px;
+    font-size: 11px; font-weight: 900; letter-spacing: 0;
+    line-height: 1;
+  }
+  .grade-icon.grade-yes {
+    background: rgba(80,200,120,0.18);
+    border: 1px solid rgba(80,200,120,0.65);
+    color: #6eeda0;
+  }
+  .grade-icon.grade-no {
+    background: rgba(224,85,85,0.16);
+    border: 1px solid rgba(224,85,85,0.55);
+    color: #f08080;
+  }
+
+  /* 교과별 카드용 등급 아이콘 (더 큰 사이즈) */
+  .catsubj-grade-icon {
+    display: inline-flex; align-items: center; justify-content: center;
+    flex-shrink: 0; width: 22px; height: 22px;
+    border-radius: 4px;
+    font-size: 13px; font-weight: 900; letter-spacing: 0;
+    line-height: 1;
+  }
+  .catsubj-grade-icon.grade-yes {
+    background: rgba(80,200,120,0.18);
+    border: 1px solid rgba(80,200,120,0.65);
+    color: #6eeda0;
+  }
+  .catsubj-grade-icon.grade-no {
+    background: rgba(224,85,85,0.16);
+    border: 1px solid rgba(224,85,85,0.55);
+    color: #f08080;
+  }
   .txt-국어{color:#7eb8e0} .txt-수학{color:#e07eb8} .txt-영어{color:#7ee0b0}
   .txt-사회{color:#e0b87e} .txt-과학{color:#a07ee0} .txt-예체능{color:#e07e7e}
   .txt-직업{color:#7ec8e0} .txt-기타{color:#b0b0b0}
@@ -1176,12 +1227,14 @@
     display: flex; align-items: center; gap: 20px;
   }
   .dept-back {
-    display: inline-flex; align-items: center; gap: 8px; padding: 9px 18px;
-    background: none; border: 1px solid rgba(201,168,76,0.28); color: rgba(201,168,76,0.7);
-    font-family: 'Noto Sans KR', sans-serif; font-size: 12px; cursor: pointer;
-    letter-spacing: 1px; transition: all 0.25s; flex-shrink: 0;
+    display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px;
+    background: linear-gradient(135deg, rgba(212,176,90,0.18), rgba(160,120,40,0.10));
+    border: 1.5px solid rgba(201,168,76,0.65); color: var(--gold);
+    font-family: 'Noto Sans KR', sans-serif; font-size: 13px; font-weight: 700;
+    cursor: pointer; letter-spacing: 1px; transition: all 0.2s; flex-shrink: 0;
+    border-radius: 3px; box-shadow: 0 2px 10px rgba(201,168,76,0.18);
   }
-  .dept-back:hover { background: rgba(201,168,76,0.1); border-color: var(--gold); color: var(--gold); }
+  .dept-back:hover { background: rgba(201,168,76,0.28); border-color: var(--gold); box-shadow: 0 3px 16px rgba(201,168,76,0.35); transform: translateX(-2px); }
   .dept-header-info { flex: 1; }
   .dept-header-label { font-size: 10px; letter-spacing: 4px; color: var(--gold); margin-bottom: 4px; }
   .dept-header-title { font-family: 'Noto Serif KR', serif; font-size: clamp(18px,2.5vw,28px); font-weight: 900; color: var(--white); }
@@ -1311,11 +1364,14 @@
     background: rgba(10,22,40,0.6); backdrop-filter: blur(10px);
   }
   .ss-back {
-    background: none; border: 1px solid rgba(255,255,255,0.15);
-    color: rgba(255,255,255,0.6); font-family: 'Noto Sans KR', sans-serif;
-    font-size: 13px; padding: 8px 16px; cursor: pointer; transition: all 0.2s;
+    display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px;
+    background: linear-gradient(135deg, rgba(212,176,90,0.18), rgba(160,120,40,0.10));
+    border: 1.5px solid rgba(201,168,76,0.65); color: var(--gold);
+    font-family: 'Noto Sans KR', sans-serif; font-size: 13px; font-weight: 700;
+    cursor: pointer; letter-spacing: 1px; transition: all 0.2s; flex-shrink: 0;
+    border-radius: 3px; box-shadow: 0 2px 10px rgba(201,168,76,0.18);
   }
-  .ss-back:hover { border-color: var(--gold); color: var(--gold); }
+  .ss-back:hover { background: rgba(201,168,76,0.28); border-color: var(--gold); box-shadow: 0 3px 16px rgba(201,168,76,0.35); transform: translateX(-2px); }
   .ss-header-info .ss-label { font-size: 9px; letter-spacing: 4px; color: var(--accent-teal); margin-bottom: 4px; }
   .ss-header-info .ss-title { font-family: 'Noto Serif KR', serif; font-size: 20px; font-weight: 900; color: var(--white); }
 
@@ -1449,12 +1505,14 @@
     position: sticky; top: 0; z-index: 10;
   }
   .dept-detail-back {
-    display: inline-flex; align-items: center; gap: 8px; padding: 9px 18px;
-    background: none; border: 1px solid rgba(201,168,76,0.28); color: rgba(201,168,76,0.7);
-    font-family: 'Noto Sans KR', sans-serif; font-size: 12px; cursor: pointer;
-    letter-spacing: 1px; transition: all 0.25s; flex-shrink: 0;
+    display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px;
+    background: linear-gradient(135deg, rgba(212,176,90,0.18), rgba(160,120,40,0.10));
+    border: 1.5px solid rgba(201,168,76,0.65); color: var(--gold);
+    font-family: 'Noto Sans KR', sans-serif; font-size: 13px; font-weight: 700;
+    cursor: pointer; letter-spacing: 1px; transition: all 0.2s; flex-shrink: 0;
+    border-radius: 3px; box-shadow: 0 2px 10px rgba(201,168,76,0.18);
   }
-  .dept-detail-back:hover { background: rgba(201,168,76,0.1); border-color: var(--gold); color: var(--gold); }
+  .dept-detail-back:hover { background: rgba(201,168,76,0.28); border-color: var(--gold); box-shadow: 0 3px 16px rgba(201,168,76,0.35); transform: translateX(-2px); }
   .dept-detail-icon { font-size: 26px; }
   .dept-detail-header-info { flex: 1; }
   .dept-detail-label { font-size: 10px; letter-spacing: 4px; color: var(--gold); margin-bottom: 4px; }
@@ -1648,18 +1706,81 @@
   }
   /* 파일명 + 페이지 정보 상단 바 */
   .dept-pdf-topbar {
-    display: flex; align-items: center; justify-content: space-between;
+    display: flex; align-items: center; gap: 8px;
     padding: 8px 14px;
     background: rgba(0,0,0,0.35);
     border-bottom: 1px solid rgba(255,255,255,0.06);
   }
   .dept-pdf-filename {
     font-size: 11px; color: rgba(255,255,255,0.38); letter-spacing: 0.5px;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60%;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;
   }
   .dept-pdf-pageinfo {
     font-size: 12px; color: rgba(201,168,76,0.75); letter-spacing: 1px; flex-shrink: 0;
   }
+  .dept-pdf-fs-btn {
+    flex-shrink: 0; width: 26px; height: 26px;
+    display: flex; align-items: center; justify-content: center;
+    background: none; border: 1px solid rgba(201,168,76,0.3);
+    color: rgba(201,168,76,0.6); font-size: 13px; cursor: pointer;
+    transition: all 0.2s; border-radius: 3px;
+  }
+  .dept-pdf-fs-btn:hover { background: rgba(201,168,76,0.12); border-color: var(--gold); color: var(--gold); }
+
+  /* ── 공통 PDF 전체화면 오버레이 ── */
+  #pdf-fs-overlay {
+    position: fixed; inset: 0; z-index: 1500;
+    background: #080f1e;
+    display: none; flex-direction: column;
+  }
+  #pdf-fs-overlay.open { display: flex; }
+  #pdf-fs-bar {
+    flex-shrink: 0; display: flex; align-items: center; gap: 14px;
+    padding: 12px 20px;
+    background: rgba(10,22,40,0.98);
+    border-bottom: 1px solid rgba(201,168,76,0.14);
+  }
+  #pdf-fs-title { font-size: 12px; color: rgba(255,255,255,0.45); flex: 1; letter-spacing: 0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #pdf-fs-close {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 16px; background: none;
+    border: 1px solid rgba(201,168,76,0.35); color: rgba(201,168,76,0.7);
+    font-family: 'Noto Sans KR', sans-serif; font-size: 12px; cursor: pointer;
+    transition: all 0.2s; flex-shrink: 0; letter-spacing: 1px;
+  }
+  #pdf-fs-close:hover { background: rgba(201,168,76,0.1); border-color: var(--gold); color: var(--gold); }
+  #pdf-fs-viewer {
+    flex: 1; overflow-y: auto; display: flex; align-items: flex-start; justify-content: center;
+    padding: 16px;
+  }
+  #pdf-fs-viewer::-webkit-scrollbar { width: 5px; }
+  #pdf-fs-viewer::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.28); border-radius: 3px; }
+  #pdf-fs-viewer canvas { display: block; max-width: 100%; background: #fff; }
+  #pdf-fs-nav {
+    flex-shrink: 0; display: flex; align-items: center; justify-content: center; gap: 20px;
+    padding: 12px 20px;
+    background: rgba(10,22,40,0.98);
+    border-top: 1px solid rgba(201,168,76,0.1);
+  }
+  #pdf-fs-pageinfo { font-size: 13px; color: rgba(255,255,255,0.45); letter-spacing: 1px; min-width: 90px; text-align: center; }
+
+  /* media-pdf 라벨 영역에 전체화면 버튼 배치 */
+  .media-pdf-label-row {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 11px; letter-spacing: 1px; color: rgba(201,168,76,0.7);
+    margin-bottom: 0; padding: 6px 10px;
+    background: rgba(201,168,76,0.06); border: 1px solid rgba(201,168,76,0.15);
+    border-bottom: none;
+  }
+  .media-pdf-label-row span { flex: 1; }
+  .media-pdf-fs-btn {
+    flex-shrink: 0; width: 24px; height: 24px;
+    display: flex; align-items: center; justify-content: center;
+    background: none; border: 1px solid rgba(201,168,76,0.3);
+    color: rgba(201,168,76,0.6); font-size: 12px; cursor: pointer;
+    transition: all 0.2s; border-radius: 3px;
+  }
+  .media-pdf-fs-btn:hover { background: rgba(201,168,76,0.12); border-color: var(--gold); color: var(--gold); }
   /* 슬라이드 영역 */
   .dept-pdf-stage {
     position: relative; width: 100%; overflow: hidden;
@@ -1679,19 +1800,31 @@
   /* 좌우 화살표 버튼 */
   .dept-pdf-nav {
     position: absolute; top: 50%; transform: translateY(-50%);
-    width: 40px; height: 56px;
-    background: rgba(10,22,40,0.72);
-    border: 1px solid rgba(201,168,76,0.22);
-    color: rgba(201,168,76,0.75);
-    font-size: 20px; cursor: pointer;
+    width: 52px; height: 72px;
+    background: linear-gradient(135deg, rgba(212,176,90,0.92), rgba(160,120,40,0.88));
+    border: none;
+    color: #0a1628;
+    font-size: 28px; font-weight: 900; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
-    transition: all 0.2s; z-index: 4;
-    backdrop-filter: blur(4px);
+    transition: all 0.2s ease; z-index: 4;
+    backdrop-filter: blur(6px);
+    box-shadow: 0 4px 20px rgba(212,176,90,0.55), 0 2px 8px rgba(0,0,0,0.5);
   }
-  .dept-pdf-nav:hover { background: rgba(201,168,76,0.15); border-color: var(--gold); color: var(--gold); }
-  .dept-pdf-nav:disabled { opacity: 0.18; cursor: default; pointer-events: none; }
-  .dept-pdf-nav.prev { left: 0; border-left: none; }
-  .dept-pdf-nav.next { right: 0; border-right: none; }
+  .dept-pdf-nav:hover { 
+    background: linear-gradient(135deg, #f0d888, var(--gold)); 
+    color: #0a1628;
+    box-shadow: 0 6px 28px rgba(212,176,90,0.75), 0 2px 10px rgba(0,0,0,0.5);
+    transform: translateY(-50%) scale(1.08);
+  }
+  .dept-pdf-nav:disabled { opacity: 0.22; cursor: default; pointer-events: none; box-shadow: none; }
+  .dept-pdf-nav.prev { left: 0; border-radius: 0 6px 6px 0; }
+  .dept-pdf-nav.next { right: 0; border-radius: 6px 0 0 6px; }
+
+  @keyframes navPulse {
+    0%,100% { box-shadow: 0 4px 20px rgba(212,176,90,0.55), 0 2px 8px rgba(0,0,0,0.5); }
+    50%      { box-shadow: 0 4px 28px rgba(212,176,90,0.85), 0 2px 8px rgba(0,0,0,0.5); }
+  }
+  .dept-pdf-nav:not(:disabled) { animation: navPulse 2.4s ease infinite; }
   /* 하단 바 (점 인디케이터) */
   .dept-pdf-botbar {
     display: flex; align-items: center; justify-content: center; gap: 6px;
@@ -1722,7 +1855,7 @@
   @keyframes pdfSpin { to { transform: rotate(360deg); } }
 
   @media (max-width:600px) {
-    .dept-pdf-nav { width: 32px; height: 44px; font-size: 16px; }
+    .dept-pdf-nav { width: 42px; height: 56px; font-size: 22px; }
   }
 
   /* 일반 파일 카드 */
@@ -1803,13 +1936,14 @@
     backdrop-filter: blur(10px);
   }
   .gb-back-btn {
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 9px 18px; background: none;
-    border: 1px solid rgba(201,168,76,0.3); color: rgba(201,168,76,0.75);
-    font-family: 'Noto Sans KR', sans-serif; font-size: 12px;
-    cursor: pointer; letter-spacing: 1px; transition: all 0.25s; flex-shrink: 0;
+    display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px;
+    background: linear-gradient(135deg, rgba(212,176,90,0.18), rgba(160,120,40,0.10));
+    border: 1.5px solid rgba(201,168,76,0.65); color: var(--gold);
+    font-family: 'Noto Sans KR', sans-serif; font-size: 13px; font-weight: 700;
+    cursor: pointer; letter-spacing: 1px; transition: all 0.2s; flex-shrink: 0;
+    border-radius: 3px; box-shadow: 0 2px 10px rgba(201,168,76,0.18);
   }
-  .gb-back-btn:hover { background: rgba(201,168,76,0.1); border-color: var(--gold); color: var(--gold); }
+  .gb-back-btn:hover { background: rgba(201,168,76,0.28); border-color: var(--gold); box-shadow: 0 3px 16px rgba(201,168,76,0.35); transform: translateX(-2px); }
   .gb-header-info { flex: 1; }
   .gb-header-label { font-size: 9px; letter-spacing: 4px; color: var(--gold); margin-bottom: 4px; }
   .gb-header-title { font-family: 'Noto Serif KR', serif; font-size: clamp(16px,2vw,24px); font-weight: 900; color: var(--white); }
@@ -1906,12 +2040,22 @@
     display: flex; align-items: center; justify-content: center; gap: 16px;
   }
   .gb-nav-btn {
-    padding: 7px 18px; background: none;
-    border: 1px solid rgba(201,168,76,0.25); color: rgba(201,168,76,0.6);
-    font-size: 18px; cursor: pointer; transition: all 0.2s; line-height: 1;
+    padding: 10px 26px;
+    background: linear-gradient(135deg, rgba(212,176,90,0.88), rgba(160,120,40,0.82));
+    border: none;
+    color: #0a1628;
+    font-size: 22px; font-weight: 900; cursor: pointer;
+    transition: all 0.2s ease; line-height: 1;
+    border-radius: 4px;
+    box-shadow: 0 3px 14px rgba(212,176,90,0.45), 0 1px 5px rgba(0,0,0,0.45);
   }
-  .gb-nav-btn:hover:not(:disabled) { background: rgba(201,168,76,0.1); border-color: var(--gold); color: var(--gold); }
-  .gb-nav-btn:disabled { opacity: 0.2; cursor: default; }
+  .gb-nav-btn:hover:not(:disabled) { 
+    background: linear-gradient(135deg, #f0d888, var(--gold)); 
+    color: #0a1628;
+    box-shadow: 0 5px 20px rgba(212,176,90,0.7), 0 1px 5px rgba(0,0,0,0.45);
+    transform: translateY(-2px) scale(1.06);
+  }
+  .gb-nav-btn:disabled { opacity: 0.22; cursor: default; box-shadow: none; background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.2); }
   .gb-page-info { font-size: 12px; color: rgba(255,255,255,0.35); letter-spacing: 1px; min-width: 80px; text-align: center; }
 
   /* 전체화면 버튼 */
@@ -2094,7 +2238,7 @@
 
   <!-- 상단 헤더 -->
   <div class="detail-header">
-    <button class="detail-back" onclick="closeDetail()">← 목록으로</button>
+    <button class="detail-back" onclick="closeDetail()">◀ 목록으로</button>
     <div class="detail-header-info">
       <div class="detail-tag" id="detail-cat"></div>
       <div class="detail-name" id="detail-name"></div>
@@ -2244,15 +2388,24 @@
 ═══════════════════════════════════════ -->
 <div id="semester-screen">
   <div class="sem-header">
-    <button class="sem-back" onclick="closeSemesterScreen()">← 뒤로</button>
+    <button class="sem-back" onclick="closeSemesterScreen()">◀ 뒤로</button>
     <div class="sem-header-info">
       <div class="sem-header-label">CURRICULUM · 학기별 개설과목</div>
       <div class="sem-header-title">학기별 개설과목 안내</div>
-      <div class="graded-notice">더 진하게 표시된 과목은 <span class="graded-notice-em">등급이 산출되는 과목</span>입니다</div>
+      <div class="graded-notice">
+        <span class="grade-icon grade-yes" style="font-size:10px;width:16px;height:16px;">O</span>
+        <span class="graded-notice-em">등급 산출</span>
+        <span style="margin:0 6px;color:rgba(255,255,255,0.18)">|</span>
+        <span class="grade-icon grade-no" style="font-size:10px;width:16px;height:16px;">X</span>
+        <span class="graded-notice-em" style="border-color:rgba(224,85,85,0.55);color:#f08080;">등급 미산출</span>
+        <span style="margin-left:6px;color:rgba(255,255,255,0.38)">— 과목 카드 우측 아이콘 표시</span>
+      </div>
     </div>
-    <div class="sem-grade-tabs">
-      <button class="sem-grade-tab" id="sem-tab-2학년" onclick="setSemGrade('2학년')">2학년</button>
-      <button class="sem-grade-tab" id="sem-tab-3학년" onclick="setSemGrade('3학년')">3학년</button>
+    <div class="sem-grade-tabs" id="sem-semester-tabs">
+      <button class="sem-grade-tab" id="sem-tab-0" onclick="setCurrentSem(0)">2학년 1학기</button>
+      <button class="sem-grade-tab" id="sem-tab-1" onclick="setCurrentSem(1)">2학년 2학기</button>
+      <button class="sem-grade-tab" id="sem-tab-2" onclick="setCurrentSem(2)">3학년 1학기</button>
+      <button class="sem-grade-tab" id="sem-tab-3" onclick="setCurrentSem(3)">3학년 2학기</button>
       <button class="btn-sem-col-edit" onclick="openSemColEditPw()" title="열 헤더 · 학점 편집">✏️ 편집</button>
     </div>
   </div>
@@ -2572,11 +2725,18 @@
 ═══════════════════════════════════════ -->
 <div id="catsubj-screen">
   <div class="sem-header">
-    <button class="sem-back" onclick="closeCatSubjScreen()">← 뒤로</button>
+    <button class="sem-back" onclick="closeCatSubjScreen()">◀ 뒤로</button>
     <div class="sem-header-info">
       <div class="sem-header-label">CURRICULUM · 교과별 선택과목</div>
       <div class="sem-header-title">교과별 선택과목 안내</div>
-      <div class="graded-notice">더 진하게 표시된 과목은 <span class="graded-notice-em">등급이 산출되는 과목</span>입니다</div>
+      <div class="graded-notice">
+        <span class="catsubj-grade-icon grade-yes" style="font-size:11px;width:18px;height:18px;">O</span>
+        <span class="graded-notice-em">등급 산출</span>
+        <span style="margin:0 6px;color:rgba(255,255,255,0.18)">|</span>
+        <span class="catsubj-grade-icon grade-no" style="font-size:11px;width:18px;height:18px;">X</span>
+        <span class="graded-notice-em" style="border-color:rgba(224,85,85,0.55);color:#f08080;">등급 미산출</span>
+        <span style="margin-left:6px;color:rgba(255,255,255,0.38)">— 과목 카드 우측 아이콘 표시</span>
+      </div>
     </div>
   </div>
   <div class="catsubj-body">
@@ -2592,7 +2752,7 @@
 ═══════════════════════════════════════ -->
 <div id="dept-screen">
   <div class="dept-header">
-    <button class="dept-back" onclick="closeDeptScreen()">← 뒤로</button>
+    <button class="dept-back" onclick="closeDeptScreen()">◀ 뒤로</button>
     <div class="dept-header-info">
       <div class="dept-header-label">DEPARTMENT GUIDE · 학과별 안내</div>
       <div class="dept-header-title">학과별 안내</div>
@@ -2668,7 +2828,7 @@
 ═══════════════════════════════════════ -->
 <div id="subject-search-screen">
   <div class="ss-header">
-    <button class="ss-back" onclick="closeSubjectSearch()">← 뒤로</button>
+    <button class="ss-back" onclick="closeSubjectSearch()">◀ 뒤로</button>
     <div class="ss-header-info">
       <div class="ss-label">RECOMMENDED SUBJECTS · 2028학년도</div>
       <div class="ss-title">권장과목 검색</div>
@@ -2734,7 +2894,7 @@
 ═══════════════════════════════════════ -->
 <div id="dept-detail-panel">
   <div class="dept-detail-header">
-    <button class="dept-detail-back" onclick="closeDeptDetail()">← 학과 목록</button>
+    <button class="dept-detail-back" onclick="closeDeptDetail()">◀ 학과 목록</button>
     <div class="dept-detail-icon" id="dept-detail-icon"></div>
     <div class="dept-detail-header-info">
       <div class="dept-detail-label">DEPARTMENT · 학과 안내</div>
@@ -2771,7 +2931,7 @@
 ═══════════════════════════════════════ -->
 <div id="enroll-screen">
   <div class="dept-detail-header">
-    <button class="dept-detail-back" onclick="closeEnrollScreen()">← 뒤로</button>
+    <button class="dept-detail-back" onclick="closeEnrollScreen()">◀ 뒤로</button>
     <div class="dept-detail-icon">📝</div>
     <div class="dept-detail-header-info">
       <div class="dept-detail-label">COURSE REGISTRATION · 수강신청 안내</div>
@@ -2808,7 +2968,7 @@
 ═══════════════════════════════════════ -->
 <div id="suneung-screen">
   <div class="dept-detail-header">
-    <button class="dept-detail-back" onclick="closeSuneungScreen()">← 뒤로</button>
+    <button class="dept-detail-back" onclick="closeSuneungScreen()">◀ 뒤로</button>
     <div class="dept-detail-icon">📚</div>
     <div class="dept-detail-header-info">
       <div class="dept-detail-label">SUNEUNG 2028 · 수능 안내</div>
@@ -2846,7 +3006,7 @@
 <div id="guidebook-screen">
   <!-- 헤더 -->
   <div class="gb-header">
-    <button class="gb-back-btn" onclick="closeGuidebookScreen()">← 뒤로</button>
+    <button class="gb-back-btn" onclick="closeGuidebookScreen()">◀ 뒤로</button>
     <div class="gb-header-info">
       <div class="gb-header-label">GUIDEBOOK · 책자 안내</div>
       <div class="gb-header-title" id="menu-06-title">선택과목 길라잡이 책자</div>
@@ -2919,6 +3079,21 @@
   </div>
 </div>
 
+</div>
+
+<!-- ══════ 공통 PDF 전체화면 오버레이 ══════ -->
+<div id="pdf-fs-overlay">
+  <div id="pdf-fs-bar">
+    <button id="pdf-fs-close" onclick="closePdfFs()">✕ 축소</button>
+    <span id="pdf-fs-title"></span>
+    <span id="pdf-fs-pageinfo"></span>
+  </div>
+  <div id="pdf-fs-viewer"></div>
+  <div id="pdf-fs-nav">
+    <button class="gb-nav-btn" id="pdf-fs-prev" onclick="pdfFsGo(-1)" disabled>‹</button>
+    <span id="pdf-fs-pageinfo-nav" class="gb-page-info">0 / 0</span>
+    <button class="gb-nav-btn" id="pdf-fs-next" onclick="pdfFsGo(1)" disabled>›</button>
+  </div>
 </div>
 
 <script>
@@ -3079,8 +3254,8 @@ function applyPageTexts() {
   if (hdMus && p.hdMus) hdMus.textContent = p.hdMus;
   const hdMusHint = document.getElementById('hd-hint-음악미술');
   if (hdMusHint && p.hdMusHint) hdMusHint.textContent = p.hdMusHint;
-  // 동적 열 헤더(사회과학, 외국어)도 현재 학년에 맞게 갱신
-  if (typeof currentSemGrade !== 'undefined') setSemGrade(currentSemGrade);
+  // 동적 열 헤더(사회과학, 외국어)도 현재 학기에 맞게 갱신
+  if (typeof currentSemIdx !== 'undefined') setCurrentSem(currentSemIdx);
   const hdWLEl = document.getElementById('hd-외국어정보-0');
   if (hdWLEl) {
     const lbl = p.hdForeign || '외국어&amp;교양';
@@ -3581,7 +3756,7 @@ function buildMediaEl(blockIdx, mi, m, ro) {
     return `
       <div class="media-pdf-block" id="wrap-${vid}" style="position:relative">
         ${hasFile ? `
-          <div class="media-pdf-label">📄 ${escHtml(m.name || 'PDF 파일')}</div>
+          <div class="media-pdf-label-row"><span>📄 ${escHtml(m.name || 'PDF 파일')}</span><button class="media-pdf-fs-btn" onclick="openPdfFs('${vid}','media')" title="전체화면">⛶</button></div>
           <div class="media-pdf-viewer" id="viewer-${vid}">
             <div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>PDF 불러오는 중...</span></div>
           </div>
@@ -3728,6 +3903,97 @@ async function mediaPdfGo(vid, dir) {
   if (np < 1 || np > st.totalPages) return;
   st.curPage = np;
   await renderMediaPdfPage(vid);
+  // 전체화면 중이면 전체화면도 동기화
+  if (pdfFsState.vid === vid && pdfFsState.type === 'media') pdfFsSync();
+}
+
+/* ── 공통 PDF 전체화면 ── */
+const pdfFsState = { vid: null, type: null, rendering: false };
+
+function openPdfFs(vid, type) {
+  pdfFsState.vid  = vid;
+  pdfFsState.type = type;
+  const overlay = document.getElementById('pdf-fs-overlay');
+  overlay.classList.add('open');
+
+  if (type === 'pdfv') {
+    const st = pdfViewerState[vid];
+    if (!st) return;
+    const pi = document.getElementById(vid + '-pi');
+    document.getElementById('pdf-fs-title').textContent = (document.getElementById(vid)?.querySelector('.dept-pdf-filename')?.textContent) || '';
+    pdfFsSync();
+  } else if (type === 'media') {
+    const st = mediaPdfState[vid];
+    if (!st || !st.pdfDoc) return;
+    document.getElementById('pdf-fs-title').textContent = (document.getElementById('viewer-' + vid)?.closest('.media-pdf-block')?.querySelector('.media-pdf-label-row span')?.textContent) || 'PDF';
+    pdfFsSync();
+  }
+}
+
+function closePdfFs() {
+  document.getElementById('pdf-fs-overlay').classList.remove('open');
+  pdfFsState.vid = null;
+  pdfFsState.type = null;
+  document.getElementById('pdf-fs-viewer').innerHTML = '';
+}
+
+async function pdfFsSync() {
+  if (pdfFsState.rendering) return;
+  pdfFsState.rendering = true;
+  const viewerEl = document.getElementById('pdf-fs-viewer');
+  const prevBtn  = document.getElementById('pdf-fs-prev');
+  const nextBtn  = document.getElementById('pdf-fs-next');
+  const piNav    = document.getElementById('pdf-fs-pageinfo-nav');
+  const piBar    = document.getElementById('pdf-fs-pageinfo');
+
+  let pdfDoc, curPage, total;
+  if (pdfFsState.type === 'pdfv') {
+    const st = pdfViewerState[pdfFsState.vid];
+    if (!st || !st.pdfDoc) { pdfFsState.rendering = false; return; }
+    pdfDoc = st.pdfDoc; curPage = st.currentPage; total = st.total;
+  } else {
+    const st = mediaPdfState[pdfFsState.vid];
+    if (!st || !st.pdfDoc) { pdfFsState.rendering = false; return; }
+    pdfDoc = st.pdfDoc; curPage = st.curPage; total = st.totalPages;
+  }
+
+  viewerEl.innerHTML = '<div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>' + curPage + ' / ' + total + ' 페이지</span></div>';
+  try {
+    const page     = await pdfDoc.getPage(curPage);
+    const vw       = Math.min(viewerEl.clientWidth - 32, 1200);
+    const vp0      = page.getViewport({ scale: 1 });
+    const scale    = vw / vp0.width;
+    const vp       = page.getViewport({ scale });
+    const canvas   = document.createElement('canvas');
+    canvas.width   = vp.width;
+    canvas.height  = vp.height;
+    canvas.style.display = 'block';
+    await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
+    viewerEl.innerHTML = '';
+    viewerEl.appendChild(canvas);
+    if (piNav) piNav.textContent = curPage + ' / ' + total;
+    if (piBar) piBar.textContent = curPage + ' / ' + total;
+    if (prevBtn) prevBtn.disabled = (curPage <= 1);
+    if (nextBtn) nextBtn.disabled = (curPage >= total);
+  } catch(e) {
+    viewerEl.innerHTML = '<div class="gb-pdf-loading"><span>렌더링 실패</span></div>';
+  }
+  pdfFsState.rendering = false;
+}
+
+async function pdfFsGo(dir) {
+  const { vid, type } = pdfFsState;
+  if (!vid) return;
+  if (type === 'pdfv') {
+    pdfGo(vid, dir);
+    // pdfGo는 동기이므로 바로 pdfFsSync
+  } else {
+    await mediaPdfGo(vid, dir);
+    pdfFsState.rendering = false; // mediaPdfGo 내부에서 pdfFsSync 호출됨, 중복 방지
+    return;
+  }
+  pdfFsState.rendering = false;
+  pdfFsSync();
 }
 
 function handleImgUpload(event, blockIdx) {
@@ -3924,11 +4190,15 @@ function renderCatSubjList() {
       card.style.borderColor = hexToRgba(color, 0.7);
       card.style.borderLeftColor = color;
     }
+    const catGradeIconHtml = graded
+      ? `<span class="catsubj-grade-icon grade-yes" title="등급 산출">O</span>`
+      : `<span class="catsubj-grade-icon grade-no" title="등급 미산출">✕</span>`;
     card.innerHTML = `
       <div class="catsubj-card-info">
         <div class="catsubj-card-name">${escHtml(s.name)}</div>
         <div class="catsubj-card-meta">${escHtml(semesterLabel)}${info.credit ? ' · ' + escHtml(info.credit) : ''}</div>
       </div>
+      ${catGradeIconHtml}
       <span class="catsubj-card-arrow">›</span>`;
     card.addEventListener('click', () => openDetail(s, 'catsubj'));
     grid.appendChild(card);
@@ -3969,25 +4239,28 @@ function openSemesterScreen() {
   renderAllSemCols();
   document.getElementById('semester-screen').classList.add('open');
   document.getElementById('semester-screen').scrollTop = 0;
-  // 기본 학년 선택 (2학년)
-  setSemGrade('2학년');
+  // 기본 학기 선택 (2학년 1학기)
+  setCurrentSem(0);
 }
 
-let currentSemGrade = '2학년';
+let currentSemIdx = 0;
 
-function setSemGrade(grade) {
-  currentSemGrade = grade;
-  // 탭 활성화 스타일
-  ['2학년', '3학년'].forEach(g => {
-    const tab = document.getElementById('sem-tab-' + g);
-    if (tab) {
-      tab.className = 'sem-grade-tab' + (g === grade ? ' active-' + g : '');
-    }
+function setCurrentSem(idx) {
+  currentSemIdx = idx;
+  const grade = idx < 2 ? '2' : '3';
+
+  // 탭 활성화
+  [0,1,2,3].forEach(i => {
+    const tab = document.getElementById('sem-tab-' + i);
+    if (!tab) return;
+    tab.className = 'sem-grade-tab' + (i === idx ? ' active-sem' : '');
+    if (i === idx) tab.setAttribute('data-grade', grade);
   });
+
   // 열 헤더 — 사회과학 라벨 학년별로 교체
   const hdSS = document.getElementById('hd-사회과학-0');
   if (hdSS) {
-    if (grade === '2학년') {
+    if (idx < 2) {
       const label = (pageTexts.hdSS2) || '사회&amp;과학';
       const hint  = (pageTexts.hdSS2Hint) || '3개 선택';
       hdSS.innerHTML = `<span class="sem-col-header-label hd-사회과학">${label}</span><span class="sem-col-select-hint hint-사회과학">${hint}</span>`;
@@ -3997,9 +4270,18 @@ function setSemGrade(grade) {
       hdSS.innerHTML = `<span class="sem-col-header-label hd-사회과학">${label}</span><span class="sem-col-select-hint hint-사회과학">${hint}</span>`;
     }
   }
+
+  // 외국어 열 헤더도 갱신
+  const hdWL = document.getElementById('hd-외국어정보-0');
+  if (hdWL) {
+    const label = (pageTexts.hdForeign) || '외국어&amp;교양';
+    const hint  = (pageTexts.hdForeignHint) || '1개 선택';
+    hdWL.innerHTML = `<span class="sem-col-header-label hd-외국어정보">${label}</span><span class="sem-col-select-hint hint-외국어정보">${hint}</span>`;
+  }
+
   // 행 보이기/숨기기
-  document.querySelectorAll('.sem-row').forEach(row => {
-    if (row.classList.contains('row-' + grade)) {
+  document.querySelectorAll('.sem-row').forEach((row, rowIdx) => {
+    if (rowIdx === idx) {
       row.style.display = '';
       row.style.flex = '1';
     } else {
@@ -4007,6 +4289,21 @@ function setSemGrade(grade) {
       row.style.flex = '0';
     }
   });
+}
+
+// 하위 호환을 위한 래퍼 (applyPageTexts 등에서 호출될 수 있음)
+let currentSemGrade = '2학년';
+function setSemGrade(grade) {
+  currentSemGrade = grade;
+  // grade 문자열 기반으로 현재 idx 유지, 헤더만 갱신
+  const idx = currentSemIdx;
+  const hdSS = document.getElementById('hd-사회과학-0');
+  if (hdSS) {
+    const is2 = grade === '2학년';
+    const label = is2 ? (pageTexts.hdSS2 || '사회&amp;과학') : (pageTexts.hdSS3 || '사회&amp;과학&amp;예술');
+    const hint  = is2 ? (pageTexts.hdSS2Hint || '3개 선택') : (pageTexts.hdSS3Hint || '3개 선택');
+    hdSS.innerHTML = `<span class="sem-col-header-label hd-사회과학">${label}</span><span class="sem-col-select-hint hint-사회과학">${hint}</span>`;
+  }
 }
 function closeSemesterScreen() {
   document.getElementById('semester-screen').classList.remove('open');
@@ -4110,11 +4407,15 @@ function renderSemCol(colIdx) {
       card.style.borderColor   = hexToRgba(c, 0.7);
       card.style.borderLeftColor = c;
     }
+    const gradeIconHtml = graded
+      ? `<span class="grade-icon grade-yes" title="등급 산출">O</span>`
+      : `<span class="grade-icon grade-no" title="등급 미산출">✕</span>`;
     card.innerHTML = `
       <div class="sem-subj-info">
         <div class="sem-subj-name">${escHtml(name)}</div>
         <div class="sem-subj-cat txt-${cat}">${cat}</div>
       </div>
+      ${gradeIconHtml}
       <span class="sem-subj-arrow">›</span>
       <button class="btn-sem-subj-del" onclick="event.stopPropagation();removeSemSubj(${colIdx},${itemIdx})">×</button>`;
     card.addEventListener('click', () => {
@@ -4827,6 +5128,7 @@ function renderDeptFileItems(b) {
           <div class="dept-pdf-topbar">
             <span class="dept-pdf-filename">📄 ${escHtml(f.name)}</span>
             <span class="dept-pdf-pageinfo" id="${vid}-pi">로딩 중...</span>
+            <button class="dept-pdf-fs-btn" onclick="openPdfFs('${vid}','pdfv')" title="전체화면">⛶</button>
           </div>
           <div class="dept-pdf-stage" id="${vid}-stage">
             <div class="dept-pdf-loading" id="${vid}-loading">
@@ -4972,6 +5274,8 @@ function pdfGo(vid, dir) {
   if (next < 1 || next > st.total) return;
   st.currentPage = next;
   updatePdfUI(vid);
+  // 전체화면 중이면 동기화
+  if (pdfFsState.vid === vid && pdfFsState.type === 'pdfv') pdfFsSync();
 }
 
 function pdfGoTo(vid, page) {
@@ -5257,6 +5561,7 @@ function renderEnrollFileItems(b) {
           <div class="dept-pdf-topbar">
             <span class="dept-pdf-filename">📄 ${escHtml(f.name)}</span>
             <span class="dept-pdf-pageinfo" id="${vid}-pi">로딩 중...</span>
+            <button class="dept-pdf-fs-btn" onclick="openPdfFs('${vid}','pdfv')" title="전체화면">⛶</button>
           </div>
           <div class="dept-pdf-stage" id="${vid}-stage">
             <div class="dept-pdf-loading" id="${vid}-loading"><div class="dept-pdf-spinner"></div><span>PDF 불러오는 중</span></div>
@@ -5512,6 +5817,7 @@ function renderSuneungFileItems(b) {
           <div class="dept-pdf-topbar">
             <span class="dept-pdf-filename">📄 ${escHtml(f.name)}</span>
             <span class="dept-pdf-pageinfo" id="${vid}-pi">로딩 중...</span>
+            <button class="dept-pdf-fs-btn" onclick="openPdfFs('${vid}','pdfv')" title="전체화면">⛶</button>
           </div>
           <div class="dept-pdf-stage" id="${vid}-stage">
             <div class="dept-pdf-loading" id="${vid}-loading"><div class="dept-pdf-spinner"></div><span>PDF 불러오는 중</span></div>
@@ -5657,9 +5963,14 @@ const gbState = {
 
 function openGuidebookScreen() {
   document.getElementById('guidebook-screen').classList.add('open');
-  // 저장된 PDF 데이터 로드
-  loadGbPdfFromStorage('left');
-  loadGbPdfFromStorage('right');
+  // rendering 플래그 초기화 (이중 호출로 갇히는 문제 방지)
+  gbState.left.rendering  = false;
+  gbState.right.rendering = false;
+  // PDF가 이미 로드된 경우 재렌더링만, 없으면 스토리지에서 로드
+  if (gbState.left.pdfDoc)  gbRenderPage('left');
+  else                       loadGbPdfFromStorage('left');
+  if (gbState.right.pdfDoc) gbRenderPage('right');
+  else                       loadGbPdfFromStorage('right');
   // 편집 버튼 상태 초기화
   gbEditMode = false;
   document.getElementById('gb-edit-btn').classList.remove('active');
@@ -5798,6 +6109,7 @@ async function gbRenderPage(side) {
     nextBtn.disabled = (st.curPage >= st.totalPages);
   } catch(e) {
     viewer.innerHTML = '<div class="gb-pdf-loading"><span>페이지 렌더링 실패</span></div>';
+    st.rendering = false;
   }
   st.rendering = false;
 }
