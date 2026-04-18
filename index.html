@@ -1499,8 +1499,37 @@
     }
     .sem-header-info { order: 2; width: 100%; flex: none; }
     .sem-back { order: 1; }
-    .sem-grade-tabs { order: 3; width: 100%; justify-content: flex-start; }
+    .sem-grade-tabs { order: 3; width: 100%; justify-content: flex-start; flex-wrap: wrap; gap: 6px; }
     .graded-notice { flex-wrap: wrap; gap: 4px 6px; }
+
+    /* 드롭다운 숨기고 탭 버튼 표시 */
+    .sem-dropdown-wrap { display: none !important; }
+    .sem-mobile-tabs { display: flex !important; }
+  }
+
+  /* 모바일 탭 버튼 스타일 */
+  .sem-mobile-tabs {
+    display: none;
+    gap: 5px;
+    flex-wrap: nowrap;
+  }
+  .sem-mobile-tab {
+    padding: 7px 10px;
+    background: rgba(201,168,76,0.10);
+    border: 1px solid rgba(201,168,76,0.45);
+    color: rgba(16,82,160,0.80);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
+    cursor: pointer; transition: all 0.18s;
+    border-radius: 3px; white-space: nowrap;
+  }
+  .sem-mobile-tab:hover { background: rgba(201,168,76,0.20); border-color: rgba(201,168,76,0.80); }
+  .sem-mobile-tab.active-sem {
+    background: rgba(201,168,76,0.28);
+    border-color: rgba(201,168,76,0.90);
+    color: #1052a0;
+    font-weight: 900;
+    box-shadow: 0 1px 6px rgba(201,168,76,0.25);
   }
 
   /* ══════════════════════════════════════
@@ -2872,6 +2901,13 @@
           <span class="sem-dropdown-arrow" id="sem-dropdown-arrow">▾</span>
         </button>
 
+      </div>
+      <!-- 모바일 전용 탭 버튼 (드롭다운 대체) -->
+      <div class="sem-mobile-tabs" id="sem-mobile-tabs">
+        <button class="sem-mobile-tab active-sem" id="mob-sem-tab-0" onclick="setCurrentSem(0)">2-1학기</button>
+        <button class="sem-mobile-tab" id="mob-sem-tab-1" onclick="setCurrentSem(1)">2-2학기</button>
+        <button class="sem-mobile-tab" id="mob-sem-tab-2" onclick="setCurrentSem(2)">3-1학기</button>
+        <button class="sem-mobile-tab" id="mob-sem-tab-3" onclick="setCurrentSem(3)">3-2학기</button>
       </div>
       <button class="btn-sem-col-edit" onclick="openSemColEditPw()" title="열 헤더 · 학점 편집">✏️ 편집</button>
     </div>
@@ -5193,8 +5229,9 @@ function setCurrentSem(idx) {
   // 드롭다운 아이템 활성화
   [0,1,2,3].forEach(i => {
     const tab = document.getElementById('sem-tab-' + i);
-    if (!tab) return;
-    tab.className = 'sem-dropdown-item' + (i === idx ? ' active-sem' : '');
+    if (tab) tab.className = 'sem-dropdown-item' + (i === idx ? ' active-sem' : '');
+    const mobTab = document.getElementById('mob-sem-tab-' + i);
+    if (mobTab) mobTab.className = 'sem-mobile-tab' + (i === idx ? ' active-sem' : '');
   });
 
   // 열 헤더 — 사회과학 라벨 학년별로 교체
