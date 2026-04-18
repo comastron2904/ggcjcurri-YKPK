@@ -824,7 +824,12 @@
     position: fixed; inset: 0; background: #f0f4f8; z-index: 700;
     display: flex; flex-direction: column;
     opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
-    overflow: hidden;
+    overflow: hidden; /* 데스크탑용 */
+  }
+  @media (max-width: 700px) {
+    #semester-screen {
+      overflow: visible !important; /* 모바일: 자식 스크롤 허용 */
+    }
   }
   #semester-screen.open { opacity: 1; pointer-events: all; }
 
@@ -934,89 +939,99 @@
 
   /* ── 모바일 가로 스크롤 ── */
   @media (max-width: 700px) {
-    /* 단일 스크롤 컨테이너: 가로+세로 모두 스크롤 */
+
+    /* 스크롤 컨테이너: flex child로 남은 높이 차지, 가로+세로 스크롤 */
     #sem-scroll-outer {
       flex: 1 1 0 !important;
-      overflow-x: auto !important;
-      overflow-y: auto !important;
-      -webkit-overflow-scrolling: touch !important;
-      display: block !important;
-      width: 100% !important;
-      /* 높이: #semester-screen(fixed,inset:0)에서 헤더(.sem-header) 높이를 뺀 나머지 */
-      height: calc(100vh - 160px) !important;
-      max-height: calc(100vh - 160px) !important;
       min-height: 0 !important;
-      box-sizing: border-box !important;
+      width: 100% !important;
+      overflow-x: scroll !important;
+      overflow-y: scroll !important;
+      -webkit-overflow-scrolling: touch !important;
+      display: flex !important;
+      flex-direction: column !important;
     }
 
-    /* 열 헤더: 스크롤 컨테이너 안에서 sticky top */
+    /* 열 헤더: 스크롤 안에서 상단 고정 */
     .sem-col-header-row {
       display: flex !important;
-      flex-direction: row;
-      position: sticky;
-      top: 0;
-      z-index: 5;
-      width: max-content;
-      min-width: 100%;
-      border-bottom: 2px solid rgba(26,107,191,0.22);
-      background: rgba(230,240,252,0.98);
+      flex-direction: row !important;
+      position: sticky !important;
+      top: 0 !important;
+      z-index: 5 !important;
+      /* 충분히 넓게 — 80 + 5×130 = 730px */
+      width: 730px !important;
+      background: rgba(230,240,252,0.98) !important;
+      border-bottom: 2px solid rgba(26,107,191,0.22) !important;
     }
     .sem-col-header-row .sem-col-header-cell {
-      width: 130px;
-      min-width: 130px;
-      flex-shrink: 0;
+      width: 130px !important;
+      min-width: 130px !important;
+      max-width: 130px !important;
+      flex-shrink: 0 !important;
+      box-sizing: border-box !important;
     }
     .sem-col-header-row .sem-col-header-cell:first-child {
-      width: 80px;
-      min-width: 80px;
-      position: sticky;
-      left: 0;
-      z-index: 6;
+      width: 80px !important;
+      min-width: 80px !important;
+      max-width: 80px !important;
+      position: sticky !important;
+      left: 0 !important;
+      z-index: 6 !important;
       background: rgba(210,228,248,0.99) !important;
     }
 
-    /* 그리드: 열 헤더 바로 아래, 가로로 충분히 넓게 */
+    /* 그리드 */
     .sem-grid {
-      display: flex !important;
-      flex-direction: column;
-      width: max-content;
-      min-width: 100%;
+      display: block !important;
+      /* 헤더와 동일한 너비 */
+      width: 730px !important;
     }
 
     /* 각 학기 행 */
     .sem-row {
       display: flex !important;
-      flex-direction: row;
-      width: max-content;
-      min-width: 100%;
-      height: auto;
+      flex-direction: row !important;
+      width: 730px !important;
+      /* 화면에 꽉 차도록 최소 높이 */
+      min-height: calc(100vh - 220px) !important;
+      box-sizing: border-box !important;
     }
     .sem-row.sem-row-hidden {
       display: none !important;
     }
 
-    /* 학기명 셀: sticky left */
+    /* 학기명 셀: 좌측 고정 */
     .sem-row-head {
-      position: sticky;
-      left: 0;
-      z-index: 3;
-      flex-shrink: 0;
-      width: 80px;
-      min-width: 80px;
-      background: #f0f4f8;
+      position: sticky !important;
+      left: 0 !important;
+      z-index: 3 !important;
+      flex-shrink: 0 !important;
+      width: 80px !important;
+      min-width: 80px !important;
+      max-width: 80px !important;
+      box-sizing: border-box !important;
+      background: rgba(234,244,252,0.99) !important;
     }
-    .sem-row.row-2학년 .sem-row-head { background: rgba(234,244,252,0.99); }
-    .sem-row.row-3학년 .sem-row-head { background: rgba(243,237,252,0.99); }
+    .sem-row.row-3학년 .sem-row-head { background: rgba(243,237,252,0.99) !important; }
 
     /* 각 과목군 셀 */
     .sem-cell {
-      width: 130px;
-      min-width: 130px;
-      flex-shrink: 0;
-      height: auto;
+      width: 130px !important;
+      min-width: 130px !important;
+      max-width: 130px !important;
+      flex-shrink: 0 !important;
+      box-sizing: border-box !important;
+      height: auto !important;
     }
-    .sem-subrow-wrap { overflow: visible; }
-    .sem-subrow { min-height: 60px; overflow: visible; }
+
+    /* subrow */
+    .sem-subrow-wrap {
+      display: flex !important;
+      flex-direction: column !important;
+      overflow: visible !important;
+    }
+    .sem-subrow { min-height: 60px !important; overflow: visible !important; }
     .sem-subject-list { overflow: visible !important; height: auto !important; }
   }
 
@@ -5132,25 +5147,16 @@ function openSemesterScreen() {
   renderAllSemCols();
   document.getElementById('semester-screen').classList.add('open');
   document.getElementById('semester-screen').scrollTop = 0;
-  // 모바일: sem-scroll-outer 스크롤 강제 적용 (높이 명시)
+  // 모바일: overflow 강제 적용
   if (window.innerWidth <= 700) {
-    const outer = document.getElementById('sem-scroll-outer');
-    const screen = document.getElementById('semester-screen');
-    const header = screen ? screen.querySelector('.sem-header') : null;
-    if (outer && header) {
-      const headerH = header.getBoundingClientRect().height;
-      const h = window.innerHeight - headerH;
-      outer.style.cssText = [
-        'overflow-x:auto',
-        'overflow-y:auto',
-        '-webkit-overflow-scrolling:touch',
-        'display:block',
-        'width:100%',
-        'height:' + h + 'px',
-        'max-height:' + h + 'px',
-        'box-sizing:border-box'
-      ].join(';');
-    }
+    requestAnimationFrame(() => {
+      const outer = document.getElementById('sem-scroll-outer');
+      if (outer) {
+        outer.style.overflowX = 'scroll';
+        outer.style.overflowY = 'scroll';
+        outer.style.webkitOverflowScrolling = 'touch';
+      }
+    });
   }
   setCurrentSem(0);
 }
