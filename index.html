@@ -384,7 +384,7 @@
   /* 카테고리 색상 */
   .cc-국어   { color: #7eb8e0; border-color: #7eb8e0; }
   .cc-수학   { color: #e07eb8; border-color: #e07eb8; }
-  .cc-영어   { color: #7ee0b0; border-color: #7ee0b0; }
+  .cc-영어   { color: #1a9e5c; border-color: #1a9e5c; }
   .cc-사회   { color: #e0b87e; border-color: #e0b87e; }
   .cc-과학   { color: #a07ee0; border-color: #a07ee0; }
   .cc-예체능 { color: #e07e7e; border-color: #e07e7e; }
@@ -583,16 +583,16 @@
   .card-body-input.body-내용 { min-height: 60px; font-size: 14px; }
 
   /* 자료 카드 */
-  .block-card.card-자료 { border-left: 3px solid rgba(126,224,176,0.5); padding: 28px 36px; }
+  .block-card.card-자료 { border-left: 3px solid rgba(26,158,92,0.5); padding: 28px 36px; }
   .card-media-title-input {
     width: 100%; background: transparent; border: none; outline: none;
     font-family: 'Noto Serif KR', serif; font-size: clamp(16px,2vw,22px); font-weight: 900;
-    color: #7ee0b0; margin-bottom: 20px; line-height: 1.3;
-    border-bottom: 2px solid rgba(126,224,176,0.18); padding: 0;
+    color: #1a9e5c; margin-bottom: 20px; line-height: 1.3;
+    border-bottom: 2px solid rgba(26,158,92,0.18); padding: 0;
     transition: border-color 0.2s;
   }
-  .card-media-title-input:focus { border-color: rgba(126,224,176,0.5); }
-  .card-media-title-input::placeholder { color: rgba(126,224,176,0.3); }
+  .card-media-title-input:focus { border-color: rgba(26,158,92,0.5); }
+  .card-media-title-input::placeholder { color: rgba(26,158,92,0.3); }
 
   /* 미디어 아이템 */
   .block-media-area { display: flex; flex-direction: column; gap: 16px; }
@@ -643,18 +643,18 @@
     display: flex; gap: 8px; margin-bottom: 12px;
   }
   .media-video-url-input {
-    flex: 1; background: rgba(126,224,176,0.06); border: 1px solid rgba(126,224,176,0.28);
+    flex: 1; background: rgba(26,158,92,0.06); border: 1px solid rgba(26,158,92,0.28);
     color: var(--white); font-family: 'Noto Sans KR', sans-serif; font-size: 12px;
     padding: 10px 14px; outline: none; transition: border-color 0.2s;
   }
-  .media-video-url-input:focus { border-color: rgba(126,224,176,0.5); }
+  .media-video-url-input:focus { border-color: rgba(26,158,92,0.5); }
   .media-video-url-input::placeholder { color: rgba(26,46,74,0.30); }
   .btn-video-embed {
-    padding: 10px 18px; background: rgba(126,224,176,0.1); border: 1px solid rgba(126,224,176,0.3);
-    color: #7ee0b0; font-family: 'Noto Sans KR', sans-serif; font-size: 12px;
+    padding: 10px 18px; background: rgba(26,158,92,0.1); border: 1px solid rgba(26,158,92,0.3);
+    color: #1a9e5c; font-family: 'Noto Sans KR', sans-serif; font-size: 12px;
     cursor: pointer; white-space: nowrap; transition: all 0.2s;
   }
-  .btn-video-embed:hover { background: rgba(126,224,176,0.2); }
+  .btn-video-embed:hover { background: rgba(26,158,92,0.2); }
   .media-video-frame {
     position: relative; width: 100%; padding-bottom: 56.25%; height: 0; overflow: hidden;
     background: #000;
@@ -683,7 +683,7 @@
     font-family: 'Noto Sans KR', sans-serif; font-size: 12px; cursor: pointer;
     transition: all 0.2s; letter-spacing: 0.5px;
   }
-  .btn-media-add:hover { border-color: rgba(126,224,176,0.55); color: #7ee0b0; background: rgba(126,224,176,0.06); }
+  .btn-media-add:hover { border-color: rgba(26,158,92,0.55); color: #1a9e5c; background: rgba(26,158,92,0.06); }
 
   .blocks-empty {
     text-align: center; padding: 48px 20px;
@@ -824,6 +824,7 @@
     background: rgba(240,244,248,0.97);
     backdrop-filter: blur(10px);
     display: flex; align-items: center; gap: 20px;
+    position: relative; z-index: 10; overflow: visible;
   }
   .sem-back {
     display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px;
@@ -836,34 +837,45 @@
   .sem-back:hover { background: rgba(26,107,191,0.28); border-color: var(--gold); box-shadow: 0 3px 16px rgba(201,168,76,0.35); transform: translateX(-2px); }
   .sem-header-info { flex: 1; }
 
-  /* 학기 선택 탭 */
-  .sem-grade-tabs {
-    display: flex; gap: 6px; flex-shrink: 0; flex-wrap: wrap;
-  }
-  .sem-grade-tab {
+  /* 학기 선택 드롭다운 */
+  .sem-grade-tabs { display: flex; gap: 6px; flex-shrink: 0; align-items: center; }
+  .sem-dropdown-wrap { position: relative; }
+  .sem-dropdown-btn {
+    display: inline-flex; align-items: center; gap: 8px;
     padding: 8px 16px;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(201,168,76,0.18);
-    color: rgba(26,46,74,0.75);
+    background: rgba(201,168,76,0.14);
+    border: 1px solid rgba(201,168,76,0.70);
+    color: var(--gold-light);
     font-family: 'Noto Sans KR', sans-serif;
     font-size: 12px; font-weight: 700; letter-spacing: 1px;
     cursor: pointer; transition: all 0.22s;
+    white-space: nowrap; min-width: 130px; justify-content: space-between;
   }
-  .sem-grade-tab:hover { border-color: rgba(201,168,76,0.5); color: var(--white); }
-  .sem-grade-tab.active-sem {
-    background: rgba(201,168,76,0.18);
-    border-color: rgba(201,168,76,0.8);
-    color: var(--gold-light);
+  .sem-dropdown-btn:hover { background: rgba(201,168,76,0.22); border-color: rgba(201,168,76,1); }
+  .sem-dropdown-arrow { font-size: 11px; transition: transform 0.2s; display: inline-block; }
+  .sem-dropdown-arrow.open { transform: rotate(180deg); }
+  .sem-dropdown-menu {
+    position: fixed;
+    background: rgba(235,242,252,1);
+    border: 1px solid rgba(201,168,76,0.55);
+    box-shadow: 0 8px 28px rgba(26,46,74,0.22);
+    z-index: 99999; display: none; flex-direction: column;
+    min-width: 145px; overflow: hidden;
   }
-  .sem-grade-tab.active-sem[data-grade="2"] {
-    background: rgba(106,189,232,0.15);
-    border-color: rgba(106,189,232,0.7);
-    color: rgb(106,189,232);
+  .sem-dropdown-menu.open { display: flex; }
+  .sem-dropdown-item {
+    padding: 10px 18px; background: transparent;
+    border: none; border-bottom: 1px solid rgba(26,107,191,0.08);
+    color: rgba(26,46,74,0.80);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.8px;
+    cursor: pointer; text-align: left; transition: all 0.18s; white-space: nowrap;
   }
-  .sem-grade-tab.active-sem[data-grade="3"] {
-    background: rgba(176,126,224,0.15);
-    border-color: rgba(176,126,224,0.7);
-    color: rgb(176,126,224);
+  .sem-dropdown-item:last-child { border-bottom: none; }
+  .sem-dropdown-item:hover { background: rgba(201,168,76,0.12); color: var(--gold-light); }
+  .sem-dropdown-item.active-sem {
+    background: rgba(201,168,76,0.18); color: var(--gold-light);
+    border-left: 3px solid rgba(201,168,76,0.80);
   }
   .btn-sem-col-edit {
     display: inline-flex; align-items: center; gap: 6px;
@@ -977,8 +989,8 @@
 
   /* 학기명 셀 (맨 왼쪽) */
   .sem-row-head {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    padding: 14px 10px; border-right: 2px solid rgba(26,107,191,0.15);
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+    padding: 14px 10px 10px; border-right: 2px solid rgba(26,107,191,0.15);
     text-align: center; flex-shrink: 0;
   }
   .sem-row.row-2학년 .sem-row-head { background: rgba(106,189,232,0.05); border-left: 3px solid rgba(106,189,232,0.5); }
@@ -991,6 +1003,46 @@
   .sem-row-title {
     font-family: 'Noto Serif KR', serif; font-size: 13px; font-weight: 900; color: #1a2e4a;
   }
+
+  /* 학기 셀 안 일반/진로/융합 범례 */
+  .sem-row-type-labels {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    width: 100%;
+    margin-top: 6px;
+    gap: 0;
+  }
+  .sem-row-type-label {
+    flex: 1;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; font-weight: 900; letter-spacing: 1.5px;
+    font-family: 'Noto Sans KR', sans-serif;
+    border-radius: 2px;
+  }
+  .rtl-일반 { color: #3a8abe; }
+  .rtl-진로 { color: #1a9070; }
+  .rtl-융합 { color: #9060c0; }
+
+  /* 각 과목군 셀 안 3행 분할 */
+  .sem-subrow-wrap {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .sem-subrow {
+    flex: 1;
+    min-height: 0;
+    border-bottom: 1px solid rgba(26,107,191,0.07);
+    display: flex;
+    overflow: hidden;
+  }
+  .sem-subrow:last-child { border-bottom: none; }
+  .sem-subrow-일반 { background: rgba(58,138,190,0.03); }
+  .sem-subrow-진로 { background: rgba(26,144,112,0.03); }
+  .sem-subrow-융합 { background: rgba(144,96,192,0.03); }
 
   /* 각 과목군 셀 */
   .sem-cell {
@@ -1056,8 +1108,10 @@
   /* 셀 안 — 필수·선택 구조 통일: 추가버튼 + 목록 */
   .sem-panel { display: contents; } /* 더 이상 필요 없지만 JS 호환용 */
 
+  
+
   /* 패널 내 과목 목록 */
-  .sem-subject-list { flex: 1; overflow-y: auto; padding: 8px 6px; }
+  .sem-subject-list { flex: 1; overflow-y: auto; padding: 6px 6px; min-width: 0; }
   /* 과목 6개 이상 → JS가 .wide 클래스 추가 → 2열 그리드 */
   .sem-subject-list.wide { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; align-content: start; }
   .sem-subject-list.wide .sem-subj-card { margin-bottom: 0; }
@@ -1136,11 +1190,11 @@
   .btn-spj-confirm:hover { opacity: 0.85; }
 
   /* 카테고리 컬러 */
-  .dot-국어{background:#7eb8e0} .dot-수학{background:#e07eb8} .dot-영어{background:#7ee0b0}
+  .dot-국어{background:#7eb8e0} .dot-수학{background:#e07eb8} .dot-영어{background:#1a9e5c}
   .dot-사회{background:#e0b87e} .dot-과학{background:#a07ee0} .dot-예체능{background:#e07e7e}
   .dot-직업{background:#7ec8e0} .dot-기타{background:#b0b0b0}
   .sem-bc-국어{border-left-color:#7eb8e0} .sem-bc-수학{border-left-color:#e07eb8}
-  .sem-bc-영어{border-left-color:#7ee0b0} .sem-bc-사회{border-left-color:#e0b87e}
+  .sem-bc-영어{border-left-color:#1a9e5c} .sem-bc-사회{border-left-color:#e0b87e}
   .sem-bc-과학{border-left-color:#a07ee0} .sem-bc-예체능{border-left-color:#e07e7e}
   .sem-bc-직업{border-left-color:#7ec8e0} .sem-bc-기타{border-left-color:rgba(26,46,74,0.15)}
 
@@ -1194,7 +1248,7 @@
     border: 1px solid rgba(200,120,20,0.50);
     color: #b06010;
   }
-  .txt-국어{color:#7eb8e0} .txt-수학{color:#e07eb8} .txt-영어{color:#7ee0b0}
+  .txt-국어{color:#7eb8e0} .txt-수학{color:#e07eb8} .txt-영어{color:#1a9e5c}
   .txt-사회{color:#e0b87e} .txt-과학{color:#a07ee0} .txt-예체능{color:#e07e7e}
   .txt-직업{color:#7ec8e0} .txt-기타{color:#b0b0b0}
 
@@ -2415,7 +2469,7 @@
           <div class="info-field-label">등급산출여부</div>
           <div class="grade-picker" id="grade-picker">
             <button type="button" class="grade-picker-trigger" id="grade-picker-trigger" onclick="toggleGradePicker()">
-              <span class="gpt-badge" id="gpt-badge" style="display:none"></span>
+              <span class="gpt-badge" id="gpt-badge"></span>
               <span class="gpt-label" id="gpt-label">선택하세요</span>
               <span class="gpt-arrow">▼</span>
             </button>
@@ -2568,7 +2622,7 @@
             📁 이미지 선택 (JPG, PNG, WEBP)
           </button>
           <button class="btn-pe-bg-remove" onclick="removeBgImage()" title="배경 제거">✕</button>
-          <input type="file" id="pe-bg-file-input" accept="image/*" style="display:none" onchange="onBgFileChange(this)">
+          <input type="file" id="pe-bg-file-input" accept="image/*" onchange="onBgFileChange(this)">
         </div>
         <div class="pe-opacity-row">
           <span class="pe-opacity-label">투명도</span>
@@ -2610,10 +2664,13 @@
       </div>
     </div>
     <div class="sem-grade-tabs" id="sem-semester-tabs">
-      <button class="sem-grade-tab" id="sem-tab-0" onclick="setCurrentSem(0)">2학년 1학기</button>
-      <button class="sem-grade-tab" id="sem-tab-1" onclick="setCurrentSem(1)">2학년 2학기</button>
-      <button class="sem-grade-tab" id="sem-tab-2" onclick="setCurrentSem(2)">3학년 1학기</button>
-      <button class="sem-grade-tab" id="sem-tab-3" onclick="setCurrentSem(3)">3학년 2학기</button>
+      <div class="sem-dropdown-wrap" id="sem-dropdown-wrap">
+        <button class="sem-dropdown-btn" id="sem-dropdown-btn" onclick="toggleSemDropdown(event)">
+          <span id="sem-dropdown-label">2학년 1학기</span>
+          <span class="sem-dropdown-arrow" id="sem-dropdown-arrow">▾</span>
+        </button>
+
+      </div>
       <button class="btn-sem-col-edit" onclick="openSemColEditPw()" title="열 헤더 · 학점 편집">✏️ 편집</button>
     </div>
   </div>
@@ -2644,174 +2701,412 @@
       <div class="sem-row-head">
         <div class="sem-row-grade">2학년</div>
         <div class="sem-row-title">1학기</div>
+        <div class="sem-row-type-labels">
+          <div class="sem-row-type-label rtl-일반">일반</div>
+          <div class="sem-row-type-label rtl-진로">진로</div>
+          <div class="sem-row-type-label rtl-융합">융합</div>
+        </div>
       </div>
-      <div class="sem-cell cell-req">
+      <div class="sem-cell cell-req" style="border-right:2px solid rgba(232,130,106,0.20);">
         <div class="sem-panel-head">
           <span class="sem-panel-count" id="sem-stat-req-0">0개</span>
           <button class="btn-sem-add req-add" onclick="openSubjPickPw(0,'필수')">＋ 추가</button>
         </div>
-        <div class="sem-subject-list" id="sem-list-req-0"></div>
+        <div class="sem-subrow-wrap">
+          <div class="sem-subrow sem-subrow-일반">
+            <div class="sem-subject-list" id="sem-list-req-0-일반"></div>
+          </div>
+          <div class="sem-subrow sem-subrow-진로">
+            <div class="sem-subject-list" id="sem-list-req-0-진로"></div>
+          </div>
+          <div class="sem-subrow sem-subrow-융합">
+            <div class="sem-subject-list" id="sem-list-req-0-융합"></div>
+          </div>
+        </div>
+        <div class="sem-subject-list" id="sem-list-req-0" style="display:none"></div>
       </div>
-      <div class="sem-cell cell-사회과학">
+      <div class="sem-cell cell-사회과학" style="">
         <div class="sem-panel-head">
           <span class="sem-panel-count" id="sem-stat-elec-사회과학-0">0개</span>
           <button class="btn-sem-add elec-사회과학-add" onclick="openSubjPickPw(0,'사회&과학')">＋ 추가</button>
         </div>
-        <div class="sem-subject-list" id="sem-list-elec-사회과학-0"></div>
+        <div class="sem-subrow-wrap">
+          <div class="sem-subrow sem-subrow-일반">
+            <div class="sem-subject-list" id="sem-list-elec-사회과학-0-일반"></div>
+          </div>
+          <div class="sem-subrow sem-subrow-진로">
+            <div class="sem-subject-list" id="sem-list-elec-사회과학-0-진로"></div>
+          </div>
+          <div class="sem-subrow sem-subrow-융합">
+            <div class="sem-subject-list" id="sem-list-elec-사회과학-0-융합"></div>
+          </div>
+        </div>
+        <div class="sem-subject-list" id="sem-list-elec-사회과학-0" style="display:none"></div>
       </div>
-      <div class="sem-cell cell-국수영">
+      <div class="sem-cell cell-국수영" style="">
         <div class="sem-panel-head">
           <span class="sem-panel-count" id="sem-stat-elec-국수영-0">0개</span>
           <button class="btn-sem-add elec-국수영-add" onclick="openSubjPickPw(0,'국&수&영')">＋ 추가</button>
         </div>
-        <div class="sem-subject-list" id="sem-list-elec-국수영-0"></div>
+        <div class="sem-subrow-wrap">
+          <div class="sem-subrow sem-subrow-일반">
+            <div class="sem-subject-list" id="sem-list-elec-국수영-0-일반"></div>
+          </div>
+          <div class="sem-subrow sem-subrow-진로">
+            <div class="sem-subject-list" id="sem-list-elec-국수영-0-진로"></div>
+          </div>
+          <div class="sem-subrow sem-subrow-융합">
+            <div class="sem-subject-list" id="sem-list-elec-국수영-0-융합"></div>
+          </div>
+        </div>
+        <div class="sem-subject-list" id="sem-list-elec-국수영-0" style="display:none"></div>
       </div>
-      <div class="sem-cell cell-외국어정보">
+      <div class="sem-cell cell-외국어정보" style="">
         <div class="sem-panel-head">
           <span class="sem-panel-count" id="sem-stat-elec-외국어정보-0">0개</span>
           <button class="btn-sem-add elec-외국어정보-add" onclick="openSubjPickPw(0,'외국어&교양')">＋ 추가</button>
         </div>
-        <div class="sem-subject-list" id="sem-list-elec-외국어정보-0"></div>
+        <div class="sem-subrow-wrap">
+          <div class="sem-subrow sem-subrow-일반">
+            <div class="sem-subject-list" id="sem-list-elec-외국어정보-0-일반"></div>
+          </div>
+          <div class="sem-subrow sem-subrow-진로">
+            <div class="sem-subject-list" id="sem-list-elec-외국어정보-0-진로"></div>
+          </div>
+          <div class="sem-subrow sem-subrow-융합">
+            <div class="sem-subject-list" id="sem-list-elec-외국어정보-0-융합"></div>
+          </div>
+        </div>
+        <div class="sem-subject-list" id="sem-list-elec-외국어정보-0" style="display:none"></div>
       </div>
-      <div class="sem-cell cell-음악미술">
+      <div class="sem-cell cell-음악미술" style="">
         <div class="sem-panel-head">
           <span class="sem-panel-count" id="sem-stat-elec-음악미술-0">0개</span>
           <button class="btn-sem-add elec-음악미술-add" onclick="openSubjPickPw(0,'음악&미술')">＋ 추가</button>
         </div>
-        <div class="sem-subject-list" id="sem-list-elec-음악미술-0"></div>
+        <div class="sem-subrow-wrap">
+          <div class="sem-subrow sem-subrow-일반">
+            <div class="sem-subject-list" id="sem-list-elec-음악미술-0-일반"></div>
+          </div>
+          <div class="sem-subrow sem-subrow-진로">
+            <div class="sem-subject-list" id="sem-list-elec-음악미술-0-진로"></div>
+          </div>
+          <div class="sem-subrow sem-subrow-융합">
+            <div class="sem-subject-list" id="sem-list-elec-음악미술-0-융합"></div>
+          </div>
+        </div>
+        <div class="sem-subject-list" id="sem-list-elec-음악미술-0" style="display:none"></div>
       </div>
     </div>
-
     <!-- 2학년 2학기 -->
     <div class="sem-row row-2학년">
       <div class="sem-row-head">
         <div class="sem-row-grade">2학년</div>
         <div class="sem-row-title">2학기</div>
+        <div class="sem-row-type-labels">
+          <div class="sem-row-type-label rtl-일반">일반</div>
+          <div class="sem-row-type-label rtl-진로">진로</div>
+          <div class="sem-row-type-label rtl-융합">융합</div>
+        </div>
       </div>
-      <div class="sem-cell cell-req">
+      <div class="sem-cell cell-req" style="border-right:2px solid rgba(232,130,106,0.20);">
         <div class="sem-panel-head">
           <span class="sem-panel-count" id="sem-stat-req-1">0개</span>
           <button class="btn-sem-add req-add" onclick="openSubjPickPw(1,'필수')">＋ 추가</button>
         </div>
-        <div class="sem-subject-list" id="sem-list-req-1"></div>
+        <div class="sem-subrow-wrap">
+          <div class="sem-subrow sem-subrow-일반">
+            <div class="sem-subject-list" id="sem-list-req-1-일반"></div>
+          </div>
+          <div class="sem-subrow sem-subrow-진로">
+            <div class="sem-subject-list" id="sem-list-req-1-진로"></div>
+          </div>
+          <div class="sem-subrow sem-subrow-융합">
+            <div class="sem-subject-list" id="sem-list-req-1-융합"></div>
+          </div>
+        </div>
+        <div class="sem-subject-list" id="sem-list-req-1" style="display:none"></div>
       </div>
-      <div class="sem-cell cell-사회과학">
+      <div class="sem-cell cell-사회과학" style="">
         <div class="sem-panel-head">
           <span class="sem-panel-count" id="sem-stat-elec-사회과학-1">0개</span>
           <button class="btn-sem-add elec-사회과학-add" onclick="openSubjPickPw(1,'사회&과학')">＋ 추가</button>
         </div>
-        <div class="sem-subject-list" id="sem-list-elec-사회과학-1"></div>
+        <div class="sem-subrow-wrap">
+          <div class="sem-subrow sem-subrow-일반">
+            <div class="sem-subject-list" id="sem-list-elec-사회과학-1-일반"></div>
+          </div>
+          <div class="sem-subrow sem-subrow-진로">
+            <div class="sem-subject-list" id="sem-list-elec-사회과학-1-진로"></div>
+          </div>
+          <div class="sem-subrow sem-subrow-융합">
+            <div class="sem-subject-list" id="sem-list-elec-사회과학-1-융합"></div>
+          </div>
+        </div>
+        <div class="sem-subject-list" id="sem-list-elec-사회과학-1" style="display:none"></div>
       </div>
-      <div class="sem-cell cell-국수영">
+      <div class="sem-cell cell-국수영" style="">
         <div class="sem-panel-head">
           <span class="sem-panel-count" id="sem-stat-elec-국수영-1">0개</span>
           <button class="btn-sem-add elec-국수영-add" onclick="openSubjPickPw(1,'국&수&영')">＋ 추가</button>
         </div>
-        <div class="sem-subject-list" id="sem-list-elec-국수영-1"></div>
+        <div class="sem-subrow-wrap">
+          <div class="sem-subrow sem-subrow-일반">
+            <div class="sem-subject-list" id="sem-list-elec-국수영-1-일반"></div>
+          </div>
+          <div class="sem-subrow sem-subrow-진로">
+            <div class="sem-subject-list" id="sem-list-elec-국수영-1-진로"></div>
+          </div>
+          <div class="sem-subrow sem-subrow-융합">
+            <div class="sem-subject-list" id="sem-list-elec-국수영-1-융합"></div>
+          </div>
+        </div>
+        <div class="sem-subject-list" id="sem-list-elec-국수영-1" style="display:none"></div>
       </div>
-      <div class="sem-cell cell-외국어정보">
+      <div class="sem-cell cell-외국어정보" style="">
         <div class="sem-panel-head">
           <span class="sem-panel-count" id="sem-stat-elec-외국어정보-1">0개</span>
           <button class="btn-sem-add elec-외국어정보-add" onclick="openSubjPickPw(1,'외국어&교양')">＋ 추가</button>
         </div>
-        <div class="sem-subject-list" id="sem-list-elec-외국어정보-1"></div>
+        <div class="sem-subrow-wrap">
+          <div class="sem-subrow sem-subrow-일반">
+            <div class="sem-subject-list" id="sem-list-elec-외국어정보-1-일반"></div>
+          </div>
+          <div class="sem-subrow sem-subrow-진로">
+            <div class="sem-subject-list" id="sem-list-elec-외국어정보-1-진로"></div>
+          </div>
+          <div class="sem-subrow sem-subrow-융합">
+            <div class="sem-subject-list" id="sem-list-elec-외국어정보-1-융합"></div>
+          </div>
+        </div>
+        <div class="sem-subject-list" id="sem-list-elec-외국어정보-1" style="display:none"></div>
       </div>
-      <div class="sem-cell cell-음악미술">
+      <div class="sem-cell cell-음악미술" style="">
         <div class="sem-panel-head">
           <span class="sem-panel-count" id="sem-stat-elec-음악미술-1">0개</span>
           <button class="btn-sem-add elec-음악미술-add" onclick="openSubjPickPw(1,'음악&미술')">＋ 추가</button>
         </div>
-        <div class="sem-subject-list" id="sem-list-elec-음악미술-1"></div>
+        <div class="sem-subrow-wrap">
+          <div class="sem-subrow sem-subrow-일반">
+            <div class="sem-subject-list" id="sem-list-elec-음악미술-1-일반"></div>
+          </div>
+          <div class="sem-subrow sem-subrow-진로">
+            <div class="sem-subject-list" id="sem-list-elec-음악미술-1-진로"></div>
+          </div>
+          <div class="sem-subrow sem-subrow-융합">
+            <div class="sem-subject-list" id="sem-list-elec-음악미술-1-융합"></div>
+          </div>
+        </div>
+        <div class="sem-subject-list" id="sem-list-elec-음악미술-1" style="display:none"></div>
       </div>
     </div>
-
     <!-- 3학년 1학기 -->
     <div class="sem-row row-3학년 row-grade-break">
       <div class="sem-row-head">
         <div class="sem-row-grade">3학년</div>
         <div class="sem-row-title">1학기</div>
+        <div class="sem-row-type-labels">
+          <div class="sem-row-type-label rtl-일반">일반</div>
+          <div class="sem-row-type-label rtl-진로">진로</div>
+          <div class="sem-row-type-label rtl-융합">융합</div>
+        </div>
       </div>
-      <div class="sem-cell cell-req">
+      <div class="sem-cell cell-req" style="border-right:2px solid rgba(232,130,106,0.20);">
         <div class="sem-panel-head">
           <span class="sem-panel-count" id="sem-stat-req-2">0개</span>
           <button class="btn-sem-add req-add" onclick="openSubjPickPw(2,'필수')">＋ 추가</button>
         </div>
-        <div class="sem-subject-list" id="sem-list-req-2"></div>
+        <div class="sem-subrow-wrap">
+          <div class="sem-subrow sem-subrow-일반">
+            <div class="sem-subject-list" id="sem-list-req-2-일반"></div>
+          </div>
+          <div class="sem-subrow sem-subrow-진로">
+            <div class="sem-subject-list" id="sem-list-req-2-진로"></div>
+          </div>
+          <div class="sem-subrow sem-subrow-융합">
+            <div class="sem-subject-list" id="sem-list-req-2-융합"></div>
+          </div>
+        </div>
+        <div class="sem-subject-list" id="sem-list-req-2" style="display:none"></div>
       </div>
-      <div class="sem-cell cell-사회과학">
+      <div class="sem-cell cell-사회과학" style="">
         <div class="sem-panel-head">
           <span class="sem-panel-count" id="sem-stat-elec-사회과학-2">0개</span>
           <button class="btn-sem-add elec-사회과학-add" onclick="openSubjPickPw(2,'사회&과학&예술')">＋ 추가</button>
         </div>
-        <div class="sem-subject-list" id="sem-list-elec-사회과학-2"></div>
+        <div class="sem-subrow-wrap">
+          <div class="sem-subrow sem-subrow-일반">
+            <div class="sem-subject-list" id="sem-list-elec-사회과학-2-일반"></div>
+          </div>
+          <div class="sem-subrow sem-subrow-진로">
+            <div class="sem-subject-list" id="sem-list-elec-사회과학-2-진로"></div>
+          </div>
+          <div class="sem-subrow sem-subrow-융합">
+            <div class="sem-subject-list" id="sem-list-elec-사회과학-2-융합"></div>
+          </div>
+        </div>
+        <div class="sem-subject-list" id="sem-list-elec-사회과학-2" style="display:none"></div>
       </div>
-      <div class="sem-cell cell-국수영">
+      <div class="sem-cell cell-국수영" style="">
         <div class="sem-panel-head">
           <span class="sem-panel-count" id="sem-stat-elec-국수영-2">0개</span>
           <button class="btn-sem-add elec-국수영-add" onclick="openSubjPickPw(2,'국&수&영')">＋ 추가</button>
         </div>
-        <div class="sem-subject-list" id="sem-list-elec-국수영-2"></div>
+        <div class="sem-subrow-wrap">
+          <div class="sem-subrow sem-subrow-일반">
+            <div class="sem-subject-list" id="sem-list-elec-국수영-2-일반"></div>
+          </div>
+          <div class="sem-subrow sem-subrow-진로">
+            <div class="sem-subject-list" id="sem-list-elec-국수영-2-진로"></div>
+          </div>
+          <div class="sem-subrow sem-subrow-융합">
+            <div class="sem-subject-list" id="sem-list-elec-국수영-2-융합"></div>
+          </div>
+        </div>
+        <div class="sem-subject-list" id="sem-list-elec-국수영-2" style="display:none"></div>
       </div>
-      <div class="sem-cell cell-외국어정보">
+      <div class="sem-cell cell-외국어정보" style="">
         <div class="sem-panel-head">
           <span class="sem-panel-count" id="sem-stat-elec-외국어정보-2">0개</span>
           <button class="btn-sem-add elec-외국어정보-add" onclick="openSubjPickPw(2,'외국어&교양')">＋ 추가</button>
         </div>
-        <div class="sem-subject-list" id="sem-list-elec-외국어정보-2"></div>
+        <div class="sem-subrow-wrap">
+          <div class="sem-subrow sem-subrow-일반">
+            <div class="sem-subject-list" id="sem-list-elec-외국어정보-2-일반"></div>
+          </div>
+          <div class="sem-subrow sem-subrow-진로">
+            <div class="sem-subject-list" id="sem-list-elec-외국어정보-2-진로"></div>
+          </div>
+          <div class="sem-subrow sem-subrow-융합">
+            <div class="sem-subject-list" id="sem-list-elec-외국어정보-2-융합"></div>
+          </div>
+        </div>
+        <div class="sem-subject-list" id="sem-list-elec-외국어정보-2" style="display:none"></div>
       </div>
-      <div class="sem-cell cell-음악미술">
+      <div class="sem-cell cell-음악미술" style="">
         <div class="sem-panel-head">
           <span class="sem-panel-count" id="sem-stat-elec-음악미술-2">0개</span>
           <button class="btn-sem-add elec-음악미술-add" onclick="openSubjPickPw(2,'음악&미술')">＋ 추가</button>
         </div>
-        <div class="sem-subject-list" id="sem-list-elec-음악미술-2"></div>
+        <div class="sem-subrow-wrap">
+          <div class="sem-subrow sem-subrow-일반">
+            <div class="sem-subject-list" id="sem-list-elec-음악미술-2-일반"></div>
+          </div>
+          <div class="sem-subrow sem-subrow-진로">
+            <div class="sem-subject-list" id="sem-list-elec-음악미술-2-진로"></div>
+          </div>
+          <div class="sem-subrow sem-subrow-융합">
+            <div class="sem-subject-list" id="sem-list-elec-음악미술-2-융합"></div>
+          </div>
+        </div>
+        <div class="sem-subject-list" id="sem-list-elec-음악미술-2" style="display:none"></div>
       </div>
     </div>
-
     <!-- 3학년 2학기 -->
     <div class="sem-row row-3학년">
       <div class="sem-row-head">
         <div class="sem-row-grade">3학년</div>
         <div class="sem-row-title">2학기</div>
+        <div class="sem-row-type-labels">
+          <div class="sem-row-type-label rtl-일반">일반</div>
+          <div class="sem-row-type-label rtl-진로">진로</div>
+          <div class="sem-row-type-label rtl-융합">융합</div>
+        </div>
       </div>
-      <div class="sem-cell cell-req">
+      <div class="sem-cell cell-req" style="border-right:2px solid rgba(232,130,106,0.20);">
         <div class="sem-panel-head">
           <span class="sem-panel-count" id="sem-stat-req-3">0개</span>
           <button class="btn-sem-add req-add" onclick="openSubjPickPw(3,'필수')">＋ 추가</button>
         </div>
-        <div class="sem-subject-list" id="sem-list-req-3"></div>
+        <div class="sem-subrow-wrap">
+          <div class="sem-subrow sem-subrow-일반">
+            <div class="sem-subject-list" id="sem-list-req-3-일반"></div>
+          </div>
+          <div class="sem-subrow sem-subrow-진로">
+            <div class="sem-subject-list" id="sem-list-req-3-진로"></div>
+          </div>
+          <div class="sem-subrow sem-subrow-융합">
+            <div class="sem-subject-list" id="sem-list-req-3-융합"></div>
+          </div>
+        </div>
+        <div class="sem-subject-list" id="sem-list-req-3" style="display:none"></div>
       </div>
-      <div class="sem-cell cell-사회과학">
+      <div class="sem-cell cell-사회과학" style="">
         <div class="sem-panel-head">
           <span class="sem-panel-count" id="sem-stat-elec-사회과학-3">0개</span>
           <button class="btn-sem-add elec-사회과학-add" onclick="openSubjPickPw(3,'사회&과학&예술')">＋ 추가</button>
         </div>
-        <div class="sem-subject-list" id="sem-list-elec-사회과학-3"></div>
+        <div class="sem-subrow-wrap">
+          <div class="sem-subrow sem-subrow-일반">
+            <div class="sem-subject-list" id="sem-list-elec-사회과학-3-일반"></div>
+          </div>
+          <div class="sem-subrow sem-subrow-진로">
+            <div class="sem-subject-list" id="sem-list-elec-사회과학-3-진로"></div>
+          </div>
+          <div class="sem-subrow sem-subrow-융합">
+            <div class="sem-subject-list" id="sem-list-elec-사회과학-3-융합"></div>
+          </div>
+        </div>
+        <div class="sem-subject-list" id="sem-list-elec-사회과학-3" style="display:none"></div>
       </div>
-      <div class="sem-cell cell-국수영">
+      <div class="sem-cell cell-국수영" style="">
         <div class="sem-panel-head">
           <span class="sem-panel-count" id="sem-stat-elec-국수영-3">0개</span>
           <button class="btn-sem-add elec-국수영-add" onclick="openSubjPickPw(3,'국&수&영')">＋ 추가</button>
         </div>
-        <div class="sem-subject-list" id="sem-list-elec-국수영-3"></div>
+        <div class="sem-subrow-wrap">
+          <div class="sem-subrow sem-subrow-일반">
+            <div class="sem-subject-list" id="sem-list-elec-국수영-3-일반"></div>
+          </div>
+          <div class="sem-subrow sem-subrow-진로">
+            <div class="sem-subject-list" id="sem-list-elec-국수영-3-진로"></div>
+          </div>
+          <div class="sem-subrow sem-subrow-융합">
+            <div class="sem-subject-list" id="sem-list-elec-국수영-3-융합"></div>
+          </div>
+        </div>
+        <div class="sem-subject-list" id="sem-list-elec-국수영-3" style="display:none"></div>
       </div>
-      <div class="sem-cell cell-외국어정보">
+      <div class="sem-cell cell-외국어정보" style="">
         <div class="sem-panel-head">
           <span class="sem-panel-count" id="sem-stat-elec-외국어정보-3">0개</span>
           <button class="btn-sem-add elec-외국어정보-add" onclick="openSubjPickPw(3,'외국어&교양')">＋ 추가</button>
         </div>
-        <div class="sem-subject-list" id="sem-list-elec-외국어정보-3"></div>
+        <div class="sem-subrow-wrap">
+          <div class="sem-subrow sem-subrow-일반">
+            <div class="sem-subject-list" id="sem-list-elec-외국어정보-3-일반"></div>
+          </div>
+          <div class="sem-subrow sem-subrow-진로">
+            <div class="sem-subject-list" id="sem-list-elec-외국어정보-3-진로"></div>
+          </div>
+          <div class="sem-subrow sem-subrow-융합">
+            <div class="sem-subject-list" id="sem-list-elec-외국어정보-3-융합"></div>
+          </div>
+        </div>
+        <div class="sem-subject-list" id="sem-list-elec-외국어정보-3" style="display:none"></div>
       </div>
-      <div class="sem-cell cell-음악미술">
+      <div class="sem-cell cell-음악미술" style="">
         <div class="sem-panel-head">
           <span class="sem-panel-count" id="sem-stat-elec-음악미술-3">0개</span>
           <button class="btn-sem-add elec-음악미술-add" onclick="openSubjPickPw(3,'음악&미술')">＋ 추가</button>
         </div>
-        <div class="sem-subject-list" id="sem-list-elec-음악미술-3"></div>
+        <div class="sem-subrow-wrap">
+          <div class="sem-subrow sem-subrow-일반">
+            <div class="sem-subject-list" id="sem-list-elec-음악미술-3-일반"></div>
+          </div>
+          <div class="sem-subrow sem-subrow-진로">
+            <div class="sem-subject-list" id="sem-list-elec-음악미술-3-진로"></div>
+          </div>
+          <div class="sem-subrow sem-subrow-융합">
+            <div class="sem-subject-list" id="sem-list-elec-음악미술-3-융합"></div>
+          </div>
+        </div>
+        <div class="sem-subject-list" id="sem-list-elec-음악미술-3" style="display:none"></div>
       </div>
     </div>
 
   </div>
+
 </div>
 
 <!-- ═══════════════════════════════════════
@@ -2916,7 +3211,14 @@
   <div class="modal-box">
     <button class="modal-close" onclick="closeSubjPick()">×</button>
     <div class="modal-label">SUBJECT SELECT</div>
-    <div class="modal-title" style="margin-bottom:16px" id="subj-pick-title">과목 선택</div>
+    <div class="modal-title" style="margin-bottom:12px" id="subj-pick-title">과목 선택</div>
+    <!-- 일반/진로/융합 분류 선택 -->
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px;flex-shrink:0;">
+      <span style="font-size:10px;letter-spacing:1.5px;color:rgba(26,46,74,0.65);flex-shrink:0;">분류</span>
+      <button id="spj-subtype-일반" class="spf-tab active" onclick="setPickSubtype('일반')" style="font-size:11px;padding:5px 14px;">일반</button>
+      <button id="spj-subtype-진로" class="spf-tab" onclick="setPickSubtype('진로')" style="font-size:11px;padding:5px 14px;">진로</button>
+      <button id="spj-subtype-융합" class="spf-tab" onclick="setPickSubtype('융합')" style="font-size:11px;padding:5px 14px;">융합</button>
+    </div>
     <div class="subj-pick-filter" id="spj-filter"></div>
     <div class="subj-pick-list-wrap">
       <div id="spj-list"></div>
@@ -3059,7 +3361,7 @@
     </div>
 
     <!-- 선택 단계들 -->
-    <div class="ss-steps" id="ss-steps" style="display:none">
+    <div class="ss-steps" id="ss-steps">
 
       <!-- 1단계: 권역 선택 -->
       <div class="ss-step" id="ss-step-region">
@@ -3068,25 +3370,25 @@
       </div>
 
       <!-- 2단계: 지역 선택 -->
-      <div class="ss-step" id="ss-step-area" style="display:none">
+      <div class="ss-step" id="ss-step-area">
         <div class="ss-step-label">STEP 2 · 지역 선택</div>
         <div class="ss-chips" id="ss-chips-area"></div>
       </div>
 
       <!-- 3단계: 대학명 선택 -->
-      <div class="ss-step" id="ss-step-univ" style="display:none">
+      <div class="ss-step" id="ss-step-univ">
         <div class="ss-step-label">STEP 3 · 대학명 선택</div>
         <div class="ss-chips" id="ss-chips-univ"></div>
       </div>
 
       <!-- 4단계: 모집단위(계열/그룹) 선택 -->
-      <div class="ss-step" id="ss-step-dept1" style="display:none">
+      <div class="ss-step" id="ss-step-dept1">
         <div class="ss-step-label">STEP 4 · 모집단위 선택</div>
         <div class="ss-chips" id="ss-chips-dept1"></div>
       </div>
 
       <!-- 5단계: 세부 모집단위 선택 (분리형일 때만 표시) -->
-      <div class="ss-step" id="ss-step-dept2" style="display:none">
+      <div class="ss-step" id="ss-step-dept2">
         <div class="ss-step-label">STEP 5 · 세부 모집단위 선택</div>
         <div class="ss-chips" id="ss-chips-dept2"></div>
       </div>
@@ -3094,7 +3396,7 @@
     </div>
 
     <!-- 결과 표시 -->
-    <div id="ss-result-area" style="display:none"></div>
+    <div id="ss-result-area"></div>
 
     <!-- 초기화 버튼 -->
     <div id="ss-reset-wrap" style="display:none;text-align:center">
@@ -3241,8 +3543,8 @@
         <span class="gb-panel-label">LEFT · 왼쪽</span>
         <span class="gb-panel-filename" id="gb-left-filename">PDF 없음</span>
         <button class="gb-fullscreen-btn" id="gb-left-fs-btn" onclick="openGbFullscreen('left')" title="전체화면">⛶</button>
-        <button class="gb-upload-btn" id="gb-left-upload-btn" onclick="triggerGbPdfInput('left')" style="display:none">📂 PDF 업로드</button>
-        <input type="file" id="gb-left-input" accept="application/pdf" style="display:none" onchange="handleGbPdf('left', this)">
+        <button class="gb-upload-btn" id="gb-left-upload-btn" onclick="triggerGbPdfInput('left')">📂 PDF 업로드</button>
+        <input type="file" id="gb-left-input" accept="application/pdf" onchange="handleGbPdf('left', this)">
       </div>
       <div class="gb-panel-viewer" id="gb-left-viewer">
         <div class="gb-empty" id="gb-left-empty">
@@ -3250,7 +3552,7 @@
           <div class="gb-empty-text">왼쪽 PDF가 없습니다.<br><span style="font-size:10px;opacity:0.6">관리자가 PDF를 업로드할 수 있습니다.</span></div>
         </div>
       </div>
-      <div class="gb-panel-nav" id="gb-left-nav" style="display:none">
+      <div class="gb-panel-nav" id="gb-left-nav">
         <button class="gb-nav-btn" id="gb-left-prev" onclick="gbPageGo('left',-1)" disabled>‹</button>
         <span class="gb-page-info" id="gb-left-pageinfo">0 / 0</span>
         <button class="gb-nav-btn" id="gb-left-next" onclick="gbPageGo('left',1)" disabled>›</button>
@@ -3263,8 +3565,8 @@
         <span class="gb-panel-label">RIGHT · 오른쪽</span>
         <span class="gb-panel-filename" id="gb-right-filename">PDF 없음</span>
         <button class="gb-fullscreen-btn" id="gb-right-fs-btn" onclick="openGbFullscreen('right')" title="전체화면">⛶</button>
-        <button class="gb-upload-btn" id="gb-right-upload-btn" onclick="triggerGbPdfInput('right')" style="display:none">📂 PDF 업로드</button>
-        <input type="file" id="gb-right-input" accept="application/pdf" style="display:none" onchange="handleGbPdf('right', this)">
+        <button class="gb-upload-btn" id="gb-right-upload-btn" onclick="triggerGbPdfInput('right')">📂 PDF 업로드</button>
+        <input type="file" id="gb-right-input" accept="application/pdf" onchange="handleGbPdf('right', this)">
       </div>
       <div class="gb-panel-viewer" id="gb-right-viewer">
         <div class="gb-empty" id="gb-right-empty">
@@ -3272,7 +3574,7 @@
           <div class="gb-empty-text">오른쪽 PDF가 없습니다.<br><span style="font-size:10px;opacity:0.6">관리자가 PDF를 업로드할 수 있습니다.</span></div>
         </div>
       </div>
-      <div class="gb-panel-nav" id="gb-right-nav" style="display:none">
+      <div class="gb-panel-nav" id="gb-right-nav">
         <button class="gb-nav-btn" id="gb-right-prev" onclick="gbPageGo('right',-1)" disabled>‹</button>
         <span class="gb-page-info" id="gb-right-pageinfo">0 / 0</span>
         <button class="gb-nav-btn" id="gb-right-next" onclick="gbPageGo('right',1)" disabled>›</button>
@@ -4027,7 +4329,7 @@ function createSubjectBlockEl(block, idx, ro) {
           <button class="btn-media-add" onclick="addMedia(${idx},'video')">▶ 영상 자료</button>
           <button class="btn-media-add" onclick="addMedia(${idx},'pdf')">📄 PDF 자료</button>
         </div>
-        <input type="file" id="img-input-${idx}" accept="image/*" style="display:none" onchange="handleImgUpload(event,${idx})">`}
+        <input type="file" id="img-input-${idx}" accept="image/*" onchange="handleImgUpload(event,${idx})">`}
       </div>`;
   }
 
@@ -4124,7 +4426,7 @@ function buildMediaEl(blockIdx, mi, m, ro) {
           <button class="btn-media-add" style="margin-top:10px;width:100%;" onclick="document.getElementById('pdf-input-${blockIdx}-${mi}').click()">
             📄 ${hasFile ? 'PDF 교체' : 'PDF 업로드'}
           </button>
-          <input type="file" id="pdf-input-${blockIdx}-${mi}" accept="application/pdf" style="display:none"
+          <input type="file" id="pdf-input-${blockIdx}-${mi}" accept="application/pdf"
             onchange="handlePdfUpload(event,${blockIdx},${mi})">
           <button class="btn-media-del-top" onclick="deleteMedia(${blockIdx},${mi})">× 삭제</button>`}
       </div>`;
@@ -4515,7 +4817,7 @@ function hexToRgba(hex, alpha) {
 }
 
 const CAT_COLORS = {
-  '국어':'#7eb8e0','수학':'#e07eb8','영어':'#7ee0b0',
+  '국어':'#7eb8e0','수학':'#e07eb8','영어':'#1a9e5c',
   '사회':'#e0b87e','과학':'#a07ee0','예체능':'#e07e7e',
   '직업':'#7ec8e0','기타':'#b0b0b0'
 };
@@ -4609,6 +4911,7 @@ function migrateSemData(raw) {
         // 구버전 타입 마이그레이션
         if (item.type === '선택') return { ...item, type: '사회&과학' };
         if (item.type === '외국어&정보') return { ...item, type: '외국어&교양' };
+        if (!item.subtype) return { ...item, subtype: '일반' };
         return item;
       });
     });
@@ -4634,16 +4937,55 @@ function openSemesterScreen() {
 
 let currentSemIdx = 0;
 
+function toggleSemDropdown(e) {
+  e.stopPropagation();
+  const menu  = document.getElementById('sem-dropdown-menu');
+  const arrow = document.getElementById('sem-dropdown-arrow');
+  const btn   = document.getElementById('sem-dropdown-btn');
+  const isOpen = menu.classList.contains('open');
+  if (!isOpen) {
+    // 버튼의 실제 viewport 위치 계산 → fixed 메뉴 위치 지정
+    const rect = btn.getBoundingClientRect();
+    menu.style.top   = (rect.bottom + 4) + 'px';
+    menu.style.left  = 'auto';
+    menu.style.right = (window.innerWidth - rect.right) + 'px';
+  }
+  menu.classList.toggle('open', !isOpen);
+  arrow.classList.toggle('open', !isOpen);
+}
+
+function setSemFromDropdown(idx) {
+  const menu = document.getElementById('sem-dropdown-menu');
+  const arrow = document.getElementById('sem-dropdown-arrow');
+  menu.classList.remove('open');
+  arrow.classList.remove('open');
+  setCurrentSem(idx);
+}
+
+// 드롭다운 외부 클릭 시 닫기
+document.addEventListener('click', function(e) {
+  const wrap = document.getElementById('sem-dropdown-wrap');
+  if (wrap && !wrap.contains(e.target)) {
+    const menu = document.getElementById('sem-dropdown-menu');
+    const arrow = document.getElementById('sem-dropdown-arrow');
+    if (menu) menu.classList.remove('open');
+    if (arrow) arrow.classList.remove('open');
+  }
+});
+
 function setCurrentSem(idx) {
   currentSemIdx = idx;
   const grade = idx < 2 ? '2' : '3';
 
-  // 탭 활성화
+  // 드롭다운 버튼 라벨 갱신
+  const label = document.getElementById('sem-dropdown-label');
+  if (label) label.textContent = SEM_NAMES[idx] || '';
+
+  // 드롭다운 아이템 활성화
   [0,1,2,3].forEach(i => {
     const tab = document.getElementById('sem-tab-' + i);
     if (!tab) return;
-    tab.className = 'sem-grade-tab' + (i === idx ? ' active-sem' : '');
-    if (i === idx) tab.setAttribute('data-grade', grade);
+    tab.className = 'sem-dropdown-item' + (i === idx ? ' active-sem' : '');
   });
 
   // 열 헤더 — 사회과학 라벨 학년별로 교체
@@ -4815,60 +5157,65 @@ function renderSemCol(colIdx) {
     return card;
   }
 
-  // 필수 목록
-  const reqWrap = document.getElementById('sem-list-req-' + colIdx);
-  if (reqWrap) {
-    reqWrap.innerHTML = '';
-    if (required.length === 0) {
-      reqWrap.innerHTML = '<div class="sem-empty">과목 없음</div>';
+  // 필수 목록 — 일반/진로/융합 서브행
+  const statReq2 = document.getElementById('sem-stat-req-' + colIdx);
+  if (statReq2) statReq2.textContent = required.length + '개';
+  ['일반','진로','융합'].forEach(tp => {
+    const w = document.getElementById(`sem-list-req-${colIdx}-${tp}`);
+    if (!w) return;
+    w.innerHTML = '';
+    const filtered = required.filter(x => (x.subtype || '일반') === tp);
+    if (filtered.length === 0) {
+      w.innerHTML = '<div class="sem-empty" style="font-size:9px;padding:6px 4px;opacity:0.4;">없음</div>';
     } else {
-      required.forEach(item => reqWrap.appendChild(makeCard(item)));
+      filtered.forEach(item => w.appendChild(makeCard(item)));
     }
-  }
+  });
 
-  // 선택 서브패널 4개
+  // 선택 서브패널 4개 — 일반/진로/융합 서브행
   getElecCats(colIdx).forEach((cat, ci) => {
     const key = ELEC_KEYS[ci];
     const elective = items.filter(x => x.type === cat);
     const statEl = document.getElementById('sem-stat-elec-' + key + '-' + colIdx);
     if (statEl) statEl.textContent = elective.length + '개';
-    const elecWrap = document.getElementById('sem-list-elec-' + key + '-' + colIdx);
-    if (elecWrap) {
-      elecWrap.innerHTML = '';
-      if (elective.length === 0) {
-        elecWrap.innerHTML = '<div class="sem-empty">과목 없음</div>';
+    ['일반','진로','융합'].forEach(tp => {
+      const w = document.getElementById(`sem-list-elec-${key}-${colIdx}-${tp}`);
+      if (!w) return;
+      w.innerHTML = '';
+      const filtered = elective.filter(x => (x.subtype || '일반') === tp);
+      if (filtered.length === 0) {
+        w.innerHTML = '<div class="sem-empty" style="font-size:9px;padding:6px 4px;opacity:0.4;">없음</div>';
       } else {
-        elective.forEach(item => elecWrap.appendChild(makeCard(item)));
+        filtered.forEach(item => w.appendChild(makeCard(item)));
       }
-    }
+    });
   });
 
   // ── Wide 자동 조절 ──────────────────────────────────────────
-  // 열별 과목 수 집계 → 6개 이상이면 wide(2fr), 미만이면 표준(1fr)
-  // grid col 순서: [학기명, req, 사회과학, 국수영, 외국어정보, 음악미술]
-  // colIdx(행) 는 0~3 이지만, wide 판단은 같은 행 내 각 타입별 합산
-  // → renderSemCol이 특정 colIdx 한 행만 그리므로 해당 행 기준으로 처리
+  // 서브타입(일반/진로/융합)별 과목 수 기준 → 6개 이상이면 .wide(2열 그리드)
   const wideThreshold = 6;
-  const reqCount  = items.filter(x => x.type === '필수').length;
-  const counts = {
-    req:      reqCount,
-    사회과학: items.filter(x => ['사회&과학','사회&과학&예술'].includes(x.type)).length,
-    국수영:   items.filter(x => x.type === '국&수&영').length,
-    외국어정보: items.filter(x => x.type === '외국어&교양').length,
-    음악미술: items.filter(x => x.type === '음악&미술').length,
-  };
+  const SUBTYPES = ['일반','진로','융합'];
 
-  // 목록 래퍼에 .wide 클래스 토글
-  const listIds = {
-    req:       `sem-list-req-${colIdx}`,
-    사회과학:  `sem-list-elec-사회과학-${colIdx}`,
-    국수영:    `sem-list-elec-국수영-${colIdx}`,
-    외국어정보:`sem-list-elec-외국어정보-${colIdx}`,
-    음악미술:  `sem-list-elec-음악미술-${colIdx}`,
-  };
-  Object.entries(counts).forEach(([key, cnt]) => {
-    const el = document.getElementById(listIds[key]);
+  // 필수 — 각 서브타입별 wide 토글
+  SUBTYPES.forEach(tp => {
+    const cnt = items.filter(x => x.type === '필수' && (x.subtype || '일반') === tp).length;
+    const el = document.getElementById(`sem-list-req-${colIdx}-${tp}`);
     if (el) el.classList.toggle('wide', cnt >= wideThreshold);
+  });
+
+  // 선택 4개 군 — 각 서브타입별 wide 토글
+  const elecKeyMap = {
+    사회과학:  x => ['사회&과학','사회&과학&예술'].includes(x.type),
+    국수영:    x => x.type === '국&수&영',
+    외국어정보:x => x.type === '외국어&교양',
+    음악미술:  x => x.type === '음악&미술',
+  };
+  Object.entries(elecKeyMap).forEach(([key, pred]) => {
+    SUBTYPES.forEach(tp => {
+      const cnt = items.filter(x => pred(x) && (x.subtype || '일반') === tp).length;
+      const el = document.getElementById(`sem-list-elec-${key}-${colIdx}-${tp}`);
+      if (el) el.classList.toggle('wide', cnt >= wideThreshold);
+    });
   });
 
   // 그리드 컬럼 폭 재계산 (모든 4개 행 + 헤더에 동시 적용)
@@ -4909,18 +5256,27 @@ function updateSemGridColumns() {
     row.style.gridTemplateColumns = colTemplate;
   });
 
-  // 각 열 목록 전체에 .wide 토글 (모든 colIdx 행에 적용)
+  // 각 열 목록 전체에 .wide 토글 (모든 colIdx 행, 모든 서브타입에 적용)
+  const SUBTYPES_GC = ['일반','진로','융합'];
   [0,1,2,3].forEach(ci => {
-    const reqEl  = document.getElementById(`sem-list-req-${ci}`);
-    const ssEl   = document.getElementById(`sem-list-elec-사회과학-${ci}`);
-    const knsEl  = document.getElementById(`sem-list-elec-국수영-${ci}`);
-    const forEl  = document.getElementById(`sem-list-elec-외국어정보-${ci}`);
-    const musEl  = document.getElementById(`sem-list-elec-음악미술-${ci}`);
-    if (reqEl)  reqEl.classList.toggle('wide',  maxReq >= threshold);
-    if (ssEl)   ssEl.classList.toggle('wide',   maxSS  >= threshold);
-    if (knsEl)  knsEl.classList.toggle('wide',  maxKns >= threshold);
-    if (forEl)  forEl.classList.toggle('wide',  maxFor >= threshold);
-    if (musEl)  musEl.classList.toggle('wide',  maxMus >= threshold);
+    SUBTYPES_GC.forEach(tp => {
+      const colData = semesterData[ci] || [];
+      const reqCnt = colData.filter(x => x.type === '필수' && (x.subtype || '일반') === tp).length;
+      const ssCnt  = colData.filter(x => ['사회&과학','사회&과학&예술'].includes(x.type) && (x.subtype || '일반') === tp).length;
+      const knsCnt = colData.filter(x => x.type === '국&수&영' && (x.subtype || '일반') === tp).length;
+      const forCnt = colData.filter(x => x.type === '외국어&교양' && (x.subtype || '일반') === tp).length;
+      const musCnt = colData.filter(x => x.type === '음악&미술' && (x.subtype || '일반') === tp).length;
+      const reqEl = document.getElementById(`sem-list-req-${ci}-${tp}`);
+      const ssEl  = document.getElementById(`sem-list-elec-사회과학-${ci}-${tp}`);
+      const knsEl = document.getElementById(`sem-list-elec-국수영-${ci}-${tp}`);
+      const forEl = document.getElementById(`sem-list-elec-외국어정보-${ci}-${tp}`);
+      const musEl = document.getElementById(`sem-list-elec-음악미술-${ci}-${tp}`);
+      if (reqEl) reqEl.classList.toggle('wide', reqCnt >= threshold);
+      if (ssEl)  ssEl.classList.toggle('wide',  ssCnt  >= threshold);
+      if (knsEl) knsEl.classList.toggle('wide', knsCnt >= threshold);
+      if (forEl) forEl.classList.toggle('wide', forCnt >= threshold);
+      if (musEl) musEl.classList.toggle('wide', musCnt >= threshold);
+    });
   });
 }
 
@@ -4935,6 +5291,7 @@ let pickTargetCol = -1;
 let pickSelected = new Set();
 let spjFilterCat = '전체';
 let pickSubjType = '선택'; // '필수' or '선택'
+let pickSubjectSubtype = '일반'; // '일반' | '진로' | '융합'
 
 function setPickType(type) {
   pickSubjType = type;
@@ -4942,6 +5299,14 @@ function setPickType(type) {
   const elecBtn = document.getElementById('pick-type-elec');
   if (reqBtn) reqBtn.style.opacity = type === '필수' ? '1' : '0.4';
   if (elecBtn) elecBtn.style.opacity = type === '선택' ? '1' : '0.4';
+}
+
+function setPickSubtype(subtype) {
+  pickSubjectSubtype = subtype;
+  ['일반','진로','융합'].forEach(tp => {
+    const btn = document.getElementById('spj-subtype-' + tp);
+    if (btn) btn.classList.toggle('active', tp === subtype);
+  });
 }
 
 function openSubjPickPw(colIdx, type) {
@@ -4956,6 +5321,8 @@ function openSubjPickPw(colIdx, type) {
 
 function openSubjPick() {
   pickSelected = new Set();
+  pickSubjectSubtype = '일반';
+  setPickSubtype('일반');
   spjFilterCat = '전체';
   setPickType(pickSubjType);
   const semNames = ['2학년 1학기','2학년 2학기','3학년 1학기','3학년 2학기'];
@@ -5021,7 +5388,7 @@ function confirmSubjPick() {
   const existingNames = new Set((semesterData[pickTargetCol] || []).map(x => x.name));
   pickSelected.forEach(name => {
     if (!existingNames.has(name)) {
-      semesterData[pickTargetCol].push({ name, type: pickSubjType });
+      semesterData[pickTargetCol].push({ name, type: pickSubjType, subtype: pickSubjectSubtype });
       // 해당 과목의 info.semester에도 자동 저장 (기존 값 없으면)
       const subj = subjects.find(x => x.name === name);
       if (subj) {
@@ -6701,6 +7068,13 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 
 <div id="dept-save-toast"></div>
+
+<div class="sem-dropdown-menu" id="sem-dropdown-menu">
+  <button class="sem-dropdown-item" id="sem-tab-0" onclick="setSemFromDropdown(0)">2학년 1학기</button>
+  <button class="sem-dropdown-item" id="sem-tab-1" onclick="setSemFromDropdown(1)">2학년 2학기</button>
+  <button class="sem-dropdown-item" id="sem-tab-2" onclick="setSemFromDropdown(2)">3학년 1학기</button>
+  <button class="sem-dropdown-item" id="sem-tab-3" onclick="setSemFromDropdown(3)">3학년 2학기</button>
+</div>
 
 </body>
 </html>
