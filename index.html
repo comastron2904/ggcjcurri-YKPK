@@ -932,120 +932,119 @@
     .graded-notice { font-size: 10px; }
   }
 
-  /* ── 모바일 가로 스크롤 래퍼 ── */
+  /* ── 모바일 가로 스크롤 (전면 재작성) ── */
   @media (max-width: 700px) {
-    /* 헤더 행 + 그리드를 묶는 스크롤 컨테이너 */
+
+    /* ① 최외곽 래퍼: 화면 남은 높이를 flex column으로 채움 */
     .sem-scroll-outer {
-      flex: 1;
+      flex: 1 1 0;
       display: flex;
       flex-direction: column;
-      overflow: hidden;
       min-height: 0;
+      overflow: hidden;
     }
 
-    /* 헤더 행 전체를 감싸는 가로 스크롤 래퍼 (헤더용) */
-    .sem-col-header-scroll {
+    /* ② 헤더 동기화 래퍼: 가로 넘침 숨김 (translateX로 동기화) */
+    .sem-col-header-sync {
       flex-shrink: 0;
-      display: flex;
-      overflow: hidden; /* 헤더는 본문과 동기화되므로 직접 스크롤 없음 */
-    }
-
-    /* 헤더 첫 번째 셀(학기) — sticky */
-    .sem-col-header-row .sem-col-header-cell:first-child {
-      position: sticky;
-      left: 0;
+      overflow: hidden;
+      position: relative;
       z-index: 5;
-      flex-shrink: 0;
-      width: 90px;
-      min-width: 90px;
-      background: rgba(210,228,248,0.98) !important;
     }
 
-    /* 본문 스크롤 영역 */
-    .sem-grid-scroll {
-      flex: 1;
-      overflow-x: auto;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-    }
-    .sem-grid-scroll::-webkit-scrollbar { height: 4px; width: 4px; }
-    .sem-grid-scroll::-webkit-scrollbar-thumb { background: rgba(26,107,191,0.25); border-radius: 2px; }
-
-    /* 헤더 행 — 첫 번째 셀 고정, 나머지는 고정 너비로 */
+    /* ③ 헤더 행: flex 가로 나열, 실제 너비보다 넓어짐 */
     .sem-col-header-row {
       display: flex !important;
       flex-direction: row;
       width: max-content;
       min-width: 100%;
+      border-bottom: 2px solid rgba(26,107,191,0.22);
+      background: rgba(230,240,252,0.98);
     }
     .sem-col-header-row .sem-col-header-cell {
-      width: 140px;
-      min-width: 140px;
+      width: 130px;
+      min-width: 130px;
       flex-shrink: 0;
     }
+    /* 헤더 첫 번째 셀(학기 라벨): sticky */
     .sem-col-header-row .sem-col-header-cell:first-child {
-      width: 90px;
-      min-width: 90px;
+      width: 80px;
+      min-width: 80px;
+      position: sticky;
+      left: 0;
+      z-index: 6;
+      background: rgba(210,228,248,0.99) !important;
     }
 
-    /* 각 학기 행 — 첫 번째 셀 고정, 나머지 고정 너비 */
+    /* ④ 본문 스크롤 컨테이너: 가로+세로 스크롤 모두 허용 */
+    .sem-grid-scroll {
+      flex: 1 1 0;
+      overflow-x: auto;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      min-height: 0;
+    }
+    .sem-grid-scroll::-webkit-scrollbar { height: 3px; width: 3px; }
+    .sem-grid-scroll::-webkit-scrollbar-thumb { background: rgba(26,107,191,0.30); border-radius: 2px; }
+
+    /* ⑤ sem-grid: 자체 overflow 제거, 스크롤은 부모가 담당 */
+    .sem-grid {
+      display: flex !important;
+      flex-direction: column;
+      overflow: visible !important;
+      flex: none !important;
+      width: max-content;
+      min-width: 100%;
+    }
+
+    /* ⑥ 각 학기 행: flex 가로, 높이는 내용에 맞게 auto */
     .sem-row {
       display: flex !important;
       flex-direction: row;
       width: max-content;
       min-width: 100%;
+      min-height: unset !important;
+      flex: none !important;
+      height: auto;
     }
+
+    /* ⑦ 학기명 셀(맨 왼쪽): sticky 고정 */
     .sem-row-head {
       position: sticky;
       left: 0;
-      z-index: 4;
+      z-index: 3;
       flex-shrink: 0;
-      width: 90px;
-      min-width: 90px;
+      width: 80px;
+      min-width: 80px;
       background: #f0f4f8;
     }
-    .sem-row.row-2학년 .sem-row-head { background: rgba(235,244,252,0.98); }
-    .sem-row.row-3학년 .sem-row-head { background: rgba(244,238,252,0.98); }
+    .sem-row.row-2학년 .sem-row-head { background: rgba(234,244,252,0.99); }
+    .sem-row.row-3학년 .sem-row-head { background: rgba(243,237,252,0.99); }
 
+    /* ⑧ 각 과목군 셀: 고정 너비, 높이는 내용에 맞게 */
     .sem-cell {
-      width: 140px;
-      min-width: 140px;
+      width: 130px;
+      min-width: 130px;
       flex-shrink: 0;
+      height: auto;
     }
 
-    /* 헤더와 본문 스크롤 동기화 */
-    .sem-col-header-sync {
-      overflow: hidden;
-      flex-shrink: 0;
-    }
-    /* 모바일에서 sem-grid 자체는 overflow 해제, 부모 scroll 컨테이너가 담당 */
-    .sem-grid {
-      overflow: visible !important;
-      flex: unset !important;
-    }
-
-    /* sem-scroll-outer가 flex column 구조 담당 */
-    .sem-scroll-outer {
-      flex: 1;
+    /* ⑨ 일반/진로/융합 subrow: 고정 최소 높이로 모두 보이게 */
+    .sem-subrow-wrap {
       display: flex;
       flex-direction: column;
-      overflow: hidden;
-      min-height: 0;
-    }
-
-    /* 헤더 sync 래퍼: 헤더 행을 숨겨서 translateX 넘침 방지 */
-    .sem-col-header-sync {
-      overflow: hidden;
-      flex-shrink: 0;
-    }
-
-    /* 본문 스크롤 영역이 남은 높이 차지 */
-    .sem-grid-scroll {
       flex: 1;
-      overflow-x: auto;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
       min-height: 0;
+      overflow: visible;
+    }
+    .sem-subrow {
+      flex: none;
+      min-height: 60px;
+      overflow: visible;
+    }
+    .sem-subject-list {
+      overflow: visible !important;
+      height: auto !important;
     }
   }
 
@@ -1478,6 +1477,11 @@
     .sem-col-header-row,
     .sem-row { grid-template-columns: 80px 1fr 1fr 1fr 1fr 1fr; }
     .sem-row-title { font-size: 11px; }
+  }
+  @media (max-width:700px) {
+    /* 모바일에서는 flex 사용하므로 grid 규칙 무력화 */
+    .sem-col-header-row,
+    .sem-row { grid-template-columns: unset !important; }
   }
   @media (max-width:500px) {
     .sem-col-header-row,
