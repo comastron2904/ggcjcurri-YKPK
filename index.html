@@ -41,7 +41,7 @@
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: 'Noto Sans KR', sans-serif; background: var(--deep-navy); min-height: 100vh; overflow-x: hidden; }
+  body { font-family: 'Noto Sans KR', sans-serif; background: var(--deep-navy); min-height: 100vh; overflow-x: hidden; overflow-y: auto; }
 
   /* ══════════════════════════════════════
      상단 버튼 그룹 (연필 + 과목관리)
@@ -935,13 +935,18 @@
   /* ── 모바일 가로 스크롤 ── */
   @media (max-width: 700px) {
     /* 단일 스크롤 컨테이너: 가로+세로 모두 스크롤 */
-    .sem-scroll-outer {
-      flex: 1 1 0;
-      min-height: 0;
-      overflow-x: auto;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-      display: block;
+    #sem-scroll-outer {
+      flex: 1 1 0 !important;
+      overflow-x: auto !important;
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+      display: block !important;
+      width: 100% !important;
+      /* 높이: #semester-screen(fixed,inset:0)에서 헤더(.sem-header) 높이를 뺀 나머지 */
+      height: calc(100vh - 160px) !important;
+      max-height: calc(100vh - 160px) !important;
+      min-height: 0 !important;
+      box-sizing: border-box !important;
     }
 
     /* 열 헤더: 스크롤 컨테이너 안에서 sticky top */
@@ -1017,7 +1022,7 @@
 
   /* ── 새 레이아웃: 학기(행) × 과목군(열) ── */
   /* 데스크탑 */
-  .sem-scroll-outer {
+  #sem-scroll-outer {
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -5118,7 +5123,6 @@ let semesterData = [];
 function saveSemester() { sbSetQ('cg_semester', semesterData); }
 
 function openSemesterScreen() {
-  // 열 헤더 라벨 세팅 (2학년/3학년 라벨이 다름 — 대표로 2학년 기준 표시, 변동 열만 동적으로)
   const hdWL = document.getElementById('hd-외국어정보-0');
   if (hdWL) {
     const label = (pageTexts.hdForeign) || '외국어&amp;교양';
@@ -5128,7 +5132,26 @@ function openSemesterScreen() {
   renderAllSemCols();
   document.getElementById('semester-screen').classList.add('open');
   document.getElementById('semester-screen').scrollTop = 0;
-  // 기본 학기 선택 (2학년 1학기)
+  // 모바일: sem-scroll-outer 스크롤 강제 적용 (높이 명시)
+  if (window.innerWidth <= 700) {
+    const outer = document.getElementById('sem-scroll-outer');
+    const screen = document.getElementById('semester-screen');
+    const header = screen ? screen.querySelector('.sem-header') : null;
+    if (outer && header) {
+      const headerH = header.getBoundingClientRect().height;
+      const h = window.innerHeight - headerH;
+      outer.style.cssText = [
+        'overflow-x:auto',
+        'overflow-y:auto',
+        '-webkit-overflow-scrolling:touch',
+        'display:block',
+        'width:100%',
+        'height:' + h + 'px',
+        'max-height:' + h + 'px',
+        'box-sizing:border-box'
+      ].join(';');
+    }
+  }
   setCurrentSem(0);
 }
 
