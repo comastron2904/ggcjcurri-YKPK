@@ -934,8 +934,7 @@
 
   /* ── 모바일 가로 스크롤 ── */
   @media (max-width: 700px) {
-
-    /* ① 최외곽 래퍼: 단일 스크롤 컨테이너 */
+    /* 단일 스크롤 컨테이너: 가로+세로 모두 스크롤 */
     .sem-scroll-outer {
       flex: 1 1 0;
       min-height: 0;
@@ -944,24 +943,16 @@
       -webkit-overflow-scrolling: touch;
       display: block;
     }
-    .sem-scroll-outer::-webkit-scrollbar { height: 3px; width: 3px; }
-    .sem-scroll-outer::-webkit-scrollbar-thumb { background: rgba(26,107,191,0.30); border-radius: 2px; }
 
-    /* ② 헤더 동기화 래퍼: sticky top */
-    .sem-col-header-sync {
+    /* 열 헤더: 스크롤 컨테이너 안에서 sticky top */
+    .sem-col-header-row {
+      display: flex !important;
+      flex-direction: row;
       position: sticky;
       top: 0;
       z-index: 5;
       width: max-content;
       min-width: 100%;
-    }
-
-    /* ③ 헤더 행 */
-    .sem-col-header-row {
-      display: flex !important;
-      flex-direction: row;
-      width: max-content;
-      min-width: 100vw;
       border-bottom: 2px solid rgba(26,107,191,0.22);
       background: rgba(230,240,252,0.98);
     }
@@ -979,39 +970,27 @@
       background: rgba(210,228,248,0.99) !important;
     }
 
-    /* ④ 본문 스크롤 컨테이너: 단순 래퍼 */
-    .sem-grid-scroll {
-      display: block;
-      overflow: visible;
+    /* 그리드: 열 헤더 바로 아래, 가로로 충분히 넓게 */
+    .sem-grid {
+      display: flex !important;
+      flex-direction: column;
       width: max-content;
       min-width: 100%;
     }
 
-    /* ⑤ sem-grid */
-    .sem-grid {
-      display: flex !important;
-      flex-direction: column;
-      overflow: visible !important;
-      flex: none !important;
-      width: max-content;
-      min-width: 100vw;
-    }
-
-    /* ⑥ 각 학기 행 */
+    /* 각 학기 행 */
     .sem-row {
       display: flex !important;
       flex-direction: row;
       width: max-content;
-      min-width: 100vw;
-      min-height: unset !important;
-      flex: none !important;
+      min-width: 100%;
       height: auto;
     }
     .sem-row.sem-row-hidden {
       display: none !important;
     }
 
-    /* ⑦ 학기명 셀(맨 왼쪽): sticky 고정 */
+    /* 학기명 셀: sticky left */
     .sem-row-head {
       position: sticky;
       left: 0;
@@ -1024,43 +1003,21 @@
     .sem-row.row-2학년 .sem-row-head { background: rgba(234,244,252,0.99); }
     .sem-row.row-3학년 .sem-row-head { background: rgba(243,237,252,0.99); }
 
-    /* ⑧ 각 과목군 셀 */
+    /* 각 과목군 셀 */
     .sem-cell {
       width: 130px;
       min-width: 130px;
       flex-shrink: 0;
       height: auto;
     }
+    .sem-subrow-wrap { overflow: visible; }
+    .sem-subrow { min-height: 60px; overflow: visible; }
+    .sem-subject-list { overflow: visible !important; height: auto !important; }
+  }
 
-    /* ⑨ subrow */
-    .sem-subrow-wrap {
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-      min-height: 0;
-      overflow: visible;
-    }
-    .sem-subrow {
-      flex: none;
-      min-height: 60px;
-      overflow: visible;
-    }
-    .sem-subject-list {
-      overflow: visible !important;
-      height: auto !important;
-    }
-  }
   /* ── 새 레이아웃: 학기(행) × 과목군(열) ── */
-  /* 데스크탑: 새 래퍼 div들은 투명하게 통과 */
+  /* 데스크탑 */
   .sem-scroll-outer {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-    overflow: hidden;
-  }
-  .sem-col-header-sync { flex-shrink: 0; }
-  .sem-grid-scroll {
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -1109,10 +1066,11 @@
   .sem-col-select-hint.hint-외국어정보 { color: #1a9070; }
   .sem-col-select-hint.hint-음악미술  { color: #c04090; }
 
-  /* 스크롤 가능한 학기 행 목록 */
+  /* 스크롤 가능한 학기 행 목록 (데스크탑) */
   .sem-grid {
     flex: 1; display: flex; flex-direction: column;
     overflow-y: auto;
+    min-height: 0;
   }
   .sem-grid::-webkit-scrollbar { width: 4px; }
   .sem-grid::-webkit-scrollbar-thumb { background: rgba(26,107,191,0.20); border-radius: 2px; }
@@ -2914,12 +2872,10 @@
       <button class="btn-sem-col-edit" onclick="openSemColEditPw()" title="열 헤더 · 학점 편집">✏️ 편집</button>
     </div>
   </div>
-  <!-- 모바일 가로 스크롤 래퍼 -->
+  <!-- 모바일 가로 스크롤 래퍼 — 헤더+본문을 하나의 스크롤 컨테이너로 -->
   <div class="sem-scroll-outer" id="sem-scroll-outer">
-  <!-- 고정 열 헤더 (헤더는 스크롤 영역 위에 오버플로우 히든으로 동기화) -->
-  <div class="sem-col-header-sync" id="sem-col-header-sync">
   <div class="sem-col-header-row" id="sem-col-header-row">
-    <div class="sem-col-header-cell" style="background:rgba(210,228,248,0.80)">
+<div class="sem-col-header-cell" style="background:rgba(210,228,248,0.80)">
       <span class="sem-col-header-label" style="color:rgba(26,46,74,0.75);letter-spacing:1.5px">학기</span>
     </div>
     <div class="sem-col-header-cell hd-req">
@@ -2936,11 +2892,7 @@
       <span class="sem-col-select-hint hint-음악미술" id="hd-hint-음악미술">1개 선택</span>
     </div>
   </div><!-- /sem-col-header-row -->
-  </div><!-- /sem-col-header-sync -->
-
-  <div class="sem-grid-scroll" id="sem-grid-scroll">
   <div class="sem-grid" id="sem-grid">
-
     <!-- 2학년 1학기 -->
     <div class="sem-row row-2학년">
       <div class="sem-row-head">
@@ -3349,10 +3301,8 @@
         <div class="sem-subject-list" id="sem-list-elec-음악미술-3" style="display:none"></div>
       </div>
     </div>
-
   </div><!-- /sem-grid -->
-  </div><!-- /sem-grid-scroll -->
-  </div><!-- /sem-scroll-outer -->
+</div><!-- /sem-scroll-outer -->
 
 </div>
 
