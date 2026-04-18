@@ -1007,6 +1007,10 @@
       flex: none !important;
       height: auto;
     }
+    /* data 속성으로 숨김 처리 — !important보다 specificity를 높여 덮어씀 */
+    .sem-row.sem-row-hidden {
+      display: none !important;
+    }
 
     /* ⑦ 학기명 셀(맨 왼쪽): sticky 고정 */
     .sem-row-head {
@@ -5268,14 +5272,23 @@ function setCurrentSem(idx) {
   }
   document.querySelectorAll('.sem-row').forEach((row, rowIdx) => {
     if (rowIdx === idx) {
-      row.style.display = isMobile ? 'flex' : '';
-      row.style.flex = isMobile ? 'none' : '1';
-      row.style.minHeight = isMobile ? 'unset' : '';
-      row.style.width = isMobile ? 'max-content' : '';
-      row.style.minWidth = isMobile ? '100%' : '';
+      row.classList.remove('sem-row-hidden');
+      row.style.display = '';
+      if (isMobile) {
+        row.style.flex = 'none';
+        row.style.minHeight = 'unset';
+        row.style.width = 'max-content';
+        row.style.minWidth = '100%';
+      } else {
+        row.style.flex = '1';
+        row.style.minHeight = '';
+        row.style.width = '';
+        row.style.minWidth = '';
+      }
     } else {
-      row.style.display = 'none';
-      row.style.flex = '0';
+      row.classList.add('sem-row-hidden');
+      row.style.display = '';
+      row.style.flex = '';
     }
   });
 }
