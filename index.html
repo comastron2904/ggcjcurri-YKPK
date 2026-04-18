@@ -3442,7 +3442,7 @@ const SUB_SCREEN_IDS = [
   'enroll-screen','suneung-screen','guidebook-screen'
 ];
 
-let pendingBgBase64 = null;
+let pendingBgFile = null;   // 업로드 대기 중인 File 객체
 
 function applySubBg(base64, opacity) {
   const op = parseFloat(opacity) / 100;
@@ -3462,22 +3462,26 @@ function applySubBg(base64, opacity) {
 
 function onBgFileChange(input) {
   const file = input.files[0]; if (!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    pendingBgBase64 = ev.target.result;
-    const preview = document.getElementById('pe-bg-preview');
-    preview.style.backgroundImage = 'url(' + pendingBgBase64 + ')';
-    preview.classList.add('has-img');
-    preview.textContent = '';
-    const op = document.getElementById('pe-bg-opacity').value;
-    applySubBg(pendingBgBase64, op);
-  };
-  reader.readAsDataURL(file);
+  pendingBgFile = file;
+  // 미리보기: ObjectURL (로컬 전용, 저장 시 Storage 업로드)
+  const previewUrl = URL.createObjectURL(file);
+  const preview = document.getElementById('pe-bg-preview');
+  preview.style.backgroundImage = 'url(' + previewUrl + ')';
+  preview.classList.add('has-img');
+  preview.textContent = '';
+  const op = document.getElementById('pe-bg-opacity').value;
+  applySubBg(previewUrl, op);
   input.value = '';
 }
 
-function removeBgImage() {
-  pendingBgBase64 = null;
+async function removeBgImage() {
+  pendingBgFile = null;
+  // 기존 Storage 파일 삭제
+  if (pageTexts.bgImageUrl) {
+    await deleteFromStorage(pageTexts.bgImageUrl).catch(() => {});
+    delete pageTexts.bgImageUrl;
+    savePage();
+  }
   const preview = document.getElementById('pe-bg-preview');
   preview.style.backgroundImage = '';
   preview.classList.remove('has-img');
@@ -3487,8 +3491,8 @@ function removeBgImage() {
 
 function updateOpacityVal(val) {
   document.getElementById('pe-bg-opacity-val').textContent = val + '%';
-  const base64 = pendingBgBase64 || pageTexts.bgImage || null;
-  if (base64) applySubBg(base64, val);
+  const url = (pendingBgFile ? URL.createObjectURL(pendingBgFile) : null) || pageTexts.bgImageUrl || null;
+  if (url) applySubBg(url, val);
 }
 
 function applyPageTexts() {
@@ -3538,7 +3542,7 @@ function applyPageTexts() {
     hdWLEl.innerHTML = `<span class="sem-col-header-label hd-외국어정보">${lbl}</span><span class="sem-col-select-hint hint-외국어정보">${hnt}</span>`;
   }
   // 서브화면 배경 이미지 적용
-  applySubBg(p.bgImage || null, p.bgOpacity ?? 10);
+  applySubBg(p.bgImageUrl || null, p.bgOpacity ?? 10);
 }
 // applyPageTexts() — Supabase 로드 후 호출됨
 
@@ -4408,8 +4412,8 @@ function openPageEdit() {
   // 배경 이미지 미리보기 복원
   pendingBgBase64 = null;
   const bgPreview = document.getElementById('pe-bg-preview');
-  if (p.bgImage) {
-    bgPreview.style.backgroundImage = 'url(' + p.bgImage + ')';
+  if (p.bgImageUrl) {
+    bgPreview.style.backgroundImage = 'url(' + p.bgImageUrl + ')';
     bgPreview.classList.add('has-img');
     bgPreview.textContent = '';
   } else {
@@ -4429,7 +4433,7 @@ function closePageEdit() {
   document.getElementById('page-edit-modal').classList.remove('open');
 }
 
-function savePageEdit() {
+async function savePageEdit() {
   const g = id => document.getElementById(id).value.trim();
   pageTexts = {
     badge:        g('pe-badge'),
@@ -4445,17 +4449,30 @@ function savePageEdit() {
     pageTexts[k] = document.getElementById('pe-menu-' + String(i).padStart(2,'0')).value.trim();
   }
   pageTexts.menu07url = document.getElementById('pe-menu-07-url').value.trim();
-  // 배경 이미지 — pendingBgBase64가 null이면 제거, 문자열이면 새 이미지
-  if (pendingBgBase64 !== null) {
-    pageTexts.bgImage = pendingBgBase64;
-  } else if (!document.getElementById('pe-bg-preview').classList.contains('has-img')) {
-    delete pageTexts.bgImage;
-  }
   pageTexts.bgOpacity = document.getElementById('pe-bg-opacity').value;
   // 열 헤더·학점 값은 saveSemColEdit() 에서 별도 저장 (pageTexts에 보존)
+
+  // 배경 이미지: 새 파일이 있으면 Storage에 업로드
+  if (pendingBgFile) {
+    const okEl = document.getElementById('pe-save-ok');
+    okEl.textContent = '⏳ 이미지 업로드 중...'; okEl.classList.add('show');
+    try {
+      // 기존 파일 삭제
+      if (pageTexts.bgImageUrl) await deleteFromStorage(pageTexts.bgImageUrl).catch(() => {});
+      const url = await uploadToStorage(pendingBgFile);
+      pageTexts.bgImageUrl = url;
+      pendingBgFile = null;
+    } catch(e) {
+      okEl.textContent = '⚠ 이미지 업로드 실패'; 
+      setTimeout(() => { okEl.classList.remove('show'); okEl.textContent = '✓ 저장되었습니다'; }, 2500);
+      return;
+    }
+  }
+
   savePage();
   applyPageTexts();
   const ok = document.getElementById('pe-save-ok');
+  ok.textContent = '✓ 저장되었습니다';
   ok.classList.add('show');
   setTimeout(() => ok.classList.remove('show'), 2200);
 }
