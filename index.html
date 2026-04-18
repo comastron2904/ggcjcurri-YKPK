@@ -932,32 +932,36 @@
     .graded-notice { font-size: 10px; }
   }
 
-  /* ── 모바일 가로 스크롤 (전면 재작성) ── */
+  /* ── 모바일 가로 스크롤 ── */
   @media (max-width: 700px) {
 
-    /* ① 최외곽 래퍼: 화면 남은 높이를 flex column으로 채움 */
+    /* ① 최외곽 래퍼: 단일 스크롤 컨테이너 */
     .sem-scroll-outer {
       flex: 1 1 0;
-      display: flex;
-      flex-direction: column;
       min-height: 0;
-      overflow: hidden;
+      overflow-x: auto;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      display: block;
     }
+    .sem-scroll-outer::-webkit-scrollbar { height: 3px; width: 3px; }
+    .sem-scroll-outer::-webkit-scrollbar-thumb { background: rgba(26,107,191,0.30); border-radius: 2px; }
 
-    /* ② 헤더 동기화 래퍼: 가로 넘침 숨김 (translateX로 동기화) */
+    /* ② 헤더 동기화 래퍼: sticky top */
     .sem-col-header-sync {
-      flex-shrink: 0;
-      overflow: hidden;
-      position: relative;
+      position: sticky;
+      top: 0;
       z-index: 5;
+      width: max-content;
+      min-width: 100%;
     }
 
-    /* ③ 헤더 행: flex 가로 나열, 실제 너비보다 넓어짐 */
+    /* ③ 헤더 행 */
     .sem-col-header-row {
       display: flex !important;
       flex-direction: row;
       width: max-content;
-      min-width: 100%;
+      min-width: 100vw;
       border-bottom: 2px solid rgba(26,107,191,0.22);
       background: rgba(230,240,252,0.98);
     }
@@ -966,7 +970,6 @@
       min-width: 130px;
       flex-shrink: 0;
     }
-    /* 헤더 첫 번째 셀(학기 라벨): sticky */
     .sem-col-header-row .sem-col-header-cell:first-child {
       width: 80px;
       min-width: 80px;
@@ -976,38 +979,34 @@
       background: rgba(210,228,248,0.99) !important;
     }
 
-    /* ④ 본문 스크롤 컨테이너: 가로+세로 스크롤 모두 허용 */
+    /* ④ 본문 스크롤 컨테이너: 단순 래퍼 */
     .sem-grid-scroll {
-      flex: 1 1 0;
-      overflow-x: auto;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-      min-height: 0;
+      display: block;
+      overflow: visible;
+      width: max-content;
+      min-width: 100%;
     }
-    .sem-grid-scroll::-webkit-scrollbar { height: 3px; width: 3px; }
-    .sem-grid-scroll::-webkit-scrollbar-thumb { background: rgba(26,107,191,0.30); border-radius: 2px; }
 
-    /* ⑤ sem-grid: 자체 overflow 제거, 스크롤은 부모가 담당 */
+    /* ⑤ sem-grid */
     .sem-grid {
       display: flex !important;
       flex-direction: column;
       overflow: visible !important;
       flex: none !important;
       width: max-content;
-      min-width: 100%;
+      min-width: 100vw;
     }
 
-    /* ⑥ 각 학기 행: flex 가로, 높이는 내용에 맞게 auto */
+    /* ⑥ 각 학기 행 */
     .sem-row {
       display: flex !important;
       flex-direction: row;
       width: max-content;
-      min-width: 100%;
+      min-width: 100vw;
       min-height: unset !important;
       flex: none !important;
       height: auto;
     }
-    /* data 속성으로 숨김 처리 — !important보다 specificity를 높여 덮어씀 */
     .sem-row.sem-row-hidden {
       display: none !important;
     }
@@ -1025,7 +1024,7 @@
     .sem-row.row-2학년 .sem-row-head { background: rgba(234,244,252,0.99); }
     .sem-row.row-3학년 .sem-row-head { background: rgba(243,237,252,0.99); }
 
-    /* ⑧ 각 과목군 셀: 고정 너비, 높이는 내용에 맞게 */
+    /* ⑧ 각 과목군 셀 */
     .sem-cell {
       width: 130px;
       min-width: 130px;
@@ -1033,7 +1032,7 @@
       height: auto;
     }
 
-    /* ⑨ 일반/진로/융합 subrow: 고정 최소 높이로 모두 보이게 */
+    /* ⑨ subrow */
     .sem-subrow-wrap {
       display: flex;
       flex-direction: column;
@@ -1051,7 +1050,6 @@
       height: auto !important;
     }
   }
-
   /* ── 새 레이아웃: 학기(행) × 과목군(열) ── */
   /* 데스크탑: 새 래퍼 div들은 투명하게 통과 */
   .sem-scroll-outer {
@@ -5262,32 +5260,13 @@ function setCurrentSem(idx) {
 
   // 행 보이기/숨기기
   const isMobile = window.innerWidth <= 700;
-  const semGrid = document.getElementById('sem-grid');
-  if (semGrid && isMobile) {
-    semGrid.style.width = 'max-content';
-    semGrid.style.minWidth = '100%';
-  } else if (semGrid) {
-    semGrid.style.width = '';
-    semGrid.style.minWidth = '';
-  }
   document.querySelectorAll('.sem-row').forEach((row, rowIdx) => {
     if (rowIdx === idx) {
       row.classList.remove('sem-row-hidden');
-      row.style.display = '';
-      if (isMobile) {
-        row.style.flex = 'none';
-        row.style.minHeight = 'unset';
-        row.style.width = 'max-content';
-        row.style.minWidth = '100%';
-      } else {
-        row.style.flex = '1';
-        row.style.minHeight = '';
-        row.style.width = '';
-        row.style.minWidth = '';
-      }
+      // 데스크탑: flex로 행 높이 채우기
+      row.style.flex = isMobile ? '' : '1';
     } else {
       row.classList.add('sem-row-hidden');
-      row.style.display = '';
       row.style.flex = '';
     }
   });
@@ -7337,34 +7316,13 @@ document.addEventListener('DOMContentLoaded', () => {
 })();
 
 /* ══════════════════════════════════════
-   모바일 가로 스크롤 동기화 (헤더 ↔ 본문)
+   화면 회전/리사이즈 시 학기 상태 재적용
 ══════════════════════════════════════ */
-(function() {
-  document.addEventListener('DOMContentLoaded', function() {
-    const gridScroll = document.getElementById('sem-grid-scroll');
-    const headerSync = document.getElementById('sem-col-header-sync');
-    const headerRow  = document.getElementById('sem-col-header-row');
-    if (!gridScroll || !headerSync || !headerRow) return;
-
-    // 본문 스크롤 시 헤더도 동기화
-    gridScroll.addEventListener('scroll', function() {
-      headerRow.style.transform = 'translateX(-' + gridScroll.scrollLeft + 'px)';
-    }, { passive: true });
-  });
-
-  // 화면 회전/리사이즈 시 현재 학기 상태 재적용
-  window.addEventListener('resize', function() {
-    if (typeof setCurrentSem === 'function' && typeof currentSemIdx !== 'undefined') {
-      setCurrentSem(currentSemIdx);
-    }
-    // 헤더 transform 초기화
-    const headerRow = document.getElementById('sem-col-header-row');
-    const gridScroll = document.getElementById('sem-grid-scroll');
-    if (headerRow && gridScroll) {
-      headerRow.style.transform = 'translateX(-' + gridScroll.scrollLeft + 'px)';
-    }
-  });
-})();
+window.addEventListener('resize', function() {
+  if (typeof setCurrentSem === 'function' && typeof currentSemIdx !== 'undefined') {
+    setCurrentSem(currentSemIdx);
+  }
+});
 </script>
 
 <div id="dept-save-toast"></div>
