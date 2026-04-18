@@ -5220,10 +5220,22 @@ function setCurrentSem(idx) {
   }
 
   // 행 보이기/숨기기
+  const isMobile = window.innerWidth <= 700;
+  const semGrid = document.getElementById('sem-grid');
+  if (semGrid && isMobile) {
+    semGrid.style.width = 'max-content';
+    semGrid.style.minWidth = '100%';
+  } else if (semGrid) {
+    semGrid.style.width = '';
+    semGrid.style.minWidth = '';
+  }
   document.querySelectorAll('.sem-row').forEach((row, rowIdx) => {
     if (rowIdx === idx) {
-      row.style.display = '';
-      row.style.flex = '1';
+      row.style.display = isMobile ? 'flex' : '';
+      row.style.flex = isMobile ? 'none' : '1';
+      row.style.minHeight = isMobile ? 'unset' : '';
+      row.style.width = isMobile ? 'max-content' : '';
+      row.style.minWidth = isMobile ? '100%' : '';
     } else {
       row.style.display = 'none';
       row.style.flex = '0';
@@ -7288,6 +7300,19 @@ document.addEventListener('DOMContentLoaded', () => {
     gridScroll.addEventListener('scroll', function() {
       headerRow.style.transform = 'translateX(-' + gridScroll.scrollLeft + 'px)';
     }, { passive: true });
+  });
+
+  // 화면 회전/리사이즈 시 현재 학기 상태 재적용
+  window.addEventListener('resize', function() {
+    if (typeof setCurrentSem === 'function' && typeof currentSemIdx !== 'undefined') {
+      setCurrentSem(currentSemIdx);
+    }
+    // 헤더 transform 초기화
+    const headerRow = document.getElementById('sem-col-header-row');
+    const gridScroll = document.getElementById('sem-grid-scroll');
+    if (headerRow && gridScroll) {
+      headerRow.style.transform = 'translateX(-' + gridScroll.scrollLeft + 'px)';
+    }
   });
 })();
 </script>
