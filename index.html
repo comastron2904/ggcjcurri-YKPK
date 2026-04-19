@@ -4782,9 +4782,9 @@ async function renderMediaPdfPage(vid) {
   viewerEl.innerHTML = '<div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>' + st.curPage + ' / ' + st.totalPages + ' 페이지</span></div>';
   try {
     const page     = await st.pdfDoc.getPage(st.curPage);
-    const vw       = viewerEl.clientWidth - 4;
-    const viewport = page.getViewport({ scale: 1 });
     const dpr      = window.devicePixelRatio || 1;
+    const vw       = (viewerEl.clientWidth || viewerEl.offsetWidth || 300) - 4;
+    const viewport = page.getViewport({ scale: 1 });
     const scale    = Math.max(vw / viewport.width, 0.5);
     const vp       = page.getViewport({ scale: scale * dpr });
     const canvas   = document.createElement('canvas');
@@ -4872,14 +4872,17 @@ async function pdfFsSync() {
     const vp0      = page.getViewport({ scale: 1 });
     const dpr      = window.devicePixelRatio || 1;
     const isDesktop = window.innerWidth >= 768;
+    const elW = viewerEl.clientWidth || viewerEl.offsetWidth || window.innerWidth;
+    const elH = viewerEl.clientHeight || viewerEl.offsetHeight || window.innerHeight;
     let baseScale;
     if (isDesktop) {
-      const availW = viewerEl.clientWidth - 64;
-      const availH = viewerEl.clientHeight - 32;
+      const availW = elW - 64;
+      const availH = elH - 32;
       baseScale = Math.min(availW / vp0.width, availH / vp0.height);
     } else {
-      baseScale = (viewerEl.clientWidth - 16) / vp0.width;
+      baseScale = (elW - 16) / vp0.width;
     }
+    baseScale = Math.max(baseScale, 0.3);
     const vp       = page.getViewport({ scale: baseScale * dpr });
     const canvas   = document.createElement('canvas');
     canvas.width   = vp.width;
@@ -6194,7 +6197,7 @@ function renderDeptFileItems(b) {
           <div class="dept-pdf-botbar" id="${vid}-dots"></div>
         </div>`;
       wrap.appendChild(item);
-      setTimeout(() => initPdfViewer(vid, f.url), 0);
+      requestAnimationFrame(() => setTimeout(() => initPdfViewer(vid, f.url), 50));
       return;
     } else {
       item.innerHTML = `${delBtn}
@@ -6244,8 +6247,9 @@ async function initPdfViewer(vid, dataUrl) {
 
       const page   = await pdfDoc.getPage(p);
       const vp     = page.getViewport({ scale: 1 });
-      const contentW = slotW - 80;
       const dpr      = window.devicePixelRatio || 1;
+      const safeSlotW = slotW || stageEl.offsetWidth || 300;
+      const contentW = safeSlotW - 80;
       const scale    = Math.min(contentW / vp.width, 2.5);
       const scaled   = page.getViewport({ scale: scale * dpr });
 
@@ -6626,7 +6630,7 @@ function renderEnrollFileItems(b) {
           <div class="dept-pdf-botbar" id="${vid}-dots"></div>
         </div>`;
       wrap.appendChild(item);
-      setTimeout(() => initPdfViewer(vid, f.url), 0);
+      requestAnimationFrame(() => setTimeout(() => initPdfViewer(vid, f.url), 50));
       return;
     } else {
       item.innerHTML = `${delBtn}
@@ -6882,7 +6886,7 @@ function renderSuneungFileItems(b) {
           <div class="dept-pdf-botbar" id="${vid}-dots"></div>
         </div>`;
       wrap.appendChild(item);
-      setTimeout(() => initPdfViewer(vid, f.url), 0);
+      requestAnimationFrame(() => setTimeout(() => initPdfViewer(vid, f.url), 50));
       return;
     } else {
       item.innerHTML = `${delBtn}
@@ -7159,9 +7163,9 @@ async function gbRenderPage(side) {
 
   try {
     const page     = await st.pdfDoc.getPage(st.curPage);
-    const vw       = viewer.clientWidth - 24;
-    const viewport = page.getViewport({ scale: 1 });
     const dpr      = window.devicePixelRatio || 1;
+    const vw       = (viewer.clientWidth || viewer.offsetWidth || 300) - 24;
+    const viewport = page.getViewport({ scale: 1 });
     const scale    = Math.min(vw / viewport.width, 2);
     const vp       = page.getViewport({ scale: scale * dpr });
 
@@ -7220,14 +7224,17 @@ async function gbFsRenderPage() {
     const viewport = page.getViewport({ scale: 1 });
     const dpr = window.devicePixelRatio || 1;
     const isDesktop = window.innerWidth >= 768;
+    const vElW = viewer.clientWidth || viewer.offsetWidth || window.innerWidth;
+    const vElH = viewer.clientHeight || viewer.offsetHeight || window.innerHeight;
     let baseScale;
     if (isDesktop) {
-      const availW = viewer.clientWidth - 64;
-      const availH = viewer.clientHeight - 32;
+      const availW = vElW - 64;
+      const availH = vElH - 32;
       baseScale = Math.min(availW / viewport.width, availH / viewport.height, 3);
     } else {
-      baseScale = Math.min((viewer.clientWidth - 16) / viewport.width, 3);
+      baseScale = Math.min((vElW - 16) / viewport.width, 3);
     }
+    baseScale = Math.max(baseScale, 0.3);
     const vp = page.getViewport({ scale: baseScale * dpr });
     const canvas = document.createElement('canvas');
     canvas.className = 'gb-pdf-canvas';
