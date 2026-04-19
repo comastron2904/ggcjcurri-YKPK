@@ -1928,16 +1928,42 @@
     /* 학과 상세 헤더 줄바꿈 */
     .dept-detail-header {
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 8px;
+      padding: 12px 16px 12px;
+      align-items: flex-start;
     }
-    .dept-detail-back { order: 1; flex-shrink: 0; }
-    .dept-detail-icon { order: 2; flex-shrink: 0; }
-    .dept-detail-header-info { order: 3; flex: 1; min-width: 0; }
-    .dept-detail-header .dd-edit-btn { order: 4; flex-shrink: 0; }
-    .dept-detail-header .detail-home { order: 5; flex-shrink: 0; }
+
+    /* 첫 번째 줄: 뒤로가기 버튼 + 홈 버튼 */
+    .dept-detail-back { order: 1; flex-shrink: 0; font-size: 12px; padding: 8px 14px; }
+    .dept-detail-header .dd-edit-btn { order: 2; flex-shrink: 0; margin-left: auto; }
+    .dept-detail-header .detail-home { order: 3; flex-shrink: 0; }
+
+    /* 두 번째 줄: 아이콘 + 제목 정보 */
+    .dept-detail-icon { order: 4; flex-shrink: 0; font-size: 22px; align-self: center; margin-top: 4px; }
+    .dept-detail-header-info { order: 5; flex: 1; min-width: 0; margin-top: 4px; }
+
+    /* 뒤로가기 + 편집버튼 + 홈버튼이 한 줄 */
+    .dept-detail-back,
+    .dept-detail-header .dd-edit-btn,
+    .dept-detail-header .detail-home {
+      flex-basis: auto;
+    }
+
+    /* 아이콘 + 정보가 다음 줄 */
+    .dept-detail-icon,
+    .dept-detail-header-info {
+      flex-basis: auto;
+      width: auto;
+    }
+
+    /* 제목 텍스트 크기 모바일 조정 */
+    .dept-detail-label { font-size: 9px; letter-spacing: 2px; }
+    .dept-detail-name { font-size: 18px; line-height: 1.25; word-break: keep-all; }
   }
   @media (max-width:420px) {
     .dept-grid { grid-template-columns: 1fr; }
+    .dept-detail-name { font-size: 16px; }
+    .dept-detail-back { font-size: 11px; padding: 7px 12px; }
   }
 
   /* ══════════════════════════════════════
