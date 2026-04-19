@@ -7173,7 +7173,8 @@ function openGbFullscreen(side) {
   const fnEl = document.getElementById('gb-' + side + '-filename');
   document.getElementById('gb-fs-filename').textContent = fnEl.textContent;
   document.getElementById('gb-fs-overlay').classList.add('open');
-  gbFsRenderPage();
+  // 오버레이가 완전히 펼쳐진 뒤(레이아웃 확정 후) 렌더링 → clientWidth 정확하게 측정
+  requestAnimationFrame(() => requestAnimationFrame(() => gbFsRenderPage()));
 }
 
 function closeGbFullscreen() {
@@ -7191,14 +7192,28 @@ async function gbFsRenderPage() {
   viewer.innerHTML = '<div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>' + st.curPage + ' / ' + st.totalPages + ' 페이지</span></div>';
   try {
     const page = await st.pdfDoc.getPage(st.curPage);
-    const vw = viewer.clientWidth - 32;
-    const viewport = page.getViewport({ scale: 1 });
-    const scale = Math.min(vw / viewport.width, 3);
-    const vp = page.getViewport({ scale });
+
+    // 전체화면 오버레이가 완전히 펼쳐진 후 실제 뷰어 크기 측정
+    // clientWidth/Height가 0이면 window 크기로 대체
+    const dpr = window.devicePixelRatio || 1;
+    const availW = (viewer.clientWidth  || window.innerWidth)  - 24;
+    const availH = (viewer.clientHeight || window.innerHeight) - 80;
+
+    const viewport1 = page.getViewport({ scale: 1 });
+    // 가로/세로 모두 뷰어 안에 맞는 scale 계산 후 dpr 배율로 고화질 렌더
+    const fitScale    = Math.min(availW / viewport1.width, availH / viewport1.height);
+    const renderScale = fitScale * dpr;
+    const vp = page.getViewport({ scale: renderScale });
+
     const canvas = document.createElement('canvas');
-    canvas.className = 'gb-pdf-canvas';
-    canvas.width = vp.width;
-    canvas.height = vp.height;
+    canvas.className  = 'gb-pdf-canvas';
+    canvas.width      = vp.width;
+    canvas.height     = vp.height;
+    // CSS 표시 크기는 fit 기준 → 실제 픽셀은 dpr 배율이므로 선명하게 표시
+    canvas.style.width    = Math.floor(vp.width  / dpr) + 'px';
+    canvas.style.height   = Math.floor(vp.height / dpr) + 'px';
+    canvas.style.maxWidth = '100%';
+
     await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
     viewer.innerHTML = '';
     viewer.appendChild(canvas);
