@@ -2459,16 +2459,6 @@
     box-shadow: 0 4px 24px rgba(26,107,191,0.18);
     border: 1px solid rgba(26,107,191,0.10);
   }
-  /* 전체화면 뷰어 안에서는 캔버스가 가로·세로 모두 꽉 채우도록 */
-  .gb-fs-viewer .gb-pdf-canvas {
-    width: 100% !important;
-    height: 100% !important;
-    max-width: 100% !important;
-    object-fit: contain;
-    box-shadow: none;
-    border: none;
-    display: block;
-  }
   .gb-pdf-loading {
     display: flex; flex-direction: column; align-items: center; gap: 12px;
     padding: 60px 20px; color: rgba(26,46,74,0.45); font-size: 13px;
@@ -2542,11 +2532,16 @@
   .gb-fs-close:hover { background: rgba(26,107,191,0.08); border-color: var(--gold); color: var(--gold); }
   .gb-fs-viewer {
     flex: 1; overflow: hidden;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    background: rgba(20,35,60,0.95); padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: #000; padding: 0;
   }
-  .gb-fs-viewer::-webkit-scrollbar { width: 5px; }
-  .gb-fs-viewer::-webkit-scrollbar-thumb { background: rgba(26,107,191,0.28); border-radius: 3px; }
+  .gb-fs-viewer::-webkit-scrollbar { display: none; }
+  /* 전체화면 캔버스: JS가 정확한 px 크기를 직접 지정 */
+  .gb-fs-viewer .gb-pdf-canvas {
+    display: block;
+    box-shadow: none;
+    border: none;
+  }
   .gb-fs-nav {
     flex-shrink: 0; padding: 10px 20px;
     background: rgba(230,240,252,0.95);
@@ -7202,30 +7197,30 @@ async function gbFsRenderPage() {
   viewer.innerHTML = '<div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>' + st.curPage + ' / ' + st.totalPages + ' 페이지</span></div>';
   try {
     const page = await st.pdfDoc.getPage(st.curPage);
+    const dpr = window.devicePixelRatio || 1;
 
-    // 뷰어의 실제 표시 폭 측정 (패딩 32px 제외)
-    // clientWidth가 0이면 window.innerWidth 사용
-    const dpr     = window.devicePixelRatio || 1;
-    const viewerW = viewer.clientWidth  || window.innerWidth;
-    const viewerH = viewer.clientHeight || (window.innerHeight - 100);
-    const availW  = viewerW - 32;   // 좌우 패딩 합산
-    const availH  = viewerH - 32;   // 상하 패딩 합산
+    // 뷰어 실제 픽셀 크기 (CSS px 단위)
+    const W = viewer.clientWidth  || window.innerWidth;
+    const H = viewer.clientHeight || window.innerHeight;
 
-    const viewport1 = page.getViewport({ scale: 1 });
+    // scale 1 기준 PDF 크기
+    const vp1 = page.getViewport({ scale: 1 });
 
-    // 가로/세로 중 꽉 채울 수 있는 scale → dpr 곱해 고화질 렌더
-    const fitScale    = Math.min(availW / viewport1.width, availH / viewport1.height);
-    const renderScale = fitScale * dpr;
-    const vp          = page.getViewport({ scale: renderScale });
+    // PDF를 뷰어에 꽉 채우는 scale (비율 유지)
+    const fitScale = Math.min(W / vp1.width, H / vp1.height);
+
+    // 실제 렌더 해상도: fitScale × dpr → 고화질
+    const vp = page.getViewport({ scale: fitScale * dpr });
 
     const canvas = document.createElement('canvas');
     canvas.className = 'gb-pdf-canvas';
-    canvas.width     = vp.width;
-    canvas.height    = vp.height;
-    // 뷰어 전체를 꽉 채움 (비율은 object-fit: contain으로 유지)
-    canvas.style.width    = '100%';
-    canvas.style.height   = '100%';
-    canvas.style.maxWidth = '100%';
+    // 캔버스 내부 픽셀 = 뷰어 CSS px × dpr (선명)
+    canvas.width  = vp.width;
+    canvas.height = vp.height;
+    // CSS 표시 크기 = 뷰어 전체 (빈 공간 없음)
+    canvas.style.width  = W + 'px';
+    canvas.style.height = H + 'px';
+    canvas.style.display = 'block';
 
     await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
     viewer.innerHTML = '';
