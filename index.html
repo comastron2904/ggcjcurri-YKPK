@@ -2459,6 +2459,16 @@
     box-shadow: 0 4px 24px rgba(26,107,191,0.18);
     border: 1px solid rgba(26,107,191,0.10);
   }
+  /* 전체화면 뷰어 안에서는 캔버스가 가로·세로 모두 꽉 채우도록 */
+  .gb-fs-viewer .gb-pdf-canvas {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    object-fit: contain;
+    box-shadow: none;
+    border: none;
+    display: block;
+  }
   .gb-pdf-loading {
     display: flex; flex-direction: column; align-items: center; gap: 12px;
     padding: 60px 20px; color: rgba(26,46,74,0.45); font-size: 13px;
@@ -2531,9 +2541,9 @@
   }
   .gb-fs-close:hover { background: rgba(26,107,191,0.08); border-color: var(--gold); color: var(--gold); }
   .gb-fs-viewer {
-    flex: 1; overflow-y: auto; overflow-x: hidden;
-    display: flex; flex-direction: column; align-items: center;
-    background: rgba(20,35,60,0.95); padding: 24px 16px; gap: 12px;
+    flex: 1; overflow: hidden;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: rgba(20,35,60,0.95); padding: 0;
   }
   .gb-fs-viewer::-webkit-scrollbar { width: 5px; }
   .gb-fs-viewer::-webkit-scrollbar-thumb { background: rgba(26,107,191,0.28); border-radius: 3px; }
@@ -7193,25 +7203,28 @@ async function gbFsRenderPage() {
   try {
     const page = await st.pdfDoc.getPage(st.curPage);
 
-    // 전체화면 오버레이가 완전히 펼쳐진 후 실제 뷰어 크기 측정
-    // clientWidth/Height가 0이면 window 크기로 대체
-    const dpr = window.devicePixelRatio || 1;
-    const availW = (viewer.clientWidth  || window.innerWidth)  - 24;
-    const availH = (viewer.clientHeight || window.innerHeight) - 80;
+    // 뷰어의 실제 표시 폭 측정 (패딩 32px 제외)
+    // clientWidth가 0이면 window.innerWidth 사용
+    const dpr     = window.devicePixelRatio || 1;
+    const viewerW = viewer.clientWidth  || window.innerWidth;
+    const viewerH = viewer.clientHeight || (window.innerHeight - 100);
+    const availW  = viewerW - 32;   // 좌우 패딩 합산
+    const availH  = viewerH - 32;   // 상하 패딩 합산
 
     const viewport1 = page.getViewport({ scale: 1 });
-    // 가로/세로 모두 뷰어 안에 맞는 scale 계산 후 dpr 배율로 고화질 렌더
+
+    // 가로/세로 중 꽉 채울 수 있는 scale → dpr 곱해 고화질 렌더
     const fitScale    = Math.min(availW / viewport1.width, availH / viewport1.height);
     const renderScale = fitScale * dpr;
-    const vp = page.getViewport({ scale: renderScale });
+    const vp          = page.getViewport({ scale: renderScale });
 
     const canvas = document.createElement('canvas');
-    canvas.className  = 'gb-pdf-canvas';
-    canvas.width      = vp.width;
-    canvas.height     = vp.height;
-    // CSS 표시 크기는 fit 기준 → 실제 픽셀은 dpr 배율이므로 선명하게 표시
-    canvas.style.width    = Math.floor(vp.width  / dpr) + 'px';
-    canvas.style.height   = Math.floor(vp.height / dpr) + 'px';
+    canvas.className = 'gb-pdf-canvas';
+    canvas.width     = vp.width;
+    canvas.height    = vp.height;
+    // 뷰어 전체를 꽉 채움 (비율은 object-fit: contain으로 유지)
+    canvas.style.width    = '100%';
+    canvas.style.height   = '100%';
     canvas.style.maxWidth = '100%';
 
     await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
