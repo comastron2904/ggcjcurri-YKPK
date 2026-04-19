@@ -2180,31 +2180,14 @@
   #pdf-fs-close:hover { background: rgba(26,107,191,0.08); border-color: var(--gold); color: var(--gold); }
   #pdf-fs-viewer {
     flex: 1; overflow-y: auto; display: flex; align-items: flex-start; justify-content: center;
-    padding: 8px;
-    min-height: 0;
+    padding: 16px;
   }
   #pdf-fs-viewer::-webkit-scrollbar { width: 5px; }
   #pdf-fs-viewer::-webkit-scrollbar-thumb { background: rgba(26,107,191,0.28); border-radius: 3px; }
-  #pdf-fs-viewer canvas { display: block; width: 100% !important; max-width: 100%; height: auto !important; background: #fff; }
-
-  /* ── 데스크톱: PDF를 뷰어 높이에 맞춰 한 눈에 표시 ── */
+  #pdf-fs-viewer canvas { display: block; max-width: 100%; background: #fff; }
   @media (min-width: 768px) {
-    #pdf-fs-overlay {
-      background: rgba(20,30,50,0.97);
-    }
-    #pdf-fs-viewer {
-      overflow: hidden;
-      align-items: center;
-      justify-content: center;
-      padding: 16px 32px;
-    }
-    #pdf-fs-viewer canvas {
-      width: auto !important;
-      height: auto !important;
-      max-width: 100%;
-      max-height: 100%;
-      display: block;
-    }
+    #pdf-fs-viewer { overflow: hidden; align-items: center; justify-content: center; }
+    #pdf-fs-viewer canvas { width: auto !important; height: auto !important; max-width: 100%; max-height: 100%; }
   }
   #pdf-fs-nav {
     flex-shrink: 0; display: flex; align-items: center; justify-content: center; gap: 20px;
@@ -2244,8 +2227,7 @@
     will-change: transform;
   }
   .dept-pdf-canvas {
-    display: block; width: 100% !important; height: auto !important;
-    max-width: 100%;
+    display: block; max-width: 100%;
     background: #fff;
   }
   /* 좌우 화살표 버튼 */
@@ -2555,27 +2537,13 @@
   .gb-fs-viewer {
     flex: 1; overflow-y: auto; overflow-x: hidden;
     display: flex; flex-direction: column; align-items: center;
-    background: rgba(20,35,60,0.95); padding: 8px; gap: 8px;
-    min-height: 0;
+    background: rgba(20,35,60,0.95); padding: 24px 16px; gap: 12px;
   }
   .gb-fs-viewer::-webkit-scrollbar { width: 5px; }
   .gb-fs-viewer::-webkit-scrollbar-thumb { background: rgba(26,107,191,0.28); border-radius: 3px; }
-  .gb-fs-viewer .gb-pdf-canvas { width: 100% !important; height: auto !important; max-width: 100%; }
-
-  /* ── 데스크톱: gb 전체화면도 한 눈에 ── */
   @media (min-width: 768px) {
-    .gb-fs-viewer {
-      overflow: hidden;
-      align-items: center;
-      justify-content: center;
-      padding: 16px 32px;
-    }
-    .gb-fs-viewer .gb-pdf-canvas {
-      width: auto !important;
-      height: auto !important;
-      max-width: 100%;
-      max-height: 100%;
-    }
+    .gb-fs-viewer { overflow: hidden; align-items: center; justify-content: center; }
+    .gb-fs-viewer .gb-pdf-canvas { width: auto !important; height: auto !important; max-width: 100%; max-height: 100%; }
   }
   .gb-fs-nav {
     flex-shrink: 0; padding: 10px 20px;
@@ -4816,8 +4784,8 @@ async function renderMediaPdfPage(vid) {
     const page     = await st.pdfDoc.getPage(st.curPage);
     const vw       = viewerEl.clientWidth - 4;
     const viewport = page.getViewport({ scale: 1 });
-    const scale    = Math.max(vw / viewport.width, 0.5);
     const dpr      = window.devicePixelRatio || 1;
+    const scale    = Math.max(vw / viewport.width, 0.5);
     const vp       = page.getViewport({ scale: scale * dpr });
     const canvas   = document.createElement('canvas');
     canvas.className = 'gb-pdf-canvas';
@@ -4904,20 +4872,14 @@ async function pdfFsSync() {
     const vp0      = page.getViewport({ scale: 1 });
     const dpr      = window.devicePixelRatio || 1;
     const isDesktop = window.innerWidth >= 768;
-
     let baseScale;
     if (isDesktop) {
-      // 데스크톱: 뷰어의 가로·세로 모두 고려해 한 화면에 들어오도록
       const availW = viewerEl.clientWidth - 64;
       const availH = viewerEl.clientHeight - 32;
-      const scaleByW = availW / vp0.width;
-      const scaleByH = availH / vp0.height;
-      baseScale = Math.min(scaleByW, scaleByH);
+      baseScale = Math.min(availW / vp0.width, availH / vp0.height);
     } else {
-      // 모바일: 너비 기준 (세로 스크롤)
       baseScale = (viewerEl.clientWidth - 16) / vp0.width;
     }
-
     const vp       = page.getViewport({ scale: baseScale * dpr });
     const canvas   = document.createElement('canvas');
     canvas.width   = vp.width;
@@ -6282,11 +6244,10 @@ async function initPdfViewer(vid, dataUrl) {
 
       const page   = await pdfDoc.getPage(p);
       const vp     = page.getViewport({ scale: 1 });
-      // 슬롯 전체 너비를 사용 (nav 버튼은 absolute 오버레이)
-      const contentW = slotW;
+      const contentW = slotW - 80;
       const dpr      = window.devicePixelRatio || 1;
-      const baseScale = Math.min(contentW / vp.width, 3.0);
-      const scaled   = page.getViewport({ scale: baseScale * dpr });
+      const scale    = Math.min(contentW / vp.width, 2.5);
+      const scaled   = page.getViewport({ scale: scale * dpr });
 
       const canvas = document.createElement('canvas');
       canvas.className = 'dept-pdf-canvas';
@@ -7201,8 +7162,8 @@ async function gbRenderPage(side) {
     const vw       = viewer.clientWidth - 24;
     const viewport = page.getViewport({ scale: 1 });
     const dpr      = window.devicePixelRatio || 1;
-    const baseScale = Math.min(vw / viewport.width, 2);
-    const vp       = page.getViewport({ scale: baseScale * dpr });
+    const scale    = Math.min(vw / viewport.width, 2);
+    const vp       = page.getViewport({ scale: scale * dpr });
 
     const canvas  = document.createElement('canvas');
     canvas.className = 'gb-pdf-canvas';
@@ -7259,18 +7220,14 @@ async function gbFsRenderPage() {
     const viewport = page.getViewport({ scale: 1 });
     const dpr = window.devicePixelRatio || 1;
     const isDesktop = window.innerWidth >= 768;
-
     let baseScale;
     if (isDesktop) {
       const availW = viewer.clientWidth - 64;
       const availH = viewer.clientHeight - 32;
-      const scaleByW = availW / viewport.width;
-      const scaleByH = availH / viewport.height;
-      baseScale = Math.min(scaleByW, scaleByH, 3);
+      baseScale = Math.min(availW / viewport.width, availH / viewport.height, 3);
     } else {
       baseScale = Math.min((viewer.clientWidth - 16) / viewport.width, 3);
     }
-
     const vp = page.getViewport({ scale: baseScale * dpr });
     const canvas = document.createElement('canvas');
     canvas.className = 'gb-pdf-canvas';
