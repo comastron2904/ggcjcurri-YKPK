@@ -973,13 +973,15 @@
     }
 
     /* 열 헤더 행 */
-    .sem-col-header-row {
+   .sem-col-header-row {
       display: flex !important;
       flex-direction: row !important;
-      position: static !important;   /* sticky 제거 — 스크롤 2번 문제 원인 */
+      position: static !important;
       background: rgba(230,240,252,0.98) !important;
       border-bottom: 2px solid rgba(26,107,191,0.22) !important;
-    }
+      height: 64px !important; /* 높이 추가 */
+      align-items: stretch !important;
+     }
     .sem-col-header-row .sem-col-header-cell {
       width: 130px !important;
       min-width: 130px !important;
@@ -1015,10 +1017,14 @@
     .sem-row-head {
       flex-shrink: 0 !important;
       width: 80px !important;
-      min-width: 80px !important;
-      max-width: 80px !important;
+      background: rgba(230,240,252,0.5) !important;
+      border-right: 2px solid rgba(26,107,191,0.22) !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important; /* 상단 정렬에서 중앙 정렬로 변경 */
+      height: 64px !important; /* 높이 추가 */
       box-sizing: border-box !important;
-      position: static !important;
     }
 
     /* 과목군 셀 */
@@ -1163,10 +1169,15 @@
 
   /* 패널 서브헤더 — 열 헤더로 이동했으므로 셀 내엔 추가 버튼만 */
   .sem-panel-head {
-    flex-shrink: 0; padding: 8px 8px 7px;
-    border-bottom: 1px solid rgba(26,107,191,0.10);
-    display: flex; flex-direction: column; align-items: center; gap: 5px;
-  }
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      padding: 0 8px !important;
+      background: rgba(26,107,191,0.05) !important;
+      border-bottom: 1px solid rgba(26,107,191,0.1) !important;
+      height: 34px !important; /* 높이 명시적 고정 */
+      box-sizing: border-box !important;
+    }
   .sem-panel-label {
     font-size: 9px; letter-spacing: 2px; font-weight: 700;
     font-family: 'Noto Sans KR', sans-serif; text-align: center; line-height: 1.4;
