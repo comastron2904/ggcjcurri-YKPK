@@ -1012,17 +1012,39 @@
     }
 
     /* 학기명 셀 (좌측 첫 번째) */
+    /* 학기명 셀 — display:contents 오버라이드 */
     .sem-row-head {
+      display: flex !important;
+      flex-direction: column !important;
       flex-shrink: 0 !important;
       width: 80px !important;
       min-width: 80px !important;
       max-width: 80px !important;
       box-sizing: border-box !important;
       position: static !important;
+      border-right: 2px solid rgba(26,107,191,0.15) !important;
+    }
+    .sem-row.row-2학년 .sem-row-head { background: rgba(106,189,232,0.05) !important; border-left: 3px solid rgba(106,189,232,0.5) !important; }
+    .sem-row.row-3학년 .sem-row-head { background: rgba(176,126,224,0.05) !important; border-left: 3px solid rgba(176,126,224,0.5) !important; }
+    .sem-row-head-label {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 10px 6px !important;
+    }
+    .sem-subtype-zone {
+      flex: 1 !important;
+      grid-column: unset !important;
+      grid-row: unset !important;
+      border-right: none !important;
+      border-left: none !important;
     }
 
-    /* 과목군 셀 */
+    /* 과목군 셀 — display:contents 오버라이드 */
     .sem-cell {
+      display: flex !important;
+      flex-direction: column !important;
       width: 130px !important;
       min-width: 130px !important;
       max-width: 130px !important;
@@ -1030,6 +1052,13 @@
       box-sizing: border-box !important;
       height: auto !important;
     }
+    .sem-panel-head { grid-row: unset !important; }
+    .sem-subtype-section {
+      display: flex !important;
+      flex-direction: column !important;
+      flex: 1 !important;
+    }
+    .sem-subtype-block { grid-row: unset !important; }
 
     .sem-subject-list { overflow: visible !important; height: auto !important; }
   }
@@ -1109,13 +1138,10 @@
   .sem-row.sem-row-hidden { display: none !important; }
 
   /* 2학년↔3학년 사이 강조선 */
+  /* sem-row-head: display:contents로 자식이 직접 grid에 배치됨 */
   .sem-row-head {
-    display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
-    padding: 10px 6px 0; border-right: 2px solid rgba(26,107,191,0.15);
-    text-align: center; flex-shrink: 0;
+    display: contents;
   }
-  .sem-row.row-2학년 .sem-row-head { background: rgba(106,189,232,0.05); border-left: 3px solid rgba(106,189,232,0.5); }
-  .sem-row.row-3학년 .sem-row-head { background: rgba(176,126,224,0.05); border-left: 3px solid rgba(176,126,224,0.5); }
   .sem-row-grade {
     font-size: 9px; letter-spacing: 2px; font-weight: 700; margin-bottom: 4px;
   }
@@ -1124,19 +1150,6 @@
   .sem-row-title {
     font-family: 'Noto Serif KR', serif; font-size: 13px; font-weight: 900; color: #1a2e4a;
   }
-  .sem-subtype-zones {
-    display: flex; flex-direction: column;
-    width: 100%; flex: 1; margin-top: 8px;
-  }
-  .sem-subtype-zone {
-    flex: 1; display: flex; align-items: center; justify-content: center;
-    font-size: 9px; font-weight: 700; letter-spacing: 1.5px;
-    border-top: 1px solid rgba(26,107,191,0.10);
-    min-height: 0;
-  }
-  .sem-subtype-zone.sub-일반 { color: #4a8fc0; background: rgba(106,189,232,0.04); }
-  .sem-subtype-zone.sub-진로 { color: #9a6abf; background: rgba(176,126,224,0.04); }
-  .sem-subtype-zone.sub-융합 { color: #3a9e7a; background: rgba(60,180,130,0.04); }
 
   /* 각 과목군 셀 */
   .sem-cell {
@@ -1203,29 +1216,86 @@
   /* 셀 안 — 필수·선택 구조 통일: 추가버튼 + 목록 */
   .sem-panel { display: contents; } /* 더 이상 필요 없지만 JS 호환용 */
 
-  /* 일반/진로/융합 구조 — flex 기반, JS로 높이 동기화 */
+  /* 일반/진로/융합 구조 — 2D grid, display:contents로 자동 높이 정렬 */
   .sem-row {
+    /* columns: 학기열 + 과목군 5열, rows: panel-head행 + 일반 + 진로 + 융합 */
+    grid-template-rows: auto auto auto auto;
     align-items: stretch;
   }
+  /* 첫번째 열(학기 레이블)과 각 과목군 셀을 투명하게 — 자식이 직접 grid에 배치 */
   .sem-row-head {
-    /* flex 유지 — zones가 height로 동기화됨 */
+    display: contents;
   }
   .sem-cell {
-    display: flex; flex-direction: column; overflow: visible;
-    border-right: 1px solid rgba(26,107,191,0.08);
+    display: contents;
   }
   .sem-cell:last-child { border-right: none; }
-  .sem-cell.cell-req    { border-right: 2px solid rgba(232,130,106,0.20); background: rgba(255,230,222,0.12); }
-  .sem-cell.cell-사회과학  { background: rgba(255,230,180,0.12); }
-  .sem-cell.cell-국수영    { background: rgba(180,218,255,0.12); }
-  .sem-cell.cell-외국어정보 { background: rgba(180,255,230,0.12); }
-  .sem-cell.cell-음악미술  { background: rgba(255,180,230,0.12); }
-  .sem-subtype-section { display: flex; flex-direction: column; flex: 1; }
+
+  /* sem-row-head 내부 요소들 — grid 배치 */
+  /* 학기 레이블 (학년+학기 텍스트): column 1, row 1 (panel-head 행) */
+  .sem-row-head-label {
+    grid-column: 1;
+    grid-row: 1;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 10px 6px;
+    border-right: 2px solid rgba(26,107,191,0.15);
+    text-align: center;
+  }
+  .sem-row.row-2학년 .sem-row-head-label { background: rgba(106,189,232,0.05); border-left: 3px solid rgba(106,189,232,0.5); }
+  .sem-row.row-3학년 .sem-row-head-label { background: rgba(176,126,224,0.05); border-left: 3px solid rgba(176,126,224,0.5); }
+
+  /* 일반/진로/융합 zone: column 1, row 2/3/4 */
+  .sem-subtype-zone {
+    grid-column: 1;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; font-weight: 700; letter-spacing: 1.5px;
+    border-top: 1px solid rgba(26,107,191,0.10);
+    border-right: 2px solid rgba(26,107,191,0.15);
+    min-height: 36px;
+  }
+  .sem-subtype-zone.sub-일반 { grid-row: 2; color: #4a8fc0; background: rgba(106,189,232,0.04); }
+  .sem-subtype-zone.sub-진로 { grid-row: 3; color: #9a6abf; background: rgba(176,126,224,0.04); }
+  .sem-subtype-zone.sub-융합 { grid-row: 4; color: #3a9e7a; background: rgba(60,180,130,0.04); }
+  .sem-row.row-2학년 .sem-subtype-zone { background-color: rgba(106,189,232,0.04); border-left: 3px solid rgba(106,189,232,0.5); }
+  .sem-row.row-3학년 .sem-subtype-zone { background-color: rgba(176,126,224,0.04); border-left: 3px solid rgba(176,126,224,0.5); }
+  /* zone 자체 색상 우선 */
+  .sem-row .sem-subtype-zone.sub-일반 { background: rgba(106,189,232,0.04); }
+  .sem-row .sem-subtype-zone.sub-진로 { background: rgba(176,126,224,0.04); }
+  .sem-row .sem-subtype-zone.sub-융합 { background: rgba(60,180,130,0.04); }
+
+  /* panel-head (추가버튼 영역): row 1 */
+  .sem-panel-head {
+    grid-row: 1;
+    flex-shrink: 0; padding: 8px 8px 7px;
+    border-bottom: none;
+    display: flex; flex-direction: column; align-items: center; gap: 5px;
+    border-top: none;
+  }
+
+  /* subtype-section을 display:contents로 — 자식 block들이 직접 grid에 */
+  .sem-subtype-section { display: contents; }
+
+  /* subtype-block: row 2/3/4 */
   .sem-subtype-block {
     display: flex; flex-direction: column;
     border-top: 1px solid rgba(26,107,191,0.07);
     overflow: visible; min-height: 36px;
   }
+  .sem-subtype-block:nth-child(1) { grid-row: 2; }
+  .sem-subtype-block:nth-child(2) { grid-row: 3; }
+  .sem-subtype-block:nth-child(3) { grid-row: 4; }
+
+  /* 셀 배경색 — panel-head와 각 block에 직접 적용 */
+  .cell-req    > .sem-panel-head,
+  .cell-req    > .sem-subtype-section > .sem-subtype-block { background: rgba(255,230,222,0.12); border-right: 2px solid rgba(232,130,106,0.20); }
+  .cell-사회과학  > .sem-panel-head,
+  .cell-사회과학  > .sem-subtype-section > .sem-subtype-block { background: rgba(255,230,180,0.12); border-right: 1px solid rgba(26,107,191,0.08); }
+  .cell-국수영    > .sem-panel-head,
+  .cell-국수영    > .sem-subtype-section > .sem-subtype-block { background: rgba(180,218,255,0.12); border-right: 1px solid rgba(26,107,191,0.08); }
+  .cell-외국어정보 > .sem-panel-head,
+  .cell-외국어정보 > .sem-subtype-section > .sem-subtype-block { background: rgba(180,255,230,0.12); border-right: 1px solid rgba(26,107,191,0.08); }
+  .cell-음악미술  > .sem-panel-head,
+  .cell-음악미술  > .sem-subtype-section > .sem-subtype-block { background: rgba(255,180,230,0.12); }
 
   .sem-subject-list { padding: 2px 6px 4px; min-width: 0; overflow: visible; min-height: 4px; }
   /* 과목 6개 이상 → JS가 .wide 클래스 추가 → 2열 그리드 */
@@ -2943,13 +3013,13 @@
     <!-- 2학년 1학기 -->
     <div class="sem-row row-2학년">
       <div class="sem-row-head">
-        <div class="sem-row-grade">2학년</div>
-        <div class="sem-row-title">1학기</div>
-        <div class="sem-subtype-zones">
-          <div class="sem-subtype-zone sub-일반">일반</div>
-          <div class="sem-subtype-zone sub-진로">진로</div>
-          <div class="sem-subtype-zone sub-융합">융합</div>
+        <div class="sem-row-head-label">
+          <div class="sem-row-grade">2학년</div>
+          <div class="sem-row-title">1학기</div>
         </div>
+        <div class="sem-subtype-zone sub-일반">일반</div>
+        <div class="sem-subtype-zone sub-진로">진로</div>
+        <div class="sem-subtype-zone sub-융합">융합</div>
       </div>
       <!-- 필수 열: 추가버튼 상단, 일반/진로/융합 서브행 -->
       <div class="sem-cell cell-req" style="border-right:2px solid rgba(232,130,106,0.20);">
@@ -3041,13 +3111,13 @@
     <!-- 2학년 2학기 -->
     <div class="sem-row row-2학년">
       <div class="sem-row-head">
-        <div class="sem-row-grade">2학년</div>
-        <div class="sem-row-title">2학기</div>
-        <div class="sem-subtype-zones">
-          <div class="sem-subtype-zone sub-일반">일반</div>
-          <div class="sem-subtype-zone sub-진로">진로</div>
-          <div class="sem-subtype-zone sub-융합">융합</div>
+        <div class="sem-row-head-label">
+          <div class="sem-row-grade">2학년</div>
+          <div class="sem-row-title">2학기</div>
         </div>
+        <div class="sem-subtype-zone sub-일반">일반</div>
+        <div class="sem-subtype-zone sub-진로">진로</div>
+        <div class="sem-subtype-zone sub-융합">융합</div>
       </div>
       <div class="sem-cell cell-req" style="border-right:2px solid rgba(232,130,106,0.20);">
         <div class="sem-panel-head">
@@ -3138,13 +3208,13 @@
     <!-- 3학년 1학기 -->
     <div class="sem-row row-3학년">
       <div class="sem-row-head">
-        <div class="sem-row-grade">3학년</div>
-        <div class="sem-row-title">1학기</div>
-        <div class="sem-subtype-zones">
-          <div class="sem-subtype-zone sub-일반">일반</div>
-          <div class="sem-subtype-zone sub-진로">진로</div>
-          <div class="sem-subtype-zone sub-융합">융합</div>
+        <div class="sem-row-head-label">
+          <div class="sem-row-grade">3학년</div>
+          <div class="sem-row-title">1학기</div>
         </div>
+        <div class="sem-subtype-zone sub-일반">일반</div>
+        <div class="sem-subtype-zone sub-진로">진로</div>
+        <div class="sem-subtype-zone sub-융합">융합</div>
       </div>
       <div class="sem-cell cell-req" style="border-right:2px solid rgba(232,130,106,0.20);">
         <div class="sem-panel-head">
@@ -3235,13 +3305,13 @@
     <!-- 3학년 2학기 -->
     <div class="sem-row row-3학년">
       <div class="sem-row-head">
-        <div class="sem-row-grade">3학년</div>
-        <div class="sem-row-title">2학기</div>
-        <div class="sem-subtype-zones">
-          <div class="sem-subtype-zone sub-일반">일반</div>
-          <div class="sem-subtype-zone sub-진로">진로</div>
-          <div class="sem-subtype-zone sub-융합">융합</div>
+        <div class="sem-row-head-label">
+          <div class="sem-row-grade">3학년</div>
+          <div class="sem-row-title">2학기</div>
         </div>
+        <div class="sem-subtype-zone sub-일반">일반</div>
+        <div class="sem-subtype-zone sub-진로">진로</div>
+        <div class="sem-subtype-zone sub-융합">융합</div>
       </div>
       <div class="sem-cell cell-req" style="border-right:2px solid rgba(232,130,106,0.20);">
         <div class="sem-panel-head">
@@ -5266,12 +5336,25 @@ function setCurrentSem(idx) {
   document.querySelectorAll('.sem-row').forEach((row, rowIdx) => {
     if (rowIdx === idx) {
       row.classList.remove('sem-row-hidden');
-      // 데스크탑: flex로 행 높이 채우기
       row.style.flex = isMobile ? '' : '';
     } else {
       row.classList.add('sem-row-hidden');
       row.style.flex = '';
+      // 모바일: 숨긴 행 JS 높이 리셋 (다음에 다시 보일 때 재측정)
+      if (window.innerWidth <= 700) {
+        row.querySelectorAll('.sem-subtype-block, .sem-subtype-zone').forEach(el => {
+          el.style.height = '';
+          el.style.flex = '1';
+        });
+      }
     }
+  });
+
+  // 학기 전환 후 zone 높이 재동기화 (행이 새로 표시되므로 재측정 필요)
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      document.querySelectorAll('.sem-row:not(.sem-row-hidden)').forEach(row => _syncOneRow(row));
+    });
   });
 
   }
@@ -5365,35 +5448,32 @@ function renderAllSemCols() {
 }
 
 /* 일반/진로/융합 zone 높이를 실제 block 높이에 맞춰 동기화 */
-function syncSubtypeZoneHeights() {
-  document.querySelectorAll('.sem-row').forEach(row => {
-    const subtypes = ['일반', '진로', '융합'];
-    const zones = subtypes.map(st => row.querySelector('.sem-subtype-zone.sub-' + st));
-    if (!zones[0]) return;
 
-    // 먼저 모든 block/zone 높이 리셋 (재측정을 위해)
-    zones.forEach(z => { if (z) { z.style.height = ''; z.style.flex = '1'; } });
-    row.querySelectorAll('.sem-subtype-block').forEach(b => { b.style.height = ''; });
-
-    // 브라우저가 레이아웃 재계산하도록 한 프레임 뒤에 측정
-    requestAnimationFrame(() => {
-      subtypes.forEach((st, i) => {
-        // 이 row의 모든 셀에서 i번째 sem-subtype-block 높이 최대값
-        const blocks = Array.from(row.querySelectorAll('.sem-subtype-section > .sem-subtype-block:nth-child(' + (i + 1) + ')'));
-        const maxH = Math.max(36, ...blocks.map(b => b.offsetHeight));
-
-        // zone 높이 고정
-        if (zones[i]) {
-          zones[i].style.height = maxH + 'px';
-          zones[i].style.flex = 'none';
-        }
-        // 모든 block도 같은 높이로 고정
-        blocks.forEach(b => { b.style.height = maxH + 'px'; });
-      });
+// 데스크탑: CSS grid 자동 정렬 / 모바일: JS 동기화
+function _syncOneRow(row) {
+  if (window.innerWidth > 700) return;
+  if (row.classList.contains('sem-row-hidden')) return;
+  const subtypes = ['일반', '진로', '융합'];
+  const zones = subtypes.map(st => row.querySelector('.sem-subtype-zone.sub-' + st));
+  if (!zones[0]) return;
+  zones.forEach(z => { if (z) { z.style.height = ''; z.style.flex = '1'; } });
+  row.querySelectorAll('.sem-subtype-block').forEach(b => { b.style.height = ''; });
+  requestAnimationFrame(() => {
+    subtypes.forEach((st, i) => {
+      const blocks = Array.from(row.querySelectorAll('.sem-subtype-section > .sem-subtype-block:nth-child(' + (i + 1) + ')'));
+      const maxH = Math.max(36, ...blocks.map(b => b.getBoundingClientRect().height));
+      if (zones[i]) { zones[i].style.height = maxH + 'px'; zones[i].style.flex = 'none'; }
+      blocks.forEach(b => { b.style.height = maxH + 'px'; });
     });
   });
 }
 
+function syncSubtypeZoneHeights() {
+  if (window.innerWidth > 700) return;
+  document.querySelectorAll('.sem-row:not(.sem-row-hidden)').forEach(row => {
+    requestAnimationFrame(() => requestAnimationFrame(() => _syncOneRow(row)));
+  });
+}
 
 const ELEC_KEYS = ['사회과학', '국수영', '외국어정보', '음악미술']; // ID용
 
@@ -7365,6 +7445,7 @@ window.addEventListener('resize', function() {
   if (typeof setCurrentSem === 'function' && typeof currentSemIdx !== 'undefined') {
     setCurrentSem(currentSemIdx);
   }
+  requestAnimationFrame(() => syncSubtypeZoneHeights());
 });
 </script>
 
