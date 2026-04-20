@@ -5384,6 +5384,8 @@ function saveSemColEdit() {
 function renderAllSemCols() {
   for (let i = 0; i < 4; i++) renderSemCol(i);
   updateSemGridColumns();
+  // 렌더링 후 현재 학기 표시 상태 재적용 (모바일에서 모든 학기가 보이는 버그 수정)
+  if (typeof currentSemIdx !== 'undefined') setCurrentSem(currentSemIdx);
 }
 
 const ELEC_KEYS = ['사회과학', '국수영', '외국어정보', '음악미술']; // ID용
@@ -5558,6 +5560,19 @@ function updateSemGridColumns() {
       if (musEl) musEl.classList.toggle('wide', musCnt >= threshold);
     });
   });
+
+  // 모바일에서 학기 행 표시 상태 재적용 (인라인 style 변경 후 hidden 상태 보장)
+  if (window.innerWidth <= 700 && typeof currentSemIdx !== 'undefined') {
+    requestAnimationFrame(() => {
+      document.querySelectorAll('.sem-row').forEach((row, rowIdx) => {
+        if (rowIdx === currentSemIdx) {
+          row.classList.remove('sem-row-hidden');
+        } else {
+          row.classList.add('sem-row-hidden');
+        }
+      });
+    });
+  }
 }
 
 function removeSemSubj(colIdx, i) {
