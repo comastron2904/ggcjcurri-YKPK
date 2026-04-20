@@ -1032,7 +1032,7 @@
     }
 
     .sem-subrow-wrap { overflow: visible !important; }
-    .sem-subrow      { min-height: 60px !important; overflow: visible !important; }
+    .sem-subrow      { min-height: 60px !important; overflow: visible !important; height: auto !important; }
     .sem-subject-list { overflow: visible !important; height: auto !important; }
   }
 
@@ -1101,8 +1101,8 @@
     display: grid;
     grid-template-columns: 120px 1fr 1fr 1fr 1fr 1fr;
     border-bottom: 1px solid rgba(26,107,191,0.08);
-    min-height: 100%;
-    flex: 1;
+    min-height: 0;
+    /* height: auto — 내용물에 따라 자동으로 늘어남 */
     transition: grid-template-columns 0.3s ease;
   }
   /* 2학년↔3학년 사이 강조선 */
@@ -1132,17 +1132,17 @@
   .sem-row-type-labels {
     display: flex;
     flex-direction: column;
-    flex: 1;
     width: 100%;
     margin-top: 6px;
     gap: 0;
   }
   .sem-row-type-label {
-    flex: 1;
     display: flex; align-items: center; justify-content: center;
     font-size: 9px; font-weight: 900; letter-spacing: 1.5px;
     font-family: 'Noto Sans KR', sans-serif;
     border-radius: 2px;
+    min-height: 60px;
+    box-sizing: border-box;
   }
   .rtl-일반 { color: #3a8abe; }
   .rtl-진로 { color: #1a9070; }
@@ -1154,14 +1154,15 @@
     flex-direction: column;
     flex: 1;
     min-height: 0;
-    overflow: hidden;
+    overflow: visible;
   }
   .sem-subrow {
-    flex: 1;
-    min-height: 0;
+    /* flex: 1 제거 — 내용물 높이에 맞게 자동 늘어남 */
+    min-height: 60px;
     border-bottom: 1px solid rgba(26,107,191,0.07);
     display: flex;
-    overflow: hidden;
+    overflow: visible;
+    height: auto;
   }
   .sem-subrow:last-child { border-bottom: none; }
   .sem-subrow-일반 { background: rgba(58,138,190,0.03); }
@@ -1170,7 +1171,7 @@
 
   /* 각 과목군 셀 */
   .sem-cell {
-    display: flex; flex-direction: column; overflow: hidden;
+    display: flex; flex-direction: column; overflow: visible;
     border-right: 1px solid rgba(26,107,191,0.08);
   }
   .sem-cell:last-child { border-right: none; }
@@ -1235,7 +1236,7 @@
   
 
   /* 패널 내 과목 목록 */
-  .sem-subject-list { flex: 1; overflow-y: auto; padding: 6px 6px; min-width: 0; }
+  .sem-subject-list { padding: 6px 6px; min-width: 0; overflow: visible; min-height: 8px; }
   /* 과목 6개 이상 → JS가 .wide 클래스 추가 → 2열 그리드 */
   .sem-subject-list.wide { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; align-content: start; }
   .sem-subject-list.wide .sem-subj-card { margin-bottom: 0; }
@@ -5294,12 +5295,15 @@ function setCurrentSem(idx) {
     if (rowIdx === idx) {
       row.classList.remove('sem-row-hidden');
       // 데스크탑: flex로 행 높이 채우기
-      row.style.flex = isMobile ? '' : '1';
+      row.style.flex = isMobile ? '' : '';
     } else {
       row.classList.add('sem-row-hidden');
       row.style.flex = '';
     }
   });
+
+  // 학기 전환 후 높이 재동기화
+  requestAnimationFrame(syncSubrowHeights);
 }
 
 // 하위 호환을 위한 래퍼 (applyPageTexts 등에서 호출될 수 있음)
@@ -5384,8 +5388,51 @@ function saveSemColEdit() {
 function renderAllSemCols() {
   for (let i = 0; i < 4; i++) renderSemCol(i);
   updateSemGridColumns();
-  // 렌더링 후 현재 학기 표시 상태 재적용 (모바일에서 모든 학기가 보이는 버그 수정)
+  // 렌더링 후 현재 학기 표시 상태 재적용 + 높이 동기화 (setCurrentSem 내부에서 syncSubrowHeights 호출)
   if (typeof currentSemIdx !== 'undefined') setCurrentSem(currentSemIdx);
+}
+
+/* ── 일반/진로/융합 subrow 높이 동기화 ──────────────────────────
+   각 .sem-row 안에서 동일 인덱스의 .sem-subrow들을
+   가장 높은 것 기준으로 맞춰줌 (내용물이 넘치지 않도록)
+   좌측 .sem-row-type-label 높이도 같이 맞춰줌
+──────────────────────────────────────────────────────────────── */
+function syncSubrowHeights() {
+  // 두 번째 rAF: wide 클래스·그리드 변경이 완전히 적용된 뒤 측정
+  requestAnimationFrame(() => {
+    document.querySelectorAll('.sem-row:not(.sem-row-hidden)').forEach(row => {
+      const wraps = row.querySelectorAll('.sem-subrow-wrap');
+      if (!wraps.length) return;
+      const numSubrows = wraps[0].querySelectorAll('.sem-subrow').length;
+
+      // 좌측 타입 라벨 요소들
+      const typeLabels = row.querySelectorAll('.sem-row-type-label');
+
+      for (let si = 0; si < numSubrows; si++) {
+        // 1단계: height 리셋 → 실제 필요 높이 측정
+        wraps.forEach(wrap => {
+          const subrow = wrap.querySelectorAll('.sem-subrow')[si];
+          if (subrow) subrow.style.height = 'auto';
+        });
+        if (typeLabels[si]) typeLabels[si].style.height = 'auto';
+
+        // 2단계: 모든 셀 중 최대 scrollHeight
+        let maxH = 0;
+        wraps.forEach(wrap => {
+          const subrow = wrap.querySelectorAll('.sem-subrow')[si];
+          if (subrow) maxH = Math.max(maxH, subrow.scrollHeight);
+        });
+        maxH = Math.max(maxH, 60);
+
+        // 3단계: 동일 높이 적용
+        wraps.forEach(wrap => {
+          const subrow = wrap.querySelectorAll('.sem-subrow')[si];
+          if (subrow) subrow.style.height = maxH + 'px';
+        });
+        if (typeLabels[si]) typeLabels[si].style.height = maxH + 'px';
+      }
+    });
+  });
 }
 
 const ELEC_KEYS = ['사회과학', '국수영', '외국어정보', '음악미술']; // ID용
@@ -5573,12 +5620,16 @@ function updateSemGridColumns() {
       });
     });
   }
+
+  // 일반/진로/융합 subrow 높이 동기화
+  requestAnimationFrame(syncSubrowHeights);
 }
 
 function removeSemSubj(colIdx, i) {
   semesterData[colIdx].splice(i, 1);
   saveSemester();
   renderSemCol(colIdx);
+  requestAnimationFrame(syncSubrowHeights);
 }
 
 /* ── 과목 추가 (비밀번호 → 선택 모달) ── */
@@ -5695,6 +5746,7 @@ function confirmSubjPick() {
   save();
   saveSemester();
   renderSemCol(pickTargetCol);
+  requestAnimationFrame(syncSubrowHeights);
   closeSubjPick();
 }
 
