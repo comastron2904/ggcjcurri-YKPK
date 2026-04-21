@@ -911,7 +911,172 @@
     color: var(--gold); transform: translateY(-1px);
   }
 
-  /* 학기별 편집 모달 */
+  /* ── AI 진로 추천 버튼 ── */
+  .btn-ai-recommend {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 16px; height: 38px;
+    background: linear-gradient(135deg, rgba(106,60,200,0.12), rgba(26,107,191,0.12));
+    border: 1px solid rgba(106,60,200,0.40);
+    color: rgba(106,60,200,0.90);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.5px;
+    cursor: pointer; transition: all 0.22s; margin-left: 4px;
+  }
+  .btn-ai-recommend:hover {
+    background: linear-gradient(135deg, rgba(106,60,200,0.22), rgba(26,107,191,0.18));
+    border-color: rgba(106,60,200,0.75);
+    color: rgba(106,60,200,1);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(106,60,200,0.20);
+  }
+
+  /* ── AI 진로 추천 모달 ── */
+  #ai-recommend-modal {
+    position: fixed; inset: 0; z-index: 3000;
+    background: rgba(10,20,40,0.55);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.25s;
+    padding: 16px;
+  }
+  #ai-recommend-modal.open { opacity: 1; pointer-events: all; }
+  #ai-recommend-modal .ai-modal-box {
+    background: #fff;
+    border: 1px solid rgba(106,60,200,0.25);
+    box-shadow: 0 8px 48px rgba(106,60,200,0.18);
+    width: 100%; max-width: 560px; max-height: 90vh;
+    display: flex; flex-direction: column;
+    position: relative;
+    transform: translateY(20px) scale(0.97);
+    transition: transform 0.3s cubic-bezier(0.34,1.36,0.64,1);
+    overflow: hidden;
+  }
+  #ai-recommend-modal.open .ai-modal-box { transform: translateY(0) scale(1); }
+  .ai-modal-header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid rgba(106,60,200,0.10);
+    background: linear-gradient(135deg, rgba(106,60,200,0.05), rgba(26,107,191,0.04));
+    flex-shrink: 0;
+  }
+  .ai-modal-label { font-size: 9px; letter-spacing: 4px; color: rgba(106,60,200,0.70); margin-bottom: 4px; }
+  .ai-modal-title { font-family: 'Noto Serif KR', serif; font-size: 17px; font-weight: 900; color: rgba(26,46,74,0.90); }
+  .ai-modal-close {
+    position: absolute; top: 14px; right: 18px;
+    background: none; border: none; color: rgba(26,46,74,0.45);
+    font-size: 22px; cursor: pointer; line-height: 1; transition: color 0.2s;
+  }
+  .ai-modal-close:hover { color: rgba(106,60,200,0.80); }
+
+  /* 관리자 PDF 업로드 영역 */
+  .ai-admin-pw-zone {
+    display: none; padding: 14px 24px;
+    background: rgba(106,60,200,0.04);
+    border-bottom: 1px dashed rgba(106,60,200,0.18);
+    flex-shrink: 0;
+  }
+  .ai-admin-pw-zone.visible { display: block; }
+  .ai-admin-pw-row { display: flex; gap: 8px; }
+  .ai-admin-pw-input {
+    flex: 1; padding: 9px 12px;
+    background: rgba(26,107,191,0.05);
+    border: 1px solid rgba(26,107,191,0.20);
+    color: var(--white); font-family: 'Noto Sans KR', sans-serif;
+    font-size: 14px; outline: none;
+    transition: border-color 0.2s;
+  }
+  .ai-admin-pw-input:focus { border-color: var(--gold); }
+  .ai-admin-pw-btn {
+    padding: 9px 16px;
+    background: linear-gradient(135deg, #1a6bbf, #0e4a8a);
+    border: none; color: #fff;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 13px; font-weight: 700; cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .ai-admin-pw-btn:hover { opacity: 0.85; }
+  .ai-admin-pw-error { font-size: 11px; color: #d63030; margin-top: 6px; min-height: 16px; }
+
+  .ai-admin-zone {
+    padding: 16px 24px; border-bottom: 1px solid rgba(106,60,200,0.08);
+    background: rgba(106,60,200,0.03); flex-shrink: 0; display: none;
+  }
+  .ai-admin-zone.visible { display: block; }
+  .ai-admin-zone-label { font-size: 10px; font-weight: 700; letter-spacing: 2px; color: rgba(106,60,200,0.60); margin-bottom: 10px; }
+  .ai-pdf-list { display: flex; flex-direction: column; gap: 6px; max-height: 110px; overflow-y: auto; margin-bottom: 10px; }
+  .ai-pdf-item {
+    display: flex; align-items: center; gap: 8px; padding: 6px 10px;
+    background: rgba(106,60,200,0.06); border: 1px solid rgba(106,60,200,0.15);
+    font-size: 11px; color: rgba(26,46,74,0.75);
+  }
+  .ai-pdf-item span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ai-pdf-del { background: none; border: none; cursor: pointer; color: rgba(200,60,60,0.60); font-size: 14px; line-height: 1; padding: 0 2px; transition: color 0.2s; flex-shrink: 0; }
+  .ai-pdf-del:hover { color: rgba(200,60,60,1); }
+  .ai-pdf-empty { font-size: 11px; color: rgba(26,46,74,0.35); font-style: italic; }
+  .ai-upload-row { display: flex; gap: 8px; align-items: center; }
+  .ai-upload-btn {
+    display: inline-flex; align-items: center; gap: 5px; padding: 7px 14px;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.3px;
+    background: rgba(106,60,200,0.10); border: 1px solid rgba(106,60,200,0.35);
+    color: rgba(106,60,200,0.85); cursor: pointer; transition: all 0.2s; white-space: nowrap;
+  }
+  .ai-upload-btn:hover { background: rgba(106,60,200,0.18); }
+  .ai-upload-status { font-size: 10px; color: rgba(26,46,74,0.45); }
+
+  /* 학생 입력 영역 */
+  .ai-student-zone { padding: 20px 24px; flex-shrink: 0; }
+  .ai-input-label { font-size: 11px; font-weight: 700; letter-spacing: 1px; color: rgba(26,46,74,0.60); margin-bottom: 8px; }
+  .ai-career-input {
+    width: 100%; box-sizing: border-box; padding: 11px 14px;
+    border: 1px solid rgba(106,60,200,0.30); background: rgba(106,60,200,0.03);
+    font-family: 'Noto Sans KR', sans-serif; font-size: 13px; color: rgba(26,46,74,0.85);
+    outline: none; transition: border-color 0.2s; margin-bottom: 12px; border-radius: 0;
+  }
+  .ai-career-input:focus { border-color: rgba(106,60,200,0.60); background: rgba(106,60,200,0.05); }
+  .ai-career-input::placeholder { color: rgba(26,46,74,0.30); }
+  .ai-sem-info { font-size: 11px; color: rgba(26,46,74,0.45); margin-bottom: 12px; display: flex; gap: 6px; align-items: center; }
+  .ai-sem-badge {
+    display: inline-block; padding: 2px 8px;
+    background: rgba(26,107,191,0.10); border: 1px solid rgba(26,107,191,0.20);
+    font-size: 10px; font-weight: 700; color: rgba(26,107,191,0.80); letter-spacing: 0.5px;
+  }
+  .ai-submit-btn {
+    width: 100%; padding: 12px; border: none; color: #fff;
+    background: linear-gradient(135deg, rgba(106,60,200,0.85), rgba(26,107,191,0.85));
+    font-family: 'Noto Sans KR', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 1px;
+    cursor: pointer; transition: all 0.22s; border-radius: 0;
+  }
+  .ai-submit-btn:hover { opacity: 0.90; transform: translateY(-1px); box-shadow: 0 4px 18px rgba(106,60,200,0.30); }
+  .ai-submit-btn:disabled { opacity: 0.50; cursor: not-allowed; transform: none; }
+
+  /* 결과 영역 */
+  .ai-result-zone { flex: 1; overflow-y: auto; padding: 0 24px 20px; min-height: 0; }
+  .ai-result-inner { border-top: 1px solid rgba(106,60,200,0.10); padding-top: 16px; display: none; }
+  .ai-result-inner.visible { display: block; }
+  .ai-result-label { font-size: 9px; letter-spacing: 3px; font-weight: 700; color: rgba(106,60,200,0.60); margin-bottom: 10px; }
+  .ai-result-text { font-size: 13px; line-height: 1.8; color: rgba(26,46,74,0.82); white-space: pre-wrap; }
+  .ai-thinking { display: flex; align-items: center; gap: 8px; font-size: 12px; color: rgba(106,60,200,0.60); padding: 12px 0; }
+  .ai-thinking-dots span {
+    display: inline-block; width: 6px; height: 6px;
+    background: rgba(106,60,200,0.50); border-radius: 50%;
+    animation: aiDot 1.2s infinite;
+  }
+  .ai-thinking-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .ai-thinking-dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes aiDot {
+    0%,80%,100% { transform: scale(0.6); opacity: 0.4; }
+    40% { transform: scale(1); opacity: 1; }
+  }
+  .ai-error-msg { font-size: 12px; color: rgba(200,60,60,0.80); padding: 10px 14px; background: rgba(200,60,60,0.05); border: 1px solid rgba(200,60,60,0.15); display: none; }
+  .ai-error-msg.visible { display: block; }
+  .ai-no-pdf-msg { font-size: 12px; color: rgba(26,46,74,0.45); padding: 10px 0; text-align: center; display: none; }
+  .ai-no-pdf-msg.visible { display: block; }
+  @media (max-width: 600px) {
+    #ai-recommend-modal .ai-modal-box { max-height: 95vh; }
+    .ai-modal-header { padding: 16px 18px 12px; }
+    .ai-student-zone { padding: 14px 18px; }
+    .ai-result-zone { padding: 0 18px 16px; }
+    .ai-admin-zone { padding: 12px 18px; }
+  }
   #sem-col-edit-modal .modal-box {
     max-width: 560px; max-height: 88vh;
     padding: 32px 32px 24px;
@@ -3020,6 +3185,7 @@
         <button class="sem-mobile-tab" id="mob-sem-tab-3" onclick="setCurrentSem(3)">3-2학기</button>
       </div>
       <button class="btn-sem-col-edit" onclick="openSemColEditPw()" title="열 헤더 · 학점 편집">✏️ 편집</button>
+      <button class="btn-ai-recommend" onclick="openAiRecommend()" title="AI 진로 추천">✦ AI 추천</button>
     </div>
   </div>
   <!-- 모바일 가로 스크롤 래퍼 — 헤더+본문을 하나의 스크롤 컨테이너로 -->
@@ -3437,6 +3603,71 @@
   </div><!-- /sem-scroll-inner -->
 </div><!-- /sem-scroll-outer -->
 
+</div>
+
+<!-- ═══════════════════════════════════════
+     AI 진로 추천 모달
+═══════════════════════════════════════ -->
+<div id="ai-recommend-modal">
+  <div class="ai-modal-box">
+    <button class="ai-modal-close" onclick="closeAiRecommend()">×</button>
+
+    <div class="ai-modal-header">
+      <div class="ai-modal-label">AI · CAREER GUIDE</div>
+      <div class="ai-modal-title">✦ 진로별 과목 추천</div>
+    </div>
+
+    <!-- 관리자 비밀번호 입력 영역 -->
+    <div class="ai-admin-pw-zone" id="ai-admin-pw-zone">
+      <div class="ai-admin-zone-label">🔒 관리자 로그인</div>
+      <div class="ai-admin-pw-row">
+        <input class="ai-admin-pw-input" id="ai-admin-pw-input" type="password"
+          placeholder="비밀번호 입력"
+          onkeydown="if(event.key==='Enter') checkAiAdminPw()">
+        <button class="ai-admin-pw-btn" onclick="checkAiAdminPw()">확인</button>
+      </div>
+      <div class="ai-admin-pw-error" id="ai-admin-pw-error"></div>
+    </div>
+
+    <!-- 관리자 전용: PDF 업로드 -->
+    <div class="ai-admin-zone" id="ai-admin-zone">
+      <div class="ai-admin-zone-label">📂 추천 자료 관리 (관리자)</div>
+      <div class="ai-pdf-list" id="ai-pdf-list">
+        <div class="ai-pdf-empty" id="ai-pdf-empty">업로드된 자료가 없습니다</div>
+      </div>
+      <div class="ai-upload-row">
+        <button class="ai-upload-btn" onclick="document.getElementById('ai-pdf-input').click()">＋ PDF 추가</button>
+        <span class="ai-upload-status" id="ai-upload-status"></span>
+      </div>
+      <input type="file" id="ai-pdf-input" accept=".pdf" multiple style="display:none" onchange="handleAiPdfUpload(this)">
+    </div>
+
+    <!-- 학생 입력 -->
+    <div class="ai-student-zone">
+      <div class="ai-sem-info">
+        현재 학기: <span class="ai-sem-badge" id="ai-sem-badge">—</span>
+      </div>
+      <div class="ai-input-label">희망 진로를 입력해 주세요</div>
+      <input class="ai-career-input" id="ai-career-input" type="text"
+        placeholder="예) 의사, 컴퓨터공학, 디자이너, 교사 …"
+        onkeydown="if(event.key==='Enter') submitAiRecommend()">
+      <div class="ai-no-pdf-msg" id="ai-no-pdf-msg">⚠ 추천 자료가 없습니다. 관리자에게 문의하세요.</div>
+      <button class="ai-submit-btn" id="ai-submit-btn" onclick="submitAiRecommend()">추천받기</button>
+    </div>
+
+    <!-- 결과 -->
+    <div class="ai-result-zone">
+      <div class="ai-result-inner" id="ai-result-inner">
+        <div class="ai-result-label">AI 추천 결과</div>
+        <div class="ai-thinking" id="ai-thinking" style="display:none">
+          <span>분석 중</span>
+          <div class="ai-thinking-dots"><span></span><span></span><span></span></div>
+        </div>
+        <div class="ai-error-msg" id="ai-error-msg"></div>
+        <div class="ai-result-text" id="ai-result-text"></div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- ═══════════════════════════════════════
@@ -7671,9 +7902,311 @@ window.addEventListener('resize', function() {
   }
   requestAnimationFrame(() => syncSubtypeZoneHeights());
 });
-</script>
+/* ══════════════════════════════════════
+   AI 진로 추천 — Supabase + Anthropic
+══════════════════════════════════════ */
+(function() {
 
-<div id="dept-save-toast"></div>
+  /* ── 상수 ── */
+  const BUCKET       = 'ai-career-pdfs';           // Supabase Storage 버킷명
+  const EDGE_FN      = SUPABASE_URL + '/functions/v1/ai-career-recommend'; // Edge Function URL
+  const SEM_LABELS   = ['2학년 1학기','2학년 2학기','3학년 1학기','3학년 2학기'];
+  const AUTH_HEADERS = () => ({ apikey: SUPABASE_ANON, Authorization: 'Bearer ' + SUPABASE_ANON });
+
+  /* ── 상태 ── */
+  let aiPdfFiles = [];   // { name, path, url } 목록
+  let isAdminMode = false;
+
+  /* ────────────────────────────────────
+     모달 열기 / 닫기
+  ──────────────────────────────────── */
+  window.openAiRecommend = function() {
+    // 관리자 여부: 관리자 모달이 열렸던 적 있으면(세션 내) 관리자로 판단
+    isAdminMode = document.getElementById('admin-modal').classList.contains('open') ||
+                  sessionStorage.getItem('cgAdmin') === '1';
+
+    // 현재 학기 배지 업데이트
+    const label = SEM_LABELS[typeof currentSemIdx !== 'undefined' ? currentSemIdx : 0] || '';
+    document.getElementById('ai-sem-badge').textContent = label;
+
+    // 관리자 영역 표시 여부
+    document.getElementById('ai-admin-zone').classList.toggle('visible', isAdminMode);
+
+    // 비밀번호 입력창: 비관리자일 때만 표시, 관리자면 숨김
+    const pwZone = document.getElementById('ai-admin-pw-zone');
+    if (isAdminMode) {
+      pwZone.classList.remove('visible');
+    } else {
+      pwZone.classList.add('visible');
+      document.getElementById('ai-admin-pw-input').value = '';
+      document.getElementById('ai-admin-pw-error').textContent = '';
+    }
+
+    // 결과 초기화
+    resetAiResult();
+
+    document.getElementById('ai-career-input').value = '';
+    document.getElementById('ai-recommend-modal').classList.add('open');
+
+    // PDF 목록 로드
+    loadAiPdfList();
+
+    setTimeout(() => document.getElementById('ai-career-input').focus(), 300);
+  };
+
+  window.checkAiAdminPw = function() {
+    const input = document.getElementById('ai-admin-pw-input').value;
+    if (input === PASS) {
+      sessionStorage.setItem('cgAdmin', '1');
+      isAdminMode = true;
+      document.getElementById('ai-admin-pw-zone').classList.remove('visible');
+      document.getElementById('ai-admin-zone').classList.add('visible');
+      document.getElementById('ai-admin-pw-error').textContent = '';
+      loadAiPdfList();
+    } else {
+      document.getElementById('ai-admin-pw-error').textContent = '비밀번호가 올바르지 않습니다.';
+      document.getElementById('ai-admin-pw-input').value = '';
+      document.getElementById('ai-admin-pw-input').focus();
+    }
+  };
+
+  window.closeAiRecommend = function() {
+    document.getElementById('ai-recommend-modal').classList.remove('open');
+  };
+
+  // 배경 클릭 시 닫기
+  document.getElementById('ai-recommend-modal').addEventListener('click', function(e) {
+    if (e.target === this) window.closeAiRecommend();
+  });
+
+  // 관리자 모달이 열릴 때 세션에 기록 (비밀번호 통과 후)
+  const _origOpenAdmin = window.openAdminModal;
+  window.openAdminModal = function() {
+    sessionStorage.setItem('cgAdmin', '1');
+    if (_origOpenAdmin) _origOpenAdmin();
+  };
+
+  /* ────────────────────────────────────
+     Supabase Storage: PDF 목록 로드
+  ──────────────────────────────────── */
+  async function loadAiPdfList() {
+    try {
+      const res = await fetch(
+        SUPABASE_URL + '/storage/v1/object/list/' + BUCKET,
+        { method: 'POST', headers: { ...AUTH_HEADERS(), 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prefix: '', limit: 100, offset: 0 }) }
+      );
+      const data = await res.json();
+      if (!Array.isArray(data)) throw new Error('목록 로드 실패');
+
+      aiPdfFiles = data
+        .filter(f => f.name && f.name.endsWith('.pdf'))
+        .map(f => ({
+          name: f.name,
+          path: f.name,
+          url: SUPABASE_URL + '/storage/v1/object/public/' + BUCKET + '/' + encodeURIComponent(f.name)
+        }));
+
+      renderAiPdfList();
+      updateNoPdfMsg();
+    } catch(e) {
+      console.warn('AI PDF 목록 로드 오류:', e);
+      aiPdfFiles = [];
+      renderAiPdfList();
+      updateNoPdfMsg();
+    }
+  }
+
+  function renderAiPdfList() {
+    const list  = document.getElementById('ai-pdf-list');
+    const empty = document.getElementById('ai-pdf-empty');
+    // 기존 항목 제거 (empty 제외)
+    Array.from(list.children).forEach(c => { if (c !== empty) c.remove(); });
+
+    if (aiPdfFiles.length === 0) {
+      empty.style.display = '';
+      return;
+    }
+    empty.style.display = 'none';
+    aiPdfFiles.forEach((f, i) => {
+      const item = document.createElement('div');
+      item.className = 'ai-pdf-item';
+      item.innerHTML = `<span title="${f.name}">📄 ${f.name}</span>
+        <button class="ai-pdf-del" title="삭제" onclick="deleteAiPdf(${i})">×</button>`;
+      list.appendChild(item);
+    });
+  }
+
+  function updateNoPdfMsg() {
+    const msg = document.getElementById('ai-no-pdf-msg');
+    const btn = document.getElementById('ai-submit-btn');
+    if (aiPdfFiles.length === 0) {
+      msg.classList.add('visible');
+      btn.disabled = true;
+    } else {
+      msg.classList.remove('visible');
+      btn.disabled = false;
+    }
+  }
+
+  /* ────────────────────────────────────
+     PDF 업로드 (관리자)
+  ──────────────────────────────────── */
+  function sanitizeFileName(name) {
+    // 영문/숫자/하이픈/언더바만 남기고 나머지(한글 포함)는 모두 제거
+    const base = name.replace(/\.pdf$/i, '');
+    const englishOnly = base.replace(/[^a-zA-Z0-9\-_]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
+    const safeName = (englishOnly.length >= 3 ? englishOnly : 'pdf') + '_' + Date.now();
+    return safeName + '.pdf';
+  }
+
+  window.handleAiPdfUpload = async function(input) {
+    const files = Array.from(input.files);
+    if (!files.length) return;
+    const status = document.getElementById('ai-upload-status');
+    status.textContent = '업로드 중…';
+
+    for (const file of files) {
+      try {
+        const safeName = sanitizeFileName(file.name);
+        const res = await fetch(
+          SUPABASE_URL + '/storage/v1/object/' + BUCKET + '/' + encodeURIComponent(safeName),
+          { method: 'POST',
+            headers: { ...AUTH_HEADERS(), 'Content-Type': 'application/pdf', 'x-upsert': 'true' },
+            body: file }
+        );
+        if (!res.ok) throw new Error(await res.text());
+      } catch(e) {
+        status.textContent = '❌ 오류: ' + e.message;
+        input.value = '';
+        return;
+      }
+    }
+    status.textContent = '✅ 업로드 완료';
+    setTimeout(() => status.textContent = '', 2500);
+    input.value = '';
+    await loadAiPdfList();
+  };
+
+  /* ────────────────────────────────────
+     PDF 삭제 (관리자)
+  ──────────────────────────────────── */
+  window.deleteAiPdf = async function(idx) {
+    const f = aiPdfFiles[idx];
+    if (!f) return;
+    if (!confirm(`"${f.name}" 을 삭제할까요?`)) return;
+    try {
+      await fetch(
+        SUPABASE_URL + '/storage/v1/object/' + BUCKET,
+        { method: 'DELETE',
+          headers: { ...AUTH_HEADERS(), 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prefixes: [f.path] }) }
+      );
+    } catch(e) { console.warn('삭제 오류', e); }
+    await loadAiPdfList();
+  };
+
+  /* ────────────────────────────────────
+     AI 추천 요청 → Edge Function 호출
+  ──────────────────────────────────── */
+  window.submitAiRecommend = async function() {
+    const career = document.getElementById('ai-career-input').value.trim();
+    if (!career) {
+      document.getElementById('ai-career-input').focus();
+      return;
+    }
+    if (aiPdfFiles.length === 0) return;
+
+    const semLabel = SEM_LABELS[typeof currentSemIdx !== 'undefined' ? currentSemIdx : 0];
+
+    // 현재 학기 개설과목 목록 추출
+    const subjects = extractCurrentSemSubjects();
+
+    showAiThinking();
+
+    try {
+      const res = await fetch(EDGE_FN, {
+        method: 'POST',
+        headers: { ...AUTH_HEADERS(), 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          career,
+          semester: semLabel,
+          subjects,
+          pdf_urls: aiPdfFiles.map(f => f.url)
+        })
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || res.status);
+      }
+
+      const data = await res.json();
+      showAiResult(data.result || '추천 결과를 받지 못했습니다.');
+    } catch(e) {
+      showAiError('오류가 발생했습니다: ' + e.message);
+    }
+  };
+
+  /* ────────────────────────────────────
+     현재 학기 개설과목 추출
+  ──────────────────────────────────── */
+  function extractCurrentSemSubjects() {
+    const idx = typeof currentSemIdx !== 'undefined' ? currentSemIdx : 0;
+    const colData = (typeof semesterData !== 'undefined' && semesterData[idx]) ? semesterData[idx] : [];
+    if (colData.length > 0) {
+      return colData.map(s => ({
+        name: s.name || s.subj || '',
+        type: s.type || '',
+        subtype: s.subtype || '일반',
+        credit: s.credit || ''
+      }));
+    }
+    // fallback: DOM에서 직접 읽기
+    const cards = document.querySelectorAll(`.sem-row:not(.sem-row-hidden) .sem-subj-card`);
+    return Array.from(cards).map(c => ({
+      name: c.querySelector('.sem-subj-name')?.textContent?.trim() || '',
+      type: '', subtype: '', credit: ''
+    }));
+  }
+
+  /* ────────────────────────────────────
+     UI 상태 헬퍼
+  ──────────────────────────────────── */
+  function showAiThinking() {
+    document.getElementById('ai-submit-btn').disabled = true;
+    const inner = document.getElementById('ai-result-inner');
+    inner.classList.add('visible');
+    document.getElementById('ai-thinking').style.display = 'flex';
+    document.getElementById('ai-result-text').textContent = '';
+    document.getElementById('ai-error-msg').classList.remove('visible');
+    inner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function showAiResult(text) {
+    document.getElementById('ai-submit-btn').disabled = false;
+    document.getElementById('ai-thinking').style.display = 'none';
+    document.getElementById('ai-result-text').textContent = text;
+  }
+
+  function showAiError(msg) {
+    document.getElementById('ai-submit-btn').disabled = false;
+    document.getElementById('ai-thinking').style.display = 'none';
+    const err = document.getElementById('ai-error-msg');
+    err.textContent = msg;
+    err.classList.add('visible');
+  }
+
+  function resetAiResult() {
+    document.getElementById('ai-result-inner').classList.remove('visible');
+    document.getElementById('ai-result-text').textContent = '';
+    document.getElementById('ai-error-msg').classList.remove('visible');
+    document.getElementById('ai-thinking').style.display = 'none';
+    document.getElementById('ai-submit-btn').disabled = false;
+  }
+
+})();
+</script>
 
 <div class="sem-dropdown-menu" id="sem-dropdown-menu">
   <button class="sem-dropdown-item" id="sem-tab-0" onclick="setSemFromDropdown(0)">2학년 1학기</button>
