@@ -42,8 +42,8 @@
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: 'Noto Sans KR', sans-serif; background: var(--deep-navy); min-height: 100vh; overflow-x: hidden; overflow-y: auto; }
-  /* 모바일에서 semester-screen 내부 가로 스크롤을 위해 overflow-x 허용 */
-  @media (max-width: 700px) {
+  /* 폴드/모바일에서 semester-screen 내부 가로 스크롤을 위해 overflow-x 허용 */
+  @media (max-width: 900px) {
     body { overflow-x: unset; }
   }
 
@@ -830,9 +830,9 @@
     opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
     overflow: hidden; /* 데스크탑용 */
   }
-  @media (max-width: 700px) {
+  @media (max-width: 900px) {
     #semester-screen {
-      overflow: visible !important; /* 모바일: 자식 스크롤 허용 */
+      overflow: visible !important; /* 폴드/모바일: 자식 스크롤 허용 */
     }
   }
   #semester-screen.open { opacity: 1; pointer-events: all; }
@@ -937,12 +937,12 @@
     padding: 1px 7px;
     letter-spacing: 0.2px;
   }
-  @media (max-width: 700px) {
+  @media (max-width: 900px) {
     .graded-notice { font-size: 10px; }
   }
 
-  /* ── 모바일 가로 스크롤 ── */
-  @media (max-width: 700px) {
+  /* ── 모바일/폴드 가로 스크롤 (900px 이하) ── */
+  @media (max-width: 900px) {
 
     /* #semester-screen: flex column, 전체 화면 */
     #semester-screen {
@@ -968,17 +968,15 @@
       box-sizing: border-box !important;
     }
 
-    /* sem-scroll-inner: JS가 너비를 동적 계산하므로 기본값만 설정 */
+    /* sem-scroll-inner: JS가 너비를 동적 계산 */
     #sem-scroll-inner {
       display: block !important;
-      min-width: 730px;
       max-width: none !important;
     }
 
     /* 헤더행+그리드도 JS에서 동적 조절 */
     #sem-scroll-outer .sem-col-header-row,
     #sem-scroll-outer .sem-grid {
-      min-width: 730px;
       max-width: none !important;
     }
 
@@ -1010,11 +1008,10 @@
       overflow: visible !important;
     }
 
-    /* 학기 행 — 너비는 JS가 동적 조절, 높이는 콘텐츠에 맞게 */
+    /* 학기 행 — 너비/높이 JS가 동적 조절 */
     .sem-row {
       display: flex !important;
       flex-direction: row !important;
-      min-width: 730px;
       min-height: 0 !important;
       height: auto !important;
       box-sizing: border-box !important;
@@ -1540,24 +1537,19 @@
   .gpo-check { font-size: 13px; color: var(--gold); flex-shrink: 0; opacity: 0; }
   .grade-picker-option.selected .gpo-check { opacity: 1; }
 
-  @media (max-width:860px) {
-    .sem-col-header-row,
-    .sem-row { grid-template-columns: 80px 1fr 1fr 1fr 1fr 1fr; }
-    .sem-row-title { font-size: 11px; }
-  }
-  @media (max-width:700px) {
-    /* 모바일에서는 flex 사용하므로 grid 규칙 무력화 */
+  @media (max-width:900px) {
+    /* 모바일/폴드에서는 flex 사용하므로 grid 규칙 무력화 */
     .sem-col-header-row,
     .sem-row { grid-template-columns: unset !important; }
+    .sem-row-title { font-size: 11px; }
   }
   @media (max-width:500px) {
-    /* 모바일(700px 이하)에서는 flex 레이아웃을 사용하므로 grid-template-columns 적용 안 함 */
-    .sem-header { padding:16px 18px 14px; }
-    .sem-subject-list.wide { grid-template-columns: 1fr; }
+    /* 소형 모바일 추가 패딩 조정 */
+    .sem-header { padding:12px 14px 10px; }
   }
 
   /* ── 모바일: 학기별 헤더 줄바꿈 ── */
-  @media (max-width:700px) {
+  @media (max-width:900px) {
     .sem-header {
       flex-wrap: wrap;
       gap: 10px;
@@ -5267,7 +5259,7 @@ function openSemesterScreen() {
   document.getElementById('semester-screen').classList.add('open');
   document.getElementById('semester-screen').scrollTop = 0;
   // 모바일: sem-scroll-outer overflow 강제 (CSS !important 백업)
-  if (window.innerWidth <= 700) {
+  if (window.innerWidth <= 900) {
     requestAnimationFrame(() => {
       const outer = document.getElementById('sem-scroll-outer');
       if (outer) {
@@ -5362,7 +5354,7 @@ function setCurrentSem(idx) {
   }
 
   // 행 보이기/숨기기
-  const isMobile = window.innerWidth <= 700;
+  const isMobile = window.innerWidth <= 900;
   document.querySelectorAll('.sem-row').forEach((row, rowIdx) => {
     if (rowIdx === idx) {
       row.classList.remove('sem-row-hidden');
@@ -5371,7 +5363,7 @@ function setCurrentSem(idx) {
       row.classList.add('sem-row-hidden');
       row.style.flex = '';
       // 모바일: 숨긴 행 JS 높이 리셋 (다음에 다시 보일 때 재측정)
-      if (window.innerWidth <= 700) {
+      if (window.innerWidth <= 900) {
         row.querySelectorAll('.sem-subtype-block').forEach(el => {
           el.style.height = '';
           el.style.minHeight = '';
@@ -5384,14 +5376,8 @@ function setCurrentSem(idx) {
     }
   });
 
-  // 학기 전환 후 zone 높이 재동기화 — rAF 3번으로 레이아웃 완전 확정 후 측정
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        document.querySelectorAll('.sem-row:not(.sem-row-hidden)').forEach(row => _syncOneRow(row));
-      });
-    });
-  });
+  // 학기 전환 후 zone 높이 재동기화
+  requestAnimationFrame(() => syncSubtypeZoneHeights());
 
   }
 
@@ -5480,84 +5466,83 @@ function renderAllSemCols() {
   // 렌더링 후 현재 학기 표시 상태 재적용
   if (typeof currentSemIdx !== 'undefined') setCurrentSem(currentSemIdx);
   // 일반/진로/융합 zone 높이 동기화
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => syncSubtypeZoneHeights());
-    });
-  });
+  requestAnimationFrame(() => syncSubtypeZoneHeights());
 }
 
 /* 일반/진로/융합 zone 높이를 실제 block 높이에 맞춰 동기화 */
 
 // 데스크탑: CSS grid 자동 정렬 / 모바일: JS 동기화
+// 중복 실행 방지용 타이머
+let _syncRafId = null;
+
 function _syncOneRow(row) {
-  if (window.innerWidth > 700) return;
+  if (window.innerWidth > 900) return;
   if (row.classList.contains('sem-row-hidden')) return;
 
   const subtypes = ['일반', '진로', '융합'];
+  const cells = Array.from(row.querySelectorAll('.sem-cell'));
+  const headLabel = row.querySelector('.sem-row-head-label');
 
-  // 1) 모든 블록/존/panel-head 높이 초기화 → 자연 높이로 리셋
+  // ── 1단계: 높이 제약 모두 해제 (강제 reflow 없이 스타일만 변경)
   row.querySelectorAll('.sem-subtype-block').forEach(b => {
-    b.style.height = '';
-    b.style.minHeight = '';
+    b.style.height = ''; b.style.minHeight = '';
   });
   subtypes.forEach(st => {
     const z = row.querySelector('.sem-subtype-zone.sub-' + st);
     if (z) { z.style.height = ''; z.style.flex = ''; }
   });
-  const headLabel = row.querySelector('.sem-row-head-label');
+  const panelHeads = Array.from(row.querySelectorAll('.sem-cell > .sem-panel-head'));
+  panelHeads.forEach(ph => ph.style.height = '');
   if (headLabel) headLabel.style.height = '';
 
-  // 2) 레이아웃 확정 후 측정
+  // ── 2단계: 한 번의 rAF에서 일괄 측정 → 일괄 적용 (reflow 최소화)
   requestAnimationFrame(() => {
-    // ── 문제2 수정: panel-head 높이 통일 ──────────────────
-    // 각 sem-cell의 sem-panel-head 높이를 초기화 후 최댓값으로 맞춤
-    const panelHeads = Array.from(row.querySelectorAll('.sem-cell > .sem-panel-head'));
-    panelHeads.forEach(ph => { ph.style.height = ''; });
-    const maxPanelH = Math.max(0, ...panelHeads.map(ph => ph.getBoundingClientRect().height));
+    // panel-head 높이 일괄 측정
+    const panelHs = panelHeads.map(ph => ph.getBoundingClientRect().height);
+    const maxPanelH = Math.max(0, ...panelHs);
 
-    // sem-row-head-label도 같은 높이로 맞춤 (첫 열 "학기명+개수"칸)
-    if (headLabel) {
-      headLabel.style.height = maxPanelH + 'px';
-    }
-    panelHeads.forEach(ph => {
-      ph.style.height = maxPanelH + 'px';
+    // subtype block 높이 일괄 측정
+    const blockHsBySubtype = subtypes.map((st, i) =>
+      cells.map(cell => {
+        const sec = cell.querySelector('.sem-subtype-section');
+        return sec && sec.children[i] ? sec.children[i].getBoundingClientRect().height : 0;
+      })
+    );
+    const zoneHs = subtypes.map(st => {
+      const z = row.querySelector('.sem-subtype-zone.sub-' + st);
+      return z ? z.getBoundingClientRect().height : 0;
     });
-    // ────────────────────────────────────────────────────────
+    const maxBlockHs = subtypes.map((_, i) =>
+      Math.max(36, zoneHs[i], ...blockHsBySubtype[i])
+    );
 
-    // ── 일반/진로/융합 행 높이 통일 ─────────────────────────
+    // ── 3단계: 일괄 적용 (측정 끝난 후 한 번에 쓰기 → reflow 1회)
+    if (headLabel) headLabel.style.height = maxPanelH + 'px';
+    panelHeads.forEach(ph => ph.style.height = maxPanelH + 'px');
+
     subtypes.forEach((st, i) => {
-      const blocks = Array.from(row.querySelectorAll('.sem-cell')).map(cell => {
-        const section = cell.querySelector('.sem-subtype-section');
-        if (!section) return null;
-        return section.children[i] || null;
-      }).filter(Boolean);
-
       const zone = row.querySelector('.sem-subtype-zone.sub-' + st);
-
-      const heights = blocks.map(b => b.getBoundingClientRect().height);
-      const maxH = Math.max(36, zone ? zone.getBoundingClientRect().height : 0, ...heights);
-
-      if (zone) {
-        zone.style.height = maxH + 'px';
-        zone.style.flex = 'none';
-      }
-      blocks.forEach(b => {
-        b.style.height = maxH + 'px';
-        b.style.minHeight = maxH + 'px';
+      if (zone) { zone.style.height = maxBlockHs[i] + 'px'; zone.style.flex = 'none'; }
+      cells.forEach(cell => {
+        const sec = cell.querySelector('.sem-subtype-section');
+        if (!sec || !sec.children[i]) return;
+        sec.children[i].style.height = maxBlockHs[i] + 'px';
+        sec.children[i].style.minHeight = maxBlockHs[i] + 'px';
       });
     });
-    // ────────────────────────────────────────────────────────
 
     row.style.minHeight = '';
   });
 }
 
+// 중복 rAF 방지: 동시에 여러 번 요청돼도 한 프레임에 한 번만 실행
 function syncSubtypeZoneHeights() {
-  if (window.innerWidth > 700) return;
-  // 모든 표시 중인 행을 한 번에 동기화
-  const visibleRows = Array.from(document.querySelectorAll('.sem-row:not(.sem-row-hidden)'));
-  visibleRows.forEach(row => _syncOneRow(row));
+  if (window.innerWidth > 900) return;
+  if (_syncRafId) return; // 이미 예약된 프레임이 있으면 스킵
+  _syncRafId = requestAnimationFrame(() => {
+    _syncRafId = null;
+    document.querySelectorAll('.sem-row:not(.sem-row-hidden)').forEach(row => _syncOneRow(row));
+  });
 }
 
 const ELEC_KEYS = ['사회과학', '국수영', '외국어정보', '음악미술']; // ID용
@@ -5649,93 +5634,132 @@ function renderSemCol(colIdx) {
 
   // 그리드 컬럼 폭 재계산
   updateSemGridColumns();
-  // zone 높이 동기화 — 카드 렌더링 완료 후 3번 rAF로 정확히 측정
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => syncSubtypeZoneHeights());
-    });
-  });
+  // zone 높이 동기화
+  requestAnimationFrame(() => syncSubtypeZoneHeights());
 }
 
-/* ── 그리드 컬럼 폭 동적 조절 ──────────────────────────────────
-   전체 semesterData를 기준으로 각 과목군별 최대 과목 수를 계산하고
-   6개 이상이면 해당 열을 2fr(와이드), 미만이면 1fr(표준)로 설정.
-   sem-col-header-row 와 모든 .sem-row 에 동시 적용.
+/* ── 그리드 컬럼 폭 동적 조절 ─────────────────────────────────
+   데스크탑: CSS grid fr 단위 / 모바일: JS 픽셀 너비 직접 제어
+   화면 너비에 관계없이 항상 올바른 레이아웃을 적용.
 ────────────────────────────────────────────────────────────── */
 function updateSemGridColumns() {
   const threshold = 6;
+  const isMob = window.innerWidth <= 900; // 폴드 펼침 고려해 900px 기준
 
-  // 각 열의 최대 과목 수 (4개 학기 행 중 가장 많은 행 기준)
-  const maxReq = Math.max(...semesterData.map(col =>
+  // 각 열의 최대 과목 수
+  const maxReq = Math.max(0, ...semesterData.map(col =>
     col.filter(x => x.type === '필수').length));
-  const maxSS = Math.max(...semesterData.map(col =>
+  const maxSS = Math.max(0, ...semesterData.map(col =>
     col.filter(x => ['사회&과학','사회&과학&예술'].includes(x.type)).length));
-  const maxKns = Math.max(...semesterData.map(col =>
+  const maxKns = Math.max(0, ...semesterData.map(col =>
     col.filter(x => x.type === '국&수&영').length));
-  const maxFor = Math.max(...semesterData.map(col =>
+  const maxFor = Math.max(0, ...semesterData.map(col =>
     col.filter(x => x.type === '외국어&교양').length));
-  const maxMus = Math.max(...semesterData.map(col =>
+  const maxMus = Math.max(0, ...semesterData.map(col =>
     col.filter(x => x.type === '음악&미술').length));
 
-  const w = (cnt) => cnt >= threshold ? '2fr' : '1fr';
-  const colTemplate = `120px ${w(maxReq)} ${w(maxSS)} ${w(maxKns)} ${w(maxFor)} ${w(maxMus)}`;
-
-  // 헤더 행
-  const hdr = document.querySelector('.sem-col-header-row');
-  if (hdr) hdr.style.gridTemplateColumns = colTemplate;
-
-  // 모든 학기 행
-  document.querySelectorAll('.sem-row').forEach(row => {
-    row.style.gridTemplateColumns = colTemplate;
-  });
-
-  // 각 열 목록에 .wide 토글 (6개 이상 → 2열 그리드)
+  // .wide 토글 (6개 이상 → 2열 그리드) — 모바일/데스크탑 공통
   [0,1,2,3].forEach(ci => {
     const colData = semesterData[ci] || [];
-    const reqCnt = colData.filter(x => x.type === '필수').length;
-    const ssCnt  = colData.filter(x => ['사회&과학','사회&과학&예술'].includes(x.type)).length;
-    const knsCnt = colData.filter(x => x.type === '국&수&영').length;
-    const forCnt = colData.filter(x => x.type === '외국어&교양').length;
-    const musCnt = colData.filter(x => x.type === '음악&미술').length;
-    const reqEl = document.getElementById(`sem-list-req-${ci}`);
-    const ssEl  = document.getElementById(`sem-list-elec-사회과학-${ci}`);
-    const knsEl = document.getElementById(`sem-list-elec-국수영-${ci}`);
-    const forEl = document.getElementById(`sem-list-elec-외국어정보-${ci}`);
-    const musEl = document.getElementById(`sem-list-elec-음악미술-${ci}`);
-    if (reqEl) reqEl.classList.toggle('wide', reqCnt >= threshold);
-    if (ssEl)  ssEl.classList.toggle('wide',  ssCnt  >= threshold);
-    if (knsEl) knsEl.classList.toggle('wide', knsCnt >= threshold);
-    if (forEl) forEl.classList.toggle('wide', forCnt >= threshold);
-    if (musEl) musEl.classList.toggle('wide', musCnt >= threshold);
+    const counts = {
+      req: colData.filter(x => x.type === '필수').length,
+      ss:  colData.filter(x => ['사회&과학','사회&과학&예술'].includes(x.type)).length,
+      kns: colData.filter(x => x.type === '국&수&영').length,
+      for: colData.filter(x => x.type === '외국어&교양').length,
+      mus: colData.filter(x => x.type === '음악&미술').length,
+    };
+    const ids = {
+      req: `sem-list-req-${ci}`,
+      ss:  `sem-list-elec-사회과학-${ci}`,
+      kns: `sem-list-elec-국수영-${ci}`,
+      for: `sem-list-elec-외국어정보-${ci}`,
+      mus: `sem-list-elec-음악미술-${ci}`,
+    };
+    // 모바일에서는 열 너비가 넓어지므로 .wide(2열) 필요 없음 → false
+    // 데스크탑에서만 .wide 사용
+    Object.keys(ids).forEach(k => {
+      const el = document.getElementById(ids[k]);
+      if (el) el.classList.toggle('wide', !isMob && counts[k] >= threshold);
+    });
   });
 
-  // 모바일에서 학기 행 표시 상태 재적용 (인라인 style 변경 후 hidden 상태 보장)
-  if (window.innerWidth <= 700 && typeof currentSemIdx !== 'undefined') {
-    requestAnimationFrame(() => {
-      document.querySelectorAll('.sem-row').forEach((row, rowIdx) => {
-        if (rowIdx === currentSemIdx) {
-          row.classList.remove('sem-row-hidden');
-        } else {
-          row.classList.add('sem-row-hidden');
-        }
-      });
-    });
-  }
+  if (isMob) {
+    // ── 모바일: JS 픽셀 너비 직접 제어 ──
+    applyMobileColWidths(maxReq, maxSS, maxKns, maxFor, maxMus, threshold);
 
-  // 모바일: 열 너비 동적 조절
-  if (window.innerWidth <= 700) {
-    requestAnimationFrame(() => updateMobileColWidths(maxReq, maxSS, maxKns, maxFor, maxMus, threshold));
+    // 학기 행 표시 상태 재적용
+    if (typeof currentSemIdx !== 'undefined') {
+      document.querySelectorAll('.sem-row').forEach((row, rowIdx) => {
+        row.classList.toggle('sem-row-hidden', rowIdx !== currentSemIdx);
+      });
+    }
+  } else {
+    // ── 데스크탑: CSS grid fr 단위 + JS 인라인 스타일 전부 리셋 ──
+    resetMobileStyles();
+
+    const w = (cnt) => cnt >= threshold ? '2fr' : '1fr';
+    const colTemplate = `120px ${w(maxReq)} ${w(maxSS)} ${w(maxKns)} ${w(maxFor)} ${w(maxMus)}`;
+    const hdr = document.querySelector('.sem-col-header-row');
+    if (hdr) hdr.style.gridTemplateColumns = colTemplate;
+    document.querySelectorAll('.sem-row').forEach(row => {
+      row.style.gridTemplateColumns = colTemplate;
+    });
+    // 데스크탑: 모든 행 표시
+    document.querySelectorAll('.sem-row').forEach(row => {
+      row.classList.remove('sem-row-hidden');
+    });
   }
 }
 
-/* ── 모바일 전용: 과목 수에 따라 각 열 너비를 동적으로 조절 ──
-   6개 이상인 열은 200px, 미만은 130px. 첫 번째(학기명)열은 80px 고정.
-   sem-scroll-inner / sem-row 전체 너비도 함께 재계산.
-─────────────────────────────────────────────────────────── */
-function updateMobileColWidths(maxReq, maxSS, maxKns, maxFor, maxMus, threshold) {
+/* ── JS 인라인 스타일 전부 리셋 (모바일→데스크탑 전환 시) ── */
+function resetMobileStyles() {
+  const outer = document.getElementById('sem-scroll-outer');
+  const inner = document.getElementById('sem-scroll-inner');
+  if (outer) outer.removeAttribute('style');
+  if (inner) inner.removeAttribute('style');
+
+  ['sem-col-header-row', 'sem-grid'].forEach(id => {
+    const el = document.querySelector('.' + id) || document.getElementById(id);
+    if (el) { el.style.width = ''; el.style.minWidth = ''; }
+  });
+  const hdrRow = document.querySelector('.sem-col-header-row');
+  if (hdrRow) { hdrRow.style.width = ''; hdrRow.style.minWidth = ''; }
+  const grid = document.querySelector('.sem-grid');
+  if (grid) { grid.style.width = ''; grid.style.minWidth = ''; }
+
+  document.querySelectorAll('.sem-row').forEach(row => {
+    row.style.width = ''; row.style.minWidth = ''; row.style.height = ''; row.style.minHeight = '';
+  });
+  document.querySelectorAll('.sem-col-header-row .sem-col-header-cell').forEach(cell => {
+    cell.style.width = ''; cell.style.minWidth = ''; cell.style.maxWidth = '';
+  });
+  document.querySelectorAll('.sem-row-head').forEach(el => {
+    el.style.width = ''; el.style.minWidth = ''; el.style.maxWidth = '';
+  });
+  document.querySelectorAll('.sem-cell').forEach(el => {
+    el.style.width = ''; el.style.minWidth = ''; el.style.maxWidth = '';
+  });
+  document.querySelectorAll('.sem-subtype-block').forEach(b => {
+    b.style.height = ''; b.style.minHeight = '';
+  });
+  document.querySelectorAll('.sem-subtype-zone').forEach(z => {
+    z.style.height = ''; z.style.flex = '';
+  });
+  document.querySelectorAll('.sem-panel-head').forEach(ph => {
+    ph.style.height = '';
+  });
+  document.querySelectorAll('.sem-row-head-label').forEach(hl => {
+    hl.style.height = '';
+  });
+}
+
+/* ── 모바일 전용: 픽셀 너비 직접 계산·적용 ──
+   6개 이상 열: 190px, 미만: 130px, 학기명 열: 72px
+────────────────────────────────────────────── */
+function applyMobileColWidths(maxReq, maxSS, maxKns, maxFor, maxMus, threshold) {
   const COL_NARROW = 130;
-  const COL_WIDE   = 200;
-  const COL_HEAD   = 80;
+  const COL_WIDE   = 190;
+  const COL_HEAD   = 72;
 
   const colWidths = [
     maxReq >= threshold ? COL_WIDE : COL_NARROW,
@@ -5746,52 +5770,40 @@ function updateMobileColWidths(maxReq, maxSS, maxKns, maxFor, maxMus, threshold)
   ];
   const totalW = COL_HEAD + colWidths.reduce((a, b) => a + b, 0);
 
-  // sem-scroll-inner 및 헤더행/그리드 전체 너비 업데이트
+  // sem-scroll-outer: 가로 스크롤 컨테이너
+  const outer = document.getElementById('sem-scroll-outer');
+  if (outer) outer.setAttribute('style',
+    'flex:1 1 0;min-height:0;overflow-x:scroll;overflow-y:scroll;' +
+    '-webkit-overflow-scrolling:touch;display:block;width:100%;box-sizing:border-box;');
+
+  // sem-scroll-inner: 실제 콘텐츠 너비
   const inner = document.getElementById('sem-scroll-inner');
-  if (inner) inner.style.width = totalW + 'px';
+  if (inner) { inner.style.display = 'block'; inner.style.width = totalW + 'px'; }
 
+  // 헤더행 / 그리드 너비
   const hdrRow = document.querySelector('.sem-col-header-row');
-  if (hdrRow) hdrRow.style.width = totalW + 'px';
-
+  if (hdrRow) { hdrRow.style.width = totalW + 'px'; hdrRow.style.minWidth = ''; }
   const grid = document.querySelector('.sem-grid');
-  if (grid) grid.style.width = totalW + 'px';
-
-  // 모든 .sem-row 너비
-  document.querySelectorAll('.sem-row').forEach(row => {
-    row.style.width = totalW + 'px';
-  });
+  if (grid) { grid.style.width = totalW + 'px'; grid.style.minWidth = ''; }
 
   // 헤더 셀 너비
-  const hdrCells = document.querySelectorAll('.sem-col-header-row .sem-col-header-cell');
-  hdrCells.forEach((cell, i) => {
-    if (i === 0) {
-      cell.style.width = COL_HEAD + 'px';
-      cell.style.minWidth = COL_HEAD + 'px';
-      cell.style.maxWidth = COL_HEAD + 'px';
-    } else if (i <= 5) {
-      const w = colWidths[i - 1] + 'px';
-      cell.style.width = w;
-      cell.style.minWidth = w;
-      cell.style.maxWidth = w;
-    }
+  document.querySelectorAll('.sem-col-header-row .sem-col-header-cell').forEach((cell, i) => {
+    const w = (i === 0 ? COL_HEAD : (colWidths[i - 1] || COL_NARROW)) + 'px';
+    cell.style.width = w; cell.style.minWidth = w; cell.style.maxWidth = w;
   });
 
-  // 각 .sem-row의 .sem-row-head 및 .sem-cell 너비
+  // 각 sem-row 너비 + 내부 셀 너비
   document.querySelectorAll('.sem-row').forEach(row => {
+    row.style.width = totalW + 'px';
+
     const head = row.querySelector('.sem-row-head');
     if (head) {
-      head.style.width = COL_HEAD + 'px';
-      head.style.minWidth = COL_HEAD + 'px';
-      head.style.maxWidth = COL_HEAD + 'px';
+      const hw = COL_HEAD + 'px';
+      head.style.width = hw; head.style.minWidth = hw; head.style.maxWidth = hw;
     }
-    const cells = row.querySelectorAll('.sem-cell');
-    cells.forEach((cell, i) => {
-      if (i < colWidths.length) {
-        const w = colWidths[i] + 'px';
-        cell.style.width = w;
-        cell.style.minWidth = w;
-        cell.style.maxWidth = w;
-      }
+    row.querySelectorAll('.sem-cell').forEach((cell, i) => {
+      const w = (colWidths[i] || COL_NARROW) + 'px';
+      cell.style.width = w; cell.style.minWidth = w; cell.style.maxWidth = w;
     });
   });
 }
@@ -7604,66 +7616,13 @@ document.addEventListener('DOMContentLoaded', () => {
    화면 회전/리사이즈 시 학기 상태 재적용
 ══════════════════════════════════════ */
 window.addEventListener('resize', function() {
-  const isMob = window.innerWidth <= 700;
-
-  if (isMob) {
-    // 모바일: 가로 스크롤 wrapper 스타일 재적용 + 열 너비 재계산
-    const outer = document.getElementById('sem-scroll-outer');
-    if (outer) {
-      outer.setAttribute('style',
-        'flex:1 1 0;min-height:0;overflow-x:scroll;overflow-y:scroll;' +
-        '-webkit-overflow-scrolling:touch;display:block;width:100%;box-sizing:border-box;');
-    }
-    const inner = document.getElementById('sem-scroll-inner');
-    if (inner) inner.style.display = 'block';
-    updateSemGridColumns();
-  } else {
-    // 데스크탑: JS로 박았던 인라인 스타일 모두 제거 → CSS가 다시 제어
-    const outer = document.getElementById('sem-scroll-outer');
-    const inner = document.getElementById('sem-scroll-inner');
-    if (outer) outer.removeAttribute('style');
-    if (inner) inner.removeAttribute('style');
-
-    // sem-col-header-row / sem-grid / sem-row 너비 리셋
-    const hdrRow = document.querySelector('.sem-col-header-row');
-    if (hdrRow) { hdrRow.style.width = ''; hdrRow.style.minWidth = ''; }
-    const grid = document.querySelector('.sem-grid');
-    if (grid) { grid.style.width = ''; grid.style.minWidth = ''; }
-
-    document.querySelectorAll('.sem-row').forEach(row => {
-      row.style.width = ''; row.style.minWidth = ''; row.style.height = '';
-    });
-    document.querySelectorAll('.sem-col-header-row .sem-col-header-cell').forEach(cell => {
-      cell.style.width = ''; cell.style.minWidth = ''; cell.style.maxWidth = '';
-    });
-    document.querySelectorAll('.sem-row-head').forEach(el => {
-      el.style.width = ''; el.style.minWidth = ''; el.style.maxWidth = '';
-    });
-    document.querySelectorAll('.sem-cell').forEach(el => {
-      el.style.width = ''; el.style.minWidth = ''; el.style.maxWidth = '';
-    });
-    // subtype-block / zone 높이 리셋
-    document.querySelectorAll('.sem-subtype-block').forEach(b => {
-      b.style.height = ''; b.style.minHeight = '';
-    });
-    document.querySelectorAll('.sem-subtype-zone').forEach(z => {
-      z.style.height = ''; z.style.flex = '';
-    });
-    document.querySelectorAll('.sem-row').forEach(r => {
-      r.style.minHeight = '';
-    });
-  }
+  // updateSemGridColumns가 isMob 판단을 900px 기준으로 자체 처리
+  updateSemGridColumns();
 
   if (typeof setCurrentSem === 'function' && typeof currentSemIdx !== 'undefined') {
     setCurrentSem(currentSemIdx);
   }
-  if (isMob) {
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => syncSubtypeZoneHeights());
-      });
-    });
-  }
+  requestAnimationFrame(() => syncSubtypeZoneHeights());
 });
 </script>
 
