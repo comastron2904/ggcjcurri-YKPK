@@ -42,6 +42,10 @@
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: 'Noto Sans KR', sans-serif; background: var(--deep-navy); min-height: 100vh; overflow-x: hidden; overflow-y: auto; }
+  /* 모바일에서 semester-screen 내부 가로 스크롤을 위해 overflow-x 허용 */
+  @media (max-width: 700px) {
+    body { overflow-x: unset; }
+  }
 
   /* ══════════════════════════════════════
      상단 버튼 그룹 (연필 + 과목관리)
@@ -952,7 +956,7 @@
       flex-shrink: 0 !important;
     }
 
-    /* 스크롤 컨테이너: 남은 높이 전부, 가로 스크롤 */
+    /* 스크롤 컨테이너: 남은 높이 전부, 가로+세로 스크롤 */
     #sem-scroll-outer {
       flex: 1 1 0 !important;
       min-height: 0 !important;
@@ -964,10 +968,18 @@
       box-sizing: border-box !important;
     }
 
-    /* 헤더행+그리드를 감싸는 내부 컨테이너 — 실제 가로 너비를 가짐 */
+    /* sem-scroll-inner: 헤더+그리드를 하나의 블록으로 묶어 가로 너비를 가짐 */
+    #sem-scroll-inner {
+      display: block !important;
+      width: 730px !important;
+      min-width: 730px !important;
+      max-width: none !important;
+    }
+
+    /* 헤더행+그리드도 동일 너비 */
     #sem-scroll-outer .sem-col-header-row,
     #sem-scroll-outer .sem-grid {
-      width: 730px !important;   /* 80 + 130×5 */
+      width: 730px !important;
       min-width: 730px !important;
       max-width: none !important;
     }
@@ -1527,8 +1539,7 @@
     .sem-row { grid-template-columns: unset !important; }
   }
   @media (max-width:500px) {
-    .sem-col-header-row,
-    .sem-row { grid-template-columns: 60px 1fr 1fr 0.9fr 0.9fr 0.9fr; }
+    /* 모바일(700px 이하)에서는 flex 레이아웃을 사용하므로 grid-template-columns 적용 안 함 */
     .sem-header { padding:16px 18px 14px; }
     .sem-subject-list.wide { grid-template-columns: 1fr; }
   }
@@ -2991,6 +3002,7 @@
   </div>
   <!-- 모바일 가로 스크롤 래퍼 — 헤더+본문을 하나의 스크롤 컨테이너로 -->
   <div class="sem-scroll-outer" id="sem-scroll-outer">
+  <div class="sem-scroll-inner" id="sem-scroll-inner">
   <div class="sem-col-header-row" id="sem-col-header-row">
 <div class="sem-col-header-cell" style="background:rgba(210,228,248,0.80)">
       <span class="sem-col-header-label" style="color:rgba(26,46,74,0.75);letter-spacing:1.5px">학기</span>
@@ -3400,6 +3412,7 @@
       </div>
     </div>
   </div><!-- /sem-grid -->
+  </div><!-- /sem-scroll-inner -->
 </div><!-- /sem-scroll-outer -->
 
 </div>
@@ -5249,6 +5262,11 @@ function openSemesterScreen() {
         outer.setAttribute('style',
           'flex:1 1 0;min-height:0;overflow-x:scroll;overflow-y:scroll;' +
           '-webkit-overflow-scrolling:touch;display:block;width:100%;box-sizing:border-box;');
+      }
+      const inner = document.getElementById('sem-scroll-inner');
+      if (inner) {
+        inner.setAttribute('style',
+          'display:block;width:730px;min-width:730px;max-width:none;');
       }
     });
   }
@@ -7446,6 +7464,25 @@ window.addEventListener('resize', function() {
     setCurrentSem(currentSemIdx);
   }
   requestAnimationFrame(() => syncSubtypeZoneHeights());
+  // 모바일 가로 스크롤 wrapper 크기 재적용
+  if (window.innerWidth <= 700) {
+    const outer = document.getElementById('sem-scroll-outer');
+    if (outer) {
+      outer.setAttribute('style',
+        'flex:1 1 0;min-height:0;overflow-x:scroll;overflow-y:scroll;' +
+        '-webkit-overflow-scrolling:touch;display:block;width:100%;box-sizing:border-box;');
+    }
+    const inner = document.getElementById('sem-scroll-inner');
+    if (inner) {
+      inner.setAttribute('style',
+        'display:block;width:730px;min-width:730px;max-width:none;');
+    }
+  } else {
+    const outer = document.getElementById('sem-scroll-outer');
+    const inner = document.getElementById('sem-scroll-inner');
+    if (outer) outer.removeAttribute('style');
+    if (inner) inner.removeAttribute('style');
+  }
 });
 </script>
 
