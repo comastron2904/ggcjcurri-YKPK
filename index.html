@@ -1044,6 +1044,9 @@
       align-items: center !important;
       justify-content: center !important;
       padding: 10px 6px !important;
+      box-sizing: border-box !important;
+      flex-shrink: 0 !important;
+      overflow: hidden !important;
     }
     .sem-subtype-zone {
       flex: none !important;
@@ -1076,6 +1079,12 @@
     .sem-subtype-block { grid-row: unset !important; }
 
     .sem-subject-list { overflow: visible !important; height: auto !important; }
+
+    /* panel-head: JS가 height를 직접 설정하므로 box-sizing 확보 */
+    .sem-cell > .sem-panel-head {
+      box-sizing: border-box !important;
+      flex-shrink: 0 !important;
+    }
   }
 
   /* ── 새 레이아웃: 학기(행) × 과목군(열) ── */
@@ -5487,7 +5496,7 @@ function _syncOneRow(row) {
 
   const subtypes = ['일반', '진로', '융합'];
 
-  // 1) 먼저 모든 블록/존 높이 초기화 → 자연 높이로 리셋
+  // 1) 모든 블록/존/panel-head 높이 초기화 → 자연 높이로 리셋
   row.querySelectorAll('.sem-subtype-block').forEach(b => {
     b.style.height = '';
     b.style.minHeight = '';
@@ -5496,11 +5505,28 @@ function _syncOneRow(row) {
     const z = row.querySelector('.sem-subtype-zone.sub-' + st);
     if (z) { z.style.height = ''; z.style.flex = ''; }
   });
+  const headLabel = row.querySelector('.sem-row-head-label');
+  if (headLabel) headLabel.style.height = '';
 
   // 2) 레이아웃 확정 후 측정
   requestAnimationFrame(() => {
+    // ── 문제2 수정: panel-head 높이 통일 ──────────────────
+    // 각 sem-cell의 sem-panel-head 높이를 초기화 후 최댓값으로 맞춤
+    const panelHeads = Array.from(row.querySelectorAll('.sem-cell > .sem-panel-head'));
+    panelHeads.forEach(ph => { ph.style.height = ''; });
+    const maxPanelH = Math.max(0, ...panelHeads.map(ph => ph.getBoundingClientRect().height));
+
+    // sem-row-head-label도 같은 높이로 맞춤 (첫 열 "학기명+개수"칸)
+    if (headLabel) {
+      headLabel.style.height = maxPanelH + 'px';
+    }
+    panelHeads.forEach(ph => {
+      ph.style.height = maxPanelH + 'px';
+    });
+    // ────────────────────────────────────────────────────────
+
+    // ── 일반/진로/융합 행 높이 통일 ─────────────────────────
     subtypes.forEach((st, i) => {
-      // 각 sem-cell 안의 i번째 sem-subtype-block을 개별적으로 찾음
       const blocks = Array.from(row.querySelectorAll('.sem-cell')).map(cell => {
         const section = cell.querySelector('.sem-subtype-section');
         if (!section) return null;
@@ -5509,11 +5535,9 @@ function _syncOneRow(row) {
 
       const zone = row.querySelector('.sem-subtype-zone.sub-' + st);
 
-      // 각 블록의 자연 높이 측정
       const heights = blocks.map(b => b.getBoundingClientRect().height);
       const maxH = Math.max(36, zone ? zone.getBoundingClientRect().height : 0, ...heights);
 
-      // 존과 블록 높이를 최댓값으로 통일
       if (zone) {
         zone.style.height = maxH + 'px';
         zone.style.flex = 'none';
@@ -5523,8 +5547,8 @@ function _syncOneRow(row) {
         b.style.minHeight = maxH + 'px';
       });
     });
+    // ────────────────────────────────────────────────────────
 
-    // 3) sem-row 자체 높이: min-height 고정 제거하고 콘텐츠에 맞게
     row.style.minHeight = '';
   });
 }
@@ -7580,12 +7604,10 @@ document.addEventListener('DOMContentLoaded', () => {
    화면 회전/리사이즈 시 학기 상태 재적용
 ══════════════════════════════════════ */
 window.addEventListener('resize', function() {
-  if (typeof setCurrentSem === 'function' && typeof currentSemIdx !== 'undefined') {
-    setCurrentSem(currentSemIdx);
-  }
-  requestAnimationFrame(() => syncSubtypeZoneHeights());
-  // 모바일 가로 스크롤 wrapper 크기 재적용
-  if (window.innerWidth <= 700) {
+  const isMob = window.innerWidth <= 700;
+
+  if (isMob) {
+    // 모바일: 가로 스크롤 wrapper 스타일 재적용 + 열 너비 재계산
     const outer = document.getElementById('sem-scroll-outer');
     if (outer) {
       outer.setAttribute('style',
@@ -7594,13 +7616,53 @@ window.addEventListener('resize', function() {
     }
     const inner = document.getElementById('sem-scroll-inner');
     if (inner) inner.style.display = 'block';
-    // 열 너비 동적 재계산
     updateSemGridColumns();
   } else {
+    // 데스크탑: JS로 박았던 인라인 스타일 모두 제거 → CSS가 다시 제어
     const outer = document.getElementById('sem-scroll-outer');
     const inner = document.getElementById('sem-scroll-inner');
     if (outer) outer.removeAttribute('style');
     if (inner) inner.removeAttribute('style');
+
+    // sem-col-header-row / sem-grid / sem-row 너비 리셋
+    const hdrRow = document.querySelector('.sem-col-header-row');
+    if (hdrRow) { hdrRow.style.width = ''; hdrRow.style.minWidth = ''; }
+    const grid = document.querySelector('.sem-grid');
+    if (grid) { grid.style.width = ''; grid.style.minWidth = ''; }
+
+    document.querySelectorAll('.sem-row').forEach(row => {
+      row.style.width = ''; row.style.minWidth = ''; row.style.height = '';
+    });
+    document.querySelectorAll('.sem-col-header-row .sem-col-header-cell').forEach(cell => {
+      cell.style.width = ''; cell.style.minWidth = ''; cell.style.maxWidth = '';
+    });
+    document.querySelectorAll('.sem-row-head').forEach(el => {
+      el.style.width = ''; el.style.minWidth = ''; el.style.maxWidth = '';
+    });
+    document.querySelectorAll('.sem-cell').forEach(el => {
+      el.style.width = ''; el.style.minWidth = ''; el.style.maxWidth = '';
+    });
+    // subtype-block / zone 높이 리셋
+    document.querySelectorAll('.sem-subtype-block').forEach(b => {
+      b.style.height = ''; b.style.minHeight = '';
+    });
+    document.querySelectorAll('.sem-subtype-zone').forEach(z => {
+      z.style.height = ''; z.style.flex = '';
+    });
+    document.querySelectorAll('.sem-row').forEach(r => {
+      r.style.minHeight = '';
+    });
+  }
+
+  if (typeof setCurrentSem === 'function' && typeof currentSemIdx !== 'undefined') {
+    setCurrentSem(currentSemIdx);
+  }
+  if (isMob) {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => syncSubtypeZoneHeights());
+      });
+    });
   }
 });
 </script>
