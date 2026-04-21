@@ -995,11 +995,18 @@
       max-width: 130px;
       flex-shrink: 0 !important;
       box-sizing: border-box !important;
+      /* 모바일: border를 1px로 통일 */
+      border-right: 1px solid rgba(26,107,191,0.10) !important;
+    }
+    .sem-col-header-row .sem-col-header-cell:last-child {
+      border-right: none !important;
     }
     .sem-col-header-row .sem-col-header-cell:first-child {
-      width: 80px;
-      min-width: 80px;
-      max-width: 80px;
+      width: 72px;
+      min-width: 72px;
+      max-width: 72px;
+      /* 학기 헤더 첫 셀: row-head border와 통일 (1px) */
+      border-right: 1px solid rgba(26,107,191,0.12) !important;
     }
 
     /* 그리드 */
@@ -1026,15 +1033,15 @@
       display: flex !important;
       flex-direction: column !important;
       flex-shrink: 0 !important;
-      width: 80px !important;
-      min-width: 80px !important;
-      max-width: 80px !important;
+      width: 72px !important;
+      min-width: 72px !important;
+      max-width: 72px !important;
       box-sizing: border-box !important;
       position: static !important;
-      border-right: 2px solid rgba(26,107,191,0.15) !important;
+      border-right: 1px solid rgba(26,107,191,0.12) !important;
     }
-    .sem-row.row-2학년 .sem-row-head { background: rgba(106,189,232,0.05) !important; border-left: 3px solid rgba(106,189,232,0.5) !important; }
-    .sem-row.row-3학년 .sem-row-head { background: rgba(176,126,224,0.05) !important; border-left: 3px solid rgba(176,126,224,0.5) !important; }
+    .sem-row.row-2학년 .sem-row-head { background: rgba(106,189,232,0.05) !important; border-left: 2px solid rgba(106,189,232,0.45) !important; }
+    .sem-row.row-3학년 .sem-row-head { background: rgba(176,126,224,0.05) !important; border-left: 2px solid rgba(176,126,224,0.45) !important; }
     .sem-row-head-label {
       display: flex !important;
       flex-direction: column !important;
@@ -1066,7 +1073,12 @@
       flex-shrink: 0 !important;
       box-sizing: border-box !important;
       height: auto !important;
+      /* 모바일: 세로 경계선을 1px로 통일해 헤더와 정렬 맞춤 */
+      border-right: 1px solid rgba(26,107,191,0.10) !important;
     }
+    .sem-cell:last-child { border-right: none !important; }
+    /* 필수열 강조 border도 모바일에서는 1px로 통일 */
+    .sem-cell.cell-req { border-right: 1px solid rgba(232,130,106,0.30) !important; }
     .sem-panel-head { grid-row: unset !important; }
     .sem-subtype-section {
       display: flex !important;
@@ -1075,7 +1087,11 @@
     }
     .sem-subtype-block { grid-row: unset !important; }
 
-    .sem-subject-list { overflow: visible !important; height: auto !important; }
+    /* 모바일: panel-head/subtype-block의 border-right 제거 (셀 자체에서 처리) */
+    .sem-cell .sem-panel-head,
+    .sem-cell .sem-subtype-block {
+      border-right: none !important;
+    }
 
     /* panel-head: JS가 height를 직접 설정하므로 box-sizing 확보 */
     .sem-cell > .sem-panel-head {
@@ -1259,11 +1275,11 @@
     grid-row: 1;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     padding: 10px 6px;
-    border-right: 2px solid rgba(26,107,191,0.15);
+    border-right: 1px solid rgba(26,107,191,0.12);
     text-align: center;
   }
-  .sem-row.row-2학년 .sem-row-head-label { background: rgba(106,189,232,0.05); border-left: 3px solid rgba(106,189,232,0.5); }
-  .sem-row.row-3학년 .sem-row-head-label { background: rgba(176,126,224,0.05); border-left: 3px solid rgba(176,126,224,0.5); }
+  .sem-row.row-2학년 .sem-row-head-label { background: rgba(106,189,232,0.05); border-left: 2px solid rgba(106,189,232,0.45); }
+  .sem-row.row-3학년 .sem-row-head-label { background: rgba(176,126,224,0.05); border-left: 2px solid rgba(176,126,224,0.45); }
 
   /* 일반/진로/융합 zone: column 1, row 2/3/4 */
   .sem-subtype-zone {
@@ -1271,14 +1287,14 @@
     display: flex; align-items: center; justify-content: center;
     font-size: 9px; font-weight: 700; letter-spacing: 1.5px;
     border-top: 1px solid rgba(26,107,191,0.10);
-    border-right: 2px solid rgba(26,107,191,0.15);
+    border-right: 1px solid rgba(26,107,191,0.12);
     min-height: 36px;
   }
   .sem-subtype-zone.sub-일반 { grid-row: 2; color: #4a8fc0; background: rgba(106,189,232,0.04); }
   .sem-subtype-zone.sub-진로 { grid-row: 3; color: #9a6abf; background: rgba(176,126,224,0.04); }
   .sem-subtype-zone.sub-융합 { grid-row: 4; color: #3a9e7a; background: rgba(60,180,130,0.04); }
-  .sem-row.row-2학년 .sem-subtype-zone { background-color: rgba(106,189,232,0.04); border-left: 3px solid rgba(106,189,232,0.5); }
-  .sem-row.row-3학년 .sem-subtype-zone { background-color: rgba(176,126,224,0.04); border-left: 3px solid rgba(176,126,224,0.5); }
+  .sem-row.row-2학년 .sem-subtype-zone { background-color: rgba(106,189,232,0.04); border-left: 2px solid rgba(106,189,232,0.45); }
+  .sem-row.row-3학년 .sem-subtype-zone { background-color: rgba(176,126,224,0.04); border-left: 2px solid rgba(176,126,224,0.45); }
   /* zone 자체 색상 우선 */
   .sem-row .sem-subtype-zone.sub-일반 { background: rgba(106,189,232,0.04); }
   .sem-row .sem-subtype-zone.sub-진로 { background: rgba(176,126,224,0.04); }
@@ -3040,7 +3056,7 @@
         <div class="sem-subtype-zone sub-융합">융합</div>
       </div>
       <!-- 필수 열: 추가버튼 상단, 일반/진로/융합 서브행 -->
-      <div class="sem-cell cell-req" style="border-right:2px solid rgba(232,130,106,0.20);">
+      <div class="sem-cell cell-req">
         <div class="sem-panel-head">
           <span class="sem-panel-count" id="sem-stat-req-0">0개</span>
           <button class="btn-sem-add req-add" onclick="openSubjPickPw(0,'필수')">＋ 추가</button>
@@ -3137,7 +3153,7 @@
         <div class="sem-subtype-zone sub-진로">진로</div>
         <div class="sem-subtype-zone sub-융합">융합</div>
       </div>
-      <div class="sem-cell cell-req" style="border-right:2px solid rgba(232,130,106,0.20);">
+      <div class="sem-cell cell-req">
         <div class="sem-panel-head">
           <span class="sem-panel-count" id="sem-stat-req-1">0개</span>
           <button class="btn-sem-add req-add" onclick="openSubjPickPw(1,'필수')">＋ 추가</button>
@@ -3234,7 +3250,7 @@
         <div class="sem-subtype-zone sub-진로">진로</div>
         <div class="sem-subtype-zone sub-융합">융합</div>
       </div>
-      <div class="sem-cell cell-req" style="border-right:2px solid rgba(232,130,106,0.20);">
+      <div class="sem-cell cell-req">
         <div class="sem-panel-head">
           <span class="sem-panel-count" id="sem-stat-req-2">0개</span>
           <button class="btn-sem-add req-add" onclick="openSubjPickPw(2,'필수')">＋ 추가</button>
@@ -3331,7 +3347,7 @@
         <div class="sem-subtype-zone sub-진로">진로</div>
         <div class="sem-subtype-zone sub-융합">융합</div>
       </div>
-      <div class="sem-cell cell-req" style="border-right:2px solid rgba(232,130,106,0.20);">
+      <div class="sem-cell cell-req">
         <div class="sem-panel-head">
           <span class="sem-panel-count" id="sem-stat-req-3">0개</span>
           <button class="btn-sem-add req-add" onclick="openSubjPickPw(3,'필수')">＋ 추가</button>
