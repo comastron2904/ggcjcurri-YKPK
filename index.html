@@ -5836,10 +5836,17 @@ function updateSemGridColumns() {
     document.querySelectorAll('.sem-row').forEach(row => {
       row.style.gridTemplateColumns = colTemplate;
     });
-    // 데스크탑: 모든 행 표시
-    document.querySelectorAll('.sem-row').forEach(row => {
-      row.classList.remove('sem-row-hidden');
-    });
+    // 데스크탑: 모든 행 표시 (모바일에서 isMob이 false로 잘못 판단될 경우 대비해
+    // currentSemIdx가 설정돼 있으면 해당 학기만 표시)
+    if (window.innerWidth <= 900 && typeof currentSemIdx !== 'undefined') {
+      document.querySelectorAll('.sem-row').forEach((row, rowIdx) => {
+        row.classList.toggle('sem-row-hidden', rowIdx !== currentSemIdx);
+      });
+    } else {
+      document.querySelectorAll('.sem-row').forEach(row => {
+        row.classList.remove('sem-row-hidden');
+      });
+    }
   }
 }
 
@@ -5970,6 +5977,9 @@ function removeSemSubj(colIdx, i) {
   semesterData[colIdx].splice(i, 1);
   saveSemester();
   renderSemCol(colIdx);
+  // renderSemCol → updateSemGridColumns 안에서 행 표시가 초기화될 수 있으므로
+  // 삭제 후 현재 학기 표시 상태를 명시적으로 재적용
+  setCurrentSem(currentSemIdx);
 }
 
 /* ── 과목 추가 (비밀번호 → 선택 모달) ── */
