@@ -167,9 +167,12 @@
      서브화면 공통 배경 이미지 레이어
   ══════════════════════════════════════ */
   .screen-bg-layer {
-    position: fixed; inset: 0; z-index: 0;
+    position: absolute; inset: 0; z-index: 0;
     background-size: cover; background-position: center; background-repeat: no-repeat;
     pointer-events: none;
+    /* fixed 대신 absolute: fixed는 스크롤마다 전체화면 repaint를 유발해 흰 화면 플래시 발생 */
+    will-change: transform;
+    transform: translateZ(0);
   }
   #semester-screen > *:not(.screen-bg-layer),
   #catsubj-screen > *:not(.screen-bg-layer),
@@ -834,10 +837,12 @@
     position: fixed; inset: 0; background: #f0f4f8; z-index: 700;
     display: flex; flex-direction: column;
     opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
-    overflow: hidden; /* 데스크탑용 */
-    will-change: opacity;
+    overflow: hidden;
+    /* will-change:opacity 제거: 항상 GPU 레이어 유지 → 스크롤 중 합성 비용 증가·흰 화면 플래시 */
     transform: translateZ(0);
     -webkit-transform: translateZ(0);
+    /* 배경 이미지 레이어가 absolute이므로 스크롤 컨텍스트 격리 필요 */
+    isolation: isolate;
   }
   @media (max-width: 900px) {
     #semester-screen {
@@ -979,8 +984,9 @@
       will-change: scroll-position !important;
       transform: translateZ(0) !important;
       -webkit-transform: translateZ(0) !important;
+      backface-visibility: hidden !important;
+      -webkit-backface-visibility: hidden !important;
       /* 자식 레이아웃이 스크롤 외부에 영향 주지 않도록 격리 */
-      /* contain:strict는 overflow:hidden을 암시해 스크롤 막힘 → layout+style만 적용 */
       contain: layout style !important;
       /* 스크롤이 외부(body/화면 전체)로 전파되지 않도록 차단 — 핵심 떨림 방지 */
       overscroll-behavior: contain !important;
@@ -993,10 +999,12 @@
     #sem-scroll-inner {
       display: block !important;
       max-width: none !important;
-      /* 내부 콘텐츠도 GPU 레이어로 분리 */
+      /* 내부 콘텐츠 GPU 레이어 고정 — iOS에서 스크롤 중 레이어 재생성으로 인한 흰 화면 방지 */
       will-change: transform !important;
       transform: translateZ(0) !important;
       -webkit-transform: translateZ(0) !important;
+      backface-visibility: hidden !important;
+      -webkit-backface-visibility: hidden !important;
     }
 
     /* 헤더행+그리드도 JS에서 동적 조절 */
@@ -5345,10 +5353,12 @@ function openSemesterScreen() {
         outer.style.willChange = 'scroll-position';
         outer.style.transform = 'translateZ(0)';
         outer.style.webkitTransform = 'translateZ(0)';
-        outer.style.contain = 'layout style'; // strict는 overflow:hidden 암시로 스크롤 차단 위험
-        // 스크롤이 body로 전파되지 않도록 차단 — 화면 전체 떨림 방지
+        outer.style.contain = 'layout style';
         outer.style.overscrollBehavior = 'contain';
         outer.style.touchAction = 'pan-x pan-y';
+        // iOS 스크롤 중 레이어 재생성으로 인한 흰 화면 플래시 방지
+        outer.style.backfaceVisibility = 'hidden';
+        outer.style.webkitBackfaceVisibility = 'hidden';
         // 스크롤 중 height 재계산(표 깨짐) 방지
         if (!outer._scrollLockBound) {
           let _scrollTimer = null;
@@ -5367,6 +5377,8 @@ function openSemesterScreen() {
         inner.style.willChange = 'transform';
         inner.style.transform = 'translateZ(0)';
         inner.style.webkitTransform = 'translateZ(0)';
+        inner.style.backfaceVisibility = 'hidden';
+        inner.style.webkitBackfaceVisibility = 'hidden';
       }
       // 초기 열 너비 계산
       updateSemGridColumns();
@@ -5914,7 +5926,11 @@ function applyMobileColWidths(maxReq, maxSS, maxKns, maxFor, maxMus, threshold) 
     outer.style.willChange = 'scroll-position';
     outer.style.transform = 'translateZ(0)';
     outer.style.webkitTransform = 'translateZ(0)';
-    outer.style.contain = 'strict';
+    outer.style.contain = 'layout style';
+    outer.style.overscrollBehavior = 'contain';
+    outer.style.touchAction = 'pan-x pan-y';
+    outer.style.backfaceVisibility = 'hidden';
+    outer.style.webkitBackfaceVisibility = 'hidden';
   }
 
   // sem-scroll-inner: 실제 콘텐츠 너비
