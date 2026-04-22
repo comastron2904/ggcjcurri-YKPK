@@ -838,15 +838,25 @@
     display: flex; flex-direction: column;
     opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
     overflow: hidden;
-    /* will-change:opacity 제거: 항상 GPU 레이어 유지 → 스크롤 중 합성 비용 증가·흰 화면 플래시 */
     transform: translateZ(0);
     -webkit-transform: translateZ(0);
-    /* 배경 이미지 레이어가 absolute이므로 스크롤 컨텍스트 격리 필요 */
     isolation: isolate;
+  }
+  /* 모바일 주소창 슬라이드 시 height 변화로 인한 레이아웃 재계산·흰 화면 방지
+     dvh = dynamic viewport height (주소창 포함 기준) → fixed inset:0 과 동일 효과 */
+  @supports (height: 100dvh) {
+    #semester-screen { height: 100dvh; }
   }
   @media (max-width: 900px) {
     #semester-screen {
-      overflow: hidden !important; /* 모바일: 화면 전체 떨림 방지 — 스크롤은 sem-scroll-outer가 단독 처리 */
+      overflow: hidden !important;
+      /* inset:0의 bottom:0을 제거 — iOS 주소창 높이 변화 시 화면이 늘어나는 현상 차단 */
+      /* height는 JS openSemesterScreen()에서 window.innerHeight로 픽셀 고정 */
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: auto !important;
+      width: 100% !important;
     }
   }
   #semester-screen.open { opacity: 1; pointer-events: all; }
@@ -1148,6 +1158,10 @@
       will-change: auto !important;
       transform: none !important;
     }
+    /* 모바일: 행 높이가 순간 0이 되어 흰 화면이 노출되는 것을 방지 */
+    .sem-row:not(.sem-row-hidden) {
+      min-height: 120px !important;
+    }
     /* 모바일: 헤더 행도 GPU 레이어 유지 */
     .sem-col-header-row {
       will-change: transform !important;
@@ -1163,6 +1177,8 @@
     flex-direction: column;
     min-height: 0;
     overflow: hidden;
+    /* 자체 stacking context 생성 → 부모 레이아웃 변화로부터 격리 */
+    isolation: isolate;
   }
 
   /* 고정 열 헤더 행 */
@@ -5335,14 +5351,28 @@ function openSemesterScreen() {
     hdWL.innerHTML = `<span class="sem-col-header-label hd-외국어정보">${label}</span><span class="sem-col-select-hint hint-외국어정보">${hint}</span>`;
   }
   renderAllSemCols();
-  document.getElementById('semester-screen').classList.add('open');
-  document.getElementById('semester-screen').scrollTop = 0;
+  const scr = document.getElementById('semester-screen');
+  // ── iOS 주소창 높이 변화로 인한 화면 지직거림 방지 ──
+  // position:fixed; inset:0 은 모바일 주소창이 나타나고 사라질 때 높이가 변한다.
+  // 열릴 때 현재 innerHeight로 height를 픽셀 고정하면 이후 리사이즈가 무시된다.
+  if (window.innerWidth <= 900) {
+    scr.style.height = window.innerHeight + 'px';
+    scr.style.top = '0';
+    scr.style.bottom = 'auto';
+  }
+  scr.classList.add('open');
+  scr.scrollTop = 0;
   // 모바일: sem-scroll-outer overflow 강제 + GPU 가속 + 스크롤 중 reflow 방지
   if (window.innerWidth <= 900) {
     requestAnimationFrame(() => {
       const outer = document.getElementById('sem-scroll-outer');
       if (outer) {
-        outer.style.flex = '1 1 0';
+        // flex:1 대신 명시적 height 계산 — flex 재계산 중 높이 튀는 현상 방지
+        const header = document.querySelector('#semester-screen .sem-header');
+        const headerH = header ? header.offsetHeight : 0;
+        const totalH = window.innerHeight;
+        outer.style.height = (totalH - headerH) + 'px';
+        outer.style.flex = 'none';
         outer.style.minHeight = '0';
         outer.style.overflowX = 'scroll';
         outer.style.overflowY = 'scroll';
@@ -5366,7 +5396,8 @@ function openSemesterScreen() {
           outer.addEventListener('scroll', function() {
             _isScrolling = true;
             if (_scrollTimer) clearTimeout(_scrollTimer);
-            _scrollTimer = setTimeout(function() { _isScrolling = false; }, 120);
+            // 300ms: iOS 관성 스크롤 + 주소창 애니메이션 완료까지 여유 확보
+            _scrollTimer = setTimeout(function() { _isScrolling = false; }, 300);
           }, { passive: true });
         }
       }
@@ -5506,7 +5537,10 @@ function setSemGrade(grade) {
   }
 }
 function closeSemesterScreen() {
-  document.getElementById('semester-screen').classList.remove('open');
+  const scr = document.getElementById('semester-screen');
+  scr.classList.remove('open');
+  scr.style.height = '';
+  scr.style.bottom = '';
 }
 
 /* ── 학기별 열 헤더·학점 편집 모달 ── */
@@ -5593,41 +5627,37 @@ function _syncOneRow(row) {
   const subtypes = ['일반', '진로', '융합'];
   const cells = Array.from(row.querySelectorAll('.sem-cell'));
   const headLabel = row.querySelector('.sem-row-head-label');
-
-  // ── 1단계: 높이 제약 모두 해제 (강제 reflow 없이 스타일만 변경)
-  row.querySelectorAll('.sem-subtype-block').forEach(b => {
-    b.style.height = ''; b.style.minHeight = '';
-  });
-  subtypes.forEach(st => {
-    const z = row.querySelector('.sem-subtype-zone.sub-' + st);
-    if (z) { z.style.height = ''; z.style.flex = ''; }
-  });
   const panelHeads = Array.from(row.querySelectorAll('.sem-cell > .sem-panel-head'));
-  panelHeads.forEach(ph => ph.style.height = '');
-  if (headLabel) headLabel.style.height = '';
 
-  // ── 2단계: 한 번의 rAF에서 일괄 측정 → 일괄 적용 (reflow 최소화)
+  /* ── 높이 리셋 없이 측정 → 적용 ──────────────────────────────────────────
+     기존 방식: 1단계에서 height='' 리셋 → 레이아웃 순간 붕괴(흰 화면 깜빡임)
+     개선 방식: 현재 scrollHeight(내용 기반 자연 높이)를 직접 읽어 리셋 없이 적용.
+     scrollHeight는 현재 설정된 height 제약과 무관하게 콘텐츠 높이를 반환하므로
+     스타일을 지우지 않아도 정확한 목표 높이를 얻을 수 있음.
+  ────────────────────────────────────────────────────────────────────────── */
   requestAnimationFrame(() => {
-    // panel-head 높이 일괄 측정
-    const panelHs = panelHeads.map(ph => ph.getBoundingClientRect().height);
+    if (_isScrolling) return;
+
+    // panel-head: scrollHeight로 콘텐츠 자연 높이 측정 (height 제약 무시)
+    const panelHs = panelHeads.map(ph => ph.scrollHeight);
     const maxPanelH = Math.max(0, ...panelHs);
 
-    // subtype block 높이 일괄 측정
-    const blockHsBySubtype = subtypes.map((st, i) =>
+    // subtype block: 각 cell의 subtype-section 자식(block) scrollHeight 측정
+    const blockHsBySubtype = subtypes.map((st, si) =>
       cells.map(cell => {
         const sec = cell.querySelector('.sem-subtype-section');
-        return sec && sec.children[i] ? sec.children[i].getBoundingClientRect().height : 0;
+        return sec && sec.children[si] ? sec.children[si].scrollHeight : 0;
       })
     );
     const zoneHs = subtypes.map(st => {
       const z = row.querySelector('.sem-subtype-zone.sub-' + st);
-      return z ? z.getBoundingClientRect().height : 0;
+      return z ? z.scrollHeight : 0;
     });
     const maxBlockHs = subtypes.map((_, i) =>
       Math.max(36, zoneHs[i], ...blockHsBySubtype[i])
     );
 
-    // ── 3단계: 일괄 적용 (측정 끝난 후 한 번에 쓰기 → reflow 1회)
+    // 일괄 적용 (단 한 번의 write → reflow 1회)
     if (headLabel) headLabel.style.height = maxPanelH + 'px';
     panelHeads.forEach(ph => ph.style.height = maxPanelH + 'px');
 
@@ -5915,7 +5945,11 @@ function applyMobileColWidths(maxReq, maxSS, maxKns, maxFor, maxMus, threshold) 
   // sem-scroll-outer: 가로 스크롤 컨테이너
   const outer = document.getElementById('sem-scroll-outer');
   if (outer) {
-    outer.style.flex = '1 1 0';
+    // flex:1 대신 명시적 height — iOS 주소창 애니메이션으로 인한 높이 재계산 방지
+    const _hdr = document.querySelector('#semester-screen .sem-header');
+    const _hdrH = _hdr ? _hdr.offsetHeight : 0;
+    outer.style.height = (window.innerHeight - _hdrH) + 'px';
+    outer.style.flex = 'none';
     outer.style.minHeight = '0';
     outer.style.overflowX = 'scroll';
     outer.style.overflowY = 'scroll';
@@ -7772,16 +7806,37 @@ document.addEventListener('DOMContentLoaded', () => {
 /* ══════════════════════════════════════
    화면 회전/리사이즈 시 학기 상태 재적용
 ══════════════════════════════════════ */
+/* ── 모바일 주소창 show/hide로 인한 spurious resize 필터링 ──
+   iOS/Android는 스크롤 중 주소창이 숨겨질 때마다 resize가 발생.
+   실제 width 변화(회전 등)만 처리하고, height-only 변화는 무시. */
+let _lastResizeW = window.innerWidth;
+let _resizeRafId = null;
 window.addEventListener('resize', function() {
-  // 화면 회전/리사이즈 시 스크롤 플래그 리셋 (고착 방지)
-  _isScrolling = false;
-  // updateSemGridColumns가 isMob 판단을 900px 기준으로 자체 처리
-  updateSemGridColumns();
+  const newW = window.innerWidth;
+  const widthChanged = (newW !== _lastResizeW);
+  _lastResizeW = newW;
 
-  if (typeof setCurrentSem === 'function' && typeof currentSemIdx !== 'undefined') {
-    setCurrentSem(currentSemIdx);
+  if (!widthChanged) {
+    // height-only 변화 = 모바일 주소창 슬라이드
+    // 이때 _isScrolling을 잠시 true로 유지해 syncSubtypeZoneHeights 실행 차단
+    // → 주소창 애니메이션 중 레이아웃 재계산으로 인한 흰 화면 플래시 방지
+    _isScrolling = true;
+    clearTimeout(window._resizeHeightTimer);
+    window._resizeHeightTimer = setTimeout(function() { _isScrolling = false; }, 400);
+    return;
   }
-  requestAnimationFrame(() => syncSubtypeZoneHeights());
+
+  // 실제 너비 변화(회전 등)만 처리
+  _isScrolling = false;
+  if (_resizeRafId) cancelAnimationFrame(_resizeRafId);
+  _resizeRafId = requestAnimationFrame(function() {
+    _resizeRafId = null;
+    updateSemGridColumns();
+    if (typeof setCurrentSem === 'function' && typeof currentSemIdx !== 'undefined') {
+      setCurrentSem(currentSemIdx);
+    }
+    requestAnimationFrame(() => syncSubtypeZoneHeights());
+  });
 });
 </script>
 
