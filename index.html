@@ -966,12 +966,23 @@
       display: block !important;
       width: 100% !important;
       box-sizing: border-box !important;
+      /* GPU 레이어 분리 — 스크롤 중 레이아웃 재계산 방지 */
+      will-change: scroll-position !important;
+      transform: translateZ(0) !important;
+      -webkit-transform: translateZ(0) !important;
+      /* 자식 레이아웃이 스크롤 외부에 영향 주지 않도록 격리 */
+      /* contain:strict는 overflow:hidden을 암시해 스크롤 막힘 → layout+style만 적용 */
+      contain: layout style !important;
     }
 
     /* sem-scroll-inner: JS가 너비를 동적 계산 */
     #sem-scroll-inner {
       display: block !important;
       max-width: none !important;
+      /* 내부 콘텐츠도 GPU 레이어로 분리 */
+      will-change: transform !important;
+      transform: translateZ(0) !important;
+      -webkit-transform: translateZ(0) !important;
     }
 
     /* 헤더행+그리드도 JS에서 동적 조절 */
@@ -5276,18 +5287,42 @@ function openSemesterScreen() {
   renderAllSemCols();
   document.getElementById('semester-screen').classList.add('open');
   document.getElementById('semester-screen').scrollTop = 0;
-  // 모바일: sem-scroll-outer overflow 강제 (CSS !important 백업)
+  // 모바일: sem-scroll-outer overflow 강제 + GPU 가속 + 스크롤 중 reflow 방지
   if (window.innerWidth <= 900) {
     requestAnimationFrame(() => {
       const outer = document.getElementById('sem-scroll-outer');
       if (outer) {
-        outer.setAttribute('style',
-          'flex:1 1 0;min-height:0;overflow-x:scroll;overflow-y:scroll;' +
-          '-webkit-overflow-scrolling:touch;display:block;width:100%;box-sizing:border-box;');
+        outer.style.flex = '1 1 0';
+        outer.style.minHeight = '0';
+        outer.style.overflowX = 'scroll';
+        outer.style.overflowY = 'scroll';
+        outer.style.webkitOverflowScrolling = 'touch';
+        outer.style.display = 'block';
+        outer.style.width = '100%';
+        outer.style.boxSizing = 'border-box';
+        outer.style.willChange = 'scroll-position';
+        outer.style.transform = 'translateZ(0)';
+        outer.style.webkitTransform = 'translateZ(0)';
+        outer.style.contain = 'layout style'; // strict는 overflow:hidden 암시로 스크롤 차단 위험
+        // 스크롤 중 height 재계산(표 깨짐) 방지
+        if (!outer._scrollLockBound) {
+          let _scrollTimer = null;
+          outer._scrollLockBound = true;
+          outer.addEventListener('scroll', function() {
+            _isScrolling = true;
+            if (_scrollTimer) clearTimeout(_scrollTimer);
+            _scrollTimer = setTimeout(function() { _isScrolling = false; }, 120);
+          }, { passive: true });
+        }
       }
       // inner 너비는 updateMobileColWidths가 계산하므로 초기값만 설정
       const inner = document.getElementById('sem-scroll-inner');
-      if (inner) inner.style.display = 'block';
+      if (inner) {
+        inner.style.display = 'block';
+        inner.style.willChange = 'transform';
+        inner.style.transform = 'translateZ(0)';
+        inner.style.webkitTransform = 'translateZ(0)';
+      }
       // 초기 열 너비 계산
       updateSemGridColumns();
     });
@@ -5492,6 +5527,7 @@ function renderAllSemCols() {
 // 데스크탑: CSS grid 자동 정렬 / 모바일: JS 동기화
 // 중복 실행 방지용 타이머
 let _syncRafId = null;
+let _isScrolling = false; // 스크롤 중 height 재계산 방지 플래그
 
 function _syncOneRow(row) {
   if (window.innerWidth > 900) return;
@@ -5556,9 +5592,11 @@ function _syncOneRow(row) {
 // 중복 rAF 방지: 동시에 여러 번 요청돼도 한 프레임에 한 번만 실행
 function syncSubtypeZoneHeights() {
   if (window.innerWidth > 900) return;
+  if (_isScrolling) return; // 스크롤 중엔 height 재계산 건너뜀 (표 깨짐 방지)
   if (_syncRafId) return; // 이미 예약된 프레임이 있으면 스킵
   _syncRafId = requestAnimationFrame(() => {
     _syncRafId = null;
+    if (_isScrolling) return; // rAF 실행 시점에도 재확인
     document.querySelectorAll('.sem-row:not(.sem-row-hidden)').forEach(row => _syncOneRow(row));
   });
 }
@@ -5751,7 +5789,7 @@ function updateSemGridColumns() {
 function resetMobileStyles() {
   const outer = document.getElementById('sem-scroll-outer');
   const inner = document.getElementById('sem-scroll-inner');
-  if (outer) outer.removeAttribute('style');
+  if (outer) { outer.removeAttribute('style'); outer._scrollLockBound = false; }
   if (inner) inner.removeAttribute('style');
 
   ['sem-col-header-row', 'sem-grid'].forEach(id => {
@@ -5819,9 +5857,20 @@ function applyMobileColWidths(maxReq, maxSS, maxKns, maxFor, maxMus, threshold) 
 
   // sem-scroll-outer: 가로 스크롤 컨테이너
   const outer = document.getElementById('sem-scroll-outer');
-  if (outer) outer.setAttribute('style',
-    'flex:1 1 0;min-height:0;overflow-x:scroll;overflow-y:scroll;' +
-    '-webkit-overflow-scrolling:touch;display:block;width:100%;box-sizing:border-box;');
+  if (outer) {
+    outer.style.flex = '1 1 0';
+    outer.style.minHeight = '0';
+    outer.style.overflowX = 'scroll';
+    outer.style.overflowY = 'scroll';
+    outer.style.webkitOverflowScrolling = 'touch';
+    outer.style.display = 'block';
+    outer.style.width = '100%';
+    outer.style.boxSizing = 'border-box';
+    outer.style.willChange = 'scroll-position';
+    outer.style.transform = 'translateZ(0)';
+    outer.style.webkitTransform = 'translateZ(0)';
+    outer.style.contain = 'strict';
+  }
 
   // sem-scroll-inner: 실제 콘텐츠 너비
   const inner = document.getElementById('sem-scroll-inner');
@@ -7663,6 +7712,8 @@ document.addEventListener('DOMContentLoaded', () => {
    화면 회전/리사이즈 시 학기 상태 재적용
 ══════════════════════════════════════ */
 window.addEventListener('resize', function() {
+  // 화면 회전/리사이즈 시 스크롤 플래그 리셋 (고착 방지)
+  _isScrolling = false;
   // updateSemGridColumns가 isMob 판단을 900px 기준으로 자체 처리
   updateSemGridColumns();
 
