@@ -45,6 +45,8 @@
   /* 폴드/모바일에서 semester-screen 내부 가로 스크롤을 위해 overflow-x 허용 */
   @media (max-width: 900px) {
     body { overflow-x: unset; }
+    /* semester-screen이 열려 있을 때 body 스크롤 완전 차단 */
+    body.sem-open { overflow: hidden !important; position: fixed !important; width: 100% !important; }
   }
 
   /* ══════════════════════════════════════
@@ -839,7 +841,7 @@
   }
   @media (max-width: 900px) {
     #semester-screen {
-      overflow: visible !important; /* 폴드/모바일: 자식 스크롤 허용 */
+      overflow: hidden !important; /* 모바일: 화면 전체 떨림 방지 — 스크롤은 sem-scroll-outer가 단독 처리 */
     }
   }
   #semester-screen.open { opacity: 1; pointer-events: all; }
@@ -980,6 +982,11 @@
       /* 자식 레이아웃이 스크롤 외부에 영향 주지 않도록 격리 */
       /* contain:strict는 overflow:hidden을 암시해 스크롤 막힘 → layout+style만 적용 */
       contain: layout style !important;
+      /* 스크롤이 외부(body/화면 전체)로 전파되지 않도록 차단 — 핵심 떨림 방지 */
+      overscroll-behavior: contain !important;
+      -ms-scroll-chaining: none !important;
+      /* 터치 스크롤을 이 컨테이너에서만 처리 */
+      touch-action: pan-x pan-y !important;
     }
 
     /* sem-scroll-inner: JS가 너비를 동적 계산 */
@@ -5339,6 +5346,9 @@ function openSemesterScreen() {
         outer.style.transform = 'translateZ(0)';
         outer.style.webkitTransform = 'translateZ(0)';
         outer.style.contain = 'layout style'; // strict는 overflow:hidden 암시로 스크롤 차단 위험
+        // 스크롤이 body로 전파되지 않도록 차단 — 화면 전체 떨림 방지
+        outer.style.overscrollBehavior = 'contain';
+        outer.style.touchAction = 'pan-x pan-y';
         // 스크롤 중 height 재계산(표 깨짐) 방지
         if (!outer._scrollLockBound) {
           let _scrollTimer = null;
