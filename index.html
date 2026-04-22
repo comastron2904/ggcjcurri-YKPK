@@ -838,7 +838,9 @@
     display: flex; flex-direction: column;
     opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
     overflow: hidden;
-    
+    /* will-change:opacity 제거: 항상 GPU 레이어 유지 → 스크롤 중 합성 비용 증가·흰 화면 플래시 */
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
     /* 배경 이미지 레이어가 absolute이므로 스크롤 컨텍스트 격리 필요 */
     isolation: isolate;
   }
@@ -3059,7 +3061,7 @@
         <span class="graded-notice-em" style="border-color:rgba(26,107,191,0.45);color:#1a5faa;">성취도</span>
         <span style="margin:0 5px;color:rgba(26,46,74,0.30)">|</span>
         <span class="grade-icon grade-pf">P/F</span>
-        <span class="graded-notice-em" style="border-color:rgba(200,120,20,0.50);color:#b06010;">P/F</span>
+        <span class="graded-notice-em" style="border-color:rgba(200,120,20,0.50);color:#b06010;">이수/미이수</span>
         <span style="margin-left:6px;color:rgba(26,46,74,0.55)">— 카드 우측 아이콘 기준</span>
       </div>
     </div>
@@ -3637,7 +3639,7 @@
         <span class="graded-notice-em" style="border-color:rgba(26,107,191,0.45);color:#1a5faa;">성취도</span>
         <span style="margin:0 5px;color:rgba(26,46,74,0.30)">|</span>
         <span class="catsubj-grade-icon grade-pf">P/F</span>
-        <span class="graded-notice-em" style="border-color:rgba(200,120,20,0.50);color:#b06010;">P/F</span>
+        <span class="graded-notice-em" style="border-color:rgba(200,120,20,0.50);color:#b06010;">이수/미이수</span>
         <span style="margin-left:6px;color:rgba(26,46,74,0.55)">— 카드 우측 아이콘 기준</span>
       </div>
     </div>
@@ -5283,9 +5285,19 @@ function renderCatSubjList() {
     card.className = 'catsubj-card' + (graded ? ' graded' : '');
     card.style.borderLeftColor = color;
     if (graded) {
-      card.style.background  = hexToRgba(color, 0.22);
-      card.style.borderColor = hexToRgba(color, 0.7);
-      card.style.borderLeftColor = color;
+      if (gradeType.key === '등급') {
+        card.style.background     = hexToRgba(color, 0.22);
+        card.style.borderColor    = hexToRgba(color, 0.7);
+        card.style.borderLeftColor = color;
+      } else if (gradeType.key === '성취') {
+        card.style.background     = hexToRgba(color, 0.08);
+        card.style.borderColor    = hexToRgba(color, 0.35);
+        card.style.borderLeftColor = hexToRgba(color, 0.55);
+      } else if (gradeType.key === 'pf') {
+        card.style.background     = '#ffffff';
+        card.style.borderColor    = hexToRgba(color, 0.18);
+        card.style.borderLeftColor = hexToRgba(color, 0.30);
+      }
     }
     const catGradeIconHtml = gradeType
       ? `<span class="catsubj-grade-icon grade-${gradeType.key}" title="${gradeType.key === '등급' ? '등급&성취도' : gradeType.key === '성취' ? '성취도' : 'P/F'}">${gradeType.label}</span>`
@@ -5686,9 +5698,22 @@ function renderSemCol(colIdx) {
     card.className = 'sem-subj-card sem-bc-' + cat + (graded ? ' graded' : '');
     if (graded) {
       const c = CAT_COLORS[cat] || '#b0b0b0';
-      card.style.background    = hexToRgba(c, 0.22);
-      card.style.borderColor   = hexToRgba(c, 0.7);
-      card.style.borderLeftColor = c;
+      if (gradeType.key === '등급') {
+        // 등급&성취도 — 진하게
+        card.style.background     = hexToRgba(c, 0.22);
+        card.style.borderColor    = hexToRgba(c, 0.7);
+        card.style.borderLeftColor = c;
+      } else if (gradeType.key === '성취') {
+        // 성취도 — 연하게
+        card.style.background     = hexToRgba(c, 0.08);
+        card.style.borderColor    = hexToRgba(c, 0.35);
+        card.style.borderLeftColor = hexToRgba(c, 0.55);
+      } else if (gradeType.key === 'pf') {
+        // P/F — 흰색 배경, 테두리만 매우 연하게
+        card.style.background     = '#ffffff';
+        card.style.borderColor    = hexToRgba(c, 0.18);
+        card.style.borderLeftColor = hexToRgba(c, 0.30);
+      }
     }
     const gradeIconHtml = gradeType
       ? `<span class="grade-icon grade-${gradeType.key}" title="${gradeType.key === '등급' ? '등급&성취도' : gradeType.key === '성취' ? '성취도' : 'P/F'}">${gradeType.label}</span>`
