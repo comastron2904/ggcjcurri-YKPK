@@ -838,9 +838,7 @@
     display: flex; flex-direction: column;
     opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
     overflow: hidden;
-    /* will-change:opacity 제거: 항상 GPU 레이어 유지 → 스크롤 중 합성 비용 증가·흰 화면 플래시 */
-    transform: translateZ(0);
-    -webkit-transform: translateZ(0);
+    
     /* 배경 이미지 레이어가 absolute이므로 스크롤 컨텍스트 격리 필요 */
     isolation: isolate;
   }
