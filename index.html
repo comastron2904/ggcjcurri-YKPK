@@ -4445,24 +4445,25 @@ function openDetail(s, from, semColIdx) {
   document.getElementById('info-credit').value   = autoCredit;
   selectGrade(info.grade || '');
 
-  // 같은 선택교과군 자동 계산 (저장된 값 없을 때만)
-  let autoGroup = info.group || '';
-  if (!autoGroup) {
-    for (let ci = 0; ci < semesterData.length; ci++) {
-      const entry = semesterData[ci].find(x => x.name === s.name);
-      if (entry) {
-        if (entry.type === '필수') {
-          autoGroup = '필수과목';
-        } else {
-          const peers = semesterData[ci]
-            .filter(x => x.type === entry.type && x.name !== s.name)
-            .map(x => x.name);
-          autoGroup = peers.join(', ');
-        }
-        break;
+  // 같은 선택교과군 동적 계산 — 학기별 개설과목 현재 상태 기준으로 항상 재계산
+  // (과목을 다른 학기/교과군으로 옮겨도 즉시 반영)
+  let autoGroup = '';
+  for (let ci = 0; ci < semesterData.length; ci++) {
+    const entry = semesterData[ci].find(x => x.name === s.name);
+    if (entry) {
+      if (entry.type === '필수') {
+        autoGroup = '필수과목';
+      } else {
+        const peers = semesterData[ci]
+          .filter(x => x.type === entry.type && x.name !== s.name)
+          .map(x => x.name);
+        autoGroup = peers.join(', ');
       }
+      break;
     }
   }
+  // 학기별 개설과목에 등록되지 않은 경우에만 저장된 값 사용
+  if (!autoGroup) autoGroup = info.group || '';
   document.getElementById('info-group').value = autoGroup;
   autoResizeGroupTextarea();
   document.getElementById('info-save-ok').classList.remove('show');
