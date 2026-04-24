@@ -211,6 +211,36 @@
     font-size: 13px; cursor: pointer; transition: all 0.2s; flex-shrink: 0;
   }
   .btn-pe-bg-remove:hover { border-color: #d63030; color: #d63030; }
+
+  /* 메인 배경 이미지 섹션 */
+  .pe-main-bg-row {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 8px;
+  }
+  .pe-main-bg-preview {
+    width: 64px; height: 44px; flex-shrink: 0;
+    border: 1px solid rgba(26,107,191,0.20);
+    background: rgba(26,107,191,0.05) center/cover no-repeat;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; color: rgba(26,107,191,0.30);
+    overflow: hidden;
+  }
+  .pe-main-bg-preview.has-img { border-color: rgba(26,107,191,0.45); }
+  .pe-main-bg-status {
+    flex: 1; font-size: 12px; color: rgba(26,46,74,0.55); letter-spacing: 0.3px;
+    line-height: 1.5;
+  }
+  .pe-main-bg-status strong { color: var(--gold); font-weight: 700; }
+  .btn-pe-main-bg-remove {
+    padding: 9px 14px; background: none;
+    border: 1px solid rgba(214,48,48,0.35); color: rgba(214,48,48,0.70);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 12px; font-weight: 700; cursor: pointer;
+    transition: all 0.2s; flex-shrink: 0; letter-spacing: 0.5px;
+  }
+  .btn-pe-main-bg-remove:hover { border-color: #d63030; color: #d63030; background: rgba(214,48,48,0.06); }
+  .btn-pe-main-bg-remove:disabled {
+    opacity: 0.3; cursor: not-allowed; pointer-events: none;
+  }
   .pe-opacity-row {
     display: flex; align-items: center; gap: 10px;
   }
@@ -3016,8 +3046,19 @@
 
       <!-- 배경 이미지 -->
       <div class="pe-section">
-        <div class="pe-section-label">BACKGROUND · 서브화면 배경 이미지</div>
-        <div class="pe-field-label" style="margin-bottom:10px">메인 화면을 제외한 모든 화면에 동일하게 적용됩니다</div>
+        <div class="pe-section-label">BACKGROUND · 배경 이미지</div>
+
+        <!-- 메인 화면 배경 -->
+        <div class="pe-field-label" style="margin-bottom:8px">메인 화면 배경</div>
+        <div class="pe-main-bg-row">
+          <div class="pe-main-bg-preview" id="pe-main-bg-preview">🏠</div>
+          <div class="pe-main-bg-status" id="pe-main-bg-status">배경 이미지 없음<br><span style="font-size:11px;opacity:0.7">메인 화면을 직접 클릭하면 이미지를 설정할 수 있습니다</span></div>
+          <button class="btn-pe-main-bg-remove" id="btn-main-bg-remove" onclick="removeMainHeroBg()" disabled>🗑️ 삭제</button>
+        </div>
+        <div style="height:18px"></div>
+
+        <!-- 서브화면 배경 -->
+        <div class="pe-field-label" style="margin-bottom:10px">서브화면 배경 <span style="font-size:10px;opacity:0.55;letter-spacing:0">(메인 화면을 제외한 모든 화면에 동일 적용)</span></div>
         <div class="pe-bg-upload-row">
           <div class="pe-bg-preview" id="pe-bg-preview">🖼️</div>
           <button class="btn-pe-bg-upload" onclick="document.getElementById('pe-bg-file-input').click()">
@@ -5136,6 +5177,10 @@ function openPageEdit() {
   opSlider.value = opVal;
   document.getElementById('pe-bg-opacity-val').textContent = opVal + '%';
   document.getElementById('pe-save-ok').classList.remove('show');
+
+  // 메인 배경 이미지 상태 반영
+  syncMainBgPreview();
+
   document.getElementById('page-edit-modal').classList.add('open');
 }
 
@@ -5190,12 +5235,54 @@ async function savePageEdit() {
 /* ──────────────────────────────
    배경 이미지 (타이틀 영역만)
 ────────────────────────────── */
+
+/* 메인 배경 미리보기 동기화 */
+function syncMainBgPreview() {
+  const heroBg = document.getElementById('hero-bg');
+  const preview = document.getElementById('pe-main-bg-preview');
+  const status  = document.getElementById('pe-main-bg-status');
+  const btn     = document.getElementById('btn-main-bg-remove');
+  if (!preview || !status || !btn) return;
+
+  const bgUrl = heroBg ? heroBg.style.backgroundImage : '';
+  const hasImg = heroBg && heroBg.classList.contains('active') && bgUrl && bgUrl !== 'none';
+
+  if (hasImg) {
+    preview.style.backgroundImage = bgUrl;
+    preview.classList.add('has-img');
+    preview.textContent = '';
+    status.innerHTML = '<strong>배경 이미지 설정됨</strong><br><span style="font-size:11px;opacity:0.7">메인 화면을 직접 클릭하면 이미지를 변경할 수 있습니다</span>';
+    btn.disabled = false;
+  } else {
+    preview.style.backgroundImage = '';
+    preview.classList.remove('has-img');
+    preview.textContent = '🏠';
+    status.innerHTML = '배경 이미지 없음<br><span style="font-size:11px;opacity:0.7">메인 화면을 직접 클릭하면 이미지를 설정할 수 있습니다</span>';
+    btn.disabled = true;
+  }
+}
+
+/* 메인 배경 이미지 삭제 */
+function removeMainHeroBg() {
+  const heroBg = document.getElementById('hero-bg');
+  if (!heroBg || !heroBg.classList.contains('active')) return;
+  heroBg.style.backgroundImage = '';
+  heroBg.classList.remove('active');
+  syncMainBgPreview();
+  // 저장 ok 메시지
+  const ok = document.getElementById('pe-save-ok');
+  ok.textContent = '🗑️ 메인 배경이 삭제되었습니다';
+  ok.classList.add('show');
+  setTimeout(() => { ok.classList.remove('show'); ok.textContent = '✓ 저장되었습니다'; }, 2200);
+}
+
 document.getElementById('file-input').addEventListener('change', function(e) {
   const file = e.target.files[0]; if (!file) return;
   const reader = new FileReader();
   reader.onload = ev => {
     document.getElementById('hero-bg').style.backgroundImage = `url(${ev.target.result})`;
     document.getElementById('hero-bg').classList.add('active');
+    syncMainBgPreview();
     const t = document.getElementById('toast');
     t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 2200);
