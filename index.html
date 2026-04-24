@@ -4176,7 +4176,8 @@ const SUB_SCREEN_IDS = [
   'enroll-screen','suneung-screen','guidebook-screen'
 ];
 
-let pendingBgFile = null;   // 업로드 대기 중인 File 객체
+let pendingBgFile = null;       // 업로드 대기 중인 File 객체
+let pendingBgPreviewUrl = null; // File에 대응하는 ObjectURL (1개만 유지)
 
 function applySubBg(base64, opacity) {
   const op = parseFloat(opacity) / 100;
@@ -4196,19 +4197,22 @@ function applySubBg(base64, opacity) {
 
 function onBgFileChange(input) {
   const file = input.files[0]; if (!file) return;
+  // 이전 ObjectURL 해제
+  if (pendingBgPreviewUrl) { URL.revokeObjectURL(pendingBgPreviewUrl); pendingBgPreviewUrl = null; }
   pendingBgFile = file;
-  // 미리보기: ObjectURL (로컬 전용, 저장 시 Storage 업로드)
-  const previewUrl = URL.createObjectURL(file);
+  pendingBgPreviewUrl = URL.createObjectURL(file);
   const preview = document.getElementById('pe-bg-preview');
-  preview.style.backgroundImage = 'url(' + previewUrl + ')';
+  preview.style.backgroundImage = 'url(' + pendingBgPreviewUrl + ')';
   preview.classList.add('has-img');
   preview.textContent = '';
   const op = document.getElementById('pe-bg-opacity').value;
-  applySubBg(previewUrl, op);
+  applySubBg(pendingBgPreviewUrl, op);
   input.value = '';
 }
 
 async function removeBgImage() {
+  // 로컬 pending 초기화
+  if (pendingBgPreviewUrl) { URL.revokeObjectURL(pendingBgPreviewUrl); pendingBgPreviewUrl = null; }
   pendingBgFile = null;
   // 기존 Storage 파일 삭제
   if (pageTexts.bgImageUrl) {
@@ -4225,7 +4229,8 @@ async function removeBgImage() {
 
 function updateOpacityVal(val) {
   document.getElementById('pe-bg-opacity-val').textContent = val + '%';
-  const url = (pendingBgFile ? URL.createObjectURL(pendingBgFile) : null) || pageTexts.bgImageUrl || null;
+  // pendingBgPreviewUrl이 있으면 그걸 사용, 없으면 저장된 URL 사용
+  const url = pendingBgPreviewUrl || pageTexts.bgImageUrl || null;
   if (url) applySubBg(url, val);
 }
 
@@ -5190,7 +5195,9 @@ function closePageEdit() {
 
 async function savePageEdit() {
   const g = id => document.getElementById(id).value.trim();
-  pageTexts = {
+
+  // 기존 pageTexts를 기반으로 덮어쓰기 — bgImageUrl 등 보존
+  pageTexts = Object.assign({}, pageTexts, {
     badge:        g('pe-badge'),
     title1:       g('pe-title1'),
     title2:       g('pe-title2'),
@@ -5198,13 +5205,13 @@ async function savePageEdit() {
     divider:      g('pe-divider'),
     sectionLabel: g('pe-section-label'),
     footer:       g('pe-footer'),
-  };
+    bgOpacity:    document.getElementById('pe-bg-opacity').value,
+    menu07url:    document.getElementById('pe-menu-07-url').value.trim(),
+  });
   for (let i = 1; i <= 7; i++) {
     const k = 'menu' + String(i).padStart(2,'0');
     pageTexts[k] = document.getElementById('pe-menu-' + String(i).padStart(2,'0')).value.trim();
   }
-  pageTexts.menu07url = document.getElementById('pe-menu-07-url').value.trim();
-  pageTexts.bgOpacity = document.getElementById('pe-bg-opacity').value;
   // 열 헤더·학점 값은 saveSemColEdit() 에서 별도 저장 (pageTexts에 보존)
 
   // 배경 이미지: 새 파일이 있으면 Storage에 업로드
@@ -5212,11 +5219,13 @@ async function savePageEdit() {
     const okEl = document.getElementById('pe-save-ok');
     okEl.textContent = '⏳ 이미지 업로드 중...'; okEl.classList.add('show');
     try {
-      // 기존 파일 삭제
-      if (pageTexts.bgImageUrl) await deleteFromStorage(pageTexts.bgImageUrl).catch(() => {});
+      // 기존 파일 삭제 후 새 파일 업로드
+      const prevUrl = pageTexts.bgImageUrl;
       const url = await uploadToStorage(pendingBgFile);
       pageTexts.bgImageUrl = url;
       pendingBgFile = null;
+      if (pendingBgPreviewUrl) { URL.revokeObjectURL(pendingBgPreviewUrl); pendingBgPreviewUrl = null; }
+      if (prevUrl) await deleteFromStorage(prevUrl).catch(() => {});
     } catch(e) {
       okEl.textContent = '⚠ 이미지 업로드 실패'; 
       setTimeout(() => { okEl.classList.remove('show'); okEl.textContent = '✓ 저장되었습니다'; }, 2500);
@@ -6922,6 +6931,8 @@ async function handleDeptFiles(blockId, input) {
       const url = await uploadToStorage(file);
       const entry = b.files.find(f => f._tmpId === tmpId);
       if (entry) { entry.url = url; delete entry._tmpId; }
+      // 업로드 완료 즉시 DB에 저장 (새로고침해도 유지)
+      if (currentDeptKey) await sbSet(currentDeptKey, deptBlocks).catch(console.error);
     } catch(err) {
       b.files = b.files.filter(f => f._tmpId !== tmpId);
       alert('파일 업로드 실패: ' + file.name + '\n' + err.message);
@@ -6936,6 +6947,8 @@ function deleteDeptFile(blockId, fileIdx) {
   const removed = b.files.splice(fileIdx, 1)[0];
   if (removed && removed.url) deleteFromStorage(removed.url);
   renderDeptFileItems(b);
+  // 삭제 후 즉시 DB에 저장
+  if (currentDeptKey) sbSet(currentDeptKey, deptBlocks).catch(console.error);
 }
 
 function deptAddBlock(type) {
@@ -7190,6 +7203,8 @@ async function handleEnrollFiles(blockId, input) {
       const url = await uploadToStorage(file);
       const entry = b.files.find(f => f._tmpId === tmpId);
       if (entry) { entry.url = url; delete entry._tmpId; }
+      // 업로드 완료 즉시 DB에 저장 (새로고침해도 유지)
+      await sbSet(ENROLL_KEY, enrollBlocks).catch(console.error);
     } catch(err) {
       b.files = b.files.filter(f => f._tmpId !== tmpId);
       alert('파일 업로드 실패: ' + file.name + '\n' + err.message);
@@ -7204,6 +7219,8 @@ function deleteEnrollFile(blockId, fi) {
   const removed = b.files.splice(fi, 1)[0];
   if (removed && removed.url) deleteFromStorage(removed.url);
   renderEnrollFileItems(b);
+  // 삭제 후 즉시 DB에 저장
+  sbSet(ENROLL_KEY, enrollBlocks).catch(console.error);
 }
 
 function enrollAddBlock(type) {
@@ -7446,6 +7463,8 @@ async function handleSuneungFiles(blockId, input) {
       const url = await uploadToStorage(file);
       const entry = b.files.find(f => f._tmpId === tmpId);
       if (entry) { entry.url = url; delete entry._tmpId; }
+      // 업로드 완료 즉시 DB에 저장 (새로고침해도 유지)
+      await sbSet(SUNEUNG_KEY, suneungBlocks).catch(console.error);
     } catch(err) {
       b.files = b.files.filter(f => f._tmpId !== tmpId);
       alert('파일 업로드 실패: ' + file.name + '\n' + err.message);
@@ -7460,6 +7479,8 @@ function deleteSuneungFile(blockId, fi) {
   const removed = b.files.splice(fi, 1)[0];
   if (removed && removed.url) deleteFromStorage(removed.url);
   renderSuneungFileItems(b);
+  // 삭제 후 즉시 DB에 저장
+  sbSet(SUNEUNG_KEY, suneungBlocks).catch(console.error);
 }
 
 function suneungAddBlock(type) {
