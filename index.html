@@ -4359,23 +4359,30 @@ function openMenu07() {
 }
 
 function openMenu08() {
-  const url   = pageTexts.menu08url;
-  const blobUrl = pageTexts.menu08blobUrl || null; // Storage 공개 URL
-  const title = pageTexts.menu08 || document.getElementById('menu-08').textContent || '테스트';
+  const url      = pageTexts.menu08url;
+  const htmlCode = pageTexts.menu08html || null;
+  const title    = pageTexts.menu08 || document.getElementById('menu-08').textContent || '테스트';
 
-  const titleEl = document.getElementById('iframe-screen-title');
+  const titleEl  = document.getElementById('iframe-screen-title');
   if (titleEl) titleEl.textContent = title;
 
   const iframeEl = document.getElementById('iframe-embed');
   const noUrlEl  = document.getElementById('iframe-no-url');
 
-  // 우선순위: HTML 파일(blobUrl) > URL 입력
-  const src = blobUrl || url || '';
-  if (src) {
-    iframeEl.src = src;
+  if (htmlCode) {
+    // HTML 파일 내용을 srcdoc으로 직접 실행
+    iframeEl.removeAttribute('src');
+    iframeEl.srcdoc = htmlCode;
+    iframeEl.style.display = '';
+    if (noUrlEl) noUrlEl.style.display = 'none';
+  } else if (url) {
+    // 외부 URL을 src로 로드
+    iframeEl.removeAttribute('srcdoc');
+    iframeEl.src = url;
     iframeEl.style.display = '';
     if (noUrlEl) noUrlEl.style.display = 'none';
   } else {
+    iframeEl.removeAttribute('srcdoc');
     iframeEl.src = '';
     iframeEl.style.display = 'none';
     if (noUrlEl) noUrlEl.style.display = '';
@@ -4387,12 +4394,13 @@ function closeIframeScreen() {
   document.getElementById('iframe-screen').classList.remove('open');
   setTimeout(() => {
     const iframeEl = document.getElementById('iframe-embed');
-    if (iframeEl) iframeEl.src = '';
+    if (iframeEl) { iframeEl.removeAttribute('srcdoc'); iframeEl.src = ''; }
   }, 300);
 }
 
-/* ── 08번 HTML 파일 업로드 처리 ── */
+/* ── 08번 HTML 파일 처리 (srcdoc 방식) ── */
 let _menu08PendingFile = null;
+let _menu08HtmlContent = null; // 읽어온 HTML 문자열
 
 function onMenu08FileChange(input) {
   const file = input.files[0];
@@ -4400,9 +4408,21 @@ function onMenu08FileChange(input) {
   _menu08PendingFile = file;
   const statusEl = document.getElementById('pe-menu-08-file-status');
   const btnEl    = document.getElementById('pe-menu-08-file-btn');
-  if (statusEl) statusEl.textContent = '📄 ' + file.name + ' — 저장 시 업로드됩니다';
-  if (btnEl)    btnEl.textContent    = '📄 ' + file.name;
-  // URL 입력 칸을 비워서 파일 우선 사용임을 명시
+
+  // 파일을 텍스트로 읽기
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    _menu08HtmlContent = e.target.result;
+    if (statusEl) statusEl.textContent = '✓ ' + file.name + ' 읽기 완료 — 저장 버튼을 누르세요';
+    if (btnEl)    btnEl.textContent    = '📄 ' + file.name;
+  };
+  reader.onerror = function() {
+    if (statusEl) statusEl.textContent = '⚠ 파일 읽기 실패';
+    _menu08PendingFile = null;
+    _menu08HtmlContent = null;
+  };
+  reader.readAsText(file, 'UTF-8');
+
   const urlEl = document.getElementById('pe-menu-08-url');
   if (urlEl) urlEl.value = '';
   input.value = '';
@@ -4410,9 +4430,10 @@ function onMenu08FileChange(input) {
 
 async function clearMenu08File() {
   _menu08PendingFile = null;
-  // Supabase Storage에서 기존 파일 삭제
-  if (pageTexts.menu08blobUrl) {
-    await deleteFromStorage(pageTexts.menu08blobUrl).catch(() => {});
+  _menu08HtmlContent = null;
+  // DB에서 저장된 HTML 삭제
+  if (pageTexts.menu08html) {
+    delete pageTexts.menu08html;
     delete pageTexts.menu08blobUrl;
     savePage();
   }
@@ -4427,9 +4448,9 @@ function syncMenu08FileStatus() {
   const statusEl = document.getElementById('pe-menu-08-file-status');
   const btnEl    = document.getElementById('pe-menu-08-file-btn');
   if (!statusEl || !btnEl) return;
-  if (pageTexts.menu08blobUrl) {
-    const name = decodeURIComponent(pageTexts.menu08blobUrl.split('/').pop()).replace(/^\d+_[a-z0-9]+\./, '').slice(0, 40);
-    statusEl.textContent = '✓ 업로드된 파일: ' + name;
+  if (pageTexts.menu08html) {
+    const name = pageTexts.menu08filename || 'HTML 파일';
+    statusEl.textContent = '✓ 저장된 파일: ' + name;
     btnEl.textContent    = '📄 ' + name;
   } else {
     statusEl.textContent = '';
@@ -5384,24 +5405,15 @@ async function savePageEdit() {
     }
   }
 
-  // 08번 HTML 파일: 새 파일이 있으면 Storage에 업로드
-  if (_menu08PendingFile) {
-    const okEl = document.getElementById('pe-save-ok');
-    okEl.textContent = '⏳ HTML 파일 업로드 중...'; okEl.classList.add('show');
-    try {
-      const prevUrl = pageTexts.menu08blobUrl;
-      const url = await uploadToStorage(_menu08PendingFile);
-      pageTexts.menu08blobUrl = url;
-      // HTML 파일 사용 시 URL 입력 칸은 무시
-      pageTexts.menu08url = '';
-      _menu08PendingFile = null;
-      if (prevUrl) await deleteFromStorage(prevUrl).catch(() => {});
-      syncMenu08FileStatus();
-    } catch(e) {
-      okEl.textContent = '⚠ HTML 파일 업로드 실패';
-      setTimeout(() => { okEl.classList.remove('show'); okEl.textContent = '✓ 저장되었습니다'; }, 2500);
-      return;
-    }
+  // 08번 HTML 파일: 텍스트로 읽어 pageTexts에 직접 저장
+  if (_menu08PendingFile && _menu08HtmlContent) {
+    pageTexts.menu08html     = _menu08HtmlContent;
+    pageTexts.menu08filename = _menu08PendingFile.name;
+    pageTexts.menu08url      = ''; // URL 입력은 무시
+    delete pageTexts.menu08blobUrl;
+    _menu08PendingFile  = null;
+    _menu08HtmlContent  = null;
+    syncMenu08FileStatus();
   }
 
   savePage();
