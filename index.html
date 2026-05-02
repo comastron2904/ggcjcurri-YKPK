@@ -4358,10 +4358,10 @@ function openMenu07() {
   window.open(url, '_blank', 'noopener,noreferrer');
 }
 
-function openMenu08() {
-  const url      = pageTexts.menu08url;
-  const htmlCode = pageTexts.menu08html || null;
-  const title    = pageTexts.menu08 || document.getElementById('menu-08').textContent || '테스트';
+async function openMenu08() {
+  const storageUrl = pageTexts.menu08storageUrl || null;
+  const url        = pageTexts.menu08url || null;
+  const title      = pageTexts.menu08 || document.getElementById('menu-08').textContent || '테스트';
 
   const titleEl  = document.getElementById('iframe-screen-title');
   if (titleEl) titleEl.textContent = title;
@@ -4369,14 +4369,27 @@ function openMenu08() {
   const iframeEl = document.getElementById('iframe-embed');
   const noUrlEl  = document.getElementById('iframe-no-url');
 
-  if (htmlCode) {
-    // HTML 파일 내용을 srcdoc으로 직접 실행
-    iframeEl.removeAttribute('src');
-    iframeEl.srcdoc = htmlCode;
-    iframeEl.style.display = '';
-    if (noUrlEl) noUrlEl.style.display = 'none';
+  document.getElementById('iframe-screen').classList.add('open');
+
+  if (storageUrl) {
+    // Storage에서 HTML 텍스트를 fetch해서 srcdoc으로 실행
+    iframeEl.removeAttribute('srcdoc');
+    iframeEl.src = '';
+    iframeEl.style.display = 'none';
+    if (noUrlEl) noUrlEl.style.display = '';
+    noUrlEl.innerHTML = '<span>⏳</span> 파일을 불러오는 중...';
+    try {
+      const res = await fetch(storageUrl);
+      if (!res.ok) throw new Error('fetch 실패 ' + res.status);
+      const html = await res.text();
+      iframeEl.srcdoc = html;
+      iframeEl.style.display = '';
+      if (noUrlEl) noUrlEl.style.display = 'none';
+    } catch(e) {
+      noUrlEl.innerHTML = '<span>⚠</span> 파일 로드 실패<br><span style="font-size:12px;opacity:0.6">' + e.message + '</span>';
+    }
   } else if (url) {
-    // 외부 URL을 src로 로드
+    // 외부 URL은 src로 로드
     iframeEl.removeAttribute('srcdoc');
     iframeEl.src = url;
     iframeEl.style.display = '';
@@ -4385,9 +4398,11 @@ function openMenu08() {
     iframeEl.removeAttribute('srcdoc');
     iframeEl.src = '';
     iframeEl.style.display = 'none';
-    if (noUrlEl) noUrlEl.style.display = '';
+    if (noUrlEl) {
+      noUrlEl.innerHTML = '<span>🔗</span> URL이 설정되지 않았습니다.<br><span style="font-size:12px;opacity:0.6">메인 화면 편집에서 08번 메뉴 URL을 입력하세요</span>';
+      noUrlEl.style.display = '';
+    }
   }
-  document.getElementById('iframe-screen').classList.add('open');
 }
 
 function closeIframeScreen() {
@@ -4398,7 +4413,7 @@ function closeIframeScreen() {
   }, 300);
 }
 
-/* ── 08번 HTML 파일 처리 (srcdoc 방식) ── */
+/* ── 08번 HTML 파일 처리 (Storage 업로드 → fetch → srcdoc) ── */
 let _menu08PendingFile = null;
 let _menu08HtmlContent = null; // 읽어온 HTML 문자열
 
@@ -4409,7 +4424,7 @@ function onMenu08FileChange(input) {
   const statusEl = document.getElementById('pe-menu-08-file-status');
   const btnEl    = document.getElementById('pe-menu-08-file-btn');
 
-  // 파일을 텍스트로 읽기
+  // 미리 텍스트로 읽어둠 (저장 시 srcdoc 미리보기용)
   const reader = new FileReader();
   reader.onload = function(e) {
     _menu08HtmlContent = e.target.result;
@@ -4431,10 +4446,11 @@ function onMenu08FileChange(input) {
 async function clearMenu08File() {
   _menu08PendingFile = null;
   _menu08HtmlContent = null;
-  // DB에서 저장된 HTML 삭제
-  if (pageTexts.menu08html) {
-    delete pageTexts.menu08html;
-    delete pageTexts.menu08blobUrl;
+  // Storage에서 기존 파일 삭제
+  if (pageTexts.menu08storageUrl) {
+    await deleteFromStorage(pageTexts.menu08storageUrl).catch(() => {});
+    delete pageTexts.menu08storageUrl;
+    delete pageTexts.menu08filename;
     savePage();
   }
   const statusEl = document.getElementById('pe-menu-08-file-status');
@@ -4443,12 +4459,11 @@ async function clearMenu08File() {
   if (btnEl)    btnEl.textContent    = '📂 HTML 파일 선택';
 }
 
-/* openPageEdit 에서 08번 파일 상태 복원 */
 function syncMenu08FileStatus() {
   const statusEl = document.getElementById('pe-menu-08-file-status');
   const btnEl    = document.getElementById('pe-menu-08-file-btn');
   if (!statusEl || !btnEl) return;
-  if (pageTexts.menu08html) {
+  if (pageTexts.menu08storageUrl) {
     const name = pageTexts.menu08filename || 'HTML 파일';
     statusEl.textContent = '✓ 저장된 파일: ' + name;
     btnEl.textContent    = '📄 ' + name;
@@ -5405,15 +5420,28 @@ async function savePageEdit() {
     }
   }
 
-  // 08번 HTML 파일: 텍스트로 읽어 pageTexts에 직접 저장
+  // 08번 HTML 파일: Storage에 업로드 후 URL만 저장
   if (_menu08PendingFile && _menu08HtmlContent) {
-    pageTexts.menu08html     = _menu08HtmlContent;
-    pageTexts.menu08filename = _menu08PendingFile.name;
-    pageTexts.menu08url      = ''; // URL 입력은 무시
-    delete pageTexts.menu08blobUrl;
-    _menu08PendingFile  = null;
-    _menu08HtmlContent  = null;
-    syncMenu08FileStatus();
+    const okEl = document.getElementById('pe-save-ok');
+    okEl.textContent = '⏳ HTML 파일 업로드 중...'; okEl.classList.add('show');
+    try {
+      // Content-Type을 text/html로 지정해서 업로드
+      const htmlFile = new File([_menu08HtmlContent], _menu08PendingFile.name, { type: 'text/html' });
+      const prevUrl  = pageTexts.menu08storageUrl;
+      const url      = await uploadToStorage(htmlFile);
+      pageTexts.menu08storageUrl = url;
+      pageTexts.menu08filename   = _menu08PendingFile.name;
+      pageTexts.menu08url        = ''; // URL 입력 무시
+      delete pageTexts.menu08html; // 구버전 키 정리
+      _menu08PendingFile = null;
+      _menu08HtmlContent = null;
+      if (prevUrl) await deleteFromStorage(prevUrl).catch(() => {});
+      syncMenu08FileStatus();
+    } catch(e) {
+      okEl.textContent = '⚠ HTML 파일 업로드 실패: ' + e.message;
+      setTimeout(() => { okEl.classList.remove('show'); okEl.textContent = '✓ 저장되었습니다'; }, 3000);
+      return;
+    }
   }
 
   savePage();
