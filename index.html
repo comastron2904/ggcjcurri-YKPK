@@ -833,7 +833,7 @@
   .nav-btn:nth-child(1){animation-delay:.10s} .nav-btn:nth-child(2){animation-delay:.15s}
   .nav-btn:nth-child(3){animation-delay:.20s} .nav-btn:nth-child(4){animation-delay:.25s}
   .nav-btn:nth-child(5){animation-delay:.30s} .nav-btn:nth-child(6){animation-delay:.35s}
-  .nav-btn:nth-child(7){animation-delay:.40s}
+  .nav-btn:nth-child(7){animation-delay:.40s} .nav-btn:nth-child(8){animation-delay:.45s}
   .btn-number { font-family: 'Noto Serif KR', serif; font-size: 22px; font-weight: 900; color: var(--gold); opacity: 0.75; min-width: 32px; line-height: 1; transition: opacity 0.3s; }
   .nav-btn:hover .btn-number { opacity: 1; }
   .btn-title { flex: 1; font-size: 15px; font-weight: 700; color: rgba(26,46,74,0.92); letter-spacing: 0.3px; line-height: 1.4; transition: color 0.3s; }
@@ -2698,8 +2698,44 @@
   }
   .gb-fullscreen-btn:hover { background: rgba(26,107,191,0.10); border-color: var(--gold); color: var(--gold); }
 
-  /* 패널 전체화면 오버레이 */
-  .gb-panel-fullscreen {
+  /* ══════════════════════════════════════
+     외부 사이트 iframe 화면 (메뉴 08)
+  ══════════════════════════════════════ */
+  #iframe-screen {
+    position: fixed; inset: 0; background: #f0f4f8; z-index: 700;
+    display: flex; flex-direction: column;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+  }
+  #iframe-screen.open { opacity: 1; pointer-events: all; }
+  .iframe-header {
+    flex-shrink: 0; padding: 16px 28px;
+    border-bottom: 1px solid rgba(26,107,191,0.14);
+    background: #f0f4f8;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .iframe-back {
+    display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px;
+    background: linear-gradient(135deg, rgba(26,107,191,0.15), rgba(14,74,138,0.08));
+    border: 1.5px solid rgba(26,107,191,0.65); color: var(--gold);
+    font-family: 'Noto Sans KR', sans-serif; font-size: 13px; font-weight: 700;
+    cursor: pointer; letter-spacing: 1px; transition: all 0.2s; flex-shrink: 0;
+    border-radius: 3px;
+  }
+  .iframe-back:hover { background: rgba(26,107,191,0.22); transform: translateX(-2px); }
+  .iframe-title-bar { flex: 1; }
+  .iframe-title-label { font-size: 10px; letter-spacing: 3px; color: rgba(26,46,74,0.55); }
+  .iframe-title-name { font-family: 'Noto Serif KR', serif; font-size: 18px; font-weight: 900; color: #0a1a30; }
+  #iframe-screen iframe {
+    flex: 1; width: 100%; border: none;
+    background: #fff;
+  }
+  .iframe-no-url {
+    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 14px; color: rgba(26,46,74,0.45); font-size: 14px; letter-spacing: 1px;
+  }
+  .iframe-no-url span { font-size: 36px; }
+
+
     position: fixed; inset: 0; z-index: 1200;
     background: #1a2e4a;
     display: none; flex-direction: column;
@@ -2786,6 +2822,7 @@
     <button class="nav-btn" onclick="openSuneungScreen()"><span class="btn-number">05</span><span class="btn-title" id="menu-05">2028년 수능</span><span class="btn-arrow">›</span></button>
     <button class="nav-btn" onclick="openGuidebookScreen()"><span class="btn-number">06</span><span class="btn-title" id="menu-06">선택과목 길라잡이 책자</span><span class="btn-arrow">›</span></button>
     <button class="nav-btn" id="nav-btn-07" onclick="openMenu07()"><span class="btn-number">07</span><span class="btn-title" id="menu-07">창조고 선택과목 이수 경로</span><span class="btn-arrow">›</span></button>
+    <button class="nav-btn" id="nav-btn-08" onclick="openMenu08()"><span class="btn-number">08</span><span class="btn-title" id="menu-08">테스트</span><span class="btn-arrow">›</span></button>
   </div>
 </section>
 
@@ -3031,6 +3068,25 @@
         <div class="pe-menu-item" style="margin-top:6px">
           <span class="pe-menu-num" style="font-size:10px;color:rgba(201,168,76,0.35);letter-spacing:1px">URL</span>
           <input class="pe-menu-input" id="pe-menu-07-url" placeholder="https://example.com (비워두면 비활성)" style="font-size:12px;color:rgba(255,255,255,0.55);" />
+        </div>
+        <div class="pe-menu-item" style="margin-top:10px"><span class="pe-menu-num">08</span><input class="pe-menu-input" id="pe-menu-08" placeholder="테스트" /></div>
+        <div class="pe-menu-item" style="margin-top:6px">
+          <span class="pe-menu-num" style="font-size:10px;color:rgba(201,168,76,0.35);letter-spacing:1px">URL</span>
+          <input class="pe-menu-input" id="pe-menu-08-url" placeholder="https://example.com" style="font-size:12px;color:rgba(255,255,255,0.55);" />
+        </div>
+        <div style="margin-top:8px;padding-left:34px;display:flex;flex-direction:column;gap:6px;">
+          <div style="font-size:10px;letter-spacing:1.5px;color:rgba(26,46,74,0.60);">또는 HTML 파일 업로드</div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <button type="button" id="pe-menu-08-file-btn" onclick="document.getElementById('pe-menu-08-file-input').click()"
+              style="flex:1;padding:9px 14px;text-align:left;background:rgba(26,107,191,0.05);border:1px dashed rgba(26,107,191,0.28);color:rgba(26,46,74,0.60);font-family:'Noto Sans KR',sans-serif;font-size:12px;cursor:pointer;transition:all 0.2s;letter-spacing:0.5px;">
+              📂 HTML 파일 선택
+            </button>
+            <button type="button" id="pe-menu-08-file-clear" onclick="clearMenu08File()"
+              style="padding:9px 12px;background:none;border:1px solid rgba(26,107,191,0.15);color:rgba(26,46,74,0.45);font-size:13px;cursor:pointer;transition:all 0.2s;flex-shrink:0;"
+              title="파일 삭제">✕</button>
+          </div>
+          <div id="pe-menu-08-file-status" style="font-size:11px;color:rgba(26,107,191,0.75);letter-spacing:0.3px;min-height:16px;"></div>
+          <input type="file" id="pe-menu-08-file-input" accept=".html,.htm" style="display:none" onchange="onMenu08FileChange(this)">
         </div>
       </div>
 
@@ -4246,7 +4302,7 @@ function applyPageTexts() {
   if (p.divider)      document.getElementById('txt-divider').textContent      = p.divider;
   if (p.sectionLabel) document.getElementById('txt-section-label').textContent = p.sectionLabel;
   if (p.footer)       document.getElementById('txt-footer').textContent       = p.footer;
-  for (let i = 1; i <= 7; i++) {
+  for (let i = 1; i <= 8; i++) {
     const k = 'menu' + String(i).padStart(2,'0');
     if (p[k]) document.getElementById('menu-' + String(i).padStart(2,'0')).textContent = p[k];
   }
@@ -4259,6 +4315,17 @@ function applyPageTexts() {
     } else {
       btn07.style.opacity = '0.2';
       btn07.title = 'URL이 설정되지 않았습니다';
+    }
+  }
+  // 08 버튼 링크 유무에 따라 스타일 처리
+  const btn08 = document.getElementById('nav-btn-08');
+  if (btn08) {
+    if (p.menu08url) {
+      btn08.style.opacity = '';
+      btn08.title = p.menu08url;
+    } else {
+      btn08.style.opacity = '0.45';
+      btn08.title = 'URL이 설정되지 않았습니다';
     }
   }
   // 학기별 개설과목 열 헤더 적용
@@ -4289,6 +4356,85 @@ function openMenu07() {
   const url = pageTexts.menu07url;
   if (!url) return;
   window.open(url, '_blank', 'noopener,noreferrer');
+}
+
+function openMenu08() {
+  const url   = pageTexts.menu08url;
+  const blobUrl = pageTexts.menu08blobUrl || null; // Storage 공개 URL
+  const title = pageTexts.menu08 || document.getElementById('menu-08').textContent || '테스트';
+
+  const titleEl = document.getElementById('iframe-screen-title');
+  if (titleEl) titleEl.textContent = title;
+
+  const iframeEl = document.getElementById('iframe-embed');
+  const noUrlEl  = document.getElementById('iframe-no-url');
+
+  // 우선순위: HTML 파일(blobUrl) > URL 입력
+  const src = blobUrl || url || '';
+  if (src) {
+    iframeEl.src = src;
+    iframeEl.style.display = '';
+    if (noUrlEl) noUrlEl.style.display = 'none';
+  } else {
+    iframeEl.src = '';
+    iframeEl.style.display = 'none';
+    if (noUrlEl) noUrlEl.style.display = '';
+  }
+  document.getElementById('iframe-screen').classList.add('open');
+}
+
+function closeIframeScreen() {
+  document.getElementById('iframe-screen').classList.remove('open');
+  setTimeout(() => {
+    const iframeEl = document.getElementById('iframe-embed');
+    if (iframeEl) iframeEl.src = '';
+  }, 300);
+}
+
+/* ── 08번 HTML 파일 업로드 처리 ── */
+let _menu08PendingFile = null;
+
+function onMenu08FileChange(input) {
+  const file = input.files[0];
+  if (!file) return;
+  _menu08PendingFile = file;
+  const statusEl = document.getElementById('pe-menu-08-file-status');
+  const btnEl    = document.getElementById('pe-menu-08-file-btn');
+  if (statusEl) statusEl.textContent = '📄 ' + file.name + ' — 저장 시 업로드됩니다';
+  if (btnEl)    btnEl.textContent    = '📄 ' + file.name;
+  // URL 입력 칸을 비워서 파일 우선 사용임을 명시
+  const urlEl = document.getElementById('pe-menu-08-url');
+  if (urlEl) urlEl.value = '';
+  input.value = '';
+}
+
+async function clearMenu08File() {
+  _menu08PendingFile = null;
+  // Supabase Storage에서 기존 파일 삭제
+  if (pageTexts.menu08blobUrl) {
+    await deleteFromStorage(pageTexts.menu08blobUrl).catch(() => {});
+    delete pageTexts.menu08blobUrl;
+    savePage();
+  }
+  const statusEl = document.getElementById('pe-menu-08-file-status');
+  const btnEl    = document.getElementById('pe-menu-08-file-btn');
+  if (statusEl) statusEl.textContent = '';
+  if (btnEl)    btnEl.textContent    = '📂 HTML 파일 선택';
+}
+
+/* openPageEdit 에서 08번 파일 상태 복원 */
+function syncMenu08FileStatus() {
+  const statusEl = document.getElementById('pe-menu-08-file-status');
+  const btnEl    = document.getElementById('pe-menu-08-file-btn');
+  if (!statusEl || !btnEl) return;
+  if (pageTexts.menu08blobUrl) {
+    const name = decodeURIComponent(pageTexts.menu08blobUrl.split('/').pop()).replace(/^\d+_[a-z0-9]+\./, '').slice(0, 40);
+    statusEl.textContent = '✓ 업로드된 파일: ' + name;
+    btnEl.textContent    = '📄 ' + name;
+  } else {
+    statusEl.textContent = '';
+    btnEl.textContent    = '📂 HTML 파일 선택';
+  }
 }
 
 /* ──────────────────────────────
@@ -5159,12 +5305,16 @@ function openPageEdit() {
   g('pe-divider').value      = p.divider      ?? g('txt-divider').textContent;
   g('pe-section-label').value = p.sectionLabel ?? g('txt-section-label').textContent;
   g('pe-footer').value       = p.footer       ?? g('txt-footer').textContent;
-  for (let i = 1; i <= 7; i++) {
+  for (let i = 1; i <= 8; i++) {
     const k = 'menu' + String(i).padStart(2,'0');
     const el = g('pe-menu-' + String(i).padStart(2,'0'));
     if (el) el.value = p[k] ?? (g('menu-' + String(i).padStart(2,'0'))?.textContent || '');
   }
   g('pe-menu-07-url').value = p.menu07url ?? '';
+  g('pe-menu-08-url').value = p.menu08url ?? '';
+  // 08번 HTML 파일 상태 복원
+  _menu08PendingFile = null;
+  syncMenu08FileStatus();
   // 배경 이미지 미리보기 복원
   pendingBgBase64 = null;
   const bgPreview = document.getElementById('pe-bg-preview');
@@ -5207,8 +5357,9 @@ async function savePageEdit() {
     footer:       g('pe-footer'),
     bgOpacity:    document.getElementById('pe-bg-opacity').value,
     menu07url:    document.getElementById('pe-menu-07-url').value.trim(),
+    menu08url:    document.getElementById('pe-menu-08-url').value.trim(),
   });
-  for (let i = 1; i <= 7; i++) {
+  for (let i = 1; i <= 8; i++) {
     const k = 'menu' + String(i).padStart(2,'0');
     pageTexts[k] = document.getElementById('pe-menu-' + String(i).padStart(2,'0')).value.trim();
   }
@@ -5228,6 +5379,26 @@ async function savePageEdit() {
       if (prevUrl) await deleteFromStorage(prevUrl).catch(() => {});
     } catch(e) {
       okEl.textContent = '⚠ 이미지 업로드 실패'; 
+      setTimeout(() => { okEl.classList.remove('show'); okEl.textContent = '✓ 저장되었습니다'; }, 2500);
+      return;
+    }
+  }
+
+  // 08번 HTML 파일: 새 파일이 있으면 Storage에 업로드
+  if (_menu08PendingFile) {
+    const okEl = document.getElementById('pe-save-ok');
+    okEl.textContent = '⏳ HTML 파일 업로드 중...'; okEl.classList.add('show');
+    try {
+      const prevUrl = pageTexts.menu08blobUrl;
+      const url = await uploadToStorage(_menu08PendingFile);
+      pageTexts.menu08blobUrl = url;
+      // HTML 파일 사용 시 URL 입력 칸은 무시
+      pageTexts.menu08url = '';
+      _menu08PendingFile = null;
+      if (prevUrl) await deleteFromStorage(prevUrl).catch(() => {});
+      syncMenu08FileStatus();
+    } catch(e) {
+      okEl.textContent = '⚠ HTML 파일 업로드 실패';
       setTimeout(() => { okEl.classList.remove('show'); okEl.textContent = '✓ 저장되었습니다'; }, 2500);
       return;
     }
@@ -7926,6 +8097,28 @@ window.addEventListener('resize', function() {
   requestAnimationFrame(() => syncSubtypeZoneHeights());
 });
 </script>
+
+<!-- ═══════════════════════════════════════
+     외부 사이트 iframe 화면 (메뉴 08)
+═══════════════════════════════════════ -->
+<div id="iframe-screen">
+  <div class="iframe-header">
+    <button class="iframe-back" onclick="closeIframeScreen()">&#9664; 뒤로</button>
+    <div class="iframe-title-bar">
+      <div class="iframe-title-label">EXTERNAL SITE · 외부 사이트</div>
+      <div class="iframe-title-name" id="iframe-screen-title">테스트</div>
+    </div>
+    <button class="detail-home" onclick="closeIframeScreen()" title="메인화면으로">🏠</button>
+  </div>
+  <div id="iframe-body" style="flex:1;display:flex;flex-direction:column;">
+    <div class="iframe-no-url" id="iframe-no-url">
+      <span>🔗</span>
+      URL이 설정되지 않았습니다.<br>
+      <span style="font-size:12px;opacity:0.6">메인 화면 편집에서 08번 메뉴 URL을 입력하세요</span>
+    </div>
+    <iframe id="iframe-embed" src="" style="display:none;flex:1;width:100%;border:none;" allowfullscreen></iframe>
+  </div>
+</div>
 
 <div id="dept-save-toast"></div>
 
