@@ -2533,6 +2533,124 @@
   }
   #suneung-screen.open { opacity: 1; pointer-events: all; }
   #suneung-screen .dept-detail-body { overflow-y: auto; flex: 1; }
+  #suneung-main-view { flex: 1; overflow-y: auto; }
+
+  /* 카드 그리드 */
+  .sn-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+    padding: 28px 32px;
+  }
+  @media (max-width: 600px) {
+    .sn-cards-grid { grid-template-columns: 1fr; padding: 18px 16px; gap: 12px; }
+  }
+
+  /* 개별 카드 버튼 (일반 보기) */
+  .sn-card-btn {
+    display: flex; align-items: center; gap: 16px;
+    padding: 20px 22px;
+    background: #ffffff;
+    border: 1px solid rgba(26,107,191,0.18);
+    cursor: pointer; text-align: left;
+    transition: all 0.22s ease;
+    box-shadow: 0 2px 10px rgba(26,107,191,0.06);
+    position: relative;
+  }
+  .sn-card-btn:hover {
+    border-color: rgba(26,107,191,0.55);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 22px rgba(26,107,191,0.16);
+  }
+  .sn-card-icon { font-size: 28px; flex-shrink: 0; line-height: 1; }
+  .sn-card-info { flex: 1; min-width: 0; }
+  .sn-card-title {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 15px; font-weight: 600;
+    color: var(--white); margin-bottom: 4px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .sn-card-meta { font-size: 11px; color: rgba(26,46,74,0.42); letter-spacing: 0.5px; }
+  .sn-card-arrow { font-size: 20px; color: rgba(26,107,191,0.40); flex-shrink: 0; }
+
+  /* 편집 모드 카드 래퍼 */
+  .sn-card-edit-wrap {
+    background: #ffffff;
+    border: 1px solid rgba(26,107,191,0.22);
+    padding: 18px 20px 14px;
+    box-shadow: 0 2px 10px rgba(26,107,191,0.06);
+    position: relative;
+  }
+  .sn-card-edit-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .sn-card-edit-num {
+    font-family: 'Noto Serif KR', serif; font-size: 18px; font-weight: 900;
+    color: rgba(26,107,191,0.6); min-width: 28px; flex-shrink: 0;
+  }
+  .sn-card-title-input {
+    flex: 1; background: rgba(26,107,191,0.05);
+    border: 1px solid rgba(26,107,191,0.18);
+    color: var(--white); font-family: 'Noto Sans KR', sans-serif;
+    font-size: 14px; padding: 9px 12px; outline: none;
+    transition: border-color 0.2s;
+  }
+  .sn-card-title-input:focus { border-color: var(--gold); }
+  .sn-card-title-input::placeholder { color: rgba(26,46,74,0.3); font-size: 12px; }
+
+  .sn-card-file-zone {
+    border: 1px dashed rgba(26,107,191,0.28);
+    background: rgba(26,107,191,0.03);
+    padding: 10px 14px; cursor: pointer;
+    font-size: 12px; color: rgba(26,46,74,0.50);
+    text-align: center; transition: all 0.2s; margin-bottom: 8px;
+  }
+  .sn-card-file-zone:hover { border-color: var(--gold); color: var(--gold); background: rgba(26,107,191,0.06); }
+  .sn-card-file-list { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; }
+  .sn-card-file-item {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 11px; color: rgba(26,46,74,0.65);
+    padding: 5px 8px; background: rgba(26,107,191,0.05);
+    border: 1px solid rgba(26,107,191,0.10);
+  }
+  .sn-card-file-item-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .sn-card-file-item-del {
+    background: none; border: none; color: var(--danger);
+    font-size: 11px; cursor: pointer; padding: 0 2px; flex-shrink: 0;
+  }
+  .sn-card-actions {
+    display: flex; align-items: center; gap: 6px;
+    margin-top: 10px; padding-top: 10px;
+    border-top: 1px solid rgba(26,107,191,0.08);
+  }
+  .sn-card-act-btn {
+    background: rgba(26,107,191,0.07); border: 1px solid rgba(26,107,191,0.15);
+    color: rgba(26,46,74,0.60); font-size: 11px; padding: 4px 10px; cursor: pointer;
+    transition: all 0.18s;
+  }
+  .sn-card-act-btn:hover { background: rgba(26,107,191,0.14); border-color: var(--gold); color: var(--gold); }
+  .sn-card-act-btn.del { color: var(--danger); border-color: rgba(214,48,48,0.20); }
+  .sn-card-act-btn.del:hover { background: rgba(214,48,48,0.08); border-color: var(--danger); }
+  .sn-card-spacer { flex: 1; }
+
+  /* 파일 뷰어 화면 */
+  .sn-fv-header {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 22px; background: #ffffff;
+    border-bottom: 1px solid rgba(26,107,191,0.12);
+    flex-shrink: 0;
+  }
+  .sn-fv-back {
+    background: none; border: 1px solid rgba(26,107,191,0.25);
+    color: var(--gold); font-family: 'Noto Sans KR', sans-serif;
+    font-size: 12px; padding: 7px 14px; cursor: pointer;
+    transition: all 0.18s; flex-shrink: 0;
+  }
+  .sn-fv-back:hover { background: rgba(26,107,191,0.08); border-color: var(--gold); }
+  .sn-fv-title {
+    font-family: 'Noto Serif KR', serif; font-size: 16px; font-weight: 700;
+    color: var(--white); flex: 1;
+  }
+  .sn-fv-body { flex: 1; overflow-y: auto; padding: 24px 32px; display: flex; flex-direction: column; gap: 20px; }
+  @media (max-width: 600px) { .sn-fv-body { padding: 16px; } }
 
   /* ══════════════════════════════════════
      선택과목 길라잡이 책자 화면
@@ -3978,7 +4096,7 @@
     <div class="dept-detail-icon">📚</div>
     <div class="dept-detail-header-info">
       <div class="dept-detail-label">SUNEUNG 2028 · 수능 안내</div>
-      <div class="dept-detail-name">2028년 수능</div>
+      <div class="dept-detail-name" id="suneung-screen-title">2028년 수능</div>
     </div>
     <button class="dd-edit-btn" id="suneung-edit-btn" onclick="openSuneungEditPw()" title="편집 모드">🔒 편집</button>
     <button class="detail-home" onclick="closeSuneungScreen()" title="메인화면으로">🏠</button>
@@ -3988,21 +4106,29 @@
   <div class="dd-toolbar" id="suneung-toolbar">
     <div class="dd-toolbar-inner">
       <span class="dd-toolbar-label">편집 모드</span>
-      <button class="dd-tool-btn" onclick="suneungAddBlock('title')">＋ 제목</button>
-      <button class="dd-tool-btn" onclick="suneungAddBlock('text')">＋ 텍스트</button>
-      <button class="dd-tool-btn" onclick="suneungAddBlock('file')">＋ 파일/사진/PDF</button>
-      <button class="dd-tool-btn dd-save-btn" onclick="saveSuneungBlocks()">💾 저장</button>
+      <button class="dd-tool-btn" onclick="suneungAddCard()">＋ 버튼 추가</button>
+      <button class="dd-tool-btn dd-save-btn" onclick="saveSuneungCards()">💾 저장</button>
       <button class="dd-tool-btn dd-exit-btn" onclick="exitSuneungEdit()">✕ 편집 종료</button>
     </div>
   </div>
 
-  <div class="dept-detail-body">
-    <div id="suneung-blocks-wrap"></div>
-    <div class="dept-blocks-empty" id="suneung-blocks-empty">
+  <!-- 메인 뷰: 카드 버튼 목록 -->
+  <div class="dept-detail-body" id="suneung-main-view">
+    <div id="suneung-cards-wrap" class="sn-cards-grid"></div>
+    <div class="dept-blocks-empty" id="suneung-cards-empty">
       <span style="font-size:32px;display:block;margin-bottom:14px;opacity:0.4">📚</span>
-      등록된 내용이 없습니다.<br>
-      <span style="font-size:11px;color:rgba(255,255,255,0.15)">관리자가 편집 모드에서 내용을 추가할 수 있습니다</span>
+      등록된 버튼이 없습니다.<br>
+      <span style="font-size:11px;color:rgba(26,46,74,0.35)">편집 모드에서 ＋ 버튼 추가를 눌러 항목을 만드세요</span>
     </div>
+  </div>
+
+  <!-- 파일 뷰어 화면 (버튼 클릭 시 전환) -->
+  <div id="suneung-file-view" style="display:none;flex:1;flex-direction:column;overflow:hidden;">
+    <div class="sn-fv-header">
+      <button class="sn-fv-back" onclick="closeSuneungFileView()">◀ 목록으로</button>
+      <div class="sn-fv-title" id="sn-fv-title-text"></div>
+    </div>
+    <div class="sn-fv-body" id="sn-fv-body"></div>
   </div>
 </div>
 
@@ -7504,235 +7630,171 @@ function exitEnrollEdit() {
 ────────────────────────────── */
 const SUNEUNG_KEY = 'cg_suneung';
 let suneungEditMode = false;
-let suneungBlocks   = [];
+let suneungCards = []; // [{id, title, files:[{name,type,url,size}]}]
 
 function openSuneungScreen() {
   suneungEditMode = false;
   document.getElementById('suneung-edit-btn').classList.remove('active');
   document.getElementById('suneung-toolbar').classList.remove('show');
-  document.getElementById('suneung-blocks-wrap').classList.remove('editing-mode');
-  loadSuneungBlocks();
+  closeSuneungFileView();
+  loadSuneungCards();
   document.getElementById('suneung-screen').classList.add('open');
 }
 function closeSuneungScreen() {
   if (suneungEditMode) exitSuneungEdit();
+  closeSuneungFileView();
   document.getElementById('suneung-screen').classList.remove('open');
 }
 
-async function loadSuneungBlocks() {
-  try { const _s = await sbGet(SUNEUNG_KEY); suneungBlocks = Array.isArray(_s) ? _s : []; }
-  catch(e) { suneungBlocks = []; }
-  renderSuneungBlocks();
+async function loadSuneungCards() {
+  try { const _s = await sbGet(SUNEUNG_KEY); suneungCards = Array.isArray(_s) ? _s : []; }
+  catch(e) { suneungCards = []; }
+  renderSuneungCards();
 }
 
-async function saveSuneungBlocks() {
-  suneungBlocks.forEach(b => {
-    if (b.type === 'text' || b.type === 'title') {
-      const ta = document.getElementById('sta-' + b.id);
-      if (ta) b.text = ta.value;
-    }
+async function saveSuneungCards() {
+  // title input 동기화
+  suneungCards.forEach(c => {
+    const inp = document.getElementById('sn-title-' + c.id);
+    if (inp) c.title = inp.value;
   });
-  try { await sbSet(SUNEUNG_KEY, suneungBlocks); }
+  try { await sbSet(SUNEUNG_KEY, suneungCards); }
   catch(e) { alert('저장 공간이 부족합니다.'); return; }
   showDeptToast('✓ 저장되었습니다');
-  renderSuneungBlocks();
+  renderSuneungCards();
 }
 
-function renderSuneungBlocks() {
-  const wrap  = document.getElementById('suneung-blocks-wrap');
-  const empty = document.getElementById('suneung-blocks-empty');
+function renderSuneungCards() {
+  const wrap  = document.getElementById('suneung-cards-wrap');
+  const empty = document.getElementById('suneung-cards-empty');
   wrap.innerHTML = '';
-  empty.style.display = suneungBlocks.length === 0 ? 'block' : 'none';
-  suneungBlocks.forEach((b, idx) => wrap.appendChild(createSuneungBlockEl(b, idx)));
-  if (suneungEditMode) wrap.classList.add('editing-mode');
-  else wrap.classList.remove('editing-mode');
+  empty.style.display = suneungCards.length === 0 ? 'block' : 'none';
+  suneungCards.forEach((c, idx) => wrap.appendChild(suneungEditMode ? createSuneungCardEdit(c, idx) : createSuneungCardView(c)));
 }
 
-function createSuneungBlockEl(b, idx) {
-  const div = document.createElement('div');
-  div.className = 'dept-block' + (suneungEditMode ? ' editing' : '');
-  div.id = 'sblock-' + b.id;
-  div.innerHTML = `
-    <div class="dept-block-handle">
-      <span class="dept-block-type-badge">${b.type === 'title' ? 'TITLE' : b.type === 'text' ? 'TEXT' : 'FILE'}</span>
-      <div class="dept-block-actions">
-        ${idx > 0 ? `<button class="dept-block-action-btn" onclick="moveSuneungBlock('${b.id}',-1)">▲</button>` : ''}
-        ${idx < suneungBlocks.length-1 ? `<button class="dept-block-action-btn" onclick="moveSuneungBlock('${b.id}',1)">▼</button>` : ''}
-        <button class="dept-block-action-btn del" onclick="deleteSuneungBlock('${b.id}')">삭제</button>
-      </div>
+/* 일반 보기: 클릭 → 파일 뷰어 */
+function createSuneungCardView(c) {
+  const fileCount = (c.files || []).length;
+  const btn = document.createElement('button');
+  btn.className = 'sn-card-btn';
+  btn.onclick = () => openSuneungFileView(c);
+  btn.innerHTML = `
+    <div class="sn-card-icon">📄</div>
+    <div class="sn-card-info">
+      <div class="sn-card-title">${escHtml(c.title || '(제목 없음)')}</div>
+      <div class="sn-card-meta">${fileCount > 0 ? '파일 ' + fileCount + '개' : '파일 없음'}</div>
+    </div>
+    <div class="sn-card-arrow">›</div>`;
+  return btn;
+}
+
+/* 편집 모드: 제목 입력 + 파일 추가 */
+function createSuneungCardEdit(c, idx) {
+  const wrap = document.createElement('div');
+  wrap.className = 'sn-card-edit-wrap';
+  wrap.id = 'sncard-' + c.id;
+  wrap.innerHTML = `
+    <div class="sn-card-edit-row">
+      <span class="sn-card-edit-num">${String(idx+1).padStart(2,'0')}</span>
+      <input class="sn-card-title-input" id="sn-title-${c.id}" value="${escHtml(c.title||'')}" placeholder="버튼 제목을 입력하세요">
+    </div>
+    <div class="sn-card-file-zone" onclick="document.getElementById('snfi-${c.id}').click()">
+      📎 &nbsp; 클릭하여 파일 · 사진 · PDF 추가
+      <input type="file" id="snfi-${c.id}" style="display:none" accept="image/*,application/pdf,*/*" multiple onchange="handleSuneungCardFiles('${c.id}',this)">
+    </div>
+    <div class="sn-card-file-list" id="snfl-${c.id}"></div>
+    <div class="sn-card-actions">
+      ${idx > 0 ? `<button class="sn-card-act-btn" onclick="moveSuneungCard('${c.id}',-1)">▲ 위로</button>` : ''}
+      ${idx < suneungCards.length-1 ? `<button class="sn-card-act-btn" onclick="moveSuneungCard('${c.id}',1)">▼ 아래로</button>` : ''}
+      <span class="sn-card-spacer"></span>
+      <button class="sn-card-act-btn del" onclick="deleteSuneungCard('${c.id}')">🗑 삭제</button>
     </div>`;
-  if (b.type === 'title') {
-    const inner = document.createElement('div');
-    inner.className = 'dept-title-block';
-    inner.innerHTML = `
-      <div class="dept-title-view">${escHtml(b.text || '')}</div>
-      <textarea class="dept-title-edit" id="sta-${b.id}" placeholder="제목을 입력하세요...">${escHtml(b.text || '')}</textarea>`;
-    div.appendChild(inner);
-    setTimeout(() => {
-      const ta = document.getElementById('sta-' + b.id);
-      if (ta) { ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; }
-      if (ta) ta.addEventListener('input', function(){ this.style.height='auto'; this.style.height=this.scrollHeight+'px'; });
-    }, 0);
-  } else if (b.type === 'text') {
-    const inner = document.createElement('div');
-    inner.className = 'dept-text-block';
-    inner.innerHTML = `
-      <div class="dept-text-view">${escHtml(b.text || '')}</div>
-      <textarea class="dept-text-edit" id="sta-${b.id}" placeholder="내용을 입력하세요...">${escHtml(b.text || '')}</textarea>`;
-    div.appendChild(inner);
-    setTimeout(() => {
-      const ta = document.getElementById('sta-' + b.id);
-      if (ta) { ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; }
-      if (ta) ta.addEventListener('input', function(){ this.style.height='auto'; this.style.height=this.scrollHeight+'px'; });
-    }, 0);
-  } else {
-    const inner = document.createElement('div');
-    inner.className = 'dept-file-block';
-    inner.innerHTML = `
-      <div class="dept-file-upload-zone" onclick="document.getElementById('sfi-${b.id}').click()">
-        📎 &nbsp; 클릭하여 사진 · PDF · 파일 추가
-        <input class="dept-file-input" id="sfi-${b.id}" type="file" accept="image/*,application/pdf,*/*" multiple onchange="handleSuneungFiles('${b.id}',this)">
-      </div>
-      <div class="dept-file-items" id="sfitems-${b.id}"></div>`;
-    div.appendChild(inner);
-    setTimeout(() => renderSuneungFileItems(b), 0);
-  }
-  return div;
+  setTimeout(() => renderSuneungCardFileList(c), 0);
+  return wrap;
 }
 
-function renderSuneungFileItems(b) {
-  const wrap = document.getElementById('sfitems-' + b.id);
+function renderSuneungCardFileList(c) {
+  const wrap = document.getElementById('snfl-' + c.id);
   if (!wrap) return;
   wrap.innerHTML = '';
-  (b.files || []).forEach((f, fi) => {
-    const item = document.createElement('div');
-    item.className = 'dept-file-item';
-    item.style.position = 'relative';
+  (c.files || []).forEach((f, fi) => {
+    const row = document.createElement('div');
+    row.className = 'sn-card-file-item';
     if (f._tmpId || !f.url) {
-      item.innerHTML = `<div class="dept-generic-file" style="opacity:0.5">
-        <div class="dept-generic-file-icon">⏳</div>
-        <div class="dept-generic-file-info">
-          <div class="dept-generic-file-name">${escHtml(f.name)}</div>
-          <div class="dept-generic-file-size">업로드 중...</div>
-        </div>
-      </div>`;
-      wrap.appendChild(item);
-      return;
-    }
-    const delBtn = `<button class="dept-file-item-del" onclick="deleteSuneungFile('${b.id}',${fi})">✕ 삭제</button>`;
-    if (f.type === 'image') {
-      item.innerHTML = `${delBtn}<img class="dept-img-preview" src="${f.url}" alt="${escHtml(f.name)}"><div class="dept-img-caption">${escHtml(f.name)}</div>`;
-    } else if (f.type === 'pdf') {
-      const vid = 'spdfv-' + b.id + '-' + fi;
-      item.innerHTML = `${delBtn}
-        <div class="dept-pdf-viewer" id="${vid}">
-          <div class="dept-pdf-topbar">
-            <span class="dept-pdf-filename">📄 ${escHtml(f.name)}</span>
-            <span class="dept-pdf-pageinfo" id="${vid}-pi">로딩 중...</span>
-            <button class="dept-pdf-fs-btn" onclick="openPdfFs('${vid}','pdfv')" title="전체화면">⛶</button>
-          </div>
-          <div class="dept-pdf-stage" id="${vid}-stage">
-            <div class="dept-pdf-loading" id="${vid}-loading"><div class="dept-pdf-spinner"></div><span>PDF 불러오는 중</span></div>
-            <button class="dept-pdf-nav prev" id="${vid}-prev" onclick="pdfGo('${vid}',-1)" disabled>‹</button>
-            <div class="dept-pdf-canvas-wrap" id="${vid}-wrap"></div>
-            <button class="dept-pdf-nav next" id="${vid}-next" onclick="pdfGo('${vid}',1)" disabled>›</button>
-          </div>
-          <div class="dept-pdf-botbar" id="${vid}-dots"></div>
-        </div>`;
-      wrap.appendChild(item);
-      requestAnimationFrame(() => setTimeout(() => initPdfViewer(vid, f.url), 50));
-      return;
+      row.innerHTML = `<span style="font-size:13px">⏳</span><span class="sn-card-file-item-name">${escHtml(f.name)}</span><span style="font-size:10px;color:rgba(26,46,74,0.4)">업로드 중...</span>`;
     } else {
-      item.innerHTML = `${delBtn}
-        <div class="dept-generic-file">
-          <div class="dept-generic-file-icon">📎</div>
-          <div class="dept-generic-file-info">
-            <div class="dept-generic-file-name">${escHtml(f.name)}</div>
-            <div class="dept-generic-file-size">${f.size}</div>
-          </div>
-        </div>`;
+      const icon = f.type === 'image' ? '🖼' : f.type === 'pdf' ? '📄' : '📎';
+      row.innerHTML = `<span style="font-size:13px">${icon}</span><span class="sn-card-file-item-name">${escHtml(f.name)}</span><span style="font-size:10px;color:rgba(26,46,74,0.35)">${f.size||''}</span><button class="sn-card-file-item-del" onclick="deleteSuneungCardFile('${c.id}',${fi})">✕</button>`;
     }
-    wrap.appendChild(item);
+    wrap.appendChild(row);
   });
 }
 
-async function handleSuneungFiles(blockId, input) {
-  const b = suneungBlocks.find(x => x.id === blockId);
-  if (!b) return;
-  if (!b.files) b.files = [];
+async function handleSuneungCardFiles(cardId, input) {
+  const c = suneungCards.find(x => x.id === cardId);
+  if (!c) return;
+  if (!c.files) c.files = [];
   const files = Array.from(input.files);
   input.value = '';
   for (const file of files) {
+    // title 동기화
+    suneungCards.forEach(cc => { const inp = document.getElementById('sn-title-' + cc.id); if(inp) cc.title = inp.value; });
     const size = file.size > 1024*1024 ? (file.size/1024/1024).toFixed(1)+' MB' : (file.size/1024).toFixed(0)+' KB';
     let type = 'other';
     if (file.type.startsWith('image/')) type = 'image';
     else if (file.type === 'application/pdf') type = 'pdf';
     const tmpId = 'tmp-' + Date.now();
-    b.files.push({ name: file.name, type, url: null, size, _tmpId: tmpId });
-    renderSuneungFileItems(b);
+    c.files.push({ name: file.name, type, url: null, size, _tmpId: tmpId });
+    renderSuneungCardFileList(c);
     try {
       const url = await uploadToStorage(file);
-      const entry = b.files.find(f => f._tmpId === tmpId);
+      const entry = c.files.find(f => f._tmpId === tmpId);
       if (entry) { entry.url = url; delete entry._tmpId; }
-      // 업로드 완료 즉시 DB에 저장 (새로고침해도 유지)
-      await sbSet(SUNEUNG_KEY, suneungBlocks).catch(console.error);
+      await sbSet(SUNEUNG_KEY, suneungCards).catch(console.error);
     } catch(err) {
-      b.files = b.files.filter(f => f._tmpId !== tmpId);
+      c.files = c.files.filter(f => f._tmpId !== tmpId);
       alert('파일 업로드 실패: ' + file.name + '\n' + err.message);
     }
-    renderSuneungFileItems(b);
+    renderSuneungCardFileList(c);
   }
 }
 
-function deleteSuneungFile(blockId, fi) {
-  const b = suneungBlocks.find(x => x.id === blockId);
-  if (!b || !b.files) return;
-  const removed = b.files.splice(fi, 1)[0];
+function deleteSuneungCardFile(cardId, fi) {
+  const c = suneungCards.find(x => x.id === cardId);
+  if (!c || !c.files) return;
+  const removed = c.files.splice(fi, 1)[0];
   if (removed && removed.url) deleteFromStorage(removed.url);
-  renderSuneungFileItems(b);
-  // 삭제 후 즉시 DB에 저장
-  sbSet(SUNEUNG_KEY, suneungBlocks).catch(console.error);
+  renderSuneungCardFileList(c);
+  sbSet(SUNEUNG_KEY, suneungCards).catch(console.error);
 }
 
-function suneungAddBlock(type) {
-  // 기존 textarea 내용 동기화
-  suneungBlocks.forEach(b => {
-    if (b.type === 'text' || b.type === 'title') {
-      const ta = document.getElementById('sta-' + b.id);
-      if (ta) b.text = ta.value;
-    }
-  });
-  const id = 's' + Date.now();
-  suneungBlocks.push(type === 'file' ? { id, type, files: [] } : { id, type, text: '' });
-  renderSuneungBlocks();
+function suneungAddCard() {
+  suneungCards.forEach(c => { const inp = document.getElementById('sn-title-' + c.id); if(inp) c.title = inp.value; });
+  const id = 'sc' + Date.now();
+  suneungCards.push({ id, title: '', files: [] });
+  renderSuneungCards();
   setTimeout(() => {
-    const el = document.getElementById('sblock-' + id);
+    const el = document.getElementById('sncard-' + id);
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const inp = document.getElementById('sn-title-' + id);
+    if (inp) inp.focus();
   }, 80);
 }
 
-function deleteSuneungBlock(blockId) {
-  // 기존 textarea 내용 동기화
-  suneungBlocks.forEach(b => {
-    if (b.type === 'text' || b.type === 'title') {
-      const ta = document.getElementById('sta-' + b.id);
-      if (ta) b.text = ta.value;
-    }
-  });
-  suneungBlocks = suneungBlocks.filter(b => b.id !== blockId);
-  renderSuneungBlocks();
+function deleteSuneungCard(cardId) {
+  suneungCards.forEach(c => { const inp = document.getElementById('sn-title-' + c.id); if(inp) c.title = inp.value; });
+  suneungCards = suneungCards.filter(c => c.id !== cardId);
+  renderSuneungCards();
 }
 
-function moveSuneungBlock(blockId, dir) {
-  suneungBlocks.forEach(b => {
-    if (b.type === 'text' || b.type === 'title') { const ta = document.getElementById('sta-' + b.id); if (ta) b.text = ta.value; }
-  });
-  const idx = suneungBlocks.findIndex(b => b.id === blockId);
+function moveSuneungCard(cardId, dir) {
+  suneungCards.forEach(c => { const inp = document.getElementById('sn-title-' + c.id); if(inp) c.title = inp.value; });
+  const idx = suneungCards.findIndex(c => c.id === cardId);
   if (idx < 0) return;
   const ni = idx + dir;
-  if (ni < 0 || ni >= suneungBlocks.length) return;
-  [suneungBlocks[idx], suneungBlocks[ni]] = [suneungBlocks[ni], suneungBlocks[idx]];
-  renderSuneungBlocks();
+  if (ni < 0 || ni >= suneungCards.length) return;
+  [suneungCards[idx], suneungCards[ni]] = [suneungCards[ni], suneungCards[idx]];
+  renderSuneungCards();
 }
 
 function openSuneungEditPw() {
@@ -7746,17 +7808,74 @@ function enterSuneungEdit() {
   suneungEditMode = true;
   document.getElementById('suneung-edit-btn').classList.add('active');
   document.getElementById('suneung-toolbar').classList.add('show');
-  document.getElementById('suneung-blocks-wrap').classList.add('editing-mode');
-  document.querySelectorAll('#suneung-blocks-wrap .dept-block').forEach(el => el.classList.add('editing'));
+  renderSuneungCards();
 }
 function exitSuneungEdit() {
-  suneungBlocks.forEach(b => {
-    if (b.type === 'text' || b.type === 'title') { const ta = document.getElementById('sta-' + b.id); if (ta) b.text = ta.value; }
-  });
+  suneungCards.forEach(c => { const inp = document.getElementById('sn-title-' + c.id); if(inp) c.title = inp.value; });
   suneungEditMode = false;
   document.getElementById('suneung-edit-btn').classList.remove('active');
   document.getElementById('suneung-toolbar').classList.remove('show');
-  renderSuneungBlocks();
+  renderSuneungCards();
+}
+
+/* ── 파일 뷰어 화면 ── */
+function openSuneungFileView(c) {
+  document.getElementById('suneung-main-view').style.display = 'none';
+  const fv = document.getElementById('suneung-file-view');
+  fv.style.display = 'flex';
+  document.getElementById('sn-fv-title-text').textContent = c.title || '(제목 없음)';
+  const body = document.getElementById('sn-fv-body');
+  body.innerHTML = '';
+  const files = c.files || [];
+  if (files.length === 0) {
+    body.innerHTML = '<div style="text-align:center;padding:60px 0;color:rgba(26,46,74,0.35);font-size:14px;">등록된 파일이 없습니다.</div>';
+    return;
+  }
+  files.forEach((f, fi) => {
+    if (!f.url) return;
+    if (f.type === 'image') {
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'text-align:center;';
+      wrap.innerHTML = `<img src="${f.url}" alt="${escHtml(f.name)}" style="max-width:100%;border:1px solid rgba(26,107,191,0.12);box-shadow:0 2px 10px rgba(26,107,191,0.08);">
+        <div style="font-size:11px;color:rgba(26,46,74,0.40);margin-top:6px;letter-spacing:0.5px;">${escHtml(f.name)}</div>`;
+      body.appendChild(wrap);
+    } else if (f.type === 'pdf') {
+      const vid = 'snpdf-' + fi;
+      const pdiv = document.createElement('div');
+      pdiv.className = 'dept-pdf-viewer';
+      pdiv.id = vid;
+      pdiv.innerHTML = `
+        <div class="dept-pdf-topbar">
+          <span class="dept-pdf-filename">📄 ${escHtml(f.name)}</span>
+          <span class="dept-pdf-pageinfo" id="${vid}-pi">로딩 중...</span>
+          <button class="dept-pdf-fs-btn" onclick="openPdfFs('${vid}','pdfv')" title="전체화면">⛶</button>
+        </div>
+        <div class="dept-pdf-stage" id="${vid}-stage">
+          <div class="dept-pdf-loading" id="${vid}-loading"><div class="dept-pdf-spinner"></div><span>PDF 불러오는 중</span></div>
+          <button class="dept-pdf-nav prev" id="${vid}-prev" onclick="pdfGo('${vid}',-1)" disabled>‹</button>
+          <div class="dept-pdf-canvas-wrap" id="${vid}-wrap"></div>
+          <button class="dept-pdf-nav next" id="${vid}-next" onclick="pdfGo('${vid}',1)" disabled>›</button>
+        </div>
+        <div class="dept-pdf-botbar" id="${vid}-dots"></div>`;
+      body.appendChild(pdiv);
+      requestAnimationFrame(() => setTimeout(() => initPdfViewer(vid, f.url), 50));
+    } else {
+      const a = document.createElement('a');
+      a.href = f.url; a.target = '_blank'; a.rel = 'noopener';
+      a.style.cssText = 'display:flex;align-items:center;gap:12px;padding:16px 20px;background:#fff;border:1px solid rgba(26,107,191,0.18);text-decoration:none;color:var(--white);transition:all 0.2s;';
+      a.innerHTML = `<span style="font-size:28px">📎</span>
+        <div><div style="font-size:14px;font-weight:600;">${escHtml(f.name)}</div>
+        <div style="font-size:11px;color:rgba(26,46,74,0.45);margin-top:3px;">${f.size||''} · 클릭하여 다운로드/열기</div></div>`;
+      body.appendChild(a);
+    }
+  });
+}
+
+function closeSuneungFileView() {
+  document.getElementById('suneung-main-view').style.display = '';
+  const fv = document.getElementById('suneung-file-view');
+  fv.style.display = 'none';
+  document.getElementById('sn-fv-body').innerHTML = '';
 }
 
 /* ──────────────────────────────
