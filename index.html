@@ -2735,9 +2735,13 @@
     .gb-edit-btn { order: 3; }
   }
 
-  /* 두 패널 레이아웃 */
+  /* 단일 PDF 스프레드 뷰 레이아웃 */
   .gb-panels {
-    flex: 1; display: flex; gap: 0; overflow: hidden;
+    flex: 1; display: flex; flex-direction: column; overflow: hidden;
+  }
+  /* 뷰어 영역: 좌우 2페이지 나란히 */
+  .gb-spread-row {
+    flex: 1; display: flex; overflow: hidden; min-height: 0;
   }
   .gb-panel {
     flex: 1; display: flex; flex-direction: column;
@@ -2745,6 +2749,10 @@
     min-width: 0; overflow: hidden;
   }
   .gb-panel:last-child { border-right: none; }
+  /* 모바일: 오른쪽 패널 숨김 → 1쪽만 표시 */
+  @media (max-width: 767px) {
+    .gb-panel:last-child { display: none; }
+  }
 
   /* 패널 상단 바 */
   .gb-panel-bar {
@@ -2882,7 +2890,7 @@
   }
   .iframe-no-url span { font-size: 36px; }
 
-
+  .gb-panel-fullscreen {
     position: fixed; inset: 0; z-index: 1200;
     background: #1a2e4a;
     display: none; flex-direction: column;
@@ -2919,6 +2927,46 @@
     background: rgba(230,240,252,0.95);
     border-top: 1px solid rgba(26,107,191,0.10);
     display: flex; align-items: center; justify-content: center; gap: 16px;
+  }
+  /* ── 길라잡이 스프레드 설정 바 ── */
+  .gb-settings-bar {
+    flex-shrink: 0;
+    display: flex; align-items: center; flex-wrap: wrap; gap: 10px 20px;
+    padding: 10px 20px;
+    background: rgba(26,107,191,0.06);
+    border-bottom: 1px solid rgba(26,107,191,0.14);
+  }
+  .gb-settings-group {
+    display: flex; align-items: center; gap: 6px;
+  }
+  .gb-settings-label {
+    font-size: 10px; letter-spacing: 2px; color: rgba(26,46,74,0.55);
+    white-space: nowrap; margin-right: 2px;
+  }
+  .gb-settings-btn {
+    padding: 5px 13px;
+    background: rgba(26,107,191,0.06);
+    border: 1px solid rgba(26,107,191,0.22);
+    color: rgba(26,46,74,0.55);
+    font-family: 'Noto Sans KR', sans-serif; font-size: 11px; font-weight: 500;
+    cursor: pointer; letter-spacing: 0.5px; transition: all 0.18s;
+    border-radius: 2px;
+  }
+  .gb-settings-btn:hover { background: rgba(26,107,191,0.13); border-color: var(--gold); color: var(--gold); }
+  .gb-settings-btn.active {
+    background: linear-gradient(135deg, rgba(26,107,191,0.85), rgba(14,74,138,0.80));
+    border-color: transparent; color: #fff; font-weight: 700;
+    box-shadow: 0 2px 8px rgba(26,107,191,0.30);
+  }
+  .gb-settings-sep {
+    width: 1px; height: 20px; background: rgba(26,107,191,0.18); flex-shrink: 0;
+  }
+  .gb-settings-hint {
+    font-size: 10px; color: rgba(26,46,74,0.35); letter-spacing: 0.5px; margin-left: auto;
+  }
+  @media (max-width: 600px) {
+    .gb-settings-sep { display: none; }
+    .gb-settings-hint { display: none; }
   }
 
 </style>
@@ -4177,51 +4225,65 @@
     <button class="detail-home" onclick="closeGuidebookScreen()" title="메인화면으로">🏠</button>
   </div>
 
-  <!-- 두 패널 -->
+  <!-- 단일 PDF 스프레드 뷰 -->
   <div class="gb-panels">
 
-    <!-- 왼쪽 패널 -->
-    <div class="gb-panel" id="gb-panel-left">
-      <div class="gb-panel-bar">
-        <span class="gb-panel-label">LEFT · 왼쪽</span>
-        <span class="gb-panel-filename" id="gb-left-filename">PDF 없음</span>
-        <button class="gb-fullscreen-btn" id="gb-left-fs-btn" onclick="openGbFullscreen('left')" title="전체화면">⛶</button>
-        <button class="gb-upload-btn" id="gb-left-upload-btn" onclick="triggerGbPdfInput('left')">📂 PDF 업로드</button>
-        <input type="file" id="gb-left-input" accept="application/pdf" onchange="handleGbPdf('left', this)">
-      </div>
-      <div class="gb-panel-viewer" id="gb-left-viewer">
-        <div class="gb-empty" id="gb-left-empty">
-          <div class="gb-empty-icon">📄</div>
-          <div class="gb-empty-text">왼쪽 PDF가 없습니다.<br><span style="font-size:10px;opacity:0.6">관리자가 PDF를 업로드할 수 있습니다.</span></div>
-        </div>
-      </div>
-      <div class="gb-panel-nav" id="gb-left-nav">
-        <button class="gb-nav-btn" id="gb-left-prev" onclick="gbPageGo('left',-1)" disabled>‹</button>
-        <span class="gb-page-info" id="gb-left-pageinfo">0 / 0</span>
-        <button class="gb-nav-btn" id="gb-left-next" onclick="gbPageGo('left',1)" disabled>›</button>
-      </div>
+    <!-- 상단 바 (파일명 + 업로드) -->
+    <div class="gb-panel-bar" style="flex-shrink:0;">
+      <span class="gb-panel-label">GUIDEBOOK · 책자</span>
+      <span class="gb-panel-filename" id="gb-left-filename">PDF 없음</span>
+      <button class="gb-fullscreen-btn" id="gb-left-fs-btn" onclick="openGbFullscreen('left')" title="전체화면">⛶</button>
+      <button class="gb-upload-btn" id="gb-left-upload-btn" onclick="triggerGbPdfInput('left')">📂 PDF 업로드</button>
+      <!-- 하위 호환: right 업로드 버튼은 숨김 처리 (코드 호환용) -->
+      <button class="gb-upload-btn" id="gb-right-upload-btn" style="display:none;" onclick="triggerGbPdfInput('right')"></button>
     </div>
 
-    <!-- 오른쪽 패널 -->
-    <div class="gb-panel" id="gb-panel-right">
-      <div class="gb-panel-bar">
-        <span class="gb-panel-label">RIGHT · 오른쪽</span>
-        <span class="gb-panel-filename" id="gb-right-filename">PDF 없음</span>
-        <button class="gb-fullscreen-btn" id="gb-right-fs-btn" onclick="openGbFullscreen('right')" title="전체화면">⛶</button>
-        <button class="gb-upload-btn" id="gb-right-upload-btn" onclick="triggerGbPdfInput('right')">📂 PDF 업로드</button>
-        <input type="file" id="gb-right-input" accept="application/pdf" onchange="handleGbPdf('right', this)">
+    <!-- 스프레드 설정 바 (편집 모드에서만 표시) -->
+    <div id="gb-settings-bar" class="gb-settings-bar" style="display:none;">
+      <div class="gb-settings-group">
+        <span class="gb-settings-label">표지</span>
+        <button id="gb-cover-none"   class="gb-settings-btn active" onclick="gbSetCoverMode('none')">없음</button>
+        <button id="gb-cover-single" class="gb-settings-btn"        onclick="gbSetCoverMode('single')">1쪽 단독</button>
       </div>
-      <div class="gb-panel-viewer" id="gb-right-viewer">
-        <div class="gb-empty" id="gb-right-empty">
-          <div class="gb-empty-icon">📄</div>
-          <div class="gb-empty-text">오른쪽 PDF가 없습니다.<br><span style="font-size:10px;opacity:0.6">관리자가 PDF를 업로드할 수 있습니다.</span></div>
+      <div class="gb-settings-sep"></div>
+      <div class="gb-settings-group">
+        <span class="gb-settings-label">펼침 방향</span>
+        <button id="gb-dir-oe" class="gb-settings-btn active" onclick="gbSetSpreadDir('odd-even')">홀→짝</button>
+        <button id="gb-dir-eo" class="gb-settings-btn"        onclick="gbSetSpreadDir('even-odd')">짝→홀</button>
+      </div>
+      <span class="gb-settings-hint">설정 변경 시 자동 저장됩니다</span>
+    </div>
+
+    <!-- 좌우 뷰어 행 -->
+    <div class="gb-spread-row">
+
+      <!-- 왼쪽 패널 (홀수 페이지) -->
+      <div class="gb-panel" id="gb-panel-left">
+        <div class="gb-panel-viewer" id="gb-left-viewer">
+          <div class="gb-empty" id="gb-left-empty">
+            <div class="gb-empty-icon">📄</div>
+            <div class="gb-empty-text">PDF가 없습니다.<br><span style="font-size:10px;opacity:0.6">관리자가 PDF를 업로드할 수 있습니다.</span></div>
+          </div>
         </div>
       </div>
-      <div class="gb-panel-nav" id="gb-right-nav">
-        <button class="gb-nav-btn" id="gb-right-prev" onclick="gbPageGo('right',-1)" disabled>‹</button>
-        <span class="gb-page-info" id="gb-right-pageinfo">0 / 0</span>
-        <button class="gb-nav-btn" id="gb-right-next" onclick="gbPageGo('right',1)" disabled>›</button>
+
+      <!-- 오른쪽 패널 (짝수 페이지) — 모바일에서는 CSS로 숨김 -->
+      <div class="gb-panel" id="gb-panel-right">
+        <div class="gb-panel-viewer" id="gb-right-viewer">
+          <div class="gb-empty" id="gb-right-empty">
+            <div class="gb-empty-icon">📄</div>
+            <div class="gb-empty-text">다음 페이지</div>
+          </div>
+        </div>
       </div>
+
+    </div>
+
+    <!-- 하단 통합 네비게이션 -->
+    <div class="gb-panel-nav" id="gb-spread-nav" style="display:none;">
+      <button class="gb-nav-btn" id="gb-left-prev" onclick="gbSpreadGo(-1)" disabled>‹</button>
+      <span class="gb-page-info" id="gb-left-pageinfo">0 / 0</span>
+      <button class="gb-nav-btn" id="gb-left-next" onclick="gbSpreadGo(1)" disabled>›</button>
     </div>
 
   </div>
@@ -7921,37 +7983,66 @@ function closeSuneungFileView() {
 function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 /* ══════════════════════════════════════
-   선택과목 길라잡이 책자 기능
+   선택과목 길라잡이 책자 기능 (단일 PDF 스프레드 뷰)
 ══════════════════════════════════════ */
 const GB_KEY_LEFT  = 'cg_gb_left';
-const GB_KEY_RIGHT = 'cg_gb_right';
+const GB_KEY_RIGHT = 'cg_gb_right'; // 하위 호환 키 (미사용)
+const GB_KEY_SINGLE = 'cg_gb_single'; // 단일 PDF 키
 let gbEditMode = false;
 
-// 각 패널의 PDF 상태
+// 단일 PDF 상태
 const gbState = {
   left:  { pdfDoc: null, curPage: 1, totalPages: 0, rendering: false },
   right: { pdfDoc: null, curPage: 1, totalPages: 0, rendering: false }
 };
 
+// 단일 PDF 상태 (스프레드용)
+// coverMode: 'none'=표지없음(2쪽씩 시작), 'single'=1쪽 표지 후 2쪽씩
+// spreadDir: 'odd-even'=홀→짝(기본), 'even-odd'=짝→홀
+let gbSingle = { pdfDoc: null, curPage: 1, totalPages: 0, rendering: false };
+let gbCoverMode = 'none';    // 'none' | 'single'
+let gbSpreadDir = 'odd-even'; // 'odd-even' | 'even-odd'
+const GB_KEY_SETTINGS = 'cg_gb_settings';
+
+function isMobileView() { return window.innerWidth < 768; }
+
+// 현재 curPage에서 좌/우 패널에 렌더할 실제 페이지 번호 계산
+function gbGetSpreadPages(curPage) {
+  // coverMode='single'이고 curPage===1 이면 표지: 왼쪽만 단독
+  if (gbCoverMode === 'single' && curPage === 1) {
+    return { left: 1, right: null, isCover: true };
+  }
+  return { left: curPage, right: curPage + 1, isCover: false };
+}
+
+// step 계산: 현재 위치에서 다음으로 이동할 페이지 수
+function gbGetStep(curPage) {
+  if (isMobileView()) return 1;
+  if (gbCoverMode === 'single' && curPage === 1) return 1; // 표지 → 다음은 1칸
+  return 2;
+}
+
 function openGuidebookScreen() {
   document.getElementById('guidebook-screen').classList.add('open');
-  // rendering 플래그 초기화 (이중 호출로 갇히는 문제 방지)
-  gbState.left.rendering  = false;
-  gbState.right.rendering = false;
-  // PDF가 이미 로드된 경우 재렌더링만, 없으면 스토리지에서 로드
-  if (gbState.left.pdfDoc)  gbRenderPage('left');
-  else                       loadGbPdfFromStorage('left');
-  if (gbState.right.pdfDoc) gbRenderPage('right');
-  else                       loadGbPdfFromStorage('right');
+  gbSingle.rendering = false;
+  // 설정 로드 후 PDF 렌더링
+  gbLoadSettings().then(() => {
+    if (gbSingle.pdfDoc) gbRenderSpread();
+    else loadGbPdfFromStorage('left');
+  });
   // 편집 버튼 상태 초기화
   gbEditMode = false;
   document.getElementById('gb-edit-btn').classList.remove('active');
   document.getElementById('gb-left-upload-btn').style.display  = 'none';
   document.getElementById('gb-right-upload-btn').style.display = 'none';
+  const bar = document.getElementById('gb-settings-bar');
+  if (bar) bar.style.display = 'none';
 }
 
 function closeGuidebookScreen() {
   document.getElementById('guidebook-screen').classList.remove('open');
+  const bar = document.getElementById('gb-settings-bar');
+  if (bar) bar.style.display = 'none';
 }
 
 function openGbEditPw() {
@@ -7966,7 +8057,61 @@ function enterGbEdit() {
   gbEditMode = true;
   document.getElementById('gb-edit-btn').classList.add('active');
   document.getElementById('gb-left-upload-btn').style.display  = 'inline-flex';
-  document.getElementById('gb-right-upload-btn').style.display = 'inline-flex';
+  // 스프레드 설정 패널 표시
+  _gbShowSettings();
+}
+
+// 설정 패널 렌더링 (편집 모드 진입 시)
+function _gbShowSettings() {
+  const bar = document.getElementById('gb-settings-bar');
+  if (!bar) return;
+  bar.style.display = 'flex';
+  _gbSyncSettingsUI();
+}
+
+function _gbSyncSettingsUI() {
+  // 표지 토글
+  const btnNone   = document.getElementById('gb-cover-none');
+  const btnSingle = document.getElementById('gb-cover-single');
+  if (btnNone && btnSingle) {
+    btnNone.classList.toggle('active', gbCoverMode === 'none');
+    btnSingle.classList.toggle('active', gbCoverMode === 'single');
+  }
+  // 방향 토글
+  const btnOE = document.getElementById('gb-dir-oe');
+  const btnEO = document.getElementById('gb-dir-eo');
+  if (btnOE && btnEO) {
+    btnOE.classList.toggle('active', gbSpreadDir === 'odd-even');
+    btnEO.classList.toggle('active', gbSpreadDir === 'even-odd');
+  }
+}
+
+async function gbSetCoverMode(mode) {
+  gbCoverMode = mode;
+  _gbSyncSettingsUI();
+  if (gbSingle.pdfDoc) { gbSingle.curPage = 1; gbSingle.rendering = false; await gbRenderSpread(); }
+  await gbSaveSettings();
+}
+
+async function gbSetSpreadDir(dir) {
+  gbSpreadDir = dir;
+  _gbSyncSettingsUI();
+  if (gbSingle.pdfDoc) { gbSingle.curPage = 1; gbSingle.rendering = false; await gbRenderSpread(); }
+  await gbSaveSettings();
+}
+
+async function gbSaveSettings() {
+  try { await sbSet(GB_KEY_SETTINGS, { coverMode: gbCoverMode, spreadDir: gbSpreadDir }); } catch(_) {}
+}
+
+async function gbLoadSettings() {
+  try {
+    const s = await sbGet(GB_KEY_SETTINGS);
+    if (s) {
+      if (s.coverMode) gbCoverMode = s.coverMode;
+      if (s.spreadDir) gbSpreadDir = s.spreadDir;
+    }
+  } catch(_) {}
 }
 
 // PDF 업로드 input 트리거 (body에 새 input 생성 → 동일 파일 재선택 문제 완전 해결)
@@ -7986,14 +8131,13 @@ function triggerGbPdfInput(side) {
   tmp.click();
 }
 
-// PDF 파일 선택 처리
+// PDF 파일 선택 처리 (단일 PDF)
 async function handleGbPdf(side, input) {
   const file = input.files[0];
   if (!file) return;
 
-  // 로딩 표시
-  const viewer = document.getElementById('gb-' + side + '-viewer');
-  const empty  = document.getElementById('gb-' + side + '-empty');
+  const viewer = document.getElementById('gb-left-viewer');
+  const empty  = document.getElementById('gb-left-empty');
   empty.style.display = 'none';
   viewer.innerHTML = '<div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>업로드 중...</span></div>';
 
@@ -8002,17 +8146,21 @@ async function handleGbPdf(side, input) {
     const url = await uploadToStorage(file);
 
     // 2) 이전 파일 삭제
-    const prevKey = side === 'left' ? GB_KEY_LEFT : GB_KEY_RIGHT;
     try {
-      const prevStored = await sbGet(prevKey);
+      const prevStored = await sbGet(GB_KEY_SINGLE);
       if (prevStored && prevStored.url) await deleteFromStorage(prevStored.url);
+    } catch(_) {}
+    // 하위 호환: 이전 left 키 파일도 삭제 시도
+    try {
+      const prevLeft = await sbGet(GB_KEY_LEFT);
+      if (prevLeft && prevLeft.url) await deleteFromStorage(prevLeft.url);
     } catch(_) {}
 
     // 3) URL + 파일명을 cg_store에 저장
-    await sbSet(side === 'left' ? GB_KEY_LEFT : GB_KEY_RIGHT, { name: file.name, url });
+    await sbSet(GB_KEY_SINGLE, { name: file.name, url });
 
     // 4) 렌더링
-    await renderGbPdf(side, url, file.name);
+    await renderGbPdf('left', url, file.name);
     showDeptToast('✓ PDF가 저장되었습니다');
   } catch(err) {
     viewer.innerHTML = '';
@@ -8021,69 +8169,100 @@ async function handleGbPdf(side, input) {
   }
 }
 
-// Supabase에서 PDF URL 로드
+// Supabase에서 PDF URL 로드 (단일 PDF, 하위 호환)
 async function loadGbPdfFromStorage(side) {
-  const key = side === 'left' ? GB_KEY_LEFT : GB_KEY_RIGHT;
+  // 새 단일 키 우선
   try {
-    const stored = await sbGet(key);
+    const stored = await sbGet(GB_KEY_SINGLE);
     if (stored && stored.url) {
-      await renderGbPdf(side, stored.url, stored.name || 'PDF');
+      await renderGbPdf('left', stored.url, stored.name || 'PDF');
+      return;
     }
-  } catch(e) { /* 저장 데이터 없음 */ }
+  } catch(_) {}
+  // 하위 호환: 이전 left 키
+  try {
+    const stored = await sbGet(GB_KEY_LEFT);
+    if (stored && stored.url) {
+      await renderGbPdf('left', stored.url, stored.name || 'PDF');
+      return;
+    }
+  } catch(_) {}
 }
 
-// PDF 렌더링
+// PDF 렌더링 (단일 PDF → 스프레드 초기화)
 async function renderGbPdf(side, dataUrl, filename) {
-  const st = gbState[side];
-  const viewer   = document.getElementById('gb-' + side + '-viewer');
-  const empty    = document.getElementById('gb-' + side + '-empty');
-  const nav      = document.getElementById('gb-' + side + '-nav');
-  const fnEl     = document.getElementById('gb-' + side + '-filename');
+  const viewer = document.getElementById('gb-left-viewer');
+  const empty  = document.getElementById('gb-left-empty');
+  const fnEl   = document.getElementById('gb-left-filename');
 
-  // 기존 렌더링 상태 초기화 (교체 시 즉시 반영되도록)
-  st.rendering = false;
-  st.pdfDoc    = null;
+  gbSingle.rendering = false;
+  gbSingle.pdfDoc    = null;
 
-  // 로딩 표시
   empty.style.display = 'none';
   viewer.innerHTML = '<div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>PDF 불러오는 중...</span></div>';
 
   try {
     const loadingTask = pdfjsLib.getDocument(dataUrl);
     const pdf = await loadingTask.promise;
-    st.pdfDoc    = pdf;
-    st.totalPages = pdf.numPages;
-    st.curPage   = 1;
+    gbSingle.pdfDoc     = pdf;
+    gbSingle.totalPages = pdf.numPages;
+    gbSingle.curPage    = 1;
     fnEl.textContent = '📄 ' + filename;
-    nav.style.display = 'flex';
-    await gbRenderPage(side);
+    document.getElementById('gb-spread-nav').style.display = 'flex';
+    await gbRenderSpread();
   } catch(err) {
     viewer.innerHTML = '<div class="gb-pdf-loading"><div style="font-size:28px">⚠️</div><span>PDF를 불러오지 못했습니다.</span></div>';
   }
 }
 
-// 특정 페이지 렌더링
-async function gbRenderPage(side) {
-  const st     = gbState[side];
-  if (!st.pdfDoc || st.rendering) return;
-  st.rendering = true;
+// 스프레드 렌더링: 표지/방향 설정 반영
+async function gbRenderSpread() {
+  const sp = gbSingle;
+  if (!sp.pdfDoc || sp.rendering) return;
+  sp.rendering = true;
 
-  const viewer  = document.getElementById('gb-' + side + '-viewer');
-  const prevBtn = document.getElementById('gb-' + side + '-prev');
-  const nextBtn = document.getElementById('gb-' + side + '-next');
-  const piEl    = document.getElementById('gb-' + side + '-pageinfo');
+  const isMob = isMobileView();
+  const pages = gbGetSpreadPages(sp.curPage);
 
-  viewer.innerHTML = '<div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>' + st.curPage + ' / ' + st.totalPages + ' 페이지</span></div>';
+  // 왼쪽 패널 렌더링
+  await _gbRenderSinglePanel('gb-left-viewer', sp, pages.left);
 
+  // 오른쪽 패널: PC에서만
+  const rightViewer = document.getElementById('gb-right-viewer');
+  const rightEmpty  = document.getElementById('gb-right-empty');
+  if (!isMob) {
+    if (pages.isCover) {
+      // 표지 단독: 오른쪽 비어있음 (회색 여백)
+      rightViewer.innerHTML = '';
+      rightEmpty.style.display = 'flex';
+      rightEmpty.innerHTML = '<div class="gb-empty-icon" style="font-size:28px;opacity:0.10">□</div>';
+    } else if (pages.right && pages.right <= sp.totalPages) {
+      await _gbRenderSinglePanel('gb-right-viewer', sp, pages.right);
+    } else {
+      // 마지막 홀수: 오른쪽 빈 상태
+      rightViewer.innerHTML = '';
+      rightEmpty.style.display = 'flex';
+      rightEmpty.innerHTML = '<div class="gb-empty-icon" style="font-size:28px;opacity:0.10">□</div>';
+    }
+  }
+
+  // 네비게이션 업데이트
+  _gbUpdateSpreadNav();
+  sp.rendering = false;
+}
+
+async function _gbRenderSinglePanel(viewerId, sp, pageNum) {
+  const viewer = document.getElementById(viewerId);
+  viewer.innerHTML = '<div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>' + pageNum + ' / ' + sp.totalPages + ' 페이지</span></div>';
   try {
-    const page     = await st.pdfDoc.getPage(st.curPage);
+    const page     = await sp.pdfDoc.getPage(pageNum);
     const dpr      = window.devicePixelRatio || 1;
     const vw       = (viewer.clientWidth || viewer.offsetWidth || 300) - 24;
     const viewport = page.getViewport({ scale: 1 });
     const scale    = Math.min(vw / viewport.width, 2);
     const vp       = page.getViewport({ scale: scale * dpr });
 
-    const canvas  = document.createElement('canvas');
+    const canvas = document.createElement('canvas');
     canvas.className = 'gb-pdf-canvas';
     canvas.width  = vp.width;
     canvas.height = vp.height;
@@ -8091,30 +8270,63 @@ async function gbRenderPage(side) {
     canvas.style.height = (vp.height / dpr) + 'px';
 
     await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
-
     viewer.innerHTML = '';
     viewer.appendChild(canvas);
-
-    piEl.textContent = st.curPage + ' / ' + st.totalPages;
-    prevBtn.disabled = (st.curPage <= 1);
-    nextBtn.disabled = (st.curPage >= st.totalPages);
   } catch(e) {
     viewer.innerHTML = '<div class="gb-pdf-loading"><span>페이지 렌더링 실패</span></div>';
-    st.rendering = false;
   }
-  st.rendering = false;
 }
 
-// 페이지 이동
+function _gbUpdateSpreadNav() {
+  const sp = gbSingle;
+  const isMob = isMobileView();
+  const piEl = document.getElementById('gb-left-pageinfo');
+  const pages = gbGetSpreadPages(sp.curPage);
+
+  if (isMob) {
+    piEl.textContent = sp.curPage + ' / ' + sp.totalPages;
+  } else if (pages.isCover) {
+    piEl.textContent = '표지  1 / ' + sp.totalPages;
+  } else {
+    const r = pages.right && pages.right <= sp.totalPages ? pages.right : pages.left;
+    piEl.textContent = (pages.left === r)
+      ? pages.left + ' / ' + sp.totalPages
+      : pages.left + '–' + r + ' / ' + sp.totalPages;
+  }
+
+  const step = gbGetStep(sp.curPage);
+  document.getElementById('gb-left-prev').disabled = (sp.curPage <= 1);
+  // next 비활성: 현재 스프레드의 마지막 페이지가 totalPages 이상일 때
+  const lastVisible = isMob ? sp.curPage : (pages.isCover ? 1 : Math.min(sp.curPage + 1, sp.totalPages));
+  document.getElementById('gb-left-next').disabled = (lastVisible >= sp.totalPages);
+}
+
+// 스프레드 이동
+async function gbSpreadGo(dir) {
+  const sp = gbSingle;
+  if (!sp.pdfDoc) return;
+  const step = gbGetStep(sp.curPage);
+  let np = sp.curPage + dir * step;
+  // 역방향으로 표지(1)로 돌아올 때: coverMode=single이면 1로 스냅
+  if (dir < 0 && gbCoverMode === 'single' && np < 1) np = 1;
+  if (np < 1 || np > sp.totalPages) return;
+  sp.curPage = np;
+  sp.rendering = false;
+  await gbRenderSpread();
+}
+
+// ── 하위 호환: 기존 코드에서 gbRenderPage/gbPageGo 호출 안전하게 래핑 ──
+async function gbRenderPage(side) { await gbRenderSpread(); }
+async function gbPageGo(side, dir) { await gbSpreadGo(dir); }
 
 // 전체화면 상태
 let gbFsSide = null;
 
 function openGbFullscreen(side) {
-  const st = gbState[side];
-  if (!st.pdfDoc) return;
-  gbFsSide = side;
-  const fnEl = document.getElementById('gb-' + side + '-filename');
+  // 단일 PDF 모드: 항상 gbSingle 사용
+  if (!gbSingle.pdfDoc) return;
+  gbFsSide = 'left';
+  const fnEl = document.getElementById('gb-left-filename');
   document.getElementById('gb-fs-filename').textContent = fnEl.textContent;
   document.getElementById('gb-fs-overlay').classList.add('open');
   gbFsRenderPage();
@@ -8128,13 +8340,13 @@ function closeGbFullscreen() {
 
 async function gbFsRenderPage() {
   if (!gbFsSide) return;
-  const st = gbState[gbFsSide];
-  if (!st.pdfDoc) return;
+  const sp = gbSingle;
+  if (!sp.pdfDoc) return;
   const viewer = document.getElementById('gb-fs-viewer');
   const navinfo = document.getElementById('gb-fs-navinfo');
-  viewer.innerHTML = '<div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>' + st.curPage + ' / ' + st.totalPages + ' 페이지</span></div>';
+  viewer.innerHTML = '<div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>' + sp.curPage + ' / ' + sp.totalPages + ' 페이지</span></div>';
   try {
-    const page = await st.pdfDoc.getPage(st.curPage);
+    const page = await sp.pdfDoc.getPage(sp.curPage);
     const viewport = page.getViewport({ scale: 1 });
     const dpr = window.devicePixelRatio || 1;
     const isDesktop = window.innerWidth >= 768;
@@ -8159,9 +8371,9 @@ async function gbFsRenderPage() {
     await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
     viewer.innerHTML = '';
     viewer.appendChild(canvas);
-    navinfo.textContent = st.curPage + ' / ' + st.totalPages;
-    document.getElementById('gb-fs-prev').disabled = (st.curPage <= 1);
-    document.getElementById('gb-fs-next').disabled = (st.curPage >= st.totalPages);
+    navinfo.textContent = sp.curPage + ' / ' + sp.totalPages;
+    document.getElementById('gb-fs-prev').disabled = (sp.curPage <= 1);
+    document.getElementById('gb-fs-next').disabled = (sp.curPage >= sp.totalPages);
   } catch(e) {
     viewer.innerHTML = '<div class="gb-pdf-loading"><span>페이지 렌더링 실패</span></div>';
   }
@@ -8169,25 +8381,15 @@ async function gbFsRenderPage() {
 
 async function gbFsPageGo(dir) {
   if (!gbFsSide) return;
-  const st = gbState[gbFsSide];
-  if (!st.pdfDoc) return;
-  const np = st.curPage + dir;
-  if (np < 1 || np > st.totalPages) return;
-  st.curPage = np;
-  // 원본 패널 네비도 동기화
-  document.getElementById('gb-' + gbFsSide + '-pageinfo').textContent = st.curPage + ' / ' + st.totalPages;
-  document.getElementById('gb-' + gbFsSide + '-prev').disabled = (st.curPage <= 1);
-  document.getElementById('gb-' + gbFsSide + '-next').disabled = (st.curPage >= st.totalPages);
+  const sp = gbSingle;
+  if (!sp.pdfDoc) return;
+  const np = sp.curPage + dir;
+  if (np < 1 || np > sp.totalPages) return;
+  sp.curPage = np;
+  // 스프레드 네비도 동기화
+  _gbUpdateSpreadNav();
+  sp.rendering = false;
   await gbFsRenderPage();
-}
-
-async function gbPageGo(side, dir) {
-  const st = gbState[side];
-  if (!st.pdfDoc) return;
-  const np = st.curPage + dir;
-  if (np < 1 || np > st.totalPages) return;
-  st.curPage = np;
-  await gbRenderPage(side);
 }
 
 /* ══════════════════════════════════════
@@ -8210,9 +8412,9 @@ async function initApp() {
     hideLoadingOverlay();
   }
   applyPageTexts();
-  // 길라잡이 PDF 복원 (Supabase)
-  try { await loadGbPdfFromStorage('left');  } catch(_) {}
-  try { await loadGbPdfFromStorage('right'); } catch(_) {}
+  // 길라잡이 PDF 복원 (Supabase) - 단일 PDF
+  try { await gbLoadSettings(); } catch(_) {}
+  try { await loadGbPdfFromStorage('left'); } catch(_) {}
 }
 
 document.addEventListener('DOMContentLoaded', () => { initApp(); });
@@ -8265,7 +8467,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (side === 'fs') {
         gbFsPageGo(goNext ? 1 : -1);
       } else {
-        gbPageGo(side, goNext ? 1 : -1);
+        gbSpreadGo(goNext ? 1 : -1);
       }
     }, { passive: false });
   }
@@ -8291,6 +8493,12 @@ window.addEventListener('resize', function() {
     setCurrentSem(currentSemIdx);
   }
   requestAnimationFrame(() => syncSubtypeZoneHeights());
+
+  // 길라잡이 스프레드: 화면 크기 변경 시 재렌더링 (모바일↔PC 전환 대응)
+  if (gbSingle.pdfDoc && document.getElementById('guidebook-screen').classList.contains('open')) {
+    gbSingle.rendering = false;
+    gbRenderSpread();
+  }
 });
 </script>
 
