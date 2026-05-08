@@ -2976,38 +2976,102 @@
   .gb-spread-row.is-cover #gb-panel-left {
     flex: 1;
   }
-  /* 왼쪽 뷰어 내부 캔버스를 가운데로 */
+  /* 왼쪽 뷰어 내부 캔버스를 가운데로 (표지 단독: 스크롤 없이 꽉 맞게) */
   .gb-spread-row.is-cover #gb-left-viewer {
     align-items: center;
     justify-content: center;
+    overflow: hidden;
+  }
+  .gb-spread-row.is-cover #gb-left-viewer .gb-pdf-canvas {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto !important;
+    height: auto !important;
   }
 
-  /* ── 페이지 이동 입력 ── */
-  .gb-jump-wrap {
-    display: flex; align-items: center; gap: 4px;
+  /* ── 페이지 이동 버튼 (헤더) ── */
+  .gb-jump-trigger-btn {
+    display: none; /* PDF 로드 후 JS로 표시 */
+    align-items: center; gap: 6px;
+    padding: 9px 16px; background: none;
+    border: 1px solid rgba(26,107,191,0.30); color: rgba(26,107,191,0.65);
+    font-family: 'Noto Sans KR', sans-serif; font-size: 12px;
+    cursor: pointer; letter-spacing: 0.5px; transition: all 0.22s;
+    border-radius: 3px; flex-shrink: 0;
+  }
+  .gb-jump-trigger-btn:hover { background: rgba(26,107,191,0.10); border-color: var(--gold); color: var(--gold); }
+  .gb-jump-trigger-btn.visible { display: inline-flex; }
+
+  /* ── 페이지 이동 팝업 ── */
+  /* ── 페이지 이동 오버레이 ── */
+  .gb-jump-popup {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(14,30,60,0.55);
+    backdrop-filter: blur(4px);
+    align-items: center;
+    justify-content: center;
+  }
+  .gb-jump-popup.open { display: flex; }
+  .gb-jump-popup-box {
+    background: rgba(240,244,248,0.99);
+    border: 1.5px solid rgba(26,107,191,0.35);
+    border-radius: 10px;
+    box-shadow: 0 16px 48px rgba(14,30,60,0.35), 0 2px 8px rgba(0,0,0,0.15);
+    padding: 28px 28px 22px;
+    min-width: 220px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .gb-jump-popup-title {
+    font-size: 10px; letter-spacing: 3px; color: var(--gold);
+    font-weight: 700; text-transform: uppercase;
+  }
+  .gb-jump-popup-row {
+    display: flex; align-items: center; gap: 10px;
   }
   .gb-jump-input {
-    width: 52px; padding: 6px 8px; text-align: center;
+    width: 80px; padding: 10px 12px; text-align: center;
     background: rgba(26,107,191,0.07);
-    border: 1px solid rgba(26,107,191,0.25);
-    color: var(--white);
-    font-family: 'Noto Sans KR', sans-serif; font-size: 12px;
-    outline: none; border-radius: 2px;
+    border: 1.5px solid rgba(26,107,191,0.28);
+    color: #0e2e4a;
+    font-family: 'Noto Sans KR', sans-serif; font-size: 18px; font-weight: 700;
+    outline: none; border-radius: 5px;
     -moz-appearance: textfield;
     transition: border-color 0.18s;
   }
   .gb-jump-input::-webkit-outer-spin-button,
   .gb-jump-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-  .gb-jump-input:focus { border-color: var(--gold); background: rgba(26,107,191,0.12); }
+  .gb-jump-input:focus { border-color: var(--gold); background: rgba(201,168,76,0.07); }
+  .gb-jump-total {
+    font-size: 13px; color: rgba(26,46,74,0.50); white-space: nowrap;
+  }
+  .gb-jump-popup-actions {
+    display: flex; gap: 8px;
+  }
   .gb-jump-btn {
-    padding: 6px 12px;
-    background: linear-gradient(135deg, rgba(26,107,191,0.85), rgba(14,74,138,0.80));
+    flex: 1;
+    padding: 10px 0;
+    background: linear-gradient(135deg, rgba(26,107,191,0.90), rgba(14,74,138,0.85));
     border: none; color: #fff;
-    font-family: 'Noto Sans KR', sans-serif; font-size: 11px; font-weight: 700;
-    cursor: pointer; border-radius: 2px; letter-spacing: 0.5px;
+    font-family: 'Noto Sans KR', sans-serif; font-size: 13px; font-weight: 700;
+    cursor: pointer; border-radius: 5px; letter-spacing: 0.5px;
     transition: opacity 0.18s;
   }
-  .gb-jump-btn:hover { opacity: 0.82; }
+  .gb-jump-btn:hover { opacity: 0.85; }
+  .gb-jump-cancel-btn {
+    flex: 1;
+    padding: 10px 0;
+    background: none;
+    border: 1.5px solid rgba(26,107,191,0.25); color: rgba(26,46,74,0.55);
+    font-family: 'Noto Sans KR', sans-serif; font-size: 13px; font-weight: 600;
+    cursor: pointer; border-radius: 5px; letter-spacing: 0.5px;
+    transition: all 0.18s;
+  }
+  .gb-jump-cancel-btn:hover { border-color: rgba(26,107,191,0.50); color: rgba(26,46,74,0.80); }
 
 </style>
 </head>
@@ -4262,8 +4326,11 @@
       <div class="gb-header-title" id="menu-06-title">선택과목 길라잡이 책자</div>
     </div>
     <button class="gb-edit-btn" id="gb-edit-btn" onclick="openGbEditPw()" title="PDF 업로드 편집">🔒 편집</button>
+    <button class="gb-jump-trigger-btn" id="gb-jump-trigger-btn" onclick="toggleGbJumpPopup(event)" title="페이지 이동">↗ 쪽 이동</button>
     <button class="detail-home" onclick="closeGuidebookScreen()" title="메인화면으로">🏠</button>
   </div>
+
+
 
   <!-- 단일 PDF 스프레드 뷰 -->
   <div class="gb-panels">
@@ -4323,12 +4390,6 @@
     <div class="gb-panel-nav" id="gb-spread-nav" style="display:none;">
       <button class="gb-nav-btn" id="gb-left-prev" onclick="gbSpreadGo(-1)" disabled>‹</button>
       <span class="gb-page-info" id="gb-left-pageinfo">0 / 0</span>
-      <div class="gb-jump-wrap">
-        <input class="gb-jump-input" id="gb-jump-input" type="number" min="1" placeholder="쪽"
-          onkeydown="if(event.key==='Enter') gbJumpToPage()"
-          oninput="this.value=this.value.replace(/[^0-9]/g,'')">
-        <button class="gb-jump-btn" onclick="gbJumpToPage()">이동</button>
-      </div>
       <button class="gb-nav-btn" id="gb-left-next" onclick="gbSpreadGo(1)" disabled>›</button>
     </div>
 
@@ -8256,6 +8317,8 @@ async function renderGbPdf(side, dataUrl, filename) {
     gbSingle.curPage    = 1;
     fnEl.textContent = '📄 ' + filename;
     document.getElementById('gb-spread-nav').style.display = 'flex';
+    const jumpBtn = document.getElementById('gb-jump-trigger-btn');
+    if (jumpBtn) jumpBtn.classList.add('visible');
     await gbRenderSpread();
   } catch(err) {
     viewer.innerHTML = '<div class="gb-pdf-loading"><div style="font-size:28px">⚠️</div><span>PDF를 불러오지 못했습니다.</span></div>';
@@ -8303,8 +8366,11 @@ async function _gbRenderSinglePanel(viewerId, sp, pageNum) {
     const page     = await sp.pdfDoc.getPage(pageNum);
     const dpr      = window.devicePixelRatio || 1;
     const vw       = (viewer.clientWidth || viewer.offsetWidth || 300) - 24;
+    const vh       = (viewer.clientHeight || viewer.offsetHeight || 600) - 40;
     const viewport = page.getViewport({ scale: 1 });
-    const scale    = Math.min(vw / viewport.width, 2);
+    const scaleW   = vw / viewport.width;
+    const scaleH   = vh > 0 ? vh / viewport.height : scaleW;
+    const scale    = Math.min(scaleW, scaleH, 2);
     const vp       = page.getViewport({ scale: scale * dpr });
 
     const canvas = document.createElement('canvas');
@@ -8360,24 +8426,53 @@ async function gbSpreadGo(dir) {
   await gbRenderSpread();
 }
 
+// 페이지 이동 오버레이 열기/닫기
+function toggleGbJumpPopup(e) {
+  e.stopPropagation();
+  const popup = document.getElementById('gb-jump-popup');
+  if (popup.classList.contains('open')) {
+    closeGbJumpPopup();
+    return;
+  }
+  // 총 페이지 표시 업데이트
+  document.getElementById('gb-jump-total').textContent = '/ ' + (gbSingle.totalPages || 0);
+  popup.classList.add('open');
+  setTimeout(() => {
+    const inp = document.getElementById('gb-jump-input');
+    inp.value = '';
+    inp.focus();
+  }, 50);
+}
+function closeGbJumpPopup() {
+  document.getElementById('gb-jump-popup').classList.remove('open');
+}
+// 바깥 클릭 시 팝업 닫기
+document.addEventListener('click', function(e) {
+  const popup = document.getElementById('gb-jump-popup');
+  if (popup && popup.classList.contains('open')) {
+    if (!popup.contains(e.target) && e.target.id !== 'gb-jump-trigger-btn') {
+      closeGbJumpPopup();
+    }
+  }
+});
+
 // 특정 페이지로 바로 이동
 async function gbJumpToPage() {
   const sp = gbSingle;
   if (!sp.pdfDoc) return;
   const input = document.getElementById('gb-jump-input');
   const val = parseInt(input.value, 10);
-  input.value = '';
   if (!val || val < 1 || val > sp.totalPages) {
     // 범위 밖이면 입력칸 잠깐 빨간색으로 표시
     input.style.borderColor = '#d63030';
     setTimeout(() => { input.style.borderColor = ''; }, 800);
     return;
   }
+  closeGbJumpPopup();
   // 표지 모드일 때: 1페이지는 그대로, 나머지는 스프레드 경계에 맞게 스냅
   let target = val;
   if (!isMobileView() && gbCoverMode === 'single' && val > 1) {
-    // 2페이지부터는 짝수 시작 스프레드: 2,4,6...
-    // val이 홀수(3,5...)이면 한 장 앞 짝수로
+    // 2페이지부터는 짝수 시작 스프레드: 2,4,6...\n    // val이 홀수(3,5...)이면 한 장 앞 짝수로
     if (val % 2 === 1) target = val - 1; // 예: 3→2, 5→4
     if (target < 2) target = 2;
   } else if (!isMobileView() && gbCoverMode === 'none') {
@@ -8388,8 +8483,6 @@ async function gbJumpToPage() {
   sp.curPage = target;
   sp.rendering = false;
   await gbRenderSpread();
-  // 이동 완료 후 입력칸 포커스 해제
-  input.blur();
 }
 
 // ── 하위 호환: 기존 코드에서 gbRenderPage/gbPageGo 호출 안전하게 래핑 ──
@@ -8608,6 +8701,23 @@ window.addEventListener('resize', function() {
   <button class="sem-dropdown-item" id="sem-tab-1" onclick="setSemFromDropdown(1)">2학년 2학기</button>
   <button class="sem-dropdown-item" id="sem-tab-2" onclick="setSemFromDropdown(2)">3학년 1학기</button>
   <button class="sem-dropdown-item" id="sem-tab-3" onclick="setSemFromDropdown(3)">3학년 2학기</button>
+</div>
+
+<!-- 페이지 이동 오버레이 (body 최상단 레이어) -->
+<div class="gb-jump-popup" id="gb-jump-popup" onclick="if(event.target===this) closeGbJumpPopup()">
+  <div class="gb-jump-popup-box">
+    <div class="gb-jump-popup-title">페이지 이동</div>
+    <div class="gb-jump-popup-row">
+      <input class="gb-jump-input" id="gb-jump-input" type="number" min="1" placeholder="쪽"
+        onkeydown="if(event.key==='Enter') gbJumpToPage(); if(event.key==='Escape') closeGbJumpPopup();"
+        oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+      <span class="gb-jump-total" id="gb-jump-total">/ 0</span>
+    </div>
+    <div class="gb-jump-popup-actions">
+      <button class="gb-jump-cancel-btn" onclick="closeGbJumpPopup()">취소</button>
+      <button class="gb-jump-btn" onclick="gbJumpToPage()">이동</button>
+    </div>
+  </div>
 </div>
 
 </body>
