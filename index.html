@@ -8114,7 +8114,7 @@ async function gbLoadSettings() {
   } catch(_) {}
 }
 
-// PDF 업로드 input 트리거 (body에 새 input 생성 → 동일 파일 재선택 문제 완전 해결)
+// PDF 업로드 input 트리거
 function triggerGbPdfInput(side) {
   const prev = document.getElementById('gb-tmp-input-' + side);
   if (prev) prev.remove();
@@ -8124,16 +8124,17 @@ function triggerGbPdfInput(side) {
   tmp.accept = 'application/pdf';
   tmp.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;';
   tmp.addEventListener('change', function() {
-    handleGbPdf(side, tmp);
+    // 파일 객체를 먼저 로컬 변수에 복사한 뒤 DOM에서 제거
+    const file = tmp.files[0];
     tmp.remove();
+    if (file) handleGbPdfFile(file);
   });
   document.body.appendChild(tmp);
   tmp.click();
 }
 
 // PDF 파일 선택 처리 (단일 PDF)
-async function handleGbPdf(side, input) {
-  const file = input.files[0];
+async function handleGbPdfFile(file) {
   if (!file) return;
 
   const viewer = document.getElementById('gb-left-viewer');
