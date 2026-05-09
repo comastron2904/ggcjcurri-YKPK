@@ -2854,6 +2854,17 @@
   .gb-fullscreen-btn:hover { background: rgba(26,107,191,0.10); border-color: var(--gold); color: var(--gold); }
 
   /* ══════════════════════════════════════
+     브로셔 PDF 화면 (메뉴 09)
+  ══════════════════════════════════════ */
+  #brochure-screen {
+    position: fixed; inset: 0; background: #f0f4f8; z-index: 700;
+    display: flex; flex-direction: column;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+    overflow: hidden;
+  }
+  #brochure-screen.open { opacity: 1; pointer-events: all; }
+
+  /* ══════════════════════════════════════
      외부 사이트 iframe 화면 (메뉴 08)
   ══════════════════════════════════════ */
   #iframe-screen {
@@ -3122,6 +3133,7 @@
     <button class="nav-btn" onclick="openGuidebookScreen()"><span class="btn-number">06</span><span class="btn-title" id="menu-06">선택과목 길라잡이 책자</span><span class="btn-arrow">›</span></button>
     <button class="nav-btn" id="nav-btn-07" onclick="openMenu07()"><span class="btn-number">07</span><span class="btn-title" id="menu-07">창조고 선택과목 이수 경로</span><span class="btn-arrow">›</span></button>
     <button class="nav-btn" id="nav-btn-08" onclick="openMenu08()"><span class="btn-number">08</span><span class="btn-title" id="menu-08">테스트</span><span class="btn-arrow">›</span></button>
+    <button class="nav-btn" onclick="openBrochureScreen()"><span class="btn-number">09</span><span class="btn-title" id="menu-09">2026 교육과정 안내 브로셔</span><span class="btn-arrow">›</span></button>
   </div>
 </section>
 
@@ -3387,6 +3399,7 @@
           <div id="pe-menu-08-file-status" style="font-size:11px;color:rgba(26,107,191,0.75);letter-spacing:0.3px;min-height:16px;"></div>
           <input type="file" id="pe-menu-08-file-input" accept=".html,.htm" style="display:none" onchange="onMenu08FileChange(this)">
         </div>
+        <div class="pe-menu-item" style="margin-top:10px"><span class="pe-menu-num">09</span><input class="pe-menu-input" id="pe-menu-09" placeholder="2026 교육과정 안내 브로셔" /></div>
       </div>
 
       <!-- 푸터 -->
@@ -4553,7 +4566,7 @@ function savePage() { sbSetQ('cg_page', pageTexts); }
 const SUB_SCREEN_IDS = [
   'semester-screen','catsubj-screen','subject-detail',
   'dept-screen','subject-search-screen',
-  'enroll-screen','suneung-screen','guidebook-screen'
+  'enroll-screen','suneung-screen','guidebook-screen','brochure-screen'
 ];
 
 let pendingBgFile = null;       // 업로드 대기 중인 File 객체
@@ -4659,6 +4672,13 @@ function applyPageTexts() {
       btn08.style.opacity = '0.45';
       btn08.title = 'URL이 설정되지 않았습니다';
     }
+  }
+  // 09 브로셔 화면 제목 동기화
+  if (p.menu09) {
+    const el09 = document.getElementById('menu-09');
+    if (el09) el09.textContent = p.menu09;
+    const t09 = document.getElementById('menu-09-title');
+    if (t09) t09.textContent = p.menu09;
   }
   // 학기별 개설과목 열 헤더 적용
   const hdReq = document.getElementById('hd-label-req');
@@ -4854,6 +4874,7 @@ function checkPw() {
     else if (pwTarget === 'enrollEdit') enterEnrollEdit();
     else if (pwTarget === 'suneungEdit') enterSuneungEdit();
     else if (pwTarget === 'gbEdit') enterGbEdit();
+    else if (pwTarget === 'brEdit') enterBrEdit();
     else if (pwTarget === 'semColEdit') openSemColEdit();
     else openAdminModal();
   } else {
@@ -5673,7 +5694,7 @@ function openPageEdit() {
   g('pe-divider').value      = p.divider      ?? g('txt-divider').textContent;
   g('pe-section-label').value = p.sectionLabel ?? g('txt-section-label').textContent;
   g('pe-footer').value       = p.footer       ?? g('txt-footer').textContent;
-  for (let i = 1; i <= 8; i++) {
+  for (let i = 1; i <= 9; i++) {
     const k = 'menu' + String(i).padStart(2,'0');
     const el = g('pe-menu-' + String(i).padStart(2,'0'));
     if (el) el.value = p[k] ?? (g('menu-' + String(i).padStart(2,'0'))?.textContent || '');
@@ -5727,9 +5748,10 @@ async function savePageEdit() {
     menu07url:    document.getElementById('pe-menu-07-url').value.trim(),
     menu08url:    document.getElementById('pe-menu-08-url').value.trim(),
   });
-  for (let i = 1; i <= 8; i++) {
+  for (let i = 1; i <= 9; i++) {
     const k = 'menu' + String(i).padStart(2,'0');
-    pageTexts[k] = document.getElementById('pe-menu-' + String(i).padStart(2,'0')).value.trim();
+    const el = document.getElementById('pe-menu-' + String(i).padStart(2,'0'));
+    if (el) pageTexts[k] = el.value.trim();
   }
   // 열 헤더·학점 값은 saveSemColEdit() 에서 별도 저장 (pageTexts에 보존)
 
@@ -8152,6 +8174,357 @@ function closeGuidebookScreen() {
   if (bar) bar.style.display = 'none';
 }
 
+/* ══════════════════════════════════════
+   브로셔 화면 (메뉴 09) — 6번 길라잡이와 동일 구조
+══════════════════════════════════════ */
+const BR_KEY_SINGLE   = 'cg_br_single';
+const BR_KEY_SETTINGS = 'cg_br_settings';
+
+let brEditMode  = false;
+let brFsSide    = false;
+let brCoverMode = 'none';    // 'none' | 'single'
+let brSpreadDir = 'odd-even';
+let brSingle    = { pdfDoc: null, curPage: 1, totalPages: 0, rendering: false };
+
+/* ── 표지/스프레드 헬퍼 (gb 동일 로직) ── */
+function _brGetPair(cur) {
+  if (brCoverMode === 'single' && cur === 1) {
+    return [1, null];
+  }
+  const base = brCoverMode === 'single' ? cur - 1 : cur - 1;
+  if (brSpreadDir === 'odd-even') {
+    const l = base % 2 === 0 ? base + 1 : base;
+    return [l, l + 1];
+  } else {
+    const l = base % 2 === 0 ? base : base + 1;
+    return [l, l + 1];
+  }
+}
+function _brSpreadStep(cur, dir) {
+  if (brCoverMode === 'single' && cur === 1) return dir > 0 ? 2 : 1;
+  const [l] = _brGetPair(cur);
+  if (dir > 0) {
+    const next = l + 2;
+    return Math.min(next, brSingle.totalPages);
+  } else {
+    const prev = l - 2;
+    if (brCoverMode === 'single' && prev <= 1) return 1;
+    return Math.max(prev, 1);
+  }
+}
+function _brUpdateSpreadNav() {
+  const sp  = brSingle;
+  const nav = document.getElementById('br-spread-nav');
+  const pgi = document.getElementById('br-left-pageinfo');
+  if (!sp.pdfDoc) { if (nav) nav.style.display = 'none'; return; }
+  if (nav) nav.style.display = 'flex';
+  if (pgi) pgi.textContent = sp.curPage + ' / ' + sp.totalPages;
+  const prevBtn = document.getElementById('br-left-prev');
+  const nextBtn = document.getElementById('br-left-next');
+  if (prevBtn) prevBtn.disabled = (sp.curPage <= 1);
+  if (nextBtn) nextBtn.disabled = (sp.curPage >= sp.totalPages);
+}
+
+async function brRenderSpread() {
+  const sp = brSingle;
+  if (!sp.pdfDoc || sp.rendering) return;
+  sp.rendering = true;
+  _brUpdateSpreadNav();
+  const [lp, rp] = _brGetPair(sp.curPage);
+  await _brRenderPanel('br-left-viewer',  'br-left-empty',  lp);
+  await _brRenderPanel('br-right-viewer', 'br-right-empty', rp);
+  sp.rendering = false;
+}
+
+async function _brRenderPanel(viewerId, emptyId, pageNum) {
+  const sp      = brSingle;
+  const viewer  = document.getElementById(viewerId);
+  const emptyEl = document.getElementById(emptyId);
+  if (!viewer) return;
+  if (!pageNum || pageNum > sp.totalPages) {
+    viewer.innerHTML = '';
+    if (emptyEl) { viewer.appendChild(emptyEl); emptyEl.style.display = ''; }
+    return;
+  }
+  if (emptyEl) emptyEl.style.display = 'none';
+  viewer.innerHTML = '<div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>렌더링 중...</span></div>';
+  try {
+    const page     = await sp.pdfDoc.getPage(pageNum);
+    const viewport = page.getViewport({ scale: 1 });
+    const dpr      = window.devicePixelRatio || 1;
+    const vElW     = viewer.clientWidth  || viewer.offsetWidth  || window.innerWidth;
+    const vElH     = viewer.clientHeight || viewer.offsetHeight || window.innerHeight;
+    const isDesktop = window.innerWidth >= 768;
+    let scale;
+    if (isDesktop) {
+      scale = Math.min((vElW - 64) / viewport.width, (vElH - 32) / viewport.height, 3);
+    } else {
+      scale = Math.min((vElW - 16) / viewport.width, 3);
+    }
+    scale = Math.max(scale, 0.3);
+    const vp     = page.getViewport({ scale: scale * dpr });
+    const canvas = document.createElement('canvas');
+    canvas.className = 'gb-pdf-canvas';
+    canvas.width  = vp.width;
+    canvas.height = vp.height;
+    canvas.style.width  = (vp.width  / dpr) + 'px';
+    canvas.style.height = (vp.height / dpr) + 'px';
+    await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
+    viewer.innerHTML = '';
+    viewer.appendChild(canvas);
+  } catch(e) {
+    viewer.innerHTML = '<div class="gb-pdf-loading"><span>렌더링 실패</span></div>';
+  }
+}
+
+async function brSpreadGo(dir) {
+  const sp = brSingle;
+  if (!sp.pdfDoc) return;
+  const np = _brSpreadStep(sp.curPage, dir);
+  if (np === sp.curPage) return;
+  sp.curPage = np;
+  sp.rendering = false;
+  _brUpdateSpreadNav();
+  await brRenderSpread();
+}
+
+/* ── 전체화면 ── */
+function openBrFullscreen() {
+  const sp  = brSingle;
+  if (!sp.pdfDoc) return;
+  brFsSide = true;
+  document.getElementById('br-fs-overlay').classList.add('open');
+  brFsRenderPage();
+}
+function closeBrFullscreen() {
+  brFsSide = false;
+  document.getElementById('br-fs-overlay').classList.remove('open');
+}
+
+async function brFsRenderPage() {
+  const sp     = brSingle;
+  const viewer = document.getElementById('br-fs-viewer');
+  const navinfo= document.getElementById('br-fs-navinfo');
+  if (!viewer || !sp.pdfDoc) return;
+  viewer.innerHTML = '<div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>렌더링 중...</span></div>';
+  try {
+    const page     = await sp.pdfDoc.getPage(sp.curPage);
+    const viewport = page.getViewport({ scale: 1 });
+    const dpr      = window.devicePixelRatio || 1;
+    const vElW     = viewer.clientWidth  || window.innerWidth;
+    const vElH     = viewer.clientHeight || window.innerHeight;
+    const isDesktop = window.innerWidth >= 768;
+    let scale;
+    if (isDesktop) {
+      scale = Math.min((vElW - 64) / viewport.width, (vElH - 32) / viewport.height, 3);
+    } else {
+      scale = Math.min((vElW - 16) / viewport.width, 3);
+    }
+    scale = Math.max(scale, 0.3);
+    const vp     = page.getViewport({ scale: scale * dpr });
+    const canvas = document.createElement('canvas');
+    canvas.className = 'gb-pdf-canvas';
+    canvas.width  = vp.width;
+    canvas.height = vp.height;
+    canvas.style.width  = (vp.width  / dpr) + 'px';
+    canvas.style.height = (vp.height / dpr) + 'px';
+    await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
+    viewer.innerHTML = '';
+    viewer.appendChild(canvas);
+    navinfo.textContent = sp.curPage + ' / ' + sp.totalPages;
+    document.getElementById('br-fs-prev').disabled = (sp.curPage <= 1);
+    document.getElementById('br-fs-next').disabled = (sp.curPage >= sp.totalPages);
+  } catch(e) {
+    viewer.innerHTML = '<div class="gb-pdf-loading"><span>페이지 렌더링 실패</span></div>';
+  }
+}
+
+async function brFsPageGo(dir) {
+  if (!brFsSide) return;
+  const sp = brSingle;
+  if (!sp.pdfDoc) return;
+  const np = sp.curPage + dir;
+  if (np < 1 || np > sp.totalPages) return;
+  sp.curPage = np;
+  _brUpdateSpreadNav();
+  sp.rendering = false;
+  await brFsRenderPage();
+}
+
+/* ── 설정 저장/로드 ── */
+async function brSaveSettings() {
+  try { await sbSet(BR_KEY_SETTINGS, { coverMode: brCoverMode, spreadDir: brSpreadDir }); } catch(_) {}
+}
+async function brLoadSettings() {
+  try {
+    const s = await sbGet(BR_KEY_SETTINGS);
+    if (s) {
+      if (s.coverMode) brCoverMode = s.coverMode;
+      if (s.spreadDir) brSpreadDir = s.spreadDir;
+    }
+  } catch(_) {}
+}
+function _brSyncSettingsUI() {
+  ['br-cover-none','br-cover-single'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('active', id === 'br-cover-' + brCoverMode);
+  });
+  document.getElementById('br-dir-oe')?.classList.toggle('active', brSpreadDir === 'odd-even');
+  document.getElementById('br-dir-eo')?.classList.toggle('active', brSpreadDir === 'even-odd');
+}
+async function brSetCoverMode(mode) {
+  brCoverMode = mode; _brSyncSettingsUI();
+  if (brSingle.pdfDoc) { brSingle.curPage = 1; brSingle.rendering = false; await brRenderSpread(); }
+  await brSaveSettings();
+}
+async function brSetSpreadDir(dir) {
+  brSpreadDir = dir; _brSyncSettingsUI();
+  if (brSingle.pdfDoc) { brSingle.curPage = 1; brSingle.rendering = false; await brRenderSpread(); }
+  await brSaveSettings();
+}
+
+/* ── PDF 업로드 ── */
+let _brPdfInput = null;
+function triggerBrPdfInput() {
+  if (!_brPdfInput) {
+    _brPdfInput = document.createElement('input');
+    _brPdfInput.type   = 'file';
+    _brPdfInput.accept = 'application/pdf';
+    _brPdfInput.style.display = 'none';
+    document.body.appendChild(_brPdfInput);
+    _brPdfInput.addEventListener('change', async e => {
+      const file = e.target.files[0];
+      _brPdfInput.value = '';
+      if (!file) return;
+      const fnEl = document.getElementById('br-left-filename');
+      if (fnEl) fnEl.textContent = '⏳ 업로드 중...';
+      try {
+        const prevStored = await sbGet(BR_KEY_SINGLE);
+        if (prevStored && prevStored.url) await deleteFromStorage(prevStored.url).catch(() => {});
+        const url = await uploadToStorage(file);
+        await sbSet(BR_KEY_SINGLE, { name: file.name, url });
+        if (fnEl) fnEl.textContent = file.name;
+        await loadBrPdfFromStorage();
+      } catch(err) {
+        if (fnEl) fnEl.textContent = 'PDF 없음';
+        alert('PDF 업로드 실패: ' + err.message);
+      }
+    });
+  }
+  _brPdfInput.click();
+}
+
+async function loadBrPdfFromStorage() {
+  try {
+    const stored = await sbGet(BR_KEY_SINGLE);
+    if (!stored || !stored.url) return;
+    const fnEl = document.getElementById('br-left-filename');
+    if (fnEl) fnEl.textContent = stored.name || 'brochure.pdf';
+    const pdfDoc = await pdfjsLib.getDocument(stored.url).promise;
+    brSingle.pdfDoc      = pdfDoc;
+    brSingle.totalPages  = pdfDoc.numPages;
+    brSingle.curPage     = 1;
+    brSingle.rendering   = false;
+    _brUpdateSpreadNav();
+    if (document.getElementById('brochure-screen').classList.contains('open')) {
+      await brRenderSpread();
+    }
+  } catch(_) {}
+}
+
+/* ── 화면 열기/닫기 ── */
+function openBrochureScreen() {
+  document.getElementById('brochure-screen').classList.add('open');
+  brSingle.rendering = false;
+  brLoadSettings().then(() => {
+    if (brSingle.pdfDoc) brRenderSpread();
+    else loadBrPdfFromStorage();
+  });
+  brEditMode = false;
+  document.getElementById('br-edit-btn').classList.remove('active');
+  document.getElementById('br-left-upload-btn').style.display = 'none';
+  const bar = document.getElementById('br-settings-bar');
+  if (bar) bar.style.display = 'none';
+}
+
+function closeBrochureScreen() {
+  document.getElementById('brochure-screen').classList.remove('open');
+  const bar = document.getElementById('br-settings-bar');
+  if (bar) bar.style.display = 'none';
+}
+
+/* ── 편집 모드 ── */
+function openBrochureEditPw() {
+  pwTarget = 'brEdit';
+  pwBuffer = '';
+  updateDots();
+  document.getElementById('pw-error').textContent = '';
+  document.getElementById('pw-modal').classList.add('open');
+}
+function enterBrEdit() {
+  brEditMode = true;
+  document.getElementById('br-edit-btn').classList.add('active');
+  document.getElementById('br-left-upload-btn').style.display = 'inline-flex';
+  const bar = document.getElementById('br-settings-bar');
+  if (bar) { bar.style.display = 'flex'; _brSyncSettingsUI(); }
+}
+
+/* ── 쪽 이동 팝업 ── */
+function toggleBrJumpPopup(e) {
+  const popup = document.getElementById('br-jump-popup');
+  if (!popup) return;
+  if (popup.classList.contains('open')) { closeBrJumpPopup(); return; }
+  popup.classList.add('open');
+  const inp   = document.getElementById('br-jump-input');
+  const total = document.getElementById('br-jump-total');
+  if (inp)   inp.value = '';
+  if (total) total.textContent = '/ ' + (brSingle.totalPages || 0);
+  setTimeout(() => inp && inp.focus(), 80);
+}
+function closeBrJumpPopup() {
+  document.getElementById('br-jump-popup')?.classList.remove('open');
+}
+async function brJumpToPage() {
+  const inp  = document.getElementById('br-jump-input');
+  const sp   = brSingle;
+  if (!sp.pdfDoc || !inp) return;
+  const np = parseInt(inp.value, 10);
+  if (isNaN(np) || np < 1 || np > sp.totalPages) return;
+  sp.curPage   = np;
+  sp.rendering = false;
+  closeBrJumpPopup();
+  _brUpdateSpreadNav();
+  if (brFsSide) await brFsRenderPage();
+  else await brRenderSpread();
+}
+
+/* ── 휠 네비게이션 ── */
+(function() {
+  const cooldown = { brL: false, brF: false };
+  function brWheelHandler(side, elId) {
+    document.addEventListener('DOMContentLoaded', () => {
+      const el = document.getElementById(elId);
+      if (!el) return;
+      el.addEventListener('wheel', e => {
+        const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 4;
+        const atTop    = el.scrollTop < 4;
+        const goNext   = e.deltaY > 0;
+        const goPrev   = e.deltaY < 0;
+        if (goNext && !atBottom) return;
+        if (goPrev && !atTop)    return;
+        e.preventDefault();
+        if (cooldown[side]) return;
+        cooldown[side] = true;
+        setTimeout(() => { cooldown[side] = false; }, 300);
+        if (side === 'brF') brFsPageGo(goNext ? 1 : -1);
+        else brSpreadGo(goNext ? 1 : -1);
+      }, { passive: false });
+    });
+  }
+  brWheelHandler('brL', 'br-left-viewer');
+  brWheelHandler('brF', 'br-fs-viewer');
+})();
+
 function openGbEditPw() {
   pwTarget = 'gbEdit';
   pwBuffer = '';
@@ -8585,6 +8958,9 @@ async function initApp() {
   // 길라잡이 PDF 복원 (Supabase) - 단일 PDF
   try { await gbLoadSettings(); } catch(_) {}
   try { await loadGbPdfFromStorage('left'); } catch(_) {}
+  // 브로셔 PDF 복원
+  try { await brLoadSettings(); } catch(_) {}
+  try { await loadBrPdfFromStorage(); } catch(_) {}
 }
 
 document.addEventListener('DOMContentLoaded', () => { initApp(); });
@@ -8669,8 +9045,119 @@ window.addEventListener('resize', function() {
     gbSingle.rendering = false;
     gbRenderSpread();
   }
+  // 브로셔 스프레드: 화면 크기 변경 시 재렌더링
+  if (brSingle.pdfDoc && document.getElementById('brochure-screen').classList.contains('open')) {
+    brSingle.rendering = false;
+    brRenderSpread();
+  }
 });
 </script>
+
+<!-- ═══════════════════════════════════════
+     브로셔 PDF 화면 (메뉴 09)
+═══════════════════════════════════════ -->
+<div id="brochure-screen">
+  <div class="screen-bg-layer" id="bg-brochure-screen"></div>
+  <!-- 헤더 -->
+  <div class="gb-header">
+    <button class="gb-back-btn" onclick="closeBrochureScreen()">◀ 뒤로</button>
+    <div class="gb-header-info">
+      <div class="gb-header-label">BROCHURE · 안내 브로셔</div>
+      <div class="gb-header-title" id="menu-09-title">2026 교육과정 안내 브로셔</div>
+    </div>
+    <button class="gb-edit-btn" id="br-edit-btn" onclick="openBrochureEditPw()" title="PDF 업로드 편집">🔒 편집</button>
+    <button class="gb-jump-trigger-btn" id="br-jump-trigger-btn" onclick="toggleBrJumpPopup(event)" title="페이지 이동">↗ 쪽 이동</button>
+    <button class="detail-home" onclick="closeBrochureScreen()" title="메인화면으로">🏠</button>
+  </div>
+
+  <!-- 단일 PDF 스프레드 뷰 -->
+  <div class="gb-panels">
+
+    <!-- 상단 바 -->
+    <div class="gb-panel-bar" style="flex-shrink:0;">
+      <span class="gb-panel-label">BROCHURE · 브로셔</span>
+      <span class="gb-panel-filename" id="br-left-filename">PDF 없음</span>
+      <button class="gb-fullscreen-btn" id="br-left-fs-btn" onclick="openBrFullscreen()" title="전체화면">⛶</button>
+      <button class="gb-upload-btn" id="br-left-upload-btn" style="display:none;" onclick="triggerBrPdfInput()">📂 PDF 업로드</button>
+    </div>
+
+    <!-- 스프레드 설정 바 (편집 모드에서만 표시) -->
+    <div id="br-settings-bar" class="gb-settings-bar" style="display:none;">
+      <div class="gb-settings-group">
+        <span class="gb-settings-label">표지</span>
+        <button id="br-cover-none"   class="gb-settings-btn active" onclick="brSetCoverMode('none')">없음</button>
+        <button id="br-cover-single" class="gb-settings-btn"        onclick="brSetCoverMode('single')">1쪽 단독</button>
+      </div>
+      <div class="gb-settings-sep"></div>
+      <div class="gb-settings-group">
+        <span class="gb-settings-label">펼침 방향</span>
+        <button id="br-dir-oe" class="gb-settings-btn active" onclick="brSetSpreadDir('odd-even')">홀→짝</button>
+        <button id="br-dir-eo" class="gb-settings-btn"        onclick="brSetSpreadDir('even-odd')">짝→홀</button>
+      </div>
+      <span class="gb-settings-hint">설정 변경 시 자동 저장됩니다</span>
+    </div>
+
+    <!-- 좌우 뷰어 행 -->
+    <div class="gb-spread-row" id="br-spread-row">
+      <div class="gb-panel" id="br-panel-left">
+        <div class="gb-panel-viewer" id="br-left-viewer">
+          <div class="gb-empty" id="br-left-empty">
+            <div class="gb-empty-icon">📄</div>
+            <div class="gb-empty-text">PDF가 없습니다.<br><span style="font-size:10px;opacity:0.6">관리자가 PDF를 업로드할 수 있습니다.</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="gb-panel" id="br-panel-right">
+        <div class="gb-panel-viewer" id="br-right-viewer">
+          <div class="gb-empty" id="br-right-empty">
+            <div class="gb-empty-icon">📄</div>
+            <div class="gb-empty-text">다음 페이지</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 하단 네비게이션 -->
+    <div class="gb-panel-nav" id="br-spread-nav" style="display:none;">
+      <button class="gb-nav-btn" id="br-left-prev" onclick="brSpreadGo(-1)" disabled>‹</button>
+      <span class="gb-page-info" id="br-left-pageinfo">0 / 0</span>
+      <button class="gb-nav-btn" id="br-left-next" onclick="brSpreadGo(1)" disabled>›</button>
+    </div>
+
+  </div>
+
+  <!-- 전체화면 오버레이 -->
+  <div id="br-fs-overlay" class="gb-panel-fullscreen">
+    <div class="gb-fs-bar">
+      <button class="gb-fs-close" onclick="closeBrFullscreen()">✕ 축소</button>
+      <span class="gb-fs-filename" id="br-fs-filename"></span>
+      <span class="gb-page-info" id="br-fs-pageinfo" style="min-width:80px;text-align:right;"></span>
+    </div>
+    <div class="gb-fs-viewer" id="br-fs-viewer"></div>
+    <div class="gb-fs-nav">
+      <button class="gb-nav-btn" id="br-fs-prev" onclick="brFsPageGo(-1)" disabled>‹</button>
+      <span class="gb-page-info" id="br-fs-navinfo">0 / 0</span>
+      <button class="gb-nav-btn" id="br-fs-next" onclick="brFsPageGo(1)" disabled>›</button>
+    </div>
+  </div>
+</div>
+
+<!-- 브로셔 페이지 이동 팝업 -->
+<div class="gb-jump-popup" id="br-jump-popup" onclick="if(event.target===this) closeBrJumpPopup()">
+  <div class="gb-jump-popup-box">
+    <div class="gb-jump-popup-title">페이지 이동</div>
+    <div class="gb-jump-popup-row">
+      <input class="gb-jump-input" id="br-jump-input" type="number" min="1" placeholder="쪽"
+        onkeydown="if(event.key==='Enter') brJumpToPage(); if(event.key==='Escape') closeBrJumpPopup();"
+        oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+      <span class="gb-jump-total" id="br-jump-total">/ 0</span>
+    </div>
+    <div class="gb-jump-popup-actions">
+      <button class="gb-jump-cancel-btn" onclick="closeBrJumpPopup()">취소</button>
+      <button class="gb-jump-btn" onclick="brJumpToPage()">이동</button>
+    </div>
+  </div>
+</div>
 
 <!-- ═══════════════════════════════════════
      외부 사이트 iframe 화면 (메뉴 08)
