@@ -8166,9 +8166,19 @@ function openGuidebookScreen() {
   document.getElementById('guidebook-screen').classList.add('open');
   gbSingle.rendering = false;
   // 설정 로드 후 PDF 렌더링
-  gbLoadSettings().then(() => {
-    if (gbSingle.pdfDoc) gbRenderSpread();
-    else loadGbPdfFromStorage('left');
+  gbLoadSettings().then(async () => {
+    if (gbSingle.pdfDoc) {
+      gbRenderSpread();
+      try {
+        const stored = await sbGet(GB_KEY_SINGLE);
+        if (stored && stored.url) {
+          const dlBtn = document.getElementById('gb-download-btn');
+          if (dlBtn) dlBtn.classList.add('visible');
+        }
+      } catch(_) {}
+    } else {
+      loadGbPdfFromStorage('left');
+    }
   });
   // 편집 버튼 상태 초기화
   gbEditMode = false;
@@ -9105,18 +9115,23 @@ document.addEventListener('DOMContentLoaded', () => {
 async function downloadPdf(type) {
   const btn = document.getElementById(type + '-download-btn');
   if (!btn) return;
-  const url      = btn.dataset.url;
-  const filename = btn.dataset.filename || 'download.pdf';
-  if (!url) return;
 
   const originalText = btn.textContent;
   btn.textContent = '⏳ 받는 중...';
   btn.disabled = true;
 
   try {
-    const res  = await fetch(url);
-    if (!res.ok) throw new Error('fetch 실패');
-    const blob = await res.blob();
+    // dataset 대신 Supabase에서 직접 조회 (가장 신뢰할 수 있는 출처)
+    const key = type === 'gb' ? GB_KEY_SINGLE : BR_KEY_SINGLE;
+    const stored = await sbGet(key);
+    if (!stored || !stored.url) throw new Error('저장된 PDF가 없습니다.');
+
+    const url      = stored.url;
+    const filename = stored.name || type + '.pdf';
+
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('파일을 가져오지 못했습니다 (' + res.status + ')');
+    const blob    = await res.blob();
     const blobUrl = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href     = blobUrl;
