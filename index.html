@@ -8228,24 +8228,34 @@ async function brRenderSpread() {
   sp.rendering = false;
 }
 
+// 패널별 캔버스 재사용 맵 (DOM 할당 비용 절감)
+const _brCanvasMap = {};
+
 async function _brRenderPanel(viewerId, emptyId, pageNum) {
   const sp      = brSingle;
   const viewer  = document.getElementById(viewerId);
   const emptyEl = document.getElementById(emptyId);
   if (!viewer) return;
   if (!pageNum || pageNum > sp.totalPages) {
-    viewer.innerHTML = '';
+    // 빈 패널: 기존 캔버스 숨기고 empty placeholder 표시
+    const old = _brCanvasMap[viewerId];
+    if (old) old.style.display = 'none';
     if (emptyEl) { viewer.appendChild(emptyEl); emptyEl.style.display = ''; }
     return;
   }
   if (emptyEl) emptyEl.style.display = 'none';
-  viewer.innerHTML = '<div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>렌더링 중...</span></div>';
+
+  // 스피너는 캔버스가 아직 없을 때만 표시 (이미 있으면 이전 페이지 그대로 노출 → 깜빡임 최소화)
+  if (!_brCanvasMap[viewerId]) {
+    viewer.innerHTML = '<div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>렌더링 중...</span></div>';
+  }
+
   try {
-    const page     = await sp.pdfDoc.getPage(pageNum);
-    const viewport = page.getViewport({ scale: 1 });
-    const dpr      = Math.min(window.devicePixelRatio || 1, 2); // 3x 레티나 과다 렌더 방지 (캔버스 크기 상한)
-    const vElW     = viewer.clientWidth  || viewer.offsetWidth  || window.innerWidth;
-    const vElH     = viewer.clientHeight || viewer.offsetHeight || window.innerHeight;
+    const page      = await sp.pdfDoc.getPage(pageNum);
+    const viewport  = page.getViewport({ scale: 1 });
+    const dpr       = Math.min(window.devicePixelRatio || 1, 2);
+    const vElW      = viewer.clientWidth  || viewer.offsetWidth  || window.innerWidth;
+    const vElH      = viewer.clientHeight || viewer.offsetHeight || window.innerHeight;
     const isDesktop = window.innerWidth >= 768;
     let scale;
     if (isDesktop) {
@@ -8254,18 +8264,41 @@ async function _brRenderPanel(viewerId, emptyId, pageNum) {
       scale = Math.min((vElW - 16) / viewport.width, 3);
     }
     scale = Math.max(scale, 0.3);
-    const vp     = page.getViewport({ scale: scale * dpr });
-    const canvas = document.createElement('canvas');
-    canvas.className = 'gb-pdf-canvas';
-    canvas.width  = vp.width;
-    canvas.height = vp.height;
+    const vp = page.getViewport({ scale: scale * dpr });
+
+    // 캔버스 재사용: 크기가 같으면 새로 만들지 않음
+    let canvas = _brCanvasMap[viewerId];
+    if (!canvas || canvas.width !== vp.width || canvas.height !== vp.height) {
+      canvas = document.createElement('canvas');
+      canvas.className = 'gb-pdf-canvas';
+      _brCanvasMap[viewerId] = canvas;
+    }
+    canvas.width        = vp.width;
+    canvas.height       = vp.height;
     canvas.style.width  = (vp.width  / dpr) + 'px';
     canvas.style.height = (vp.height / dpr) + 'px';
-    await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
-    viewer.innerHTML = '';
-    viewer.appendChild(canvas);
+
+    // OffscreenCanvas 지원 시 메인 스레드 외부에서 렌더 (jank 감소)
+    if (typeof OffscreenCanvas !== 'undefined' && canvas.transferControlToOffscreen) {
+      const offscreen = canvas.transferControlToOffscreen();
+      await page.render({ canvasContext: offscreen.getContext('2d'), viewport: vp }).promise;
+    } else {
+      await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
+    }
+
+    // DOM 업데이트는 렌더 완료 후 한 번만
+    if (viewer.firstChild !== canvas) {
+      viewer.innerHTML = '';
+      viewer.appendChild(canvas);
+    }
+
+    // 다음 스프레드 프리패치: 렌더 완료 후 백그라운드에서 다음 2페이지 getPage (pdf.js 내부 캐시 웜업)
+    const prefetchPages = [pageNum + 2, pageNum + 3].filter(p => p >= 1 && p <= sp.totalPages);
+    prefetchPages.forEach(p => sp.pdfDoc.getPage(p).catch(() => {}));
+
   } catch(e) {
     viewer.innerHTML = '<div class="gb-pdf-loading"><span>렌더링 실패</span></div>';
+    delete _brCanvasMap[viewerId];
   }
 }
 
@@ -8293,16 +8326,20 @@ function closeBrFullscreen() {
   document.getElementById('br-fs-overlay').classList.remove('open');
 }
 
+const _brFsCanvas = { canvas: null };
+
 async function brFsRenderPage() {
   const sp     = brSingle;
   const viewer = document.getElementById('br-fs-viewer');
   const navinfo= document.getElementById('br-fs-navinfo');
   if (!viewer || !sp.pdfDoc) return;
-  viewer.innerHTML = '<div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>렌더링 중...</span></div>';
+  if (!_brFsCanvas.canvas) {
+    viewer.innerHTML = '<div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>렌더링 중...</span></div>';
+  }
   try {
     const page     = await sp.pdfDoc.getPage(sp.curPage);
     const viewport = page.getViewport({ scale: 1 });
-    const dpr      = window.devicePixelRatio || 1;
+    const dpr      = Math.min(window.devicePixelRatio || 1, 2);
     const vElW     = viewer.clientWidth  || window.innerWidth;
     const vElH     = viewer.clientHeight || window.innerHeight;
     const isDesktop = window.innerWidth >= 768;
@@ -8313,21 +8350,29 @@ async function brFsRenderPage() {
       scale = Math.min((vElW - 16) / viewport.width, 3);
     }
     scale = Math.max(scale, 0.3);
-    const vp     = page.getViewport({ scale: scale * dpr });
-    const canvas = document.createElement('canvas');
-    canvas.className = 'gb-pdf-canvas';
-    canvas.width  = vp.width;
-    canvas.height = vp.height;
+    const vp = page.getViewport({ scale: scale * dpr });
+
+    let canvas = _brFsCanvas.canvas;
+    if (!canvas || canvas.width !== vp.width || canvas.height !== vp.height) {
+      canvas = document.createElement('canvas');
+      canvas.className = 'gb-pdf-canvas';
+      _brFsCanvas.canvas = canvas;
+    }
+    canvas.width        = vp.width;
+    canvas.height       = vp.height;
     canvas.style.width  = (vp.width  / dpr) + 'px';
     canvas.style.height = (vp.height / dpr) + 'px';
     await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
-    viewer.innerHTML = '';
-    viewer.appendChild(canvas);
+    if (viewer.firstChild !== canvas) {
+      viewer.innerHTML = '';
+      viewer.appendChild(canvas);
+    }
     navinfo.textContent = sp.curPage + ' / ' + sp.totalPages;
     document.getElementById('br-fs-prev').disabled = (sp.curPage <= 1);
     document.getElementById('br-fs-next').disabled = (sp.curPage >= sp.totalPages);
   } catch(e) {
     viewer.innerHTML = '<div class="gb-pdf-loading"><span>페이지 렌더링 실패</span></div>';
+    _brFsCanvas.canvas = null;
   }
 }
 
