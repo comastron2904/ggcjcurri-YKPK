@@ -14,20 +14,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
-  // worker 파일을 fetch → Blob URL로 변환해 workerSrc에 설정
-  // 이 방법은 same-origin 제약 없이 worker를 확실히 로드함
-  (async function() {
-    try {
-      const resp = await fetch('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js');
-      const blob = await resp.blob();
-      const url  = URL.createObjectURL(blob);
-      pdfjsLib.GlobalWorkerOptions.workerSrc = url;
-    } catch(e) {
-      // fetch 실패 시 직접 URL 폴백 (fake worker 경고는 뜰 수 있음)
-      pdfjsLib.GlobalWorkerOptions.workerSrc =
-        'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-    }
-  })();
+  // workerSrc를 직접 지정 (Blob fetch 변환 제거 → 초기 로딩 블로킹 해소)
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 </script>
 <style>
   :root {
@@ -8231,8 +8220,11 @@ async function brRenderSpread() {
   sp.rendering = true;
   _brUpdateSpreadNav();
   const [lp, rp] = _brGetPair(sp.curPage);
-  await _brRenderPanel('br-left-viewer',  'br-left-empty',  lp);
-  await _brRenderPanel('br-right-viewer', 'br-right-empty', rp);
+  // 좌우 패널 병렬 렌더링 (기존 직렬 await → Promise.all로 속도 향상)
+  await Promise.all([
+    _brRenderPanel('br-left-viewer',  'br-left-empty',  lp),
+    _brRenderPanel('br-right-viewer', 'br-right-empty', rp)
+  ]);
   sp.rendering = false;
 }
 
@@ -8251,7 +8243,7 @@ async function _brRenderPanel(viewerId, emptyId, pageNum) {
   try {
     const page     = await sp.pdfDoc.getPage(pageNum);
     const viewport = page.getViewport({ scale: 1 });
-    const dpr      = window.devicePixelRatio || 1;
+    const dpr      = Math.min(window.devicePixelRatio || 1, 2); // 3x 레티나 과다 렌더 방지 (캔버스 크기 상한)
     const vElW     = viewer.clientWidth  || viewer.offsetWidth  || window.innerWidth;
     const vElH     = viewer.clientHeight || viewer.offsetHeight || window.innerHeight;
     const isDesktop = window.innerWidth >= 768;
@@ -8404,7 +8396,22 @@ function triggerBrPdfInput() {
         const url = await uploadToStorage(file);
         await sbSet(BR_KEY_SINGLE, { name: file.name, url });
         if (fnEl) fnEl.textContent = file.name;
-        await loadBrPdfFromStorage();
+        // 업로드 직후: 이미 메모리에 있는 File을 ArrayBuffer로 직접 파싱 (재 fetch 불필요)
+        try {
+          const arrayBuf = await file.arrayBuffer();
+          const pdfDoc   = await pdfjsLib.getDocument({ data: arrayBuf }).promise;
+          brSingle.pdfDoc     = pdfDoc;
+          brSingle.totalPages = pdfDoc.numPages;
+          brSingle.curPage    = 1;
+          brSingle.rendering  = false;
+          _brLoaded = true;
+          _brUpdateSpreadNav();
+          if (document.getElementById('brochure-screen').classList.contains('open')) {
+            await brRenderSpread();
+          }
+        } catch(_) {
+          await loadBrPdfFromStorage();
+        }
       } catch(err) {
         if (fnEl) fnEl.textContent = 'PDF 없음';
         alert('PDF 업로드 실패: ' + err.message);
@@ -8420,7 +8427,13 @@ async function loadBrPdfFromStorage() {
     if (!stored || !stored.url) return;
     const fnEl = document.getElementById('br-left-filename');
     if (fnEl) fnEl.textContent = stored.name || 'brochure.pdf';
-    const pdfDoc = await pdfjsLib.getDocument(stored.url).promise;
+    // rangeChunkSize 증가로 첫 페이지까지 왕복 횟수 감소, 스트리밍 활성화
+    const pdfDoc = await pdfjsLib.getDocument({
+      url: stored.url,
+      rangeChunkSize: 262144,   // 256 KB 청크 (기본 64KB → 4배)
+      disableAutoFetch: false,
+      disableStream: false
+    }).promise;
     brSingle.pdfDoc      = pdfDoc;
     brSingle.totalPages  = pdfDoc.numPages;
     brSingle.curPage     = 1;
@@ -8433,12 +8446,26 @@ async function loadBrPdfFromStorage() {
 }
 
 /* ── 화면 열기/닫기 ── */
+let _brLoaded = false; // lazy load 플래그: 최초 1회만 Supabase에서 PDF fetch
 function openBrochureScreen() {
   document.getElementById('brochure-screen').classList.add('open');
   brSingle.rendering = false;
-  brLoadSettings().then(() => {
-    if (brSingle.pdfDoc) brRenderSpread();
-    else loadBrPdfFromStorage();
+  brLoadSettings().then(async () => {
+    if (brSingle.pdfDoc) {
+      brRenderSpread();
+    } else if (!_brLoaded) {
+      // 최초 진입 시만 Supabase에서 PDF 로드 (이후엔 메모리에 유지)
+      _brLoaded = true;
+      // 로딩 중 표시
+      const lv = document.getElementById('br-left-viewer');
+      const rv = document.getElementById('br-right-viewer');
+      const spinner = '<div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>PDF 불러오는 중...</span></div>';
+      if (lv) lv.innerHTML = spinner;
+      if (rv) rv.innerHTML = '';
+      await loadBrPdfFromStorage();
+    } else {
+      // 이미 로드 시도했지만 PDF 없음 → 빈 상태 유지
+    }
   });
   brEditMode = false;
   document.getElementById('br-edit-btn').classList.remove('active');
@@ -8958,9 +8985,9 @@ async function initApp() {
   // 길라잡이 PDF 복원 (Supabase) - 단일 PDF
   try { await gbLoadSettings(); } catch(_) {}
   try { await loadGbPdfFromStorage('left'); } catch(_) {}
-  // 브로셔 PDF 복원
+  // 브로셔 PDF 복원 → lazy: 09번 버튼 클릭 시 처음 로드 (초기화 시간 단축)
   try { await brLoadSettings(); } catch(_) {}
-  try { await loadBrPdfFromStorage(); } catch(_) {}
+  // loadBrPdfFromStorage()는 openBrochureScreen() 최초 호출 시 실행됨
 }
 
 document.addEventListener('DOMContentLoaded', () => { initApp(); });
