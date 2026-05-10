@@ -3002,6 +3002,27 @@
   .gb-jump-trigger-btn:hover { background: rgba(26,107,191,0.10); border-color: var(--gold); color: var(--gold); }
   .gb-jump-trigger-btn.visible { display: inline-flex; }
 
+  /* PDF 다운로드 버튼 */
+  .gb-download-btn {
+    display: none; align-items: center; gap: 6px;
+    padding: 8px 14px; height: 36px;
+    background: #ffffff;
+    border: 1px solid rgba(26,107,191,0.35);
+    color: var(--gold);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 12px; font-weight: 600; letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.25s ease; white-space: nowrap;
+    text-decoration: none;
+  }
+  .gb-download-btn:hover {
+    background: rgba(14,138,122,0.08);
+    border-color: var(--accent-teal); color: var(--accent-teal);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(14,138,122,0.18);
+  }
+  .gb-download-btn.visible { display: inline-flex; }
+
   /* ── 페이지 이동 팝업 ── */
   /* ── 페이지 이동 오버레이 ── */
   .gb-jump-popup {
@@ -4329,6 +4350,7 @@
     </div>
     <button class="gb-edit-btn" id="gb-edit-btn" onclick="openGbEditPw()" title="PDF 업로드 편집">🔒 편집</button>
     <button class="gb-jump-trigger-btn" id="gb-jump-trigger-btn" onclick="toggleGbJumpPopup(event)" title="페이지 이동">↗ 쪽 이동</button>
+    <a class="gb-download-btn" id="gb-download-btn" href="#" download title="PDF 다운로드">⬇ 다운로드</a>
     <button class="detail-home" onclick="closeGuidebookScreen()" title="메인화면으로">🏠</button>
   </div>
 
@@ -8228,8 +8250,6 @@ async function brRenderSpread() {
   sp.rendering = false;
 }
 
-// (캔버스 재사용 제거 — 페이지 전환 시 충돌 방지를 위해 항상 새 캔버스에 렌더 후 교체)
-
 async function _brRenderPanel(viewerId, emptyId, pageNum) {
   const sp      = brSingle;
   const viewer  = document.getElementById(viewerId);
@@ -8241,18 +8261,13 @@ async function _brRenderPanel(viewerId, emptyId, pageNum) {
     return;
   }
   if (emptyEl) emptyEl.style.display = 'none';
-
-  // 첫 로드 시에만 스피너 (기존 캔버스가 있으면 그대로 두고 렌더 완료 후 교체)
-  if (!viewer.querySelector('canvas')) {
-    viewer.innerHTML = '<div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>렌더링 중...</span></div>';
-  }
-
+  viewer.innerHTML = '<div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>렌더링 중...</span></div>';
   try {
-    const page      = await sp.pdfDoc.getPage(pageNum);
-    const viewport  = page.getViewport({ scale: 1 });
-    const dpr       = Math.min(window.devicePixelRatio || 1, 2);
-    const vElW      = viewer.clientWidth  || viewer.offsetWidth  || window.innerWidth;
-    const vElH      = viewer.clientHeight || viewer.offsetHeight || window.innerHeight;
+    const page     = await sp.pdfDoc.getPage(pageNum);
+    const viewport = page.getViewport({ scale: 1 });
+    const dpr      = Math.min(window.devicePixelRatio || 1, 2); // 3x 레티나 과다 렌더 방지 (캔버스 크기 상한)
+    const vElW     = viewer.clientWidth  || viewer.offsetWidth  || window.innerWidth;
+    const vElH     = viewer.clientHeight || viewer.offsetHeight || window.innerHeight;
     const isDesktop = window.innerWidth >= 768;
     let scale;
     if (isDesktop) {
@@ -8261,27 +8276,16 @@ async function _brRenderPanel(viewerId, emptyId, pageNum) {
       scale = Math.min((vElW - 16) / viewport.width, 3);
     }
     scale = Math.max(scale, 0.3);
-    const vp = page.getViewport({ scale: scale * dpr });
-
-    // 항상 새 캔버스에 렌더 → 완료 후 한 번에 교체 (이전 페이지와 겹치는 충돌 방지)
+    const vp     = page.getViewport({ scale: scale * dpr });
     const canvas = document.createElement('canvas');
-    canvas.className    = 'gb-pdf-canvas';
-    canvas.width        = vp.width;
-    canvas.height       = vp.height;
+    canvas.className = 'gb-pdf-canvas';
+    canvas.width  = vp.width;
+    canvas.height = vp.height;
     canvas.style.width  = (vp.width  / dpr) + 'px';
     canvas.style.height = (vp.height / dpr) + 'px';
-
     await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
-
-    // 렌더 완료 후 한 번에 교체
     viewer.innerHTML = '';
     viewer.appendChild(canvas);
-
-    // 다음 스프레드 프리패치 (pdf.js 내부 캐시 웜업)
-    [pageNum + 2, pageNum + 3]
-      .filter(p => p >= 1 && p <= sp.totalPages)
-      .forEach(p => sp.pdfDoc.getPage(p).catch(() => {}));
-
   } catch(e) {
     viewer.innerHTML = '<div class="gb-pdf-loading"><span>렌더링 실패</span></div>';
   }
@@ -8316,13 +8320,11 @@ async function brFsRenderPage() {
   const viewer = document.getElementById('br-fs-viewer');
   const navinfo= document.getElementById('br-fs-navinfo');
   if (!viewer || !sp.pdfDoc) return;
-  if (!viewer.querySelector('canvas')) {
-    viewer.innerHTML = '<div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>렌더링 중...</span></div>';
-  }
+  viewer.innerHTML = '<div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>렌더링 중...</span></div>';
   try {
     const page     = await sp.pdfDoc.getPage(sp.curPage);
     const viewport = page.getViewport({ scale: 1 });
-    const dpr      = Math.min(window.devicePixelRatio || 1, 2);
+    const dpr      = window.devicePixelRatio || 1;
     const vElW     = viewer.clientWidth  || window.innerWidth;
     const vElH     = viewer.clientHeight || window.innerHeight;
     const isDesktop = window.innerWidth >= 768;
@@ -8333,17 +8335,14 @@ async function brFsRenderPage() {
       scale = Math.min((vElW - 16) / viewport.width, 3);
     }
     scale = Math.max(scale, 0.3);
-    const vp = page.getViewport({ scale: scale * dpr });
-
+    const vp     = page.getViewport({ scale: scale * dpr });
     const canvas = document.createElement('canvas');
-    canvas.className    = 'gb-pdf-canvas';
-    canvas.width        = vp.width;
-    canvas.height       = vp.height;
+    canvas.className = 'gb-pdf-canvas';
+    canvas.width  = vp.width;
+    canvas.height = vp.height;
     canvas.style.width  = (vp.width  / dpr) + 'px';
     canvas.style.height = (vp.height / dpr) + 'px';
-
     await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
-
     viewer.innerHTML = '';
     viewer.appendChild(canvas);
     navinfo.textContent = sp.curPage + ' / ' + sp.totalPages;
@@ -8419,6 +8418,13 @@ function triggerBrPdfInput() {
         const url = await uploadToStorage(file);
         await sbSet(BR_KEY_SINGLE, { name: file.name, url });
         if (fnEl) fnEl.textContent = file.name;
+        // 다운로드 버튼 활성화
+        const dlBtn = document.getElementById('br-download-btn');
+        if (dlBtn) {
+          dlBtn.href = url;
+          dlBtn.download = file.name;
+          dlBtn.classList.add('visible');
+        }
         // 업로드 직후: 이미 메모리에 있는 File을 ArrayBuffer로 직접 파싱 (재 fetch 불필요)
         try {
           const arrayBuf = await file.arrayBuffer();
@@ -8450,6 +8456,13 @@ async function loadBrPdfFromStorage() {
     if (!stored || !stored.url) return;
     const fnEl = document.getElementById('br-left-filename');
     if (fnEl) fnEl.textContent = stored.name || 'brochure.pdf';
+    // 다운로드 버튼 활성화
+    const dlBtn = document.getElementById('br-download-btn');
+    if (dlBtn) {
+      dlBtn.href = stored.url;
+      dlBtn.download = stored.name || 'brochure.pdf';
+      dlBtn.classList.add('visible');
+    }
     // rangeChunkSize 증가로 첫 페이지까지 왕복 횟수 감소, 스트리밍 활성화
     const pdfDoc = await pdfjsLib.getDocument({
       url: stored.url,
@@ -8739,6 +8752,13 @@ async function renderGbPdf(side, dataUrl, filename) {
     gbSingle.totalPages = pdf.numPages;
     gbSingle.curPage    = 1;
     fnEl.textContent = '📄 ' + filename;
+    // 다운로드 버튼 활성화
+    const dlBtn = document.getElementById('gb-download-btn');
+    if (dlBtn) {
+      dlBtn.href = dataUrl;
+      dlBtn.download = filename;
+      dlBtn.classList.add('visible');
+    }
     document.getElementById('gb-spread-nav').style.display = 'flex';
     const jumpBtn = document.getElementById('gb-jump-trigger-btn');
     if (jumpBtn) jumpBtn.classList.add('visible');
@@ -9117,6 +9137,7 @@ window.addEventListener('resize', function() {
     </div>
     <button class="gb-edit-btn" id="br-edit-btn" onclick="openBrochureEditPw()" title="PDF 업로드 편집">🔒 편집</button>
     <button class="gb-jump-trigger-btn" id="br-jump-trigger-btn" onclick="toggleBrJumpPopup(event)" title="페이지 이동">↗ 쪽 이동</button>
+    <a class="gb-download-btn" id="br-download-btn" href="#" download title="PDF 다운로드">⬇ 다운로드</a>
     <button class="detail-home" onclick="closeBrochureScreen()" title="메인화면으로">🏠</button>
   </div>
 
