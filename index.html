@@ -4350,7 +4350,7 @@
     </div>
     <button class="gb-edit-btn" id="gb-edit-btn" onclick="openGbEditPw()" title="PDF 업로드 편집">🔒 편집</button>
     <button class="gb-jump-trigger-btn" id="gb-jump-trigger-btn" onclick="toggleGbJumpPopup(event)" title="페이지 이동">↗ 쪽 이동</button>
-    <button class="gb-download-btn" id="gb-download-btn" onclick="downloadPdf('gb')" title="PDF 다운로드">⬇ 다운로드</button>
+    <a class="gb-download-btn" id="gb-download-btn" href="#" download title="PDF 다운로드">⬇ 다운로드</a>
     <button class="detail-home" onclick="closeGuidebookScreen()" title="메인화면으로">🏠</button>
   </div>
 
@@ -8166,19 +8166,9 @@ function openGuidebookScreen() {
   document.getElementById('guidebook-screen').classList.add('open');
   gbSingle.rendering = false;
   // 설정 로드 후 PDF 렌더링
-  gbLoadSettings().then(async () => {
-    if (gbSingle.pdfDoc) {
-      gbRenderSpread();
-      try {
-        const stored = await sbGet(GB_KEY_SINGLE);
-        if (stored && stored.url) {
-          const dlBtn = document.getElementById('gb-download-btn');
-          if (dlBtn) dlBtn.classList.add('visible');
-        }
-      } catch(_) {}
-    } else {
-      loadGbPdfFromStorage('left');
-    }
+  gbLoadSettings().then(() => {
+    if (gbSingle.pdfDoc) gbRenderSpread();
+    else loadGbPdfFromStorage('left');
   });
   // 편집 버튼 상태 초기화
   gbEditMode = false;
@@ -8431,8 +8421,8 @@ function triggerBrPdfInput() {
         // 다운로드 버튼 활성화
         const dlBtn = document.getElementById('br-download-btn');
         if (dlBtn) {
-          dlBtn.dataset.url = url;
-          dlBtn.dataset.filename = file.name;
+          dlBtn.href = url;
+          dlBtn.download = file.name;
           dlBtn.classList.add('visible');
         }
         // 업로드 직후: 이미 메모리에 있는 File을 ArrayBuffer로 직접 파싱 (재 fetch 불필요)
@@ -8469,8 +8459,8 @@ async function loadBrPdfFromStorage() {
     // 다운로드 버튼 활성화
     const dlBtn = document.getElementById('br-download-btn');
     if (dlBtn) {
-      dlBtn.dataset.url = stored.url;
-      dlBtn.dataset.filename = stored.name || 'brochure.pdf';
+      dlBtn.href = stored.url;
+      dlBtn.download = stored.name || 'brochure.pdf';
       dlBtn.classList.add('visible');
     }
     // rangeChunkSize 증가로 첫 페이지까지 왕복 횟수 감소, 스트리밍 활성화
@@ -8765,8 +8755,8 @@ async function renderGbPdf(side, dataUrl, filename) {
     // 다운로드 버튼 활성화
     const dlBtn = document.getElementById('gb-download-btn');
     if (dlBtn) {
-      dlBtn.dataset.url = dataUrl;
-      dlBtn.dataset.filename = filename;
+      dlBtn.href = dataUrl;
+      dlBtn.download = filename;
       dlBtn.classList.add('visible');
     }
     document.getElementById('gb-spread-nav').style.display = 'flex';
@@ -9109,45 +9099,7 @@ document.addEventListener('DOMContentLoaded', () => {
 /* ══════════════════════════════════════
    화면 회전/리사이즈 시 학기 상태 재적용
 ══════════════════════════════════════ */
-/* ══════════════════════════════════════
-   PDF 다운로드 (fetch → blob → 강제 저장)
-══════════════════════════════════════ */
-async function downloadPdf(type) {
-  const btn = document.getElementById(type + '-download-btn');
-  if (!btn) return;
-
-  const originalText = btn.textContent;
-  btn.textContent = '⏳ 받는 중...';
-  btn.disabled = true;
-
-  try {
-    // dataset 대신 Supabase에서 직접 조회 (가장 신뢰할 수 있는 출처)
-    const key = type === 'gb' ? GB_KEY_SINGLE : BR_KEY_SINGLE;
-    const stored = await sbGet(key);
-    if (!stored || !stored.url) throw new Error('저장된 PDF가 없습니다.');
-
-    const url      = stored.url;
-    const filename = stored.name || type + '.pdf';
-
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('파일을 가져오지 못했습니다 (' + res.status + ')');
-    const blob    = await res.blob();
-    const blobUrl = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href     = blobUrl;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
-  } catch(err) {
-    alert('다운로드에 실패했습니다.\n' + err.message);
-  } finally {
-    btn.textContent = originalText;
-    btn.disabled = false;
-  }
-}
-
+window.addEventListener('resize', function() {
   // 화면 회전/리사이즈 시 스크롤 플래그 리셋 (고착 방지)
   _isScrolling = false;
   // updateSemGridColumns가 isMob 판단을 900px 기준으로 자체 처리
@@ -9185,7 +9137,7 @@ async function downloadPdf(type) {
     </div>
     <button class="gb-edit-btn" id="br-edit-btn" onclick="openBrochureEditPw()" title="PDF 업로드 편집">🔒 편집</button>
     <button class="gb-jump-trigger-btn" id="br-jump-trigger-btn" onclick="toggleBrJumpPopup(event)" title="페이지 이동">↗ 쪽 이동</button>
-    <button class="gb-download-btn" id="br-download-btn" onclick="downloadPdf('br')" title="PDF 다운로드">⬇ 다운로드</button>
+    <a class="gb-download-btn" id="br-download-btn" href="#" download title="PDF 다운로드">⬇ 다운로드</a>
     <button class="detail-home" onclick="closeBrochureScreen()" title="메인화면으로">🏠</button>
   </div>
 
