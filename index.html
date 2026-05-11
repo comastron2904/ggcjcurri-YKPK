@@ -153,20 +153,6 @@
   .btn-pe-save:hover { opacity: 0.85; transform: translateY(-1px); }
 
   /* ══════════════════════════════════════
-     서브화면 공통 부제목
-  ══════════════════════════════════════ */
-  .menu-subtitle {
-    font-size: 11px;
-    color: rgba(26,46,74,0.52);
-    letter-spacing: 0.8px;
-    line-height: 1.5;
-    margin-top: 3px;
-    font-family: 'Noto Sans KR', sans-serif;
-    font-weight: 400;
-  }
-  .menu-subtitle:empty { display: none; }
-
-  /* ══════════════════════════════════════
      서브화면 공통 배경 이미지 레이어
   ══════════════════════════════════════ */
   .screen-bg-layer {
@@ -756,7 +742,7 @@
   #hero {
     position: relative; width: 100%; min-height: 52vh;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    overflow: hidden; cursor: pointer;
+    overflow: hidden;
     background: linear-gradient(160deg, #c5dcf5 0%, #daeaf8 50%, #b8d4f0 100%);
     user-select: none;
   }
@@ -3119,7 +3105,7 @@
 </div>
 
 <!-- ═══ HERO ═══ -->
-<section id="hero" onclick="document.getElementById('file-input').click()" title="클릭하여 배경 이미지 변경">
+<section id="hero">
   <div id="hero-bg"></div>
   <div id="hero-overlay"></div>
   <div class="geo-circle c1"></div>
@@ -3130,7 +3116,7 @@
     <div class="year-badge" id="txt-badge">Gyeonggi Changjo High School · 2026</div>
     <h1 class="main-title" id="txt-main-title">2026 경기창조고<br><span id="txt-main-span">교육과정 박람회</span></h1>
     <p class="subtitle" id="txt-subtitle">CURRICULUM FAIR · 나의 미래를 설계하다</p>
-    <div class="click-hint">📷 클릭하여 배경 이미지 변경</div>
+
   </div>
 </section>
 <input type="file" id="file-input" accept="image/*">
@@ -3394,45 +3380,17 @@
       <div class="pe-section">
         <div class="pe-section-label">MENU · 메뉴 버튼 텍스트</div>
         <div class="pe-menu-item"><span class="pe-menu-num">01</span><input class="pe-menu-input" id="pe-menu-01" placeholder="학기별 개설과목 안내" /></div>
-        <div class="pe-menu-item" style="margin-top:4px;margin-bottom:10px">
-          <span class="pe-menu-num" style="font-size:9px;color:rgba(26,107,191,0.35);letter-spacing:1px;line-height:1.2">부제</span>
-          <input class="pe-menu-input" id="pe-menu-01-sub" placeholder="부제목 (선택사항, 작은 글씨로 표시)" style="font-size:11px;color:rgba(26,46,74,0.65);" />
-        </div>
         <div class="pe-menu-item"><span class="pe-menu-num">02</span><input class="pe-menu-input" id="pe-menu-02" placeholder="교과별 선택과목 안내" /></div>
-        <div class="pe-menu-item" style="margin-top:4px;margin-bottom:10px">
-          <span class="pe-menu-num" style="font-size:9px;color:rgba(26,107,191,0.35);letter-spacing:1px;line-height:1.2">부제</span>
-          <input class="pe-menu-input" id="pe-menu-02-sub" placeholder="부제목 (선택사항, 작은 글씨로 표시)" style="font-size:11px;color:rgba(26,46,74,0.65);" />
-        </div>
         <div class="pe-menu-item"><span class="pe-menu-num">03</span><input class="pe-menu-input" id="pe-menu-03" placeholder="학과별 안내" /></div>
-        <div class="pe-menu-item" style="margin-top:4px;margin-bottom:10px">
-          <span class="pe-menu-num" style="font-size:9px;color:rgba(26,107,191,0.35);letter-spacing:1px;line-height:1.2">부제</span>
-          <input class="pe-menu-input" id="pe-menu-03-sub" placeholder="부제목 (선택사항, 작은 글씨로 표시)" style="font-size:11px;color:rgba(26,46,74,0.65);" />
-        </div>
         <div class="pe-menu-item"><span class="pe-menu-num">04</span><input class="pe-menu-input" id="pe-menu-04" placeholder="수강신청 안내" /></div>
-        <div class="pe-menu-item" style="margin-top:4px;margin-bottom:10px">
-          <span class="pe-menu-num" style="font-size:9px;color:rgba(26,107,191,0.35);letter-spacing:1px;line-height:1.2">부제</span>
-          <input class="pe-menu-input" id="pe-menu-04-sub" placeholder="부제목 (선택사항, 작은 글씨로 표시)" style="font-size:11px;color:rgba(26,46,74,0.65);" />
-        </div>
         <div class="pe-menu-item"><span class="pe-menu-num">05</span><input class="pe-menu-input" id="pe-menu-05" placeholder="2028년 수능" /></div>
-        <div class="pe-menu-item" style="margin-top:4px;margin-bottom:10px">
-          <span class="pe-menu-num" style="font-size:9px;color:rgba(26,107,191,0.35);letter-spacing:1px;line-height:1.2">부제</span>
-          <input class="pe-menu-input" id="pe-menu-05-sub" placeholder="부제목 (선택사항, 작은 글씨로 표시)" style="font-size:11px;color:rgba(26,46,74,0.65);" />
-        </div>
         <div class="pe-menu-item"><span class="pe-menu-num">06</span><input class="pe-menu-input" id="pe-menu-06" placeholder="선택과목 길라잡이 책자" /></div>
-        <div class="pe-menu-item" style="margin-top:4px;margin-bottom:10px">
-          <span class="pe-menu-num" style="font-size:9px;color:rgba(26,107,191,0.35);letter-spacing:1px;line-height:1.2">부제</span>
-          <input class="pe-menu-input" id="pe-menu-06-sub" placeholder="부제목 (선택사항, 작은 글씨로 표시)" style="font-size:11px;color:rgba(26,46,74,0.65);" />
-        </div>
         <div class="pe-menu-item"><span class="pe-menu-num">07</span><input class="pe-menu-input" id="pe-menu-07" placeholder="창조고 선택과목 이수 경로" /></div>
         <div class="pe-menu-item" style="margin-top:6px">
           <span class="pe-menu-num" style="font-size:10px;color:rgba(201,168,76,0.35);letter-spacing:1px">URL</span>
           <input class="pe-menu-input" id="pe-menu-07-url" placeholder="https://example.com (비워두면 비활성)" style="font-size:12px;color:rgba(255,255,255,0.55);" />
         </div>
         <div class="pe-menu-item" style="margin-top:10px"><span class="pe-menu-num">08</span><input class="pe-menu-input" id="pe-menu-08" placeholder="테스트" /></div>
-        <div class="pe-menu-item" style="margin-top:4px;margin-bottom:6px">
-          <span class="pe-menu-num" style="font-size:9px;color:rgba(26,107,191,0.35);letter-spacing:1px;line-height:1.2">부제</span>
-          <input class="pe-menu-input" id="pe-menu-08-sub" placeholder="부제목 (선택사항, 작은 글씨로 표시)" style="font-size:11px;color:rgba(26,46,74,0.65);" />
-        </div>
         <div class="pe-menu-item" style="margin-top:6px">
           <span class="pe-menu-num" style="font-size:10px;color:rgba(201,168,76,0.35);letter-spacing:1px">URL</span>
           <input class="pe-menu-input" id="pe-menu-08-url" placeholder="https://example.com" style="font-size:12px;color:rgba(255,255,255,0.55);" />
@@ -3452,10 +3410,6 @@
           <input type="file" id="pe-menu-08-file-input" accept=".html,.htm" style="display:none" onchange="onMenu08FileChange(this)">
         </div>
         <div class="pe-menu-item" style="margin-top:10px"><span class="pe-menu-num">09</span><input class="pe-menu-input" id="pe-menu-09" placeholder="2026 교육과정 안내 브로셔" /></div>
-        <div class="pe-menu-item" style="margin-top:4px;margin-bottom:4px">
-          <span class="pe-menu-num" style="font-size:9px;color:rgba(26,107,191,0.35);letter-spacing:1px;line-height:1.2">부제</span>
-          <input class="pe-menu-input" id="pe-menu-09-sub" placeholder="부제목 (선택사항, 작은 글씨로 표시)" style="font-size:11px;color:rgba(26,46,74,0.65);" />
-        </div>
       </div>
 
       <!-- 푸터 -->
@@ -3476,7 +3430,7 @@
         <div class="pe-field-label" style="margin-bottom:8px">메인 화면 배경</div>
         <div class="pe-main-bg-row">
           <div class="pe-main-bg-preview" id="pe-main-bg-preview">🏠</div>
-          <div class="pe-main-bg-status" id="pe-main-bg-status">배경 이미지 없음<br><span style="font-size:11px;opacity:0.7">메인 화면을 직접 클릭하면 이미지를 설정할 수 있습니다</span></div>
+          <div class="pe-main-bg-status" id="pe-main-bg-status">배경 이미지 없음<br><span style="font-size:11px;opacity:0.7">아래 업로드 버튼으로 이미지를 설정할 수 있습니다</span></div>
           <button class="btn-pe-main-bg-remove" id="btn-main-bg-remove" onclick="removeMainHeroBg()" disabled>🗑️ 삭제</button>
         </div>
         <div style="height:18px"></div>
@@ -3518,7 +3472,6 @@
     <div class="sem-header-info">
       <div class="sem-header-label">CURRICULUM · 학기별 개설과목</div>
       <div class="sem-header-title" id="menu-01-title">학기별 개설과목 안내</div>
-      <div class="menu-subtitle" id="menu-01-subtitle"></div>
       <div class="graded-notice">
         <span class="grade-icon grade-등급">등급&성취</span>
         <span class="graded-notice-em">등급&amp;성취도</span>
@@ -4097,7 +4050,6 @@
     <div class="sem-header-info">
       <div class="sem-header-label">CURRICULUM · 교과별 선택과목</div>
       <div class="sem-header-title" id="menu-02-title">교과별 선택과목 안내</div>
-      <div class="menu-subtitle" id="menu-02-subtitle"></div>
       <div class="graded-notice">
         <span class="catsubj-grade-icon grade-등급">등급&성취</span>
         <span class="graded-notice-em">등급&amp;성취도</span>
@@ -4129,7 +4081,6 @@
     <div class="dept-header-info">
       <div class="dept-header-label">DEPARTMENT GUIDE · 학과별 안내</div>
       <div class="dept-header-title">학과별 안내</div>
-      <div class="menu-subtitle" id="menu-03-subtitle"></div>
     </div>
   </div>
   <div class="dept-body">
@@ -4312,7 +4263,6 @@
     <div class="dept-detail-header-info">
       <div class="dept-detail-label">COURSE REGISTRATION · 수강신청 안내</div>
       <div class="dept-detail-name" id="menu-04-title">수강신청 안내</div>
-      <div class="menu-subtitle" id="menu-04-subtitle"></div>
     </div>
     <button class="dd-edit-btn" id="enroll-edit-btn" onclick="openEnrollEditPw()" title="편집 모드">🔒 편집</button>
     <button class="detail-home" onclick="closeEnrollScreen()" title="메인화면으로">🏠</button>
@@ -4351,7 +4301,6 @@
     <div class="dept-detail-header-info">
       <div class="dept-detail-label">SUNEUNG 2028 · 수능 안내</div>
       <div class="dept-detail-name" id="menu-05-title">2028년 수능</div>
-      <div class="menu-subtitle" id="menu-05-subtitle"></div>
     </div>
     <button class="dd-edit-btn" id="suneung-edit-btn" onclick="openSuneungEditPw()" title="편집 모드">🔒 편집</button>
     <button class="detail-home" onclick="closeSuneungScreen()" title="메인화면으로">🏠</button>
@@ -4398,7 +4347,6 @@
     <div class="gb-header-info">
       <div class="gb-header-label">GUIDEBOOK · 책자 안내</div>
       <div class="gb-header-title" id="menu-06-title">선택과목 길라잡이 책자</div>
-      <div class="menu-subtitle" id="menu-06-subtitle"></div>
     </div>
     <button class="gb-edit-btn" id="gb-edit-btn" onclick="openGbEditPw()" title="PDF 업로드 편집">🔒 편집</button>
     <button class="gb-jump-trigger-btn" id="gb-jump-trigger-btn" onclick="toggleGbJumpPopup(event)" title="페이지 이동">↗ 쪽 이동</button>
@@ -4742,13 +4690,6 @@ function applyPageTexts() {
     if (el09) el09.textContent = p.menu09;
     const t09 = document.getElementById('menu-09-title');
     if (t09) t09.textContent = p.menu09;
-  }
-  // 각 화면 부제목 동기화 (01~09)
-  for (let i = 1; i <= 9; i++) {
-    const sk = 'menu' + String(i).padStart(2,'0') + 'sub';
-    const sid = 'menu-' + String(i).padStart(2,'0') + '-subtitle';
-    const subEl = document.getElementById(sid);
-    if (subEl) subEl.textContent = p[sk] || '';
   }
   // 학기별 개설과목 열 헤더 적용
   const hdReq = document.getElementById('hd-label-req');
@@ -5768,10 +5709,6 @@ function openPageEdit() {
     const k = 'menu' + String(i).padStart(2,'0');
     const el = g('pe-menu-' + String(i).padStart(2,'0'));
     if (el) el.value = p[k] ?? (g('menu-' + String(i).padStart(2,'0'))?.textContent || '');
-    // 부제목
-    const sk = k + 'sub';
-    const subEl = g('pe-menu-' + String(i).padStart(2,'0') + '-sub');
-    if (subEl) subEl.value = p[sk] ?? '';
   }
   g('pe-menu-07-url').value = p.menu07url ?? '';
   g('pe-menu-08-url').value = p.menu08url ?? '';
@@ -5826,10 +5763,6 @@ async function savePageEdit() {
     const k = 'menu' + String(i).padStart(2,'0');
     const el = document.getElementById('pe-menu-' + String(i).padStart(2,'0'));
     if (el) pageTexts[k] = el.value.trim();
-    // 부제목 저장
-    const sk = k + 'sub';
-    const subEl = document.getElementById('pe-menu-' + String(i).padStart(2,'0') + '-sub');
-    if (subEl) pageTexts[sk] = subEl.value.trim();
   }
   // 열 헤더·학점 값은 saveSemColEdit() 에서 별도 저장 (pageTexts에 보존)
 
@@ -5903,13 +5836,13 @@ function syncMainBgPreview() {
     preview.style.backgroundImage = bgUrl;
     preview.classList.add('has-img');
     preview.textContent = '';
-    status.innerHTML = '<strong>배경 이미지 설정됨</strong><br><span style="font-size:11px;opacity:0.7">메인 화면을 직접 클릭하면 이미지를 변경할 수 있습니다</span>';
+    status.innerHTML = '<strong>배경 이미지 설정됨</strong><br><span style="font-size:11px;opacity:0.7">아래 업로드 버튼으로 이미지를 변경할 수 있습니다</span>';
     btn.disabled = false;
   } else {
     preview.style.backgroundImage = '';
     preview.classList.remove('has-img');
     preview.textContent = '🏠';
-    status.innerHTML = '배경 이미지 없음<br><span style="font-size:11px;opacity:0.7">메인 화면을 직접 클릭하면 이미지를 설정할 수 있습니다</span>';
+    status.innerHTML = '배경 이미지 없음<br><span style="font-size:11px;opacity:0.7">아래 업로드 버튼으로 이미지를 설정할 수 있습니다</span>';
     btn.disabled = true;
   }
 }
@@ -9201,7 +9134,6 @@ window.addEventListener('resize', function() {
     <div class="gb-header-info">
       <div class="gb-header-label">BROCHURE · 안내 브로셔</div>
       <div class="gb-header-title" id="menu-09-title">2026 교육과정 안내 브로셔</div>
-      <div class="menu-subtitle" id="menu-09-subtitle"></div>
     </div>
     <button class="gb-edit-btn" id="br-edit-btn" onclick="openBrochureEditPw()" title="PDF 업로드 편집">🔒 편집</button>
     <button class="gb-jump-trigger-btn" id="br-jump-trigger-btn" onclick="toggleBrJumpPopup(event)" title="페이지 이동">↗ 쪽 이동</button>
@@ -9307,7 +9239,6 @@ window.addEventListener('resize', function() {
     <div class="iframe-title-bar">
       <div class="iframe-title-label">EXTERNAL SITE · 외부 사이트</div>
       <div class="iframe-title-name" id="iframe-screen-title">테스트</div>
-      <div class="menu-subtitle" id="menu-08-subtitle"></div>
     </div>
     <button class="detail-home" onclick="closeIframeScreen()" title="메인화면으로">🏠</button>
   </div>
