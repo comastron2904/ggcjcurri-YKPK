@@ -3460,6 +3460,13 @@
           <button class="btn-pe-bg-upload" onclick="document.getElementById('file-input').click()" style="flex-shrink:0;">📁 이미지 선택</button>
           <button class="btn-pe-main-bg-remove" id="btn-main-bg-remove" onclick="removeMainHeroBg()" disabled>🗑️ 삭제</button>
         </div>
+        <!-- 메인 배경 밝기 슬라이더 -->
+        <div class="pe-opacity-row" id="main-bg-brightness-row" style="margin-top:10px;">
+          <span class="pe-opacity-label">밝기</span>
+          <input type="range" class="pe-opacity-slider" id="pe-main-bg-brightness"
+            min="20" max="150" value="100" oninput="updateMainBgBrightness(this.value)">
+          <span class="pe-opacity-val" id="pe-main-bg-brightness-val">100%</span>
+        </div>
         <div style="height:18px"></div>
 
         <!-- 서브화면 배경 -->
@@ -4739,6 +4746,8 @@ function applyPageTexts() {
   }
   // 서브화면 배경 이미지 적용
   applySubBg(p.bgImageUrl || null, p.bgOpacity ?? 10);
+  // 메인 배경 밝기 적용
+  applyMainBgBrightness(p.mainBgBrightness ?? 100);
   // 메뉴 순서 적용
   applyMenuOrder(p.menuOrder || null);
 }
@@ -5856,6 +5865,14 @@ function openPageEdit() {
   document.getElementById('pe-bg-opacity-val').textContent = opVal + '%';
   document.getElementById('pe-save-ok').classList.remove('show');
 
+  // 메인 배경 밝기 슬라이더 초기화
+  const brightnessVal = pageTexts.mainBgBrightness ?? '100';
+  const brightnessSlider = document.getElementById('pe-main-bg-brightness');
+  if (brightnessSlider) {
+    brightnessSlider.value = brightnessVal;
+    document.getElementById('pe-main-bg-brightness-val').textContent = brightnessVal + '%';
+  }
+
   // 메인 배경 이미지 상태 반영
   syncMainBgPreview();
   // 메뉴 순서 리스트 렌더링
@@ -5881,6 +5898,7 @@ async function savePageEdit() {
     sectionLabel: g('pe-section-label'),
     footer:       g('pe-footer'),
     bgOpacity:    document.getElementById('pe-bg-opacity').value,
+    mainBgBrightness: document.getElementById('pe-main-bg-brightness').value,
     menu07url:    document.getElementById('pe-menu-07-url').value.trim(),
     menu08url:    document.getElementById('pe-menu-08-url').value.trim(),
     menuOrder:    getOrderFromList(),
@@ -5971,6 +5989,19 @@ function syncMainBgPreview() {
     status.innerHTML = '배경 이미지 없음';
     btn.disabled = true;
   }
+}
+
+/* 메인 배경 밝기 적용 */
+function applyMainBgBrightness(val) {
+  const heroBg = document.getElementById('hero-bg');
+  if (!heroBg) return;
+  heroBg.style.filter = 'brightness(' + (val / 100) + ')';
+}
+
+/* 슬라이더 실시간 반영 */
+function updateMainBgBrightness(val) {
+  document.getElementById('pe-main-bg-brightness-val').textContent = val + '%';
+  applyMainBgBrightness(val);
 }
 
 /* 메인 배경 이미지 삭제 */
