@@ -4783,7 +4783,8 @@ function renderOrderList() {
     item.className = 'pe-order-item';
     item.draggable = true;
     item.dataset.arrIdx = arrIdx;
-    item.innerHTML = `<span class="pe-order-handle">☰</span><span class="pe-order-badge">${String(menuIdx).padStart(2,'0')}</span><span class="pe-order-name">${name}</span>`;
+    item.dataset.menuIdx = menuIdx;
+    item.innerHTML = `<span class="pe-order-handle">☰</span><span class="pe-order-badge">${String(arrIdx + 1).padStart(2,'0')}</span><span class="pe-order-name">${name}</span>`;
     // drag events
     item.addEventListener('dragstart', e => {
       _dragSrcIdx = arrIdx;
@@ -4817,10 +4818,7 @@ function renderOrderList() {
 function getOrderFromList() {
   const items = document.querySelectorAll('#pe-order-list .pe-order-item');
   if (!items.length) return getCurrentOrder();
-  return Array.from(items).map(el => {
-    const badge = el.querySelector('.pe-order-badge').textContent.trim();
-    return parseInt(badge, 10);
-  });
+  return Array.from(items).map(el => parseInt(el.dataset.menuIdx, 10));
 }
 
 // 메인화면 버튼 그리드에 순서 적용
@@ -4830,10 +4828,13 @@ function applyMenuOrder(order) {
   const btns = Array.from(grid.children); // 기존 9개 버튼
   if (btns.length !== 9) return;
   const validOrder = (order && order.length === 9) ? order : [1,2,3,4,5,6,7,8,9];
-  // 순서대로 재배치
-  validOrder.forEach(menuIdx => {
+  // 순서대로 재배치 후 앞 번호 갱신
+  validOrder.forEach((menuIdx, pos) => {
     const btn = btns[menuIdx - 1];
-    if (btn) grid.appendChild(btn);
+    if (!btn) return;
+    grid.appendChild(btn);
+    const numEl = btn.querySelector('.btn-number');
+    if (numEl) numEl.textContent = String(pos + 1).padStart(2, '0');
   });
 }
 
