@@ -6775,9 +6775,8 @@ function updateSemGridColumns() {
     document.querySelectorAll('.sem-row').forEach((row, rowIdx) => {
       row.style.gridTemplateColumns = rowIdx >= 2 ? colTemplate5 : colTemplate6;
     });
-    // 데스크탑: 모든 행 표시 (모바일에서 isMob이 false로 잘못 판단될 경우 대비해
-    // currentSemIdx가 설정돼 있으면 해당 학기만 표시)
-    if (window.innerWidth <= 900 && typeof currentSemIdx !== 'undefined') {
+    // 행 표시/숨김: 모바일·데스크탑 모두 currentSemIdx 기준으로 처리
+    if (typeof currentSemIdx !== 'undefined') {
       document.querySelectorAll('.sem-row').forEach((row, rowIdx) => {
         row.classList.toggle('sem-row-hidden', rowIdx !== currentSemIdx);
       });
