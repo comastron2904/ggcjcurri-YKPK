@@ -4744,6 +4744,17 @@ function applyPageTexts() {
     const hnt = p.hdForeignHint || '1개 선택';
     hdWLEl.innerHTML = `<span class="sem-col-header-label hd-외국어정보">${lbl}</span><span class="sem-col-select-hint hint-외국어정보">${hnt}</span>`;
   }
+  // 메인 배경 이미지 복원
+  const heroBgEl = document.getElementById('hero-bg');
+  if (heroBgEl) {
+    if (p.mainBgUrl) {
+      heroBgEl.style.backgroundImage = 'url(' + p.mainBgUrl + ')';
+      heroBgEl.classList.add('active');
+    } else if (!_pendingMainBgFile) {
+      heroBgEl.style.backgroundImage = '';
+      heroBgEl.classList.remove('active');
+    }
+  }
   // 서브화면 배경 이미지 적용
   applySubBg(p.bgImageUrl || null, p.bgOpacity ?? 10);
   // 메인 배경 투명도 적용
@@ -5849,6 +5860,7 @@ function openPageEdit() {
   syncMenu08FileStatus();
   // 배경 이미지 미리보기 복원
   pendingBgBase64 = null;
+  _pendingMainBgFile = null;
   const bgPreview = document.getElementById('pe-bg-preview');
   if (p.bgImageUrl) {
     bgPreview.style.backgroundImage = 'url(' + p.bgImageUrl + ')';
@@ -5953,6 +5965,25 @@ async function savePageEdit() {
     }
   }
 
+  // 메인 배경 이미지: 새 파일이 있으면 Storage에 업로드
+  if (_pendingMainBgFile) {
+    const okEl = document.getElementById('pe-save-ok');
+    okEl.textContent = '⏳ 메인 배경 업로드 중...'; okEl.classList.add('show');
+    try {
+      const prevUrl = pageTexts.mainBgUrl;
+      const url = await uploadToStorage(_pendingMainBgFile);
+      pageTexts.mainBgUrl = url;
+      _pendingMainBgFile = null;
+      if (_pendingMainBgPreviewUrl) { URL.revokeObjectURL(_pendingMainBgPreviewUrl); _pendingMainBgPreviewUrl = null; }
+      document.getElementById('hero-bg').style.backgroundImage = `url(${url})`;
+      if (prevUrl) await deleteFromStorage(prevUrl).catch(() => {});
+    } catch(e) {
+      okEl.textContent = '⚠ 메인 배경 업로드 실패';
+      setTimeout(() => { okEl.classList.remove('show'); okEl.textContent = '✓ 저장되었습니다'; }, 2500);
+      return;
+    }
+  }
+
   savePage();
   applyPageTexts();
   const ok = document.getElementById('pe-save-ok');
@@ -6005,31 +6036,42 @@ function updateMainBgOpacity(val) {
 }
 
 /* 메인 배경 이미지 삭제 */
-function removeMainHeroBg() {
+async function removeMainHeroBg() {
   const heroBg = document.getElementById('hero-bg');
-  if (!heroBg || !heroBg.classList.contains('active')) return;
+  if (!heroBg) return;
+  // pending 파일 초기화
+  if (_pendingMainBgPreviewUrl) { URL.revokeObjectURL(_pendingMainBgPreviewUrl); _pendingMainBgPreviewUrl = null; }
+  _pendingMainBgFile = null;
+  // Storage URL 삭제
+  if (pageTexts.mainBgUrl) {
+    await deleteFromStorage(pageTexts.mainBgUrl).catch(() => {});
+    delete pageTexts.mainBgUrl;
+    savePage();
+  }
   heroBg.style.backgroundImage = '';
   heroBg.classList.remove('active');
   syncMainBgPreview();
-  // 저장 ok 메시지
   const ok = document.getElementById('pe-save-ok');
   ok.textContent = '🗑️ 메인 배경이 삭제되었습니다';
   ok.classList.add('show');
   setTimeout(() => { ok.classList.remove('show'); ok.textContent = '✓ 저장되었습니다'; }, 2200);
 }
 
+let _pendingMainBgFile = null;
+let _pendingMainBgPreviewUrl = null;
+
 document.getElementById('file-input').addEventListener('change', function(e) {
   const file = e.target.files[0]; if (!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    document.getElementById('hero-bg').style.backgroundImage = `url(${ev.target.result})`;
-    document.getElementById('hero-bg').classList.add('active');
-    syncMainBgPreview();
-    const t = document.getElementById('toast');
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2200);
-  };
-  reader.readAsDataURL(file);
+  if (_pendingMainBgPreviewUrl) { URL.revokeObjectURL(_pendingMainBgPreviewUrl); }
+  _pendingMainBgFile = file;
+  _pendingMainBgPreviewUrl = URL.createObjectURL(file);
+  document.getElementById('hero-bg').style.backgroundImage = `url(${_pendingMainBgPreviewUrl})`;
+  document.getElementById('hero-bg').classList.add('active');
+  applyMainBgOpacity(document.getElementById('pe-main-bg-opacity')?.value ?? 100);
+  syncMainBgPreview();
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
   this.value = '';
 });
 
