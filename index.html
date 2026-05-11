@@ -1272,6 +1272,10 @@
   .sem-row:last-child { border-bottom: none; }
   .sem-row.sem-row-hidden { display: none !important; }
 
+  /* 3학년: 외국어&교양 열 숨김 */
+  .sem-col-header-row.hide-foreign #hd-외국어정보-0 { display: none !important; }
+  .sem-row.hide-foreign .cell-외국어정보 { display: none !important; }
+
   /* 2학년↔3학년 사이 강조선 */
   /* sem-row-head: display:contents로 자식이 직접 grid에 배치됨 */
   .sem-row-head {
@@ -6343,6 +6347,39 @@ function setCurrentSem(idx) {
     hdWL.innerHTML = `<span class="sem-col-header-label hd-외국어정보">${label}</span><span class="sem-col-select-hint hint-외국어정보">${hint}</span>`;
   }
 
+  // 3학년: 외국어&교양 열 숨김 처리
+  const is3Grade = idx >= 2;
+  const hdrRow = document.querySelector('.sem-col-header-row');
+  if (hdrRow) hdrRow.classList.toggle('hide-foreign', is3Grade);
+  document.querySelectorAll('.sem-row').forEach((row, rowIdx) => {
+    row.classList.toggle('hide-foreign', rowIdx >= 2);
+  });
+
+  // 데스크탑: 탭 전환 시 헤더 gridTemplateColumns 즉시 갱신
+  if (window.innerWidth > 900) {
+    // 각 열의 wide 여부를 semesterData 기준으로 판단
+    const _th = 6;
+    function _isWide(typeFilter) {
+      if (typeof semesterData === 'undefined') return false;
+      return Math.max(0, ...[0,1,2,3].map(ci => {
+        const items = (semesterData[ci] || []).filter(typeFilter);
+        return Math.max(0, ...['일반','진로','융합'].map(st =>
+          items.filter(x => (x.subtype || '일반') === st).length));
+      })) >= _th;
+    }
+    const _wReq = _isWide(x => x.type === '필수') ? 2 : 1;
+    const _wSS  = _isWide(x => ['사회&과학','사회&과학&예술'].includes(x.type)) ? 2 : 1;
+    const _wKns = _isWide(x => x.type === '국&수&영') ? 2 : 1;
+    const _wFor = _isWide(x => x.type === '외국어&교양') ? 2 : 1;
+    const _wMus = _isWide(x => x.type === '음악&미술') ? 2 : 1;
+    const _tpl6 = `120px ${_wReq}fr ${_wSS}fr ${_wKns}fr ${_wFor}fr ${_wMus}fr`;
+    const _tpl5 = `120px ${_wReq}fr ${_wSS + _wFor}fr ${_wKns}fr ${_wMus}fr`;
+    if (hdrRow) hdrRow.style.gridTemplateColumns = is3Grade ? _tpl5 : _tpl6;
+    document.querySelectorAll('.sem-row').forEach((row, rowIdx) => {
+      row.style.gridTemplateColumns = rowIdx >= 2 ? _tpl5 : _tpl6;
+    });
+  }
+
   // 행 보이기/숨기기
   const isMobile = window.innerWidth <= 900;
   document.querySelectorAll('.sem-row').forEach((row, rowIdx) => {
@@ -6368,6 +6405,7 @@ function setCurrentSem(idx) {
 
   // 학기 전환 후 zone 높이 재동기화
   requestAnimationFrame(() => syncSubtypeZoneHeights());
+  updateSemGridColumns();
 
   }
 
@@ -6722,11 +6760,20 @@ function updateSemGridColumns() {
       })) >= threshold;
     }
     const w = (wide) => wide ? '2fr' : '1fr';
-    const colTemplate = `120px ${w(isWideCol(x => x.type === '필수'))} ${w(isWideCol(x => ['사회&과학','사회&과학&예술'].includes(x.type)))} ${w(isWideCol(x => x.type === '국&수&영'))} ${w(isWideCol(x => x.type === '외국어&교양'))} ${w(isWideCol(x => x.type === '음악&미술'))}`;
+    // 2학년: 5개의 fr 열 (필수/사회과학/국수영/외국어/음악미술)
+    const wReq = isWideCol(x => x.type === '필수') ? 2 : 1;
+    const wSS  = isWideCol(x => ['사회&과학','사회&과학&예술'].includes(x.type)) ? 2 : 1;
+    const wKns = isWideCol(x => x.type === '국&수&영') ? 2 : 1;
+    const wFor = isWideCol(x => x.type === '외국어&교양') ? 2 : 1;
+    const wMus = isWideCol(x => x.type === '음악&미술') ? 2 : 1;
+    const colTemplate6 = `120px ${wReq}fr ${wSS}fr ${wKns}fr ${wFor}fr ${wMus}fr`;
+    // 3학년: 외국어 열(wFor)을 사회과학예술 열에 흡수 → 2학년과 동일한 절대 너비
+    const colTemplate5 = `120px ${wReq}fr ${wSS + wFor}fr ${wKns}fr ${wMus}fr`;
+    const is3GradeDesktop = typeof currentSemIdx !== 'undefined' && currentSemIdx >= 2;
     const hdr = document.querySelector('.sem-col-header-row');
-    if (hdr) hdr.style.gridTemplateColumns = colTemplate;
-    document.querySelectorAll('.sem-row').forEach(row => {
-      row.style.gridTemplateColumns = colTemplate;
+    if (hdr) hdr.style.gridTemplateColumns = is3GradeDesktop ? colTemplate5 : colTemplate6;
+    document.querySelectorAll('.sem-row').forEach((row, rowIdx) => {
+      row.style.gridTemplateColumns = rowIdx >= 2 ? colTemplate5 : colTemplate6;
     });
     // 데스크탑: 모든 행 표시 (모바일에서 isMob이 false로 잘못 판단될 경우 대비해
     // currentSemIdx가 설정돼 있으면 해당 학기만 표시)
@@ -6762,13 +6809,13 @@ function resetMobileStyles() {
     row.style.width = ''; row.style.minWidth = ''; row.style.height = ''; row.style.minHeight = '';
   });
   document.querySelectorAll('.sem-col-header-row .sem-col-header-cell').forEach(cell => {
-    cell.style.width = ''; cell.style.minWidth = ''; cell.style.maxWidth = '';
+    cell.style.width = ''; cell.style.minWidth = ''; cell.style.maxWidth = ''; cell.style.display = '';
   });
   document.querySelectorAll('.sem-row-head').forEach(el => {
     el.style.width = ''; el.style.minWidth = ''; el.style.maxWidth = '';
   });
   document.querySelectorAll('.sem-cell').forEach(el => {
-    el.style.width = ''; el.style.minWidth = ''; el.style.maxWidth = '';
+    el.style.width = ''; el.style.minWidth = ''; el.style.maxWidth = ''; el.style.display = '';
   });
   document.querySelectorAll('.sem-subtype-block').forEach(b => {
     b.style.height = ''; b.style.minHeight = '';
@@ -6810,7 +6857,15 @@ function applyMobileColWidths(maxReq, maxSS, maxKns, maxFor, maxMus, threshold) 
     isWideBySubtype(x => x.type === '외국어&교양') ? COL_WIDE : COL_NARROW,
     isWideBySubtype(x => x.type === '음악&미술') ? COL_WIDE : COL_NARROW,
   ];
-  const totalW = COL_HEAD + colWidths.reduce((a, b) => a + b, 0);
+  // 3학년용: 외국어 열(인덱스 3) 제외
+  const colWidths3 = [colWidths[0], colWidths[1] + colWidths[3], colWidths[2], colWidths[4]]; // 3학년: 사회과학예술이 외국어 너비 흡수
+
+  const totalW  = COL_HEAD + colWidths.reduce((a, b) => a + b, 0);
+  const totalW3 = COL_HEAD + colWidths3.reduce((a, b) => a + b, 0);
+
+  // 현재 보이는 행이 3학년인지
+  const is3Grade = typeof currentSemIdx !== 'undefined' && currentSemIdx >= 2;
+  const activeTotal = is3Grade ? totalW3 : totalW;
 
   // sem-scroll-outer: 가로 스크롤 컨테이너
   const outer = document.getElementById('sem-scroll-outer');
@@ -6835,32 +6890,63 @@ function applyMobileColWidths(maxReq, maxSS, maxKns, maxFor, maxMus, threshold) 
 
   // sem-scroll-inner: 실제 콘텐츠 너비
   const inner = document.getElementById('sem-scroll-inner');
-  if (inner) { inner.style.display = 'block'; inner.style.width = totalW + 'px'; }
+  if (inner) { inner.style.display = 'block'; inner.style.width = activeTotal + 'px'; }
 
   // 헤더행 / 그리드 너비
   const hdrRow = document.querySelector('.sem-col-header-row');
-  if (hdrRow) { hdrRow.style.width = totalW + 'px'; hdrRow.style.minWidth = ''; }
+  if (hdrRow) { hdrRow.style.width = activeTotal + 'px'; hdrRow.style.minWidth = ''; }
   const grid = document.querySelector('.sem-grid');
-  if (grid) { grid.style.width = totalW + 'px'; grid.style.minWidth = ''; }
+  if (grid) { grid.style.width = activeTotal + 'px'; grid.style.minWidth = ''; }
 
-  // 헤더 셀 너비
-  document.querySelectorAll('.sem-col-header-row .sem-col-header-cell').forEach((cell, i) => {
-    const w = (i === 0 ? COL_HEAD : (colWidths[i - 1] || COL_NARROW)) + 'px';
-    cell.style.width = w; cell.style.minWidth = w; cell.style.maxWidth = w;
+  // 헤더 셀 너비 (id로 직접 접근하여 확실하게 처리)
+  const cellFirst = hdrRow ? hdrRow.querySelector('.sem-col-header-cell:first-child') : null;
+  if (cellFirst) {
+    const hw = COL_HEAD + 'px';
+    cellFirst.style.width = hw; cellFirst.style.minWidth = hw; cellFirst.style.maxWidth = hw; cellFirst.style.display = '';
+  }
+  // 필수(hd-req), 사회과학, 국수영, 외국어, 음악미술 순서로 너비 지정
+  const hdrMap = [
+    { sel: '.sem-col-header-cell.hd-req',          width: colWidths[0],  hide: false },
+    { sel: '#hd-사회과학-0',                         width: is3Grade ? colWidths3[1] : colWidths[1], hide: false },
+    { sel: '.sem-col-header-cell:nth-child(4)',     width: is3Grade ? colWidths3[2] : colWidths[2], hide: false },
+    { sel: '#hd-외국어정보-0',                       width: colWidths[3],  hide: is3Grade },
+    { sel: '.sem-col-header-cell:last-child',       width: is3Grade ? colWidths3[3] : colWidths[4], hide: false },
+  ];
+  hdrMap.forEach(({ sel, width, hide }) => {
+    const cell = hdrRow ? hdrRow.querySelector(sel) : null;
+    if (!cell) return;
+    if (hide) {
+      cell.style.display = 'none';
+    } else {
+      cell.style.display = '';
+      const w = width + 'px';
+      cell.style.width = w; cell.style.minWidth = w; cell.style.maxWidth = w;
+    }
   });
 
   // 각 sem-row 너비 + 내부 셀 너비
-  document.querySelectorAll('.sem-row').forEach(row => {
-    row.style.width = totalW + 'px';
+  document.querySelectorAll('.sem-row').forEach((row, rowIdx) => {
+    const is3Row = rowIdx >= 2;
+    const rowTotal = is3Row ? totalW3 : totalW;
+    const activeWidths = is3Row ? colWidths3 : colWidths;
+    row.style.width = rowTotal + 'px';
 
     const head = row.querySelector('.sem-row-head');
     if (head) {
       const hw = COL_HEAD + 'px';
       head.style.width = hw; head.style.minWidth = hw; head.style.maxWidth = hw;
     }
-    row.querySelectorAll('.sem-cell').forEach((cell, i) => {
-      const w = (colWidths[i] || COL_NARROW) + 'px';
-      cell.style.width = w; cell.style.minWidth = w; cell.style.maxWidth = w;
+    let cellVisIdx = 0;
+    row.querySelectorAll('.sem-cell').forEach((cell) => {
+      const isForCell = cell.classList.contains('cell-외국어정보');
+      if (isForCell && is3Row) {
+        cell.style.display = 'none';
+      } else {
+        cell.style.display = '';
+        const w = (activeWidths[cellVisIdx] || COL_NARROW) + 'px';
+        cell.style.width = w; cell.style.minWidth = w; cell.style.maxWidth = w;
+        cellVisIdx++;
+      }
     });
   });
 }
