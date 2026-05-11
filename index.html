@@ -3154,15 +3154,15 @@
 <section id="nav-section">
   <p class="section-label" id="txt-section-label">원하는 항목을 선택하세요</p>
   <div class="buttons-grid">
-    <button class="nav-btn" onclick="openSemesterScreen()"><span class="btn-number">01</span><span class="btn-title" id="menu-01">학기별 개설과목 안내</span><span class="btn-arrow">›</span></button>
-    <button class="nav-btn" onclick="openCatSubjScreen()"><span class="btn-number">02</span><span class="btn-title" id="menu-02">교과별 선택과목 안내</span><span class="btn-arrow">›</span></button>
-    <button class="nav-btn" onclick="openDeptScreen()"><span class="btn-number">03</span><span class="btn-title" id="menu-03">학과별 안내</span><span class="btn-arrow">›</span></button>
-    <button class="nav-btn" onclick="openEnrollScreen()"><span class="btn-number">04</span><span class="btn-title" id="menu-04">수강신청 안내</span><span class="btn-arrow">›</span></button>
-    <button class="nav-btn" onclick="openSuneungScreen()"><span class="btn-number">05</span><span class="btn-title" id="menu-05">2028년 수능</span><span class="btn-arrow">›</span></button>
-    <button class="nav-btn" onclick="openGuidebookScreen()"><span class="btn-number">06</span><span class="btn-title" id="menu-06">선택과목 길라잡이 책자</span><span class="btn-arrow">›</span></button>
-    <button class="nav-btn" id="nav-btn-07" onclick="openMenu07()"><span class="btn-number">07</span><span class="btn-title" id="menu-07">창조고 선택과목 이수 경로</span><span class="btn-arrow">›</span></button>
-    <button class="nav-btn" id="nav-btn-08" onclick="openMenu08()"><span class="btn-number">08</span><span class="btn-title" id="menu-08">테스트</span><span class="btn-arrow">›</span></button>
-    <button class="nav-btn" onclick="openBrochureScreen()"><span class="btn-number">09</span><span class="btn-title" id="menu-09">2026 교육과정 안내 브로셔</span><span class="btn-arrow">›</span></button>
+    <button class="nav-btn" data-menu="1" onclick="openSemesterScreen()"><span class="btn-number">01</span><span class="btn-title" id="menu-01">학기별 개설과목 안내</span><span class="btn-arrow">›</span></button>
+    <button class="nav-btn" data-menu="2" onclick="openCatSubjScreen()"><span class="btn-number">02</span><span class="btn-title" id="menu-02">교과별 선택과목 안내</span><span class="btn-arrow">›</span></button>
+    <button class="nav-btn" data-menu="3" onclick="openDeptScreen()"><span class="btn-number">03</span><span class="btn-title" id="menu-03">학과별 안내</span><span class="btn-arrow">›</span></button>
+    <button class="nav-btn" data-menu="4" onclick="openEnrollScreen()"><span class="btn-number">04</span><span class="btn-title" id="menu-04">수강신청 안내</span><span class="btn-arrow">›</span></button>
+    <button class="nav-btn" data-menu="5" onclick="openSuneungScreen()"><span class="btn-number">05</span><span class="btn-title" id="menu-05">2028년 수능</span><span class="btn-arrow">›</span></button>
+    <button class="nav-btn" data-menu="6" onclick="openGuidebookScreen()"><span class="btn-number">06</span><span class="btn-title" id="menu-06">선택과목 길라잡이 책자</span><span class="btn-arrow">›</span></button>
+    <button class="nav-btn" data-menu="7" id="nav-btn-07" onclick="openMenu07()"><span class="btn-number">07</span><span class="btn-title" id="menu-07">창조고 선택과목 이수 경로</span><span class="btn-arrow">›</span></button>
+    <button class="nav-btn" data-menu="8" id="nav-btn-08" onclick="openMenu08()"><span class="btn-number">08</span><span class="btn-title" id="menu-08">테스트</span><span class="btn-arrow">›</span></button>
+    <button class="nav-btn" data-menu="9" onclick="openBrochureScreen()"><span class="btn-number">09</span><span class="btn-title" id="menu-09">2026 교육과정 안내 브로셔</span><span class="btn-arrow">›</span></button>
   </div>
 </section>
 
@@ -4845,14 +4845,12 @@ function getOrderFromList() {
 function applyMenuOrder(order) {
   const grid = document.querySelector('.buttons-grid');
   if (!grid) return;
-  const btns = Array.from(grid.children); // 기존 9개 버튼
-  if (btns.length !== 9) return;
   const validOrder = (order && order.length === 9) ? order : [1,2,3,4,5,6,7,8,9];
-  // 순서대로 재배치 후 앞 번호 갱신
+  // data-menu 속성으로 버튼을 찾아 순서대로 재배치
   validOrder.forEach((menuIdx, pos) => {
-    const btn = btns[menuIdx - 1];
+    const btn = grid.querySelector(`.nav-btn[data-menu="${menuIdx}"]`);
     if (!btn) return;
-    grid.appendChild(btn);
+    grid.appendChild(btn); // 맨 뒤로 이동 → 순서대로 붙이면 정렬 완성
     const numEl = btn.querySelector('.btn-number');
     if (numEl) numEl.textContent = String(pos + 1).padStart(2, '0');
   });
