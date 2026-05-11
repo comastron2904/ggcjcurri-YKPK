@@ -136,6 +136,25 @@
   }
   .pe-menu-input:focus { border-color: var(--gold); }
 
+  /* 메뉴 순서 조절 */
+  .pe-order-list { display: flex; flex-direction: column; gap: 6px; }
+  .pe-order-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 12px;
+    background: rgba(26,107,191,0.05); border: 1px solid rgba(26,107,191,0.15);
+    cursor: grab; user-select: none; transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+  }
+  .pe-order-item:active { cursor: grabbing; }
+  .pe-order-item.drag-over { border-color: var(--gold); background: rgba(26,107,191,0.12); }
+  .pe-order-item.dragging { opacity: 0.4; }
+  .pe-order-handle { color: rgba(26,107,191,0.45); font-size: 14px; flex-shrink: 0; }
+  .pe-order-badge {
+    font-family: 'Noto Serif KR', serif; font-size: 13px; font-weight: 900;
+    color: rgba(26,107,191,0.70); min-width: 26px; flex-shrink: 0; text-align: center;
+  }
+  .pe-order-name { flex: 1; font-size: 13px; color: var(--white); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pe-order-hint { font-size: 10px; letter-spacing: 1.5px; color: rgba(26,107,191,0.55); margin-top: 8px; }
+
   .pe-save-bar {
     display: flex; align-items: center; justify-content: flex-end; gap: 14px;
     margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(26,107,191,0.12);
@@ -3376,6 +3395,13 @@
         </div>
       </div>
 
+      <!-- 메뉴 순서 -->
+      <div class="pe-section">
+        <div class="pe-section-label">ORDER · 메뉴 순서</div>
+        <div class="pe-order-list" id="pe-order-list"></div>
+        <div class="pe-order-hint">☰ 드래그하여 순서를 변경하세요 · 저장 시 반영됩니다</div>
+      </div>
+
       <!-- 메뉴 버튼 -->
       <div class="pe-section">
         <div class="pe-section-label">MENU · 메뉴 버튼 텍스트</div>
@@ -3430,7 +3456,8 @@
         <div class="pe-field-label" style="margin-bottom:8px">메인 화면 배경</div>
         <div class="pe-main-bg-row">
           <div class="pe-main-bg-preview" id="pe-main-bg-preview">🏠</div>
-          <div class="pe-main-bg-status" id="pe-main-bg-status">배경 이미지 없음<br><span style="font-size:11px;opacity:0.7">아래 업로드 버튼으로 이미지를 설정할 수 있습니다</span></div>
+          <div class="pe-main-bg-status" id="pe-main-bg-status">배경 이미지 없음</div>
+          <button class="btn-pe-bg-upload" onclick="document.getElementById('file-input').click()" style="flex-shrink:0;">📁 이미지 선택</button>
           <button class="btn-pe-main-bg-remove" id="btn-main-bg-remove" onclick="removeMainHeroBg()" disabled>🗑️ 삭제</button>
         </div>
         <div style="height:18px"></div>
@@ -4712,8 +4739,103 @@ function applyPageTexts() {
   }
   // 서브화면 배경 이미지 적용
   applySubBg(p.bgImageUrl || null, p.bgOpacity ?? 10);
+  // 메뉴 순서 적용
+  applyMenuOrder(p.menuOrder || null);
 }
 // applyPageTexts() — Supabase 로드 후 호출됨
+
+/* ──────────────────────────────
+   메뉴 순서 조절
+────────────────────────────── */
+// 각 슬롯 번호(1~9)에 해당하는 고정 정보
+const MENU_META = {
+  1: { label: '학기별 개설과목 안내',     fn: 'openSemesterScreen()' },
+  2: { label: '교과별 선택과목 안내',     fn: 'openCatSubjScreen()' },
+  3: { label: '학과별 안내',              fn: 'openDeptScreen()' },
+  4: { label: '수강신청 안내',            fn: 'openEnrollScreen()' },
+  5: { label: '2028년 수능',              fn: 'openSuneungScreen()' },
+  6: { label: '선택과목 길라잡이 책자',   fn: 'openGuidebookScreen()' },
+  7: { label: '창조고 선택과목 이수 경로',fn: 'openMenu07()' },
+  8: { label: '테스트',                   fn: 'openMenu08()' },
+  9: { label: '2026 교육과정 안내 브로셔',fn: 'openBrochureScreen()' },
+};
+
+let _dragSrcIdx = null; // 드래그 중인 아이템의 배열 인덱스
+
+// 현재 순서 배열 (menuIdx 1~9의 순서) 반환
+function getCurrentOrder() {
+  return pageTexts.menuOrder && pageTexts.menuOrder.length === 9
+    ? pageTexts.menuOrder
+    : [1,2,3,4,5,6,7,8,9];
+}
+
+// 편집 모달의 순서 리스트 렌더링
+function renderOrderList() {
+  const list = document.getElementById('pe-order-list');
+  if (!list) return;
+  const order = getCurrentOrder();
+  list.innerHTML = '';
+  order.forEach((menuIdx, arrIdx) => {
+    const p = pageTexts;
+    const k = 'menu' + String(menuIdx).padStart(2,'0');
+    const name = (p[k]) || MENU_META[menuIdx].label;
+    const item = document.createElement('div');
+    item.className = 'pe-order-item';
+    item.draggable = true;
+    item.dataset.arrIdx = arrIdx;
+    item.innerHTML = `<span class="pe-order-handle">☰</span><span class="pe-order-badge">${String(menuIdx).padStart(2,'0')}</span><span class="pe-order-name">${name}</span>`;
+    // drag events
+    item.addEventListener('dragstart', e => {
+      _dragSrcIdx = arrIdx;
+      item.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    item.addEventListener('dragend', () => {
+      item.classList.remove('dragging');
+      document.querySelectorAll('.pe-order-item').forEach(el => el.classList.remove('drag-over'));
+    });
+    item.addEventListener('dragover', e => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      document.querySelectorAll('.pe-order-item').forEach(el => el.classList.remove('drag-over'));
+      item.classList.add('drag-over');
+    });
+    item.addEventListener('drop', e => {
+      e.preventDefault();
+      if (_dragSrcIdx === null || _dragSrcIdx === arrIdx) return;
+      const order = getCurrentOrder();
+      const moved = order.splice(_dragSrcIdx, 1)[0];
+      order.splice(arrIdx, 0, moved);
+      pageTexts.menuOrder = order;
+      renderOrderList();
+    });
+    list.appendChild(item);
+  });
+}
+
+// 현재 리스트 DOM에서 순서 배열 추출
+function getOrderFromList() {
+  const items = document.querySelectorAll('#pe-order-list .pe-order-item');
+  if (!items.length) return getCurrentOrder();
+  return Array.from(items).map(el => {
+    const badge = el.querySelector('.pe-order-badge').textContent.trim();
+    return parseInt(badge, 10);
+  });
+}
+
+// 메인화면 버튼 그리드에 순서 적용
+function applyMenuOrder(order) {
+  const grid = document.querySelector('.buttons-grid');
+  if (!grid) return;
+  const btns = Array.from(grid.children); // 기존 9개 버튼
+  if (btns.length !== 9) return;
+  const validOrder = (order && order.length === 9) ? order : [1,2,3,4,5,6,7,8,9];
+  // 순서대로 재배치
+  validOrder.forEach(menuIdx => {
+    const btn = btns[menuIdx - 1];
+    if (btn) grid.appendChild(btn);
+  });
+}
 
 function openMenu07() {
   const url = pageTexts.menu07url;
@@ -5735,6 +5857,8 @@ function openPageEdit() {
 
   // 메인 배경 이미지 상태 반영
   syncMainBgPreview();
+  // 메뉴 순서 리스트 렌더링
+  renderOrderList();
 
   document.getElementById('page-edit-modal').classList.add('open');
 }
@@ -5758,6 +5882,7 @@ async function savePageEdit() {
     bgOpacity:    document.getElementById('pe-bg-opacity').value,
     menu07url:    document.getElementById('pe-menu-07-url').value.trim(),
     menu08url:    document.getElementById('pe-menu-08-url').value.trim(),
+    menuOrder:    getOrderFromList(),
   });
   for (let i = 1; i <= 9; i++) {
     const k = 'menu' + String(i).padStart(2,'0');
@@ -5836,13 +5961,13 @@ function syncMainBgPreview() {
     preview.style.backgroundImage = bgUrl;
     preview.classList.add('has-img');
     preview.textContent = '';
-    status.innerHTML = '<strong>배경 이미지 설정됨</strong><br><span style="font-size:11px;opacity:0.7">아래 업로드 버튼으로 이미지를 변경할 수 있습니다</span>';
+    status.innerHTML = '<strong>배경 이미지 설정됨</strong>';
     btn.disabled = false;
   } else {
     preview.style.backgroundImage = '';
     preview.classList.remove('has-img');
     preview.textContent = '🏠';
-    status.innerHTML = '배경 이미지 없음<br><span style="font-size:11px;opacity:0.7">아래 업로드 버튼으로 이미지를 설정할 수 있습니다</span>';
+    status.innerHTML = '배경 이미지 없음';
     btn.disabled = true;
   }
 }
