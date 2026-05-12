@@ -172,16 +172,17 @@
   .pe-hl-picker { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
   .pe-hl-token {
     display: inline-flex; align-items: center;
-    padding: 4px 8px; font-size: 14px; font-weight: 700;
+    padding: 4px 5px; font-size: 16px; font-weight: 700;
     color: rgba(26,46,74,0.75); background: transparent;
     border: 1px solid transparent; cursor: pointer; border-radius: 2px;
-    transition: background 0.15s, border-color 0.15s, color 0.15s;
-    font-family: 'Noto Sans KR', sans-serif;
+    transition: background 0.12s, border-color 0.12s, color 0.12s;
+    font-family: 'Noto Sans KR', sans-serif; line-height: 1;
+    min-width: 22px; justify-content: center;
   }
   .pe-hl-token:hover { background: rgba(26,107,191,0.08); border-color: rgba(26,107,191,0.25); }
   .pe-hl-token.hl-on { background: rgba(26,107,191,0.15); border-color: rgba(26,107,191,0.50); color: var(--gold); font-weight: 900; }
   .pe-hl-token.hl-drag-preview { background: rgba(26,107,191,0.08); border-color: rgba(26,107,191,0.30); color: var(--gold); }
-  .pe-hl-sep { color: rgba(26,46,74,0.28); font-size: 13px; padding: 0 1px; pointer-events: none; }
+  .pe-hl-sep { color: rgba(26,46,74,0.20); font-size: 16px; padding: 4px 2px; pointer-events: none; }
   .pe-hl-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
   .pe-hl-clear-btn {
     padding: 5px 13px; font-size: 11px; letter-spacing: 1px;
@@ -3452,8 +3453,8 @@
       <div class="pe-section">
         <div class="pe-section-label">HIGHLIGHT · 메인화면 텍스트 강조</div>
         <div style="font-size:11px;color:rgba(26,46,74,0.55);margin-bottom:14px;line-height:1.7;">
-          강조할 필드를 선택하면 단어 단위로 클릭하거나 드래그해 구간을 지정할 수 있습니다.<br>
-          강조된 단어는 파란색으로 표시됩니다.
+          강조할 필드를 선택하면 글자 단위로 클릭하거나 드래그해 구간을 지정할 수 있습니다.<br>
+          강조된 글자는 파란색으로 표시됩니다.
         </div>
 
         <!-- 필드 선택 탭 -->
@@ -3474,7 +3475,7 @@
         <!-- 선택 안내 -->
         <div class="pe-hl-actions">
           <button class="pe-hl-clear-btn" onclick="peHlClearAll()">전체 해제</button>
-          <span class="pe-hl-hint">단어를 클릭하거나 드래그해 구간을 선택하세요</span>
+          <span class="pe-hl-hint">글자를 클릭하거나 드래그해 구간을 선택하세요</span>
         </div>
       </div>
 
@@ -5948,80 +5949,80 @@ function rerenderMediaArea(blockIdx) {
 ────────────────────────────── */
 /* ══════════════════════════════════════
    HIGHLIGHT · 메인화면 텍스트 강조 기능
+   (글자/문자 단위 선택)
 ══════════════════════════════════════ */
 
-// 현재 선택된 필드와 토큰 상태
-let _hlField    = 'badge';       // 현재 편집 중인 필드
-let _hlTokens   = [];            // [{text, isSep}] 토큰 배열
-let _hlSelected = new Set();     // 강조된 토큰 인덱스 Set
-let _hlDragStart = -1;           // 드래그 시작 인덱스
+let _hlField     = 'badge';
+let _hlText      = '';          // 현재 필드의 전체 텍스트
+let _hlSelected  = new Set();   // 강조된 문자 인덱스 Set (공백 포함 전체 인덱스)
+let _hlDragStart = -1;
 let _hlDragging  = false;
+let _hlDragMode  = null;        // 'add' | 'remove' — 드래그 시작 시 결정
 
-// 필드 → DOM id 매핑
 const HL_FIELD_SOURCE = {
-  badge:        () => document.getElementById('pe-badge').value      || document.getElementById('txt-badge').textContent,
-  title1:       () => document.getElementById('pe-title1').value     || document.getElementById('txt-main-title').childNodes[0].textContent.trim(),
-  title2:       () => document.getElementById('pe-title2').value     || document.getElementById('txt-main-span').textContent,
-  subtitle:     () => document.getElementById('pe-subtitle').value   || document.getElementById('txt-subtitle').textContent,
-  divider:      () => document.getElementById('pe-divider').value    || document.getElementById('txt-divider').textContent,
+  badge:        () => document.getElementById('pe-badge').value        || document.getElementById('txt-badge').textContent,
+  title1:       () => document.getElementById('pe-title1').value       || document.getElementById('txt-main-title').childNodes[0]?.textContent?.trim() || '',
+  title2:       () => document.getElementById('pe-title2').value       || document.getElementById('txt-main-span').textContent,
+  subtitle:     () => document.getElementById('pe-subtitle').value     || document.getElementById('txt-subtitle').textContent,
+  divider:      () => document.getElementById('pe-divider').value      || document.getElementById('txt-divider').textContent,
   sectionLabel: () => document.getElementById('pe-section-label').value || document.getElementById('txt-section-label').textContent,
 };
 
-// 텍스트를 단어+구분자 토큰으로 분리
-function hlTokenize(text) {
-  // 단어(연속 비공백)와 공백/구분자를 번갈아 분리
-  const parts = text.split(/(\s+|[·\-·—\/\|&,.:;!?]+)/);
-  return parts
-    .filter(p => p !== undefined && p !== '')
-    .map(p => ({ text: p, isSep: /^\s+$/.test(p) || /^[·\-—\/\|&,.:;!?]+$/.test(p) }));
-}
-
-// 강조 Set → 텍스트의 인덱스 배열로 저장 (토큰 인덱스)
-function peHlGetSavedIndices() {
-  return pageTexts.highlights?.[_hlField] || [];
-}
-
-// 강조 인덱스 배열 → 토큰에 복원
-function peHlRestoreFromSaved() {
-  const saved = peHlGetSavedIndices();
-  _hlSelected = new Set(saved);
-}
-
-// 필드 탭 선택
 function peHlSelectField(field) {
   _hlField = field;
-  // 탭 active 갱신
   document.querySelectorAll('.pe-hl-tab').forEach(btn => {
     btn.classList.toggle('active', btn.getAttribute('onclick').includes("'" + field + "'"));
   });
-  // 텍스트 토큰화
-  const text = HL_FIELD_SOURCE[field]?.() || '';
-  _hlTokens = hlTokenize(text);
-  // 저장된 강조 복원
-  peHlRestoreFromSaved();
+  _hlText = HL_FIELD_SOURCE[field]?.() || '';
+  _hlSelected = new Set(pageTexts.highlights?.[field] || []);
   peHlRenderPicker();
 }
 
-// 피커 렌더링
 function peHlRenderPicker() {
   const picker = document.getElementById('pe-hl-picker');
   if (!picker) return;
   picker.innerHTML = '';
 
-  _hlTokens.forEach((tok, i) => {
-    if (tok.isSep) {
-      // 구분자 — 클릭 불가, 시각적 표시만
-      const sep = document.createElement('span');
-      sep.className = 'pe-hl-sep';
-      sep.textContent = tok.text.replace(/ /g, '\u00A0'); // nbsp로 공백 유지
-      picker.appendChild(sep);
+  // 글자(문자) 단위로 각각 span 생성. 공백은 클릭 불가 구분 역할
+  [..._hlText].forEach((ch, i) => {
+    if (ch === ' ' || ch === '\u00A0') {
+      const sp = document.createElement('span');
+      sp.className = 'pe-hl-sep';
+      sp.textContent = '\u00A0';  // 공백 시각화
+      sp.dataset.idx = i;
+      picker.appendChild(sp);
     } else {
       const btn = document.createElement('span');
       btn.className = 'pe-hl-token' + (_hlSelected.has(i) ? ' hl-on' : '');
-      btn.textContent = tok.text;
+      btn.textContent = ch;
       btn.dataset.idx = i;
 
-      // 클릭: 토글
+      btn.addEventListener('mousedown', e => {
+        e.preventDefault();
+        _hlDragStart = i;
+        _hlDragging  = false;
+        // 드래그 모드: 시작 글자가 이미 선택돼 있으면 제거, 아니면 추가
+        _hlDragMode  = _hlSelected.has(i) ? 'remove' : 'add';
+      });
+
+      btn.addEventListener('mouseenter', e => {
+        if (_hlDragStart < 0) return;
+        _hlDragging = true;
+        const lo = Math.min(_hlDragStart, i);
+        const hi = Math.max(_hlDragStart, i);
+        // 미리보기: 실제 _hlSelected는 건드리지 않고 클래스만 조작
+        picker.querySelectorAll('.pe-hl-token, .pe-hl-sep').forEach(el => {
+          const idx = parseInt(el.dataset.idx);
+          el.classList.remove('hl-drag-preview');
+          if (idx >= lo && idx <= hi && el.classList.contains('pe-hl-token')) {
+            if ((_hlDragMode === 'add' && !_hlSelected.has(idx)) ||
+                (_hlDragMode === 'remove' && _hlSelected.has(idx))) {
+              el.classList.add('hl-drag-preview');
+            }
+          }
+        });
+      });
+
       btn.addEventListener('click', e => {
         if (_hlDragging) return;
         if (_hlSelected.has(i)) _hlSelected.delete(i);
@@ -6030,32 +6031,10 @@ function peHlRenderPicker() {
         peHlPreviewApply();
       });
 
-      // 드래그 시작
-      btn.addEventListener('mousedown', e => {
-        _hlDragStart = i;
-        _hlDragging = false;
-        e.preventDefault();
-      });
-      btn.addEventListener('mouseenter', e => {
-        if (_hlDragStart < 0) return;
-        _hlDragging = true;
-        // 드래그 미리보기: dragStart ~ i 구간
-        const lo = Math.min(_hlDragStart, i);
-        const hi = Math.max(_hlDragStart, i);
-        document.querySelectorAll('.pe-hl-token').forEach(el => {
-          const idx = parseInt(el.dataset.idx);
-          el.classList.remove('hl-drag-preview');
-          if (!_hlSelected.has(idx) && idx >= lo && idx <= hi) {
-            el.classList.add('hl-drag-preview');
-          }
-        });
-      });
-
       picker.appendChild(btn);
     }
   });
 
-  // mouseup: 드래그 끝 → 구간 토글 확정
   picker.onmouseup = e => {
     if (_hlDragStart < 0) return;
     const target = e.target.closest('.pe-hl-token');
@@ -6063,50 +6042,58 @@ function peHlRenderPicker() {
       const endIdx = parseInt(target.dataset.idx);
       const lo = Math.min(_hlDragStart, endIdx);
       const hi = Math.max(_hlDragStart, endIdx);
-      // 구간 내 단어 토큰만 토글
-      _hlTokens.forEach((tok, i) => {
-        if (!tok.isSep && i >= lo && i <= hi) {
-          if (_hlSelected.has(i)) _hlSelected.delete(i);
-          else _hlSelected.add(i);
-        }
-      });
+      for (let i = lo; i <= hi; i++) {
+        if ([..._hlText][i] === ' ') continue;  // 공백 건너뜀
+        if (_hlDragMode === 'add')    _hlSelected.add(i);
+        else                          _hlSelected.delete(i);
+      }
+    } else if (!_hlDragging && target) {
+      // 단순 클릭은 click 이벤트에서 처리됨
     }
     _hlDragStart = -1;
-    _hlDragging = false;
+    _hlDragging  = false;
+    _hlDragMode  = null;
     peHlRenderPicker();
     peHlPreviewApply();
   };
 }
 
-// 전체 해제
 function peHlClearAll() {
   _hlSelected.clear();
   peHlRenderPicker();
   peHlPreviewApply();
 }
 
-// 강조 저장: pageTexts.highlights에 기록 (savePageEdit 호출 시 함께 저장됨)
 function peHlCommit() {
   if (!pageTexts.highlights) pageTexts.highlights = {};
   pageTexts.highlights[_hlField] = [..._hlSelected];
 }
 
-// 실시간 미리보기 적용 (편집 모달 열린 상태에서 메인 화면 강조 반영)
 function peHlPreviewApply() {
   peHlCommit();
   applyHighlights();
 }
 
-// 강조 텍스트 → innerHTML 빌드
+// 강조 인덱스(문자 단위) → innerHTML 빌드
+// 연속된 강조 구간은 하나의 <span class="hl">으로 묶음
 function buildHighlightedHtml(text, hlIndices) {
   if (!hlIndices || hlIndices.length === 0) return escHtml(text);
-  const tokens = hlTokenize(text);
   const hlSet = new Set(hlIndices);
-  return tokens.map((tok, i) => {
-    const safe = escHtml(tok.text);
-    if (!tok.isSep && hlSet.has(i)) return '<span class="hl">' + safe + '</span>';
-    return safe;
-  }).join('');
+  const chars = [...text];
+  let html = '';
+  let inHl = false;
+  chars.forEach((ch, i) => {
+    const safe = escHtml(ch);
+    if (hlSet.has(i)) {
+      if (!inHl) { html += '<span class="hl">'; inHl = true; }
+      html += safe;
+    } else {
+      if (inHl) { html += '</span>'; inHl = false; }
+      html += safe;
+    }
+  });
+  if (inHl) html += '</span>';
+  return html;
 }
 
 // 모든 강조 필드에 innerHTML 적용
