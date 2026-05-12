@@ -149,6 +149,52 @@
     margin-top: 3px; margin-bottom: 6px; padding-left: 34px;
   }
   .pe-menu-sub-label { font-size: 9px; letter-spacing: 1.5px; color: rgba(26,107,191,0.45); flex-shrink: 0; min-width: 40px; }
+
+  /* ══════════════════════════════════════
+     HIGHLIGHT 강조 기능 UI
+  ══════════════════════════════════════ */
+  .pe-hl-tabs {
+    display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px;
+  }
+  .pe-hl-tab {
+    padding: 5px 13px; font-size: 11px; letter-spacing: 1px;
+    background: rgba(26,107,191,0.05); border: 1px solid rgba(26,107,191,0.18);
+    color: rgba(26,46,74,0.65); font-family: 'Noto Sans KR', sans-serif;
+    cursor: pointer; transition: all 0.18s;
+  }
+  .pe-hl-tab:hover { border-color: var(--gold); color: var(--gold); }
+  .pe-hl-tab.active { background: rgba(26,107,191,0.12); border-color: var(--gold); color: var(--gold); font-weight: 700; }
+  .pe-hl-picker-wrap {
+    min-height: 52px; padding: 12px 14px;
+    background: rgba(26,107,191,0.04); border: 1px solid rgba(26,107,191,0.12);
+    margin-bottom: 10px; user-select: none;
+  }
+  .pe-hl-picker { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+  .pe-hl-token {
+    display: inline-flex; align-items: center;
+    padding: 4px 8px; font-size: 14px; font-weight: 700;
+    color: rgba(26,46,74,0.75); background: transparent;
+    border: 1px solid transparent; cursor: pointer; border-radius: 2px;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    font-family: 'Noto Sans KR', sans-serif;
+  }
+  .pe-hl-token:hover { background: rgba(26,107,191,0.08); border-color: rgba(26,107,191,0.25); }
+  .pe-hl-token.hl-on { background: rgba(26,107,191,0.15); border-color: rgba(26,107,191,0.50); color: var(--gold); font-weight: 900; }
+  .pe-hl-token.hl-drag-preview { background: rgba(26,107,191,0.08); border-color: rgba(26,107,191,0.30); color: var(--gold); }
+  .pe-hl-sep { color: rgba(26,46,74,0.28); font-size: 13px; padding: 0 1px; pointer-events: none; }
+  .pe-hl-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .pe-hl-clear-btn {
+    padding: 5px 13px; font-size: 11px; letter-spacing: 1px;
+    background: none; border: 1px solid rgba(214,48,48,0.30);
+    color: rgba(214,48,48,0.65); font-family: 'Noto Sans KR', sans-serif;
+    cursor: pointer; transition: all 0.18s;
+  }
+  .pe-hl-clear-btn:hover { border-color: #d63030; color: #d63030; background: rgba(214,48,48,0.05); }
+  .pe-hl-hint { font-size: 10px; letter-spacing: 1px; color: rgba(26,46,74,0.40); }
+  /* 메인화면 강조 렌더링 */
+  .hl { color: #1a6bbf; font-weight: 900; }
+  .main-title .hl { color: #1a6bbf; }
+
   .pe-order-list { display: flex; flex-direction: column; gap: 6px; }
   .pe-order-item {
     display: flex; align-items: center; gap: 10px;
@@ -802,7 +848,7 @@
     animation: fadeSlideDown 0.8s ease forwards;
   }
   .main-title {
-    font-family: 'Noto Serif KR', serif; font-size: clamp(26px,5vw,54px); font-weight: 900;
+    font-family: 'Noto Sans KR', sans-serif; font-size: clamp(26px,5vw,54px); font-weight: 900;
     color: #0a1a30; line-height: 1.3; letter-spacing: -0.5px;
     animation: fadeSlideUp 0.9s ease 0.1s both; text-shadow: 0 2px 14px rgba(26,107,191,0.18);
   }
@@ -3402,6 +3448,36 @@
         </div>
       </div>
 
+      <!-- 강조 텍스트 -->
+      <div class="pe-section">
+        <div class="pe-section-label">HIGHLIGHT · 메인화면 텍스트 강조</div>
+        <div style="font-size:11px;color:rgba(26,46,74,0.55);margin-bottom:14px;line-height:1.7;">
+          강조할 필드를 선택하면 단어 단위로 클릭하거나 드래그해 구간을 지정할 수 있습니다.<br>
+          강조된 단어는 파란색으로 표시됩니다.
+        </div>
+
+        <!-- 필드 선택 탭 -->
+        <div class="pe-hl-tabs" id="pe-hl-tabs">
+          <button class="pe-hl-tab active" onclick="peHlSelectField('badge')">배지</button>
+          <button class="pe-hl-tab" onclick="peHlSelectField('title1')">타이틀 1줄</button>
+          <button class="pe-hl-tab" onclick="peHlSelectField('title2')">타이틀 2줄</button>
+          <button class="pe-hl-tab" onclick="peHlSelectField('subtitle')">서브타이틀</button>
+          <button class="pe-hl-tab" onclick="peHlSelectField('divider')">구분선</button>
+          <button class="pe-hl-tab" onclick="peHlSelectField('sectionLabel')">안내문구</button>
+        </div>
+
+        <!-- 토큰 선택 영역 -->
+        <div class="pe-hl-picker-wrap" id="pe-hl-picker-wrap">
+          <div class="pe-hl-picker" id="pe-hl-picker"></div>
+        </div>
+
+        <!-- 선택 안내 -->
+        <div class="pe-hl-actions">
+          <button class="pe-hl-clear-btn" onclick="peHlClearAll()">전체 해제</button>
+          <span class="pe-hl-hint">단어를 클릭하거나 드래그해 구간을 선택하세요</span>
+        </div>
+      </div>
+
       <!-- 구분선 / 섹션 -->
       <div class="pe-section">
         <div class="pe-section-label">SECTION · 구분선 & 안내 문구</div>
@@ -3536,17 +3612,7 @@
       <div class="sem-header-label">CURRICULUM · 학기별 개설과목</div>
       <div class="sem-header-title" id="menu-01-title">학기별 개설과목 안내</div>
       <div class="sem-header-subtitle" id="menu-01-subtitle"></div>
-      <div class="graded-notice">
-        <span class="grade-icon grade-등급">등급&성취</span>
-        <span class="graded-notice-em">등급&amp;성취도</span>
-        <span style="margin:0 5px;color:rgba(26,46,74,0.30)">|</span>
-        <span class="grade-icon grade-성취">성취</span>
-        <span class="graded-notice-em" style="border-color:rgba(26,107,191,0.45);color:#1a5faa;">성취도</span>
-        <span style="margin:0 5px;color:rgba(26,46,74,0.30)">|</span>
-        <span class="grade-icon grade-pf">P/F</span>
-        <span class="graded-notice-em" style="border-color:rgba(200,120,20,0.50);color:#b06010;">이수/미이수</span>
-        <span style="margin-left:6px;color:rgba(26,46,74,0.55)">— 카드 우측 아이콘 기준</span>
-      </div>
+
     </div>
     <div class="sem-grade-tabs" id="sem-semester-tabs">
       <div class="sem-dropdown-wrap" id="sem-dropdown-wrap">
@@ -4115,17 +4181,6 @@
       <div class="sem-header-label">CURRICULUM · 교과별 선택과목</div>
       <div class="sem-header-title" id="menu-02-title">교과별 선택과목 안내</div>
       <div class="sem-header-subtitle" id="menu-02-subtitle"></div>
-      <div class="graded-notice">
-        <span class="catsubj-grade-icon grade-등급">등급&성취</span>
-        <span class="graded-notice-em">등급&amp;성취도</span>
-        <span style="margin:0 5px;color:rgba(26,46,74,0.30)">|</span>
-        <span class="catsubj-grade-icon grade-성취">성취</span>
-        <span class="graded-notice-em" style="border-color:rgba(26,107,191,0.45);color:#1a5faa;">성취도</span>
-        <span style="margin:0 5px;color:rgba(26,46,74,0.30)">|</span>
-        <span class="catsubj-grade-icon grade-pf">P/F</span>
-        <span class="graded-notice-em" style="border-color:rgba(200,120,20,0.50);color:#b06010;">이수/미이수</span>
-        <span style="margin-left:6px;color:rgba(26,46,74,0.55)">— 카드 우측 아이콘 기준</span>
-      </div>
     </div>
   </div>
   <div class="catsubj-body">
@@ -4719,6 +4774,8 @@ function applyPageTexts() {
   if (p.divider)      document.getElementById('txt-divider').textContent      = p.divider;
   if (p.sectionLabel) document.getElementById('txt-section-label').textContent = p.sectionLabel;
   if (p.footer)       document.getElementById('txt-footer').textContent       = p.footer;
+  // 강조 적용 (텍스트 설정 후)
+  if (p.highlights) applyHighlights();
   for (let i = 1; i <= 8; i++) {
     const k = 'menu' + String(i).padStart(2,'0');
     const id = 'menu-' + String(i).padStart(2,'0');
@@ -5889,6 +5946,227 @@ function rerenderMediaArea(blockIdx) {
 /* ──────────────────────────────
    페이지 편집
 ────────────────────────────── */
+/* ══════════════════════════════════════
+   HIGHLIGHT · 메인화면 텍스트 강조 기능
+══════════════════════════════════════ */
+
+// 현재 선택된 필드와 토큰 상태
+let _hlField    = 'badge';       // 현재 편집 중인 필드
+let _hlTokens   = [];            // [{text, isSep}] 토큰 배열
+let _hlSelected = new Set();     // 강조된 토큰 인덱스 Set
+let _hlDragStart = -1;           // 드래그 시작 인덱스
+let _hlDragging  = false;
+
+// 필드 → DOM id 매핑
+const HL_FIELD_SOURCE = {
+  badge:        () => document.getElementById('pe-badge').value      || document.getElementById('txt-badge').textContent,
+  title1:       () => document.getElementById('pe-title1').value     || document.getElementById('txt-main-title').childNodes[0].textContent.trim(),
+  title2:       () => document.getElementById('pe-title2').value     || document.getElementById('txt-main-span').textContent,
+  subtitle:     () => document.getElementById('pe-subtitle').value   || document.getElementById('txt-subtitle').textContent,
+  divider:      () => document.getElementById('pe-divider').value    || document.getElementById('txt-divider').textContent,
+  sectionLabel: () => document.getElementById('pe-section-label').value || document.getElementById('txt-section-label').textContent,
+};
+
+// 텍스트를 단어+구분자 토큰으로 분리
+function hlTokenize(text) {
+  // 단어(연속 비공백)와 공백/구분자를 번갈아 분리
+  const parts = text.split(/(\s+|[·\-·—\/\|&,.:;!?]+)/);
+  return parts
+    .filter(p => p !== undefined && p !== '')
+    .map(p => ({ text: p, isSep: /^\s+$/.test(p) || /^[·\-—\/\|&,.:;!?]+$/.test(p) }));
+}
+
+// 강조 Set → 텍스트의 인덱스 배열로 저장 (토큰 인덱스)
+function peHlGetSavedIndices() {
+  return pageTexts.highlights?.[_hlField] || [];
+}
+
+// 강조 인덱스 배열 → 토큰에 복원
+function peHlRestoreFromSaved() {
+  const saved = peHlGetSavedIndices();
+  _hlSelected = new Set(saved);
+}
+
+// 필드 탭 선택
+function peHlSelectField(field) {
+  _hlField = field;
+  // 탭 active 갱신
+  document.querySelectorAll('.pe-hl-tab').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('onclick').includes("'" + field + "'"));
+  });
+  // 텍스트 토큰화
+  const text = HL_FIELD_SOURCE[field]?.() || '';
+  _hlTokens = hlTokenize(text);
+  // 저장된 강조 복원
+  peHlRestoreFromSaved();
+  peHlRenderPicker();
+}
+
+// 피커 렌더링
+function peHlRenderPicker() {
+  const picker = document.getElementById('pe-hl-picker');
+  if (!picker) return;
+  picker.innerHTML = '';
+
+  _hlTokens.forEach((tok, i) => {
+    if (tok.isSep) {
+      // 구분자 — 클릭 불가, 시각적 표시만
+      const sep = document.createElement('span');
+      sep.className = 'pe-hl-sep';
+      sep.textContent = tok.text.replace(/ /g, '\u00A0'); // nbsp로 공백 유지
+      picker.appendChild(sep);
+    } else {
+      const btn = document.createElement('span');
+      btn.className = 'pe-hl-token' + (_hlSelected.has(i) ? ' hl-on' : '');
+      btn.textContent = tok.text;
+      btn.dataset.idx = i;
+
+      // 클릭: 토글
+      btn.addEventListener('click', e => {
+        if (_hlDragging) return;
+        if (_hlSelected.has(i)) _hlSelected.delete(i);
+        else _hlSelected.add(i);
+        peHlRenderPicker();
+        peHlPreviewApply();
+      });
+
+      // 드래그 시작
+      btn.addEventListener('mousedown', e => {
+        _hlDragStart = i;
+        _hlDragging = false;
+        e.preventDefault();
+      });
+      btn.addEventListener('mouseenter', e => {
+        if (_hlDragStart < 0) return;
+        _hlDragging = true;
+        // 드래그 미리보기: dragStart ~ i 구간
+        const lo = Math.min(_hlDragStart, i);
+        const hi = Math.max(_hlDragStart, i);
+        document.querySelectorAll('.pe-hl-token').forEach(el => {
+          const idx = parseInt(el.dataset.idx);
+          el.classList.remove('hl-drag-preview');
+          if (!_hlSelected.has(idx) && idx >= lo && idx <= hi) {
+            el.classList.add('hl-drag-preview');
+          }
+        });
+      });
+
+      picker.appendChild(btn);
+    }
+  });
+
+  // mouseup: 드래그 끝 → 구간 토글 확정
+  picker.onmouseup = e => {
+    if (_hlDragStart < 0) return;
+    const target = e.target.closest('.pe-hl-token');
+    if (target && _hlDragging) {
+      const endIdx = parseInt(target.dataset.idx);
+      const lo = Math.min(_hlDragStart, endIdx);
+      const hi = Math.max(_hlDragStart, endIdx);
+      // 구간 내 단어 토큰만 토글
+      _hlTokens.forEach((tok, i) => {
+        if (!tok.isSep && i >= lo && i <= hi) {
+          if (_hlSelected.has(i)) _hlSelected.delete(i);
+          else _hlSelected.add(i);
+        }
+      });
+    }
+    _hlDragStart = -1;
+    _hlDragging = false;
+    peHlRenderPicker();
+    peHlPreviewApply();
+  };
+}
+
+// 전체 해제
+function peHlClearAll() {
+  _hlSelected.clear();
+  peHlRenderPicker();
+  peHlPreviewApply();
+}
+
+// 강조 저장: pageTexts.highlights에 기록 (savePageEdit 호출 시 함께 저장됨)
+function peHlCommit() {
+  if (!pageTexts.highlights) pageTexts.highlights = {};
+  pageTexts.highlights[_hlField] = [..._hlSelected];
+}
+
+// 실시간 미리보기 적용 (편집 모달 열린 상태에서 메인 화면 강조 반영)
+function peHlPreviewApply() {
+  peHlCommit();
+  applyHighlights();
+}
+
+// 강조 텍스트 → innerHTML 빌드
+function buildHighlightedHtml(text, hlIndices) {
+  if (!hlIndices || hlIndices.length === 0) return escHtml(text);
+  const tokens = hlTokenize(text);
+  const hlSet = new Set(hlIndices);
+  return tokens.map((tok, i) => {
+    const safe = escHtml(tok.text);
+    if (!tok.isSep && hlSet.has(i)) return '<span class="hl">' + safe + '</span>';
+    return safe;
+  }).join('');
+}
+
+// 모든 강조 필드에 innerHTML 적용
+function applyHighlights() {
+  const p = pageTexts;
+  const hl = p.highlights || {};
+
+  // badge
+  const badgeEl = document.getElementById('txt-badge');
+  if (badgeEl) {
+    const text = p.badge || badgeEl.textContent;
+    badgeEl.innerHTML = buildHighlightedHtml(text, hl.badge);
+  }
+  // title1 (childNodes[0])
+  const titleEl = document.getElementById('txt-main-title');
+  if (titleEl) {
+    const text = p.title1 !== undefined ? p.title1 : titleEl.childNodes[0]?.textContent?.trim() || '';
+    if (hl.title1 && hl.title1.length > 0) {
+      // title1 노드를 span으로 교체
+      const frag = document.createRange().createContextualFragment(buildHighlightedHtml(text, hl.title1));
+      // 첫 번째 childNode(텍스트 노드) 교체
+      const wrapper = document.createElement('span');
+      wrapper.style.cssText = 'display:contents';
+      wrapper.appendChild(frag);
+      titleEl.childNodes[0].replaceWith(wrapper);
+    } else {
+      // 강조 없으면 텍스트 노드 복원
+      if (titleEl.childNodes[0].nodeType !== Node.TEXT_NODE) {
+        titleEl.childNodes[0].replaceWith(document.createTextNode(text));
+      } else {
+        titleEl.childNodes[0].textContent = text;
+      }
+    }
+  }
+  // title2
+  const spanEl = document.getElementById('txt-main-span');
+  if (spanEl) {
+    const text = p.title2 || spanEl.textContent;
+    spanEl.innerHTML = buildHighlightedHtml(text, hl.title2);
+  }
+  // subtitle
+  const subEl = document.getElementById('txt-subtitle');
+  if (subEl) {
+    const text = p.subtitle || subEl.textContent;
+    subEl.innerHTML = buildHighlightedHtml(text, hl.subtitle);
+  }
+  // divider
+  const divEl = document.getElementById('txt-divider');
+  if (divEl) {
+    const text = p.divider || divEl.textContent;
+    divEl.innerHTML = buildHighlightedHtml(text, hl.divider);
+  }
+  // sectionLabel
+  const slEl = document.getElementById('txt-section-label');
+  if (slEl) {
+    const text = p.sectionLabel || slEl.textContent;
+    slEl.innerHTML = buildHighlightedHtml(text, hl.sectionLabel);
+  }
+}
+
 function openPageEdit() {
   const p = pageTexts;
   // 현재 화면 텍스트를 폼에 채우기
@@ -5943,6 +6221,10 @@ function openPageEdit() {
   syncMainBgPreview();
   // 메뉴 순서 리스트 렌더링
   renderOrderList();
+  // 강조 피커 초기화 (기본 필드: badge)
+  _hlField = 'badge';
+  document.querySelectorAll('.pe-hl-tab').forEach((btn, i) => btn.classList.toggle('active', i === 0));
+  peHlSelectField('badge');
 
   document.getElementById('page-edit-modal').classList.add('open');
 }
@@ -5968,6 +6250,7 @@ async function savePageEdit() {
     menu07url:    document.getElementById('pe-menu-07-url').value.trim(),
     menu08url:    document.getElementById('pe-menu-08-url').value.trim(),
     menuOrder:    getOrderFromList(),
+    highlights:   pageTexts.highlights || {},
   });
   for (let i = 1; i <= 9; i++) {
     const k = 'menu' + String(i).padStart(2,'0');
@@ -9382,6 +9665,26 @@ function autoResizeGroupTextarea() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  // 강조 피커: 텍스트 필드 변경 시 실시간 토큰 갱신
+  ['pe-badge','pe-title1','pe-title2','pe-subtitle','pe-divider','pe-section-label'].forEach(id => {
+    const fieldMap = { 'pe-badge':'badge','pe-title1':'title1','pe-title2':'title2',
+                       'pe-subtitle':'subtitle','pe-divider':'divider','pe-section-label':'sectionLabel' };
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', () => {
+      if (_hlField === fieldMap[id]) peHlSelectField(_hlField);
+    });
+  });
+
+  // 강조 피커 mouseup 전역 핸들러 (피커 영역 밖에서 마우스를 놓아도 드래그 종료)
+  document.addEventListener('mouseup', () => {
+    if (_hlDragStart >= 0 && _hlDragging) {
+      _hlDragStart = -1; _hlDragging = false;
+      peHlRenderPicker(); peHlPreviewApply();
+    } else {
+      _hlDragStart = -1; _hlDragging = false;
+    }
+  });
+
   const groupEl = document.getElementById('info-group');
   if (groupEl) {
     groupEl.addEventListener('input', autoResizeGroupTextarea);
