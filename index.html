@@ -493,6 +493,10 @@
   .cc-영어   { color: #1a9e5c; border-color: #1a9e5c; }
   .cc-사회   { color: #e0b87e; border-color: #e0b87e; }
   .cc-과학   { color: #a07ee0; border-color: #a07ee0; }
+  .cc-체육   { color: #e07e7e; border-color: #e07e7e; }
+  .cc-예술   { color: #e09a4a; border-color: #e09a4a; }
+  .cc-기술ㆍ가정\/정보\/제2외국어\/한문\/교양 { color: #5ab8a0; border-color: #5ab8a0; }
+  /* 구버전 호환 */
   .cc-예체능 { color: #e07e7e; border-color: #e07e7e; }
   .cc-직업   { color: #7ec8e0; border-color: #7ec8e0; }
   .cc-기타   { color: #b0b0b0; border-color: #b0b0b0; }
@@ -1260,19 +1264,18 @@
     display: flex;
     flex-direction: column;
     min-height: 0;
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 
-  /* 고정 열 헤더 행 */
+  /* 고정 열 헤더 행 — sem-scroll-outer 기준 sticky */
   .sem-col-header-row {
     flex-shrink: 0;
+    position: sticky; top: 0; z-index: 10;
     display: grid;
     grid-template-columns: 120px 1fr 1fr 1fr 1fr 1fr;
     border-bottom: 2px solid rgba(26,107,191,0.22);
     background: #e6f0fc;
-    /* 반투명 배경 제거 + GPU 레이어 분리 */
-    will-change: transform;
-    transform: translateZ(0);
     transition: grid-template-columns 0.3s ease;
   }
   .sem-col-header-cell {
@@ -1307,16 +1310,14 @@
   .sem-col-select-hint.hint-외국어정보 { color: #1a9070; }
   .sem-col-select-hint.hint-음악미술  { color: #c04090; }
 
-  /* 스크롤 가능한 학기 행 목록 (데스크탑) */
+  /* 학기 행 목록 — 세로 스크롤은 sem-scroll-outer가 담당 */
   .sem-grid {
-    flex: 1; display: flex; flex-direction: column;
-    overflow-y: auto;
+    flex: none; display: flex; flex-direction: column;
+    overflow: visible;
     min-height: 0;
-    will-change: scroll-position;
-    transform: translateZ(0);
   }
-  .sem-grid::-webkit-scrollbar { width: 4px; }
-  .sem-grid::-webkit-scrollbar-thumb { background: rgba(26,107,191,0.20); border-radius: 2px; }
+  #sem-scroll-outer::-webkit-scrollbar { width: 4px; }
+  #sem-scroll-outer::-webkit-scrollbar-thumb { background: rgba(26,107,191,0.20); border-radius: 2px; }
 
   /* 학기 한 행 */
   .sem-row {
@@ -1500,13 +1501,15 @@
   /* 과목 6개 이상 → JS가 .wide 클래스 추가 → 2열 그리드 */
   .sem-subject-list.wide { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; align-content: start; }
   .sem-subject-list.wide .sem-subj-card { margin-bottom: 0; min-width: 0; }
-  .sem-subject-list.wide .sem-subj-name { font-size: 11px; }
-  .sem-subject-list.wide .sem-subj-cat  { font-size: 10px; }
+  /* 같은 cell에 wide list가 있을 때 non-wide list는 50%(한 칸) 너비로 제한 */
+  .sem-subject-list.half-width { width: 50%; max-width: 50%; }
+  .sem-subject-list.wide .sem-subj-name { font-size: 13px; }
+  .sem-subject-list.wide .sem-subj-cat  { font-size: 11px; }
   .sem-subject-list::-webkit-scrollbar { width: 2px; }
   .sem-subject-list::-webkit-scrollbar-thumb { background: rgba(26,107,191,0.20); }
 
   .sem-subj-card {
-    padding: 8px 9px; margin-bottom: 5px;
+    padding: 10px 11px; margin-bottom: 5px;
     background: #fafcff; border: 1px solid rgba(26,107,191,0.10); border-left: 2px solid;
     cursor: pointer; transition: background 0.15s, box-shadow 0.15s, transform 0.15s; position: relative;
     display: flex; align-items: center; gap: 7px;
@@ -1517,9 +1520,9 @@
   .sem-subj-card.graded .sem-subj-name { font-weight: 700; }
   .sem-subj-card.graded .sem-subj-cat  { opacity: 0.8; }
   .sem-subj-info { flex: 1; min-width: 0; }
-  .sem-subj-name { font-size: 13px; font-weight: 600; color: #1a2e4a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .sem-subj-cat { font-size: 11px; letter-spacing: 0.5px; margin-top: 1px; opacity: 0.75; }
-  .sem-subj-arrow { font-size: 11px; color: rgba(201,168,76,0.60); flex-shrink: 0; transition: color 0.2s; }
+  .sem-subj-name { font-size: 15px; font-weight: 600; color: #1a2e4a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sem-subj-cat { font-size: 13px; letter-spacing: 0.5px; margin-top: 1px; opacity: 0.75; }
+  .sem-subj-arrow { font-size: 13px; color: rgba(201,168,76,0.60); flex-shrink: 0; transition: color 0.2s; }
   .sem-subj-card:hover .sem-subj-arrow { color: var(--gold); }
   .btn-sem-subj-del {
     display: none; background: none; border: none; color: rgba(26,46,74,0.30);
@@ -1554,12 +1557,18 @@
   .spj-item:last-child { border-bottom: none; }
   .spj-item:hover { background: rgba(26,107,191,0.05); }
   .spj-item.selected { background: rgba(26,107,191,0.08); }
+  .spj-item.already { background: rgba(26,107,191,0.04); }
+  .spj-item.to-remove { background: rgba(214,48,48,0.05); }
   .spj-check {
     width: 18px; height: 18px; border: 1.5px solid rgba(26,107,191,0.30);
     display: flex; align-items: center; justify-content: center;
     flex-shrink: 0; font-size: 11px; transition: all 0.18s;
   }
   .spj-item.selected .spj-check { background: var(--gold); border-color: var(--gold); color: #ffffff; font-weight: 700; }
+  .spj-item.already .spj-check { background: rgba(26,107,191,0.15); border-color: var(--gold); color: var(--gold); font-weight: 700; }
+  .spj-item.to-remove .spj-check { background: rgba(214,48,48,0.12); border-color: #d63030; color: #d63030; font-weight: 700; }
+  .spj-item.already .spj-name { color: rgba(26,46,74,0.55); }
+  .spj-item.to-remove .spj-name { color: #d63030; text-decoration: line-through; }
   .spj-cat-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
   .spj-name { flex: 1; font-size: 13px; color: #1a2e4a; font-weight: 500; }
   .spj-cat-label { font-size: 10px; letter-spacing: 1px; opacity: 0.80; }
@@ -1579,12 +1588,14 @@
 
   /* 카테고리 컬러 */
   .dot-국어{background:#7eb8e0} .dot-수학{background:#e07eb8} .dot-영어{background:#1a9e5c}
-  .dot-사회{background:#e0b87e} .dot-과학{background:#a07ee0} .dot-예체능{background:#e07e7e}
-  .dot-직업{background:#7ec8e0} .dot-기타{background:#b0b0b0}
+  .dot-사회{background:#e0b87e} .dot-과학{background:#a07ee0} .dot-체육{background:#e07e7e}
+  .dot-예술{background:#e09a4a} .dot-기술교양{background:#5ab8a0}
+  .dot-예체능{background:#e07e7e} .dot-직업{background:#7ec8e0} .dot-기타{background:#b0b0b0}
   .sem-bc-국어{border-left-color:#7eb8e0} .sem-bc-수학{border-left-color:#e07eb8}
   .sem-bc-영어{border-left-color:#1a9e5c} .sem-bc-사회{border-left-color:#e0b87e}
-  .sem-bc-과학{border-left-color:#a07ee0} .sem-bc-예체능{border-left-color:#e07e7e}
-  .sem-bc-직업{border-left-color:#7ec8e0} .sem-bc-기타{border-left-color:rgba(26,46,74,0.15)}
+  .sem-bc-과학{border-left-color:#a07ee0} .sem-bc-체육{border-left-color:#e07e7e}
+  .sem-bc-예술{border-left-color:#e09a4a} .sem-bc-기술교양{border-left-color:#5ab8a0}
+  .sem-bc-예체능{border-left-color:#e07e7e} .sem-bc-직업{border-left-color:#7ec8e0} .sem-bc-기타{border-left-color:rgba(26,46,74,0.15)}
 
   /* 등급산출 여부 아이콘 — 학기별 과목 카드 */
   .grade-icon {
@@ -1637,8 +1648,9 @@
     color: #b06010;
   }
   .txt-국어{color:#7eb8e0} .txt-수학{color:#e07eb8} .txt-영어{color:#1a9e5c}
-  .txt-사회{color:#e0b87e} .txt-과학{color:#a07ee0} .txt-예체능{color:#e07e7e}
-  .txt-직업{color:#7ec8e0} .txt-기타{color:#b0b0b0}
+  .txt-사회{color:#e0b87e} .txt-과학{color:#a07ee0} .txt-체육{color:#e07e7e}
+  .txt-예술{color:#e09a4a} .txt-기술교양{color:#5ab8a0}
+  .txt-예체능{color:#e07e7e} .txt-직업{color:#7ec8e0} .txt-기타{color:#b0b0b0}
 
   /* ── 등급산출여부 드롭다운 피커 ── */
   .grade-picker {
@@ -3288,9 +3300,9 @@
         <option value="영어">영어</option>
         <option value="사회">사회</option>
         <option value="과학">과학</option>
-        <option value="예체능">예체능</option>
-        <option value="직업">직업</option>
-        <option value="기타">기타</option>
+        <option value="체육">체육</option>
+        <option value="예술">예술</option>
+        <option value="기술ㆍ가정/정보/제2외국어/한문/교양">기술ㆍ가정/정보/제2외국어/한문/교양</option>
       </select>
       <input type="text" id="add-name" placeholder="과목명을 입력하세요" maxlength="40"
              onkeydown="if(event.key==='Enter') addSubject()">
@@ -3321,6 +3333,7 @@
     <button class="detail-back" onclick="closeDetail()">◀ 목록으로</button>
     <div class="detail-header-info">
       <div class="detail-tag" id="detail-cat"></div>
+      <select id="detail-cat-select" style="display:none;font-family:'Noto Sans KR',sans-serif;font-size:11px;padding:4px 8px;border:1px solid rgba(26,107,191,0.3);background:#fff;color:#1a2e4a;cursor:pointer;border-radius:2px;max-width:200px;" onchange="changeSubjectCat(this.value)"></select>
       <div class="detail-name" id="detail-name"></div>
     </div>
     <button class="detail-home" onclick="goHome()" title="메인화면으로">🏠</button>
@@ -4165,8 +4178,8 @@
       <div id="spj-list"></div>
     </div>
     <div class="subj-pick-foot">
-      <div class="spj-count-info"><span id="spj-sel-count">0</span>개 선택됨</div>
-      <button class="btn-spj-confirm" onclick="confirmSubjPick()">추가하기</button>
+      <div class="spj-count-info"><span id="spj-add-count">0</span>개 추가 · <span id="spj-rm-count">0</span>개 삭제</div>
+      <button class="btn-spj-confirm" onclick="confirmSubjPick()">확인</button>
     </div>
   </div>
 </div>
@@ -4685,7 +4698,7 @@ function sbSetQ(key, value, ms) {
    상수 / 상태
 ────────────────────────────── */
 const PASS = '1234';
-const CATS = ['전체','국어','수학','영어','사회','과학','예체능','직업','기타'];
+const CATS = ['전체','국어','수학','영어','사회','과학','체육','예술','기술ㆍ가정/정보/제2외국어/한문/교양'];
 let subjects  = [];
 let pageTexts = {};
 let activeCat = '전체';
@@ -5167,8 +5180,12 @@ function closeAdminModal() { document.getElementById('admin-modal').classList.re
 function renderTabs() {
   const wrap = document.getElementById('cat-tabs');
   wrap.innerHTML = '';
-  CATS.forEach(c => {
+  // CATS에 없더라도 실제 과목이 있는 구버전 카테고리를 뒤에 추가
+  const legacyCats = [...new Set(subjects.map(s => s.cat))].filter(c => !CATS.includes(c));
+  const allTabs = [...CATS, ...legacyCats];
+  allTabs.forEach(c => {
     const cnt = c === '전체' ? subjects.length : subjects.filter(s => s.cat === c).length;
+    if (c !== '전체' && cnt === 0) return; // 과목 없는 탭은 숨김
     const btn = document.createElement('button');
     btn.className = 'cat-tab' + (c === activeCat ? ' active' : '');
     btn.textContent = c + (cnt > 0 ? ` (${cnt})` : '');
@@ -5191,7 +5208,7 @@ function renderList() {
     const row = document.createElement('div');
     row.className = 'subject-item';
     row.innerHTML = `
-      <span class="subject-cat-tag cc-${s.cat}">${s.cat}</span>
+      <span class="subject-cat-tag" style="color:${CAT_COLORS[s.cat]||'#b0b0b0'};border-color:${CAT_COLORS[s.cat]||'#b0b0b0'}">${s.cat}</span>
       <span class="subject-name">${escHtml(s.name)}</span>
       <span class="subj-go-hint">상세보기 →</span>
       <div class="subject-actions" onclick="event.stopPropagation()">
@@ -5240,7 +5257,18 @@ function openDetail(s, from, semColIdx) {
   currentSubjectIdx = subjects.indexOf(s);
   const tag = document.getElementById('detail-cat');
   tag.textContent = s.cat;
-  tag.className = 'detail-tag cc-' + s.cat;
+  tag.className = 'detail-tag';
+  tag.style.color = CAT_COLORS[s.cat] || '#b0b0b0';
+  tag.style.borderColor = CAT_COLORS[s.cat] || '#b0b0b0';
+  // 과목군 변경 select 채우기
+  const catSel = document.getElementById('detail-cat-select');
+  if (catSel) {
+    catSel.innerHTML = CATS.filter(c => c !== '전체').map(c =>
+      `<option value="${c}"${c === s.cat ? ' selected' : ''}>${c}</option>`
+    ).join('');
+    catSel.style.color = CAT_COLORS[s.cat] || '#b0b0b0';
+    catSel.style.borderColor = CAT_COLORS[s.cat] || '#b0b0b0';
+  }
   document.getElementById('detail-name').textContent = s.name;
 
   // 기본 정보 로드
@@ -5334,6 +5362,13 @@ function applyReadOnly(readOnly) {
     const el = document.getElementById(id);
     if (el) el.readOnly = readOnly;
   });
+  // 과목군 변경 select: 관리자(admin) 모드에서만 표시
+  const catTag = document.getElementById('detail-cat');
+  const catSel = document.getElementById('detail-cat-select');
+  if (catTag && catSel) {
+    catTag.style.display = readOnly ? '' : 'none';
+    catSel.style.display = readOnly ? 'none' : '';
+  }
   // 등급 드롭다운 — 항상 클릭 가능하게 유지 (보기 전용 모드에서도 확인 가능)
   const gradeTrigger = document.getElementById('grade-picker-trigger');
   if (gradeTrigger) {
@@ -5428,6 +5463,27 @@ function getGradeType(gradeVal) {
   // 구버전 O/X 마이그레이션
   if (/^[oO0]$/.test(v)) return { key: '등급', label: '등급&성취' };
   return null; // 미설정
+}
+
+/* 과목군 변경 */
+function changeSubjectCat(newCat) {
+  if (currentSubjectIdx < 0 || !newCat) return;
+  subjects[currentSubjectIdx].cat = newCat;
+  save();
+  // 태그 색상 동기화
+  const tag = document.getElementById('detail-cat');
+  if (tag) {
+    tag.textContent = newCat;
+    tag.style.color = CAT_COLORS[newCat] || '#b0b0b0';
+    tag.style.borderColor = CAT_COLORS[newCat] || '#b0b0b0';
+  }
+  const catSel = document.getElementById('detail-cat-select');
+  if (catSel) {
+    catSel.style.color = CAT_COLORS[newCat] || '#b0b0b0';
+    catSel.style.borderColor = CAT_COLORS[newCat] || '#b0b0b0';
+  }
+  // admin 목록 새로고침
+  renderSubjectList();
 }
 
 /* 기본 정보 저장 */
@@ -6423,8 +6479,9 @@ function hexToRgba(hex, alpha) {
 
 const CAT_COLORS = {
   '국어':'#7eb8e0','수학':'#e07eb8','영어':'#1a9e5c',
-  '사회':'#e0b87e','과학':'#a07ee0','예체능':'#e07e7e',
-  '직업':'#7ec8e0','기타':'#b0b0b0'
+  '사회':'#e0b87e','과학':'#a07ee0','체육':'#e07e7e',
+  '예술':'#e09a4a','기술ㆍ가정/정보/제2외국어/한문/교양':'#5ab8a0',
+  /* 구버전 호환 */ '예체능':'#e07e7e','직업':'#7ec8e0','기타':'#b0b0b0'
 };
 let activeCatSubj = '';
 
@@ -6926,7 +6983,9 @@ function renderSemCol(colIdx) {
     const gradeType = getGradeType(s && s.info && s.info.grade);
     const graded = gradeType !== null;
     const card = document.createElement('div');
-    card.className = 'sem-subj-card sem-bc-' + cat + (graded ? ' graded' : '');
+    const _catColor = CAT_COLORS[cat] || '#b0b0b0';
+    card.className = 'sem-subj-card' + (graded ? ' graded' : '');
+    card.style.borderLeftColor = _catColor;
     if (graded) {
       const c = CAT_COLORS[cat] || '#b0b0b0';
       if (gradeType.key === '등급') {
@@ -6952,7 +7011,7 @@ function renderSemCol(colIdx) {
     card.innerHTML = `
       <div class="sem-subj-info">
         <div class="sem-subj-name">${escHtml(name)}</div>
-        <div class="sem-subj-cat txt-${cat}">${cat}</div>
+        <div class="sem-subj-cat" style="color:${_catColor}">${cat}</div>
       </div>
       ${gradeIconHtml}
       <span class="sem-subj-arrow">›</span>
@@ -7055,6 +7114,21 @@ function updateSemGridColumns() {
           const cnt = items.filter(x => (x.subtype || '일반') === st).length;
           el.classList.toggle('wide', cnt >= threshold);
         }
+      });
+    });
+
+    // 같은 cell에서 wide가 하나라도 있으면 non-wide list에 half-width 적용
+    const allKeys = ['req', ...elecMap.map(e => 'elec-' + e.key)];
+    allKeys.forEach(keyPart => {
+      const lists = ['일반','진로','융합'].map(st => {
+        const id = keyPart === 'req'
+          ? `sem-list-req-${st}-${ci}`
+          : `sem-list-${keyPart}-${st}-${ci}`;
+        return document.getElementById(id);
+      }).filter(Boolean);
+      const anyWide = lists.some(l => l.classList.contains('wide'));
+      lists.forEach(l => {
+        l.classList.toggle('half-width', anyWide && !l.classList.contains('wide'));
       });
     });
   });
@@ -7286,6 +7360,7 @@ function removeSemSubj(colIdx, i) {
 /* ── 과목 추가 (비밀번호 → 선택 모달) ── */
 let pickTargetCol = -1;
 let pickSelected = new Set();
+let pickToRemove = new Set();
 let spjFilterCat = '전체';
 let pickSubjType = '선택'; // '필수' or '선택'
 let pickSubjectSubtype = '일반'; // '일반' | '진로' | '융합'
@@ -7318,6 +7393,7 @@ function openSubjPickPw(colIdx, type) {
 
 function openSubjPick() {
   pickSelected = new Set();
+  pickToRemove = new Set();
   pickSubjectSubtype = '일반';
   setPickSubtype('일반');
   spjFilterCat = '전체';
@@ -7358,35 +7434,53 @@ function renderSpjList() {
   wrap.innerHTML = '';
   filtered.forEach(s => {
     const already = existingNames.has(s.name);
+    const toRemove = pickToRemove.has(s.name);
     const sel = pickSelected.has(s.name);
     const row = document.createElement('div');
-    row.className = 'spj-item' + (sel ? ' selected' : '') + (already ? ' already' : '');
-    row.style.opacity = already ? '0.38' : '1';
+    if (already) {
+      row.className = 'spj-item already' + (toRemove ? ' to-remove' : '');
+    } else {
+      row.className = 'spj-item' + (sel ? ' selected' : '');
+    }
+    let checkMark = '';
+    if (already && !toRemove) checkMark = '✓';
+    else if (already && toRemove) checkMark = '×';
+    else if (sel) checkMark = '✓';
     row.innerHTML = `
-      <div class="spj-check">${sel ? '✓' : ''}</div>
-      <div class="spj-cat-dot dot-${s.cat}"></div>
+      <div class="spj-check">${checkMark}</div>
+      <div class="spj-cat-dot" style="background:${CAT_COLORS[s.cat]||'#b0b0b0'}"></div>
       <div class="spj-name">${escHtml(s.name)}</div>
-      <div class="spj-cat-label txt-${s.cat}">${s.cat}</div>`;
-    if (!already) {
-      row.onclick = () => {
+      <div class="spj-cat-label" style="color:${CAT_COLORS[s.cat]||'#b0b0b0'}">${s.cat}</div>`;
+    row.onclick = () => {
+      if (already) {
+        if (pickToRemove.has(s.name)) pickToRemove.delete(s.name);
+        else pickToRemove.add(s.name);
+      } else {
         if (pickSelected.has(s.name)) pickSelected.delete(s.name);
         else pickSelected.add(s.name);
-        renderSpjList();
-        document.getElementById('spj-sel-count').textContent = pickSelected.size;
-      };
-    }
+      }
+      renderSpjList();
+      _updateSpjCount();
+    };
     wrap.appendChild(row);
   });
-  document.getElementById('spj-sel-count').textContent = pickSelected.size;
+  _updateSpjCount();
+}
+
+function _updateSpjCount() {
+  const addEl = document.getElementById('spj-add-count');
+  const rmEl  = document.getElementById('spj-rm-count');
+  if (addEl) addEl.textContent = pickSelected.size;
+  if (rmEl)  rmEl.textContent  = pickToRemove.size;
 }
 
 function confirmSubjPick() {
-  if (pickSelected.size === 0) { closeSubjPick(); return; }
+  if (pickSelected.size === 0 && pickToRemove.size === 0) { closeSubjPick(); return; }
+  // 추가
   const existingNames = new Set((semesterData[pickTargetCol] || []).map(x => x.name));
   pickSelected.forEach(name => {
     if (!existingNames.has(name)) {
       semesterData[pickTargetCol].push({ name, type: pickSubjType, subtype: pickSubjectSubtype });
-      // 해당 과목의 info.semester에도 자동 저장 (기존 값 없으면)
       const subj = subjects.find(x => x.name === name);
       if (subj) {
         if (!subj.info) subj.info = {};
@@ -7394,9 +7488,14 @@ function confirmSubjPick() {
       }
     }
   });
+  // 삭제
+  if (pickToRemove.size > 0) {
+    semesterData[pickTargetCol] = semesterData[pickTargetCol].filter(x => !pickToRemove.has(x.name));
+  }
   save();
   saveSemester();
   renderSemCol(pickTargetCol);
+  setCurrentSem(currentSemIdx);
   closeSubjPick();
 }
 
