@@ -6007,7 +6007,7 @@ function peHlRenderPicker() {
 
       btn.addEventListener('mouseenter', e => {
         if (_hlDragStart < 0) return;
-        _hlDragging = true;
+        if (i !== _hlDragStart) _hlDragging = true;
         const lo = Math.min(_hlDragStart, i);
         const hi = Math.max(_hlDragStart, i);
         // 미리보기: 실제 _hlSelected는 건드리지 않고 클래스만 조작
