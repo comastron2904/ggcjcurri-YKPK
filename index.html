@@ -11087,87 +11087,51 @@ async function mcFetch(path, method, body) {
 }
 
 /* ── 회원가입 ───────────────────────────────────── */
-/* ── 회원가입 실행 (수정본) ────────────────────────────────── */
 async function mcDoSignup() {
-  const id = document.getElementById('mc-signup-id').value.trim();
-  const pw = document.getElementById('mc-signup-pw').value.trim();
-  const pw2 = document.getElementById('mc-signup-pw2').value.trim();
+  const id  = document.getElementById('mc-signup-id').value.trim();
+  const pw  = document.getElementById('mc-signup-pw').value;
+  const pw2 = document.getElementById('mc-signup-pw2').value;
   const msg = document.getElementById('mc-signup-msg');
-
-  if (!id || !pw) {
-    msg.textContent = '아이디와 비밀번호를 모두 입력하세요.';
-    return;
-  }
-  if (pw !== pw2) {
-    msg.textContent = '비밀번호가 일치하지 않습니다.';
-    return;
-  }
-
-  try {
-    // 1. 중복 아이디 체크 (해당 아이디가 이미 있는지 서버에 물어봄)
-    const check = await mcFetch('/rest/v1/mc_users?id=eq.' + encodeURIComponent(id), 'GET');
-    if (check && check.length > 0) {
-      msg.textContent = '이미 사용 중인 아이디입니다.';
-      return;
-    }
-
-    // 2. 신규 가입 진행
-    const res = await mcFetch('/rest/v1/mc_users', 'POST', { 
-      id: id, 
-      pw: pw, 
-      data: {} 
-    });
-
-    // POST 요청은 성공 시 보통 빈 응답을 주므로, 에러가 없으면 성공으로 간주
-    alert('회원가입이 완료되었습니다! 이제 로그인해 주세요.');
-    mcSwitchTab('login'); // 로그인 탭으로 자동 이동
-  } catch (e) {
-    console.error(e);
-    msg.textContent = '회원가입 중 오류가 발생했습니다.';
+  msg.className = 'mc-msg';
+  if (!/^[a-zA-Z0-9]{4,16}$/.test(id)) { msg.textContent = '아이디: 영문·숫자 4~16자'; return; }
+  if (pw.length < 6) { msg.textContent = '비밀번호는 6자 이상이어야 합니다.'; return; }
+  if (pw !== pw2)    { msg.textContent = '비밀번호가 일치하지 않습니다.'; return; }
+  msg.textContent = '처리 중...';
+  const check = await mcFetch('/rest/v1/mc_users?username=eq.' + encodeURIComponent(id) + '&select=id', 'GET');
+  if (check.ok && check.data && check.data.length > 0) { msg.textContent = '이미 사용 중인 아이디입니다.'; return; }
+  const pwHash = btoa(encodeURIComponent(pw));
+  const ins = await mcFetch('/rest/v1/mc_users', 'POST', { username: id, pw_hash: pwHash, data: [{},{},{},{}] });
+  if (ins.ok) {
+    msg.className = 'mc-msg ok'; msg.textContent = '가입 완료! 로그인해 주세요.';
+    setTimeout(() => mcSwitchTab('login'), 1200);
+  } else {
+    msg.textContent = '가입 실패: ' + (ins.data && ins.data.message ? ins.data.message : ins.status);
   }
 }
 
 /* ── 로그인 ─────────────────────────────────────── */
 async function mcDoLogin() {
-  const id = document.getElementById('mc-login-id').value.trim();
-  const pw = document.getElementById('mc-login-pw').value.trim();
+  const id  = document.getElementById('mc-login-id').value.trim();
+  const pw  = document.getElementById('mc-login-pw').value;
   const msg = document.getElementById('mc-login-msg');
-
-  if (!id || !pw) {
-    msg.textContent = '아이디와 비밀번호를 모두 입력하세요.';
-    return;
-  }
-
-  try {
-    // 특정 아이디를 가진 유저 데이터만 가져오기
-    const res = await mcFetch('/rest/v1/mc_users?id=eq.' + encodeURIComponent(id), 'GET');
-    
-    // 데이터가 있고, 첫 번째 결과의 비밀번호가 일치하는지 확인
-    if (res && res.length > 0) {
-      const user = res[0];
-      
-      // DB의 비밀번호와 입력한 비밀번호 비교 (문자열 강제 변환 후 공백 제거)
-      if (String(user.pw).trim() === String(pw).trim()) {
-        mcCurrentUser = user;
-        mcSelections = user.data || {};
-        
-        // 브라우저 세션 유지
-        localStorage.setItem('mc_user', JSON.stringify(user));
-        
-        msg.textContent = '';
-        closeMyCurriculumModal();
-        openMyCurriculumScreen();
-      } else {
-        msg.textContent = '비밀번호가 틀렸습니다.';
-      }
-    } else {
-      msg.textContent = '가입되지 않은 아이디입니다.';
-    }
-  } catch (e) {
-    console.error(e);
-    msg.textContent = '로그인 서버 연결에 실패했습니다.';
-  }
+  msg.className = 'mc-msg';
+  if (!id || !pw) { msg.textContent = '아이디와 비밀번호를 입력하세요.'; return; }
+  msg.textContent = '확인 중...';
+  // username만으로 조회 후 클라이언트에서 pw_hash 비교 (URL 특수문자 인코딩 불일치 방지)
+  const res = await mcFetch('/rest/v1/mc_users?username=eq.' + encodeURIComponent(id) + '&select=id,username,pw_hash,data,career,memos', 'GET');
+  if (!res.ok || !res.data || res.data.length === 0) { msg.textContent = '아이디 또는 비밀번호가 틀렸습니다.'; return; }
+  const pwHash = btoa(encodeURIComponent(pw));
+  const user = res.data.find(u => u.pw_hash === pwHash);
+  if (!user) { msg.textContent = '아이디 또는 비밀번호가 틀렸습니다.'; return; }
+  // data: [{},{},{},{}] 형태로 저장
+  let savedData = user.data;
+  if (!Array.isArray(savedData) || savedData.length !== 4) savedData = [{},{},{},{}];
+  mcCurrentUser = { id: user.id, username: user.username, data: savedData, career: user.career || '', memos: Array.isArray(user.memos) ? user.memos : ['','','',''] };
+  localStorage.setItem('mc_user', JSON.stringify(mcCurrentUser));
+  closeMyCurriculumModal();
+  mcOpenScreen();
 }
+
 /* ── 설계 화면 열기 ─────────────────────────────── */
 function mcOpenScreen() {
   document.getElementById('mc-screen-user').textContent = '학생: ' + mcCurrentUser.username;
