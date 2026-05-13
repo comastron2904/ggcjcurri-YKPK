@@ -11087,25 +11087,39 @@ async function mcFetch(path, method, body) {
 }
 
 /* ── 회원가입 ───────────────────────────────────── */
+/* ── 회원가입 실행 (수정본) ────────────────────────────────── */
 async function mcDoSignup() {
-  const id  = document.getElementById('mc-signup-id').value.trim();
-  const pw  = document.getElementById('mc-signup-pw').value;
-  const pw2 = document.getElementById('mc-signup-pw2').value;
+  const id = document.getElementById('mc-signup-id').value.trim();
+  const pw = document.getElementById('mc-signup-pw').value.trim();
   const msg = document.getElementById('mc-signup-msg');
-  msg.className = 'mc-msg';
-  if (!/^[a-zA-Z0-9]{4,16}$/.test(id)) { msg.textContent = '아이디: 영문·숫자 4~16자'; return; }
-  if (pw.length < 6) { msg.textContent = '비밀번호는 6자 이상이어야 합니다.'; return; }
-  if (pw !== pw2)    { msg.textContent = '비밀번호가 일치하지 않습니다.'; return; }
-  msg.textContent = '처리 중...';
-  const check = await mcFetch('/rest/v1/mc_users?username=eq.' + encodeURIComponent(id) + '&select=id', 'GET');
-  if (check.ok && check.data && check.data.length > 0) { msg.textContent = '이미 사용 중인 아이디입니다.'; return; }
-  const pwHash = btoa(encodeURIComponent(pw));
-  const ins = await mcFetch('/rest/v1/mc_users', 'POST', { username: id, pw_hash: pwHash, data: [{},{},{},{}] });
-  if (ins.ok) {
-    msg.className = 'mc-msg ok'; msg.textContent = '가입 완료! 로그인해 주세요.';
-    setTimeout(() => mcSwitchTab('login'), 1200);
+
+  if (!id || !pw) {
+    msg.textContent = '아이디와 비밀번호를 모두 입력하세요.';
+    return;
+  }
+
+  // 1. 중복 아이디 체크
+  const check = await mcFetch('/rest/v1/mc_users?id=eq.' + encodeURIComponent(id), 'GET');
+  if (check && check.length > 0) {
+    msg.textContent = '이미 존재하는 아이디입니다.';
+    return;
+  }
+
+  // 2. 신규 가입 (data 컬럼에 빈 객체 {}를 명시적으로 저장)
+  const res = await mcFetch('/rest/v1/mc_users', 'POST', { 
+    id: id, 
+    pw: pw, 
+    data: {} 
+  });
+
+  // POST 요청 성공 시 보통 res는 비어있거나 생성된 객체를 반환함
+  if (res) {
+    alert('회원가입이 완료되었습니다! 로그인해 주세요.');
+    msg.textContent = '';
+    closeMyCurriculumModal();
+    openMyCurriculumModal(); // 로그인창으로 다시 열기
   } else {
-    msg.textContent = '가입 실패: ' + (ins.data && ins.data.message ? ins.data.message : ins.status);
+    msg.textContent = '회원가입에 실패했습니다. 다시 시도해주세요.';
   }
 }
 
@@ -11121,18 +11135,23 @@ async function mcDoLogin() {
     return;
   }
 
-  // 핵심 수정: 특정 아이디(id=eq.값)를 가진 유저만 정확히 검색하도록 필터 추가
+  // 정확히 해당 아이디를 가진 유저 1명만 요청
   const res = await mcFetch('/rest/v1/mc_users?id=eq.' + encodeURIComponent(id), 'GET');
   
   if (res && res.length > 0) {
-    const user = res[0]; // 이제 검색된 결과는 입력한 아이디를 가진 유저뿐입니다.
-    if (user.pw === pw) {
+    const user = res[0];
+    // 비밀번호 비교 (공백 제거 후 비교)
+    if (String(user.pw).trim() === pw) {
       mcCurrentUser = user;
-      mcSelections = user.data || {};
+      // 저장된 데이터가 없으면 빈 객체로 초기화
+      mcSelections = user.data || {}; 
+      
+      // 브라우저에 로그인 정보 저장
       localStorage.setItem('mc_user', JSON.stringify(user));
+      
       msg.textContent = '';
       closeMyCurriculumModal();
-      openMyCurriculumScreen();
+      openMyCurriculumScreen(); // 로그인 성공 후 화면 전환
     } else {
       msg.textContent = '비밀번호가 일치하지 않습니다.';
     }
