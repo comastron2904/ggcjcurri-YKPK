@@ -11118,7 +11118,7 @@ async function mcDoLogin() {
   if (!id || !pw) { msg.textContent = '아이디와 비밀번호를 입력하세요.'; return; }
   msg.textContent = '확인 중...';
   const pwHash = btoa(encodeURIComponent(pw));
-  const res = await mcFetch('/rest/v1/mc_users?username=eq.' + encodeURIComponent(id) + '&pw_hash=eq.' + encodeURIComponent(pwHash) + '&select=id,username,data,career,memos', 'GET');
+  const res = await mcFetch('/rest/v1/mc_users?username=eq.' + encodeURIComponent(id) + '&pw_hash=eq.' + pwHash + '&select=id,username,data,career,memos', 'GET');
   if (!res.ok || !res.data || res.data.length === 0) { msg.textContent = '아이디 또는 비밀번호가 틀렸습니다.'; return; }
   const user = res.data[0];
   // data: [{},{},{},{}] 형태로 저장
