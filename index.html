@@ -11110,26 +11110,36 @@ async function mcDoSignup() {
 }
 
 /* ── 로그인 ─────────────────────────────────────── */
+/* ── 로그인 실행 (수정본) ────────────────────────────────── */
 async function mcDoLogin() {
-  const id  = document.getElementById('mc-login-id').value.trim();
-  const pw  = document.getElementById('mc-login-pw').value;
+  const id = document.getElementById('mc-login-id').value.trim();
+  const pw = document.getElementById('mc-login-pw').value.trim();
   const msg = document.getElementById('mc-login-msg');
-  msg.className = 'mc-msg';
-  if (!id || !pw) { msg.textContent = '아이디와 비밀번호를 입력하세요.'; return; }
-  msg.textContent = '확인 중...';
-  const pwHash = btoa(encodeURIComponent(pw));
-  const res = await mcFetch('/rest/v1/mc_users?username=eq.' + encodeURIComponent(id) + '&pw_hash=eq.' + encodeURIComponent(pwHash) + '&select=id,username,data,career,memos', 'GET');
-  if (!res.ok || !res.data || res.data.length === 0) { msg.textContent = '아이디 또는 비밀번호가 틀렸습니다.'; return; }
-  const user = res.data[0];
-  // data: [{},{},{},{}] 형태로 저장
-  let savedData = user.data;
-  if (!Array.isArray(savedData) || savedData.length !== 4) savedData = [{},{},{},{}];
-  mcCurrentUser = { id: user.id, username: user.username, data: savedData, career: user.career || '', memos: Array.isArray(user.memos) ? user.memos : ['','','',''] };
-  localStorage.setItem('mc_user', JSON.stringify(mcCurrentUser));
-  closeMyCurriculumModal();
-  mcOpenScreen();
-}
 
+  if (!id || !pw) {
+    msg.textContent = '아이디와 비밀번호를 모두 입력하세요.';
+    return;
+  }
+
+  // 핵심 수정: 특정 아이디(id=eq.값)를 가진 유저만 정확히 검색하도록 필터 추가
+  const res = await mcFetch('/rest/v1/mc_users?id=eq.' + encodeURIComponent(id), 'GET');
+  
+  if (res && res.length > 0) {
+    const user = res[0]; // 이제 검색된 결과는 입력한 아이디를 가진 유저뿐입니다.
+    if (user.pw === pw) {
+      mcCurrentUser = user;
+      mcSelections = user.data || {};
+      localStorage.setItem('mc_user', JSON.stringify(user));
+      msg.textContent = '';
+      closeMyCurriculumModal();
+      openMyCurriculumScreen();
+    } else {
+      msg.textContent = '비밀번호가 일치하지 않습니다.';
+    }
+  } else {
+    msg.textContent = '가입되지 않은 아이디입니다.';
+  }
+}
 /* ── 설계 화면 열기 ─────────────────────────────── */
 function mcOpenScreen() {
   document.getElementById('mc-screen-user').textContent = '학생: ' + mcCurrentUser.username;
