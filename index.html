@@ -492,14 +492,15 @@
   .cc-수학   { color: #e07eb8; border-color: #e07eb8; }
   .cc-영어   { color: #1a9e5c; border-color: #1a9e5c; }
   .cc-사회   { color: #e0b87e; border-color: #e0b87e; }
+  .cc-사회역사도덕포함 { color: #e0b87e; border-color: #e0b87e; }
   .cc-과학   { color: #a07ee0; border-color: #a07ee0; }
   .cc-체육   { color: #e07e7e; border-color: #e07e7e; }
   .cc-예술   { color: #e09a4a; border-color: #e09a4a; }
   .cc-기술ㆍ가정\/정보\/제2외국어\/한문\/교양 { color: #5ab8a0; border-color: #5ab8a0; }
   /* 구버전 호환 */
-  .cc-예체능 { color: #e07e7e; border-color: #e07e7e; }
+  .cc-예체능 { color: #e09a4a; border-color: #e09a4a; }
   .cc-직업   { color: #7ec8e0; border-color: #7ec8e0; }
-  .cc-기타   { color: #b0b0b0; border-color: #b0b0b0; }
+  .cc-기타   { color: #5ab8a0; border-color: #5ab8a0; }
 
   /* ══════════════════════════════════════
      과목 상세 화면
@@ -1590,12 +1591,12 @@
   .dot-국어{background:#7eb8e0} .dot-수학{background:#e07eb8} .dot-영어{background:#1a9e5c}
   .dot-사회{background:#e0b87e} .dot-과학{background:#a07ee0} .dot-체육{background:#e07e7e}
   .dot-예술{background:#e09a4a} .dot-기술교양{background:#5ab8a0}
-  .dot-예체능{background:#e07e7e} .dot-직업{background:#7ec8e0} .dot-기타{background:#b0b0b0}
+  .dot-예체능{background:#e09a4a} .dot-직업{background:#7ec8e0} .dot-기타{background:#5ab8a0}
   .sem-bc-국어{border-left-color:#7eb8e0} .sem-bc-수학{border-left-color:#e07eb8}
   .sem-bc-영어{border-left-color:#1a9e5c} .sem-bc-사회{border-left-color:#e0b87e}
   .sem-bc-과학{border-left-color:#a07ee0} .sem-bc-체육{border-left-color:#e07e7e}
   .sem-bc-예술{border-left-color:#e09a4a} .sem-bc-기술교양{border-left-color:#5ab8a0}
-  .sem-bc-예체능{border-left-color:#e07e7e} .sem-bc-직업{border-left-color:#7ec8e0} .sem-bc-기타{border-left-color:rgba(26,46,74,0.15)}
+  .sem-bc-예체능{border-left-color:#e09a4a} .sem-bc-직업{border-left-color:#7ec8e0} .sem-bc-기타{border-left-color:#5ab8a0}
 
   /* 등급산출 여부 아이콘 — 학기별 과목 카드 */
   .grade-icon {
@@ -1650,7 +1651,7 @@
   .txt-국어{color:#7eb8e0} .txt-수학{color:#e07eb8} .txt-영어{color:#1a9e5c}
   .txt-사회{color:#e0b87e} .txt-과학{color:#a07ee0} .txt-체육{color:#e07e7e}
   .txt-예술{color:#e09a4a} .txt-기술교양{color:#5ab8a0}
-  .txt-예체능{color:#e07e7e} .txt-직업{color:#7ec8e0} .txt-기타{color:#b0b0b0}
+  .txt-예체능{color:#e09a4a} .txt-직업{color:#7ec8e0} .txt-기타{color:#5ab8a0}
 
   /* ── 등급산출여부 드롭다운 피커 ── */
   .grade-picker {
@@ -3192,6 +3193,532 @@
   }
   .gb-jump-cancel-btn:hover { border-color: rgba(26,107,191,0.50); color: rgba(26,46,74,0.80); }
 
+  /* ══════════════════════════════════════
+     나만의 교육과정 — 우측 상단 독립 고정 버튼
+  ══════════════════════════════════════ */
+  #mycurriculum-btn {
+    position: fixed; top: 20px; right: 22px; z-index: 500;
+    display: flex; align-items: center; gap: 8px;
+    padding: 9px 18px 9px 14px;
+    background: #ffffff;
+    border: 1px solid rgba(26,107,191,0.35);
+    color: var(--gold);
+    font-family: 'Noto Sans KR', sans-serif;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 2px 8px rgba(26,107,191,0.10);
+  }
+  #mycurriculum-btn:hover {
+    background: rgba(26,107,191,0.06);
+    border-color: var(--gold);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(26,107,191,0.18);
+  }
+  @keyframes mc-star-spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+  .mc-topbtn-icon {
+    font-size: 14px; line-height: 1;
+    color: rgba(26,107,191,0.60);
+    display: inline-block;
+    animation: mc-star-spin 4s linear infinite;
+  }
+  .mc-topbtn-text {
+    font-size: 13px; font-weight: 700; letter-spacing: 0.5px;
+    line-height: 1.4; text-align: left;
+  }
+  .mc-topbtn-sub {
+    font-size: 10px; font-weight: 400; opacity: 0.65; letter-spacing: 1px;
+  }
+  @media (max-width: 600px) {
+    #mycurriculum-btn { padding: 8px 13px 8px 11px; }
+    .mc-topbtn-text { font-size: 12px; }
+    .mc-topbtn-sub { display: none; }
+  }
+
+  /* ══════════════════════════════════════
+     나만의 교육과정 — 모달
+  ══════════════════════════════════════ */
+  .mc-modal-box {
+    max-width: 440px !important;
+    padding: 36px 36px 32px !important;
+  }
+  .mc-modal-header { text-align: center; margin-bottom: 24px; }
+  .mc-modal-icon {
+    font-size: 28px; color: #1a9e5c; margin-bottom: 8px;
+    display: block; animation: mc-spin 6s linear infinite;
+  }
+  @keyframes mc-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  .mc-modal-label { font-size: 11px; letter-spacing: 3px; color: #1a9e5c; margin-bottom: 6px; }
+  .mc-modal-title { font-family: 'Noto Serif KR', serif; font-size: 24px; font-weight: 900; color: var(--white); }
+  .mc-tabs {
+    display: flex; gap: 0; margin-bottom: 22px;
+    border: 1px solid rgba(26,107,191,0.20); overflow: hidden;
+  }
+  .mc-tab {
+    flex: 1; padding: 10px 0;
+    background: rgba(26,107,191,0.04); border: none;
+    color: rgba(26,46,74,0.60); font-family: 'Noto Sans KR', sans-serif;
+    font-size: 15px; font-weight: 500; cursor: pointer;
+    transition: all 0.2s; letter-spacing: 0.5px;
+  }
+  .mc-tab:first-child { border-right: 1px solid rgba(26,107,191,0.20); }
+  .mc-tab.active {
+    background: linear-gradient(135deg, #1a9e5c, #0e7a50);
+    color: #ffffff; font-weight: 700;
+  }
+  .mc-field { margin-bottom: 14px; }
+  .mc-field-label {
+    font-size: 12px; letter-spacing: 1.5px; color: rgba(26,46,74,0.70);
+    margin-bottom: 6px; display: flex; align-items: center; gap: 8px;
+  }
+  .mc-field-hint { font-size: 11px; letter-spacing: 0.5px; color: rgba(26,107,191,0.55); font-weight: 400; }
+  .mc-input {
+    width: 100%; padding: 11px 14px;
+    background: rgba(26,107,191,0.04); border: 1px solid rgba(26,107,191,0.18);
+    color: var(--white); font-family: 'Noto Sans KR', sans-serif;
+    font-size: 15px; outline: none;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .mc-input:focus { border-color: #1a9e5c; background: rgba(14,138,122,0.06); }
+  .mc-input::placeholder { color: rgba(26,46,74,0.28); font-size: 13px; }
+  .mc-msg {
+    min-height: 18px; font-size: 13px; letter-spacing: 0.3px;
+    color: #d63030; margin-bottom: 10px; text-align: center;
+  }
+  .mc-msg.ok { color: #1a9e5c; }
+  .mc-btn-primary {
+    width: 100%; padding: 12px;
+    background: linear-gradient(135deg, #1a9e5c, #0e7a50);
+    border: none; color: #ffffff;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 14px; font-weight: 700; cursor: pointer;
+    letter-spacing: 1px; transition: opacity 0.2s, transform 0.2s;
+  }
+  .mc-btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+
+  /* ══════════════════════════════════════
+     나만의 교육과정 — 설계 화면
+  ══════════════════════════════════════ */
+  #mycurriculum-screen {
+    position: fixed; inset: 0;
+    background: var(--deep-navy); z-index: 750;
+    display: flex; flex-direction: column;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s ease;
+    overflow: hidden;
+  }
+  #mycurriculum-screen.open { opacity: 1; pointer-events: all; }
+  /* ══════════════════════════════════════
+     졸업학점 계산기 (헤더 인라인)
+  ══════════════════════════════════════ */
+  .mc-grad-calc {
+    display: flex; align-items: center; gap: 0;
+    flex-shrink: 0;
+    margin-right: 16px;
+  }
+  .mc-grad-item {
+    display: flex; flex-direction: column; justify-content: center; align-items: flex-start;
+    padding: 6px 18px 6px 0; margin-right: 18px;
+    border-right: 1px solid rgba(26,107,191,0.18);
+  }
+  .mc-grad-label {
+    font-size: 9px; letter-spacing: 2px; color: rgba(26,107,191,0.65);
+    margin-bottom: 2px; font-weight: 700; white-space: nowrap;
+  }
+  .mc-grad-val {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 15px; font-weight: 700; color: var(--white); line-height: 1.15; white-space: nowrap;
+  }
+  .mc-grad-val .mc-grad-denom { font-size: 10px; font-weight: 400; color: rgba(26,46,74,0.40); }
+  .mc-grad-total-item {
+    display: flex; flex-direction: column; justify-content: center; align-items: flex-start;
+    padding: 6px 0;
+    min-width: 130px;
+  }
+  .mc-grad-total-label {
+    font-size: 9px; letter-spacing: 2px; color: #185FA5;
+    margin-bottom: 2px; font-weight: 700; white-space: nowrap;
+  }
+  .mc-grad-total-val {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 17px; font-weight: 700; color: #185FA5; line-height: 1.15; white-space: nowrap;
+  }
+  .mc-grad-total-denom { font-size: 10px; font-weight: 400; color: rgba(26,107,191,0.45); }
+  .mc-grad-total-bar-track {
+    height: 3px; background: rgba(26,107,191,0.12); border-radius: 99px; overflow: hidden; margin-top: 5px; width: 100%;
+  }
+  .mc-grad-total-bar-fill {
+    height: 100%; background: #185FA5; border-radius: 99px;
+    transition: width 0.5s cubic-bezier(0.22,1,0.36,1);
+  }
+  .mc-grad-pct { font-size: 10px; color: rgba(26,107,191,0.55); letter-spacing: 0.3px; }
+  @media (max-width: 900px) {
+    .mc-grad-calc { display: none; }
+  }
+
+  /* ══════════════════════════════════════
+     나만의 교육과정 헤더 2행 구조
+  ══════════════════════════════════════ */
+  .mc-header-top {
+    flex-shrink: 0;
+    display: flex; align-items: center; gap: 20px;
+    padding: 18px 40px 14px;
+    background: #f0f4f8;
+    border-bottom: 1px solid rgba(26,107,191,0.10);
+    position: relative; z-index: 10;
+  }
+  .mc-header-top-info { flex: 1; }
+
+  .mc-header-bottom {
+    flex-shrink: 0;
+    display: flex; align-items: center; gap: 0;
+    background: linear-gradient(135deg, #1a5fad 0%, #1252a0 60%, #0d3f82 100%);
+    padding: 0 40px;
+    min-height: 72px;
+    position: relative; z-index: 9;
+    box-shadow: 0 3px 16px rgba(14,63,130,0.28);
+  }
+
+  /* 희망 진로 히어로 */
+  .mc-career-hero {
+    flex: 1; display: flex; align-items: center; gap: 16px;
+    padding: 14px 28px 14px 0;
+    border-right: 1px solid rgba(255,255,255,0.15);
+    min-width: 0;
+  }
+  .mc-career-hero-icon {
+    font-size: 26px; flex-shrink: 0;
+    filter: drop-shadow(0 0 6px rgba(255,220,80,0.6));
+  }
+  .mc-career-hero-field { flex: 1; min-width: 0; }
+  .mc-career-hero-label {
+    font-size: 9px; letter-spacing: 3px; font-weight: 700;
+    color: rgba(255,255,255,0.55); margin-bottom: 4px;
+  }
+  .mc-career-hero-input {
+    background: none; border: none; outline: none;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 22px; font-weight: 700;
+    color: #ffffff; width: 100%;
+    caret-color: rgba(255,220,80,0.9);
+  }
+  .mc-career-hero-input::placeholder {
+    color: rgba(255,255,255,0.30); font-size: 18px; font-weight: 400;
+  }
+
+  /* 학점 계산기 (2행 우측) */
+  .mc-grad-calc {
+    display: flex; align-items: center; gap: 0;
+    flex-shrink: 0; padding-left: 28px;
+  }
+  .mc-grad-item {
+    display: flex; flex-direction: column; justify-content: center; align-items: flex-start;
+    padding: 0 20px 0 0; margin-right: 20px;
+    border-right: 1px solid rgba(255,255,255,0.15);
+  }
+  .mc-grad-label {
+    font-size: 11px; letter-spacing: 2px; color: rgba(255,255,255,0.80);
+    margin-bottom: 3px; font-weight: 700; white-space: nowrap;
+  }
+  .mc-grad-val {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 22px; font-weight: 700; color: #ffffff; line-height: 1.15; white-space: nowrap;
+  }
+  .mc-grad-val .mc-grad-denom { font-size: 13px; font-weight: 400; color: rgba(255,255,255,0.75); }
+  .mc-grad-total-item {
+    display: flex; flex-direction: column; justify-content: center; align-items: flex-start;
+    padding: 0; min-width: 150px;
+  }
+  .mc-grad-total-label {
+    font-size: 11px; letter-spacing: 2px; color: rgba(255,220,80,1.0);
+    margin-bottom: 3px; font-weight: 700; white-space: nowrap;
+  }
+  .mc-grad-total-val {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 26px; font-weight: 700; color: #ffffff; line-height: 1.15; white-space: nowrap;
+  }
+  .mc-grad-total-denom { font-size: 13px; font-weight: 400; color: rgba(255,255,255,0.75); }
+  .mc-grad-total-bar-track {
+    height: 4px; background: rgba(255,255,255,0.30); border-radius: 99px; overflow: hidden; margin-top: 6px; width: 100%;
+  }
+  .mc-grad-total-bar-fill {
+    height: 100%; background: rgba(255,220,80,1.0); border-radius: 99px;
+    transition: width 0.5s cubic-bezier(0.22,1,0.36,1);
+  }
+  .mc-grad-pct { font-size: 12px; color: rgba(255,255,255,0.80); letter-spacing: 0.3px; margin-top: 1px; }
+  @media (max-width: 900px) {
+    .mc-grad-calc { display: none; }
+    .mc-header-bottom { padding: 0 16px; }
+    .mc-header-top { padding: 14px 16px 10px; }
+    .mc-career-hero-input { font-size: 16px; }
+  }
+
+  .mc-logout-btn {
+    padding: 8px 16px; height: 36px;
+    background: none; border: 1px solid rgba(214,48,48,0.35);
+    color: rgba(214,48,48,0.75); font-family: 'Noto Sans KR', sans-serif;
+    font-size: 14px; font-weight: 600; cursor: pointer; letter-spacing: 0.5px;
+    transition: all 0.2s; flex-shrink: 0;
+  }
+  .mc-logout-btn:hover { background: rgba(214,48,48,0.07); border-color: #d63030; color: #d63030; }
+  .mc-screen-body {
+    flex: 1; display: flex; flex-direction: column;
+    overflow: hidden; padding: 20px 24px 16px;
+    gap: 12px;
+  }
+  .mc-semesters {
+    flex: 1; display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px; min-height: 0;
+  }
+  .mc-semester-col {
+    display: flex; flex-direction: column;
+    background: #ffffff;
+    border: 1px solid rgba(26,107,191,0.15);
+    box-shadow: 0 2px 10px rgba(26,107,191,0.07);
+    overflow: hidden; border-radius: 2px;
+  }
+  .mc-sem-header {
+    padding: 14px 16px 12px;
+    display: flex; flex-direction: column; gap: 2px;
+    flex-shrink: 0;
+  }
+  .mc-sem-1 { background: linear-gradient(135deg, #3a8abe 0%, #1a6bbf 100%); }
+  .mc-sem-2 { background: linear-gradient(135deg, #5ab892 0%, #1a9e5c 100%); }
+  .mc-sem-3 { background: linear-gradient(135deg, #e0923c 0%, #d06020 100%); }
+  .mc-sem-4 { background: linear-gradient(135deg, #1aae8a 0%, #0e7a5c 100%); }
+  .mc-sem-grade {
+    font-size: 12px; letter-spacing: 2px; color: rgba(255,255,255,0.80);
+    font-family: 'Noto Sans KR', sans-serif; font-weight: 400;
+  }
+  .mc-sem-name {
+    font-family: 'Noto Serif KR', serif; font-size: 22px; font-weight: 900;
+    color: #ffffff; letter-spacing: 0.5px;
+  }
+
+  /* ── 나만의 교육과정 — 학기 카드 내부 과목 선택 UI ── */
+  .mc-sem-content {
+    flex: 1; display: flex; flex-direction: column;
+    padding: 10px 10px 6px; min-height: 0; overflow-y: auto; gap: 8px;
+  }
+  .mc-cat-section { display: flex; flex-direction: column; gap: 4px; }
+  .mc-cat-label {
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 12px; letter-spacing: 1px; font-weight: 700;
+    padding: 3px 6px 3px 0;
+    border-bottom: 1px solid rgba(26,107,191,0.10);
+    color: rgba(26,46,74,0.65);
+  }
+  .mc-cat-limit {
+    font-size: 11px; letter-spacing: 0; font-weight: 400;
+    color: rgba(26,107,191,0.65); background: rgba(26,107,191,0.07);
+    padding: 1px 6px; border-radius: 8px;
+  }
+  .mc-cat-limit.over { color: #d63030; background: rgba(214,48,48,0.08); }
+  .mc-cat-limit.ok   { color: #1a9e5c; background: rgba(26,158,92,0.08); }
+  .mc-selected-list { display: flex; flex-wrap: wrap; gap: 4px; min-height: 20px; }
+  .mc-sel-chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 4px 10px 4px 10px;
+    background: rgba(26,107,191,0.08);
+    border: 1px solid rgba(26,107,191,0.22);
+    font-size: 13px; color: var(--white);
+    font-family: 'Noto Sans KR', sans-serif;
+    border-radius: 2px; max-width: 100%;
+  }
+  .mc-sel-chip-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .mc-sel-chip-del {
+    cursor: pointer; color: rgba(26,46,74,0.40); font-size: 13px; line-height: 1;
+    flex-shrink: 0; background: none; border: none; padding: 0;
+    transition: color 0.15s;
+  }
+  .mc-sel-chip-del:hover { color: #d63030; }
+  .mc-add-btn {
+    align-self: flex-start;
+    font-size: 13px; letter-spacing: 0.5px;
+    padding: 4px 12px;
+    background: rgba(26,107,191,0.06);
+    border: 1px dashed rgba(26,107,191,0.30);
+    color: rgba(26,107,191,0.75);
+    cursor: pointer; font-family: 'Noto Sans KR', sans-serif;
+    transition: all 0.15s; border-radius: 2px;
+  }
+  .mc-add-btn:hover { background: rgba(26,107,191,0.13); border-color: var(--gold); color: var(--gold); }
+
+  /* ── 과목 선택 모달 ── */
+  #mc-pick-modal {
+    position: fixed; inset: 0; z-index: 900;
+    background: rgba(26,46,74,0.55);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.2s;
+  }
+  #mc-pick-modal.open { opacity: 1; pointer-events: all; }
+  .mc-pick-box {
+    background: #fff; width: min(520px, 96vw); max-height: 80vh;
+    display: flex; flex-direction: column;
+    border: 1px solid rgba(26,107,191,0.18);
+    box-shadow: 0 8px 40px rgba(26,46,74,0.18);
+  }
+  .mc-pick-header {
+    padding: 16px 18px 12px;
+    border-bottom: 1px solid rgba(26,107,191,0.10);
+    flex-shrink: 0;
+  }
+  .mc-pick-title {
+    font-size: 15px; font-weight: 700; color: var(--white);
+    letter-spacing: 0.5px; margin-bottom: 4px;
+  }
+  .mc-pick-subtitle {
+    font-size: 12px; letter-spacing: 1px; color: rgba(26,46,74,0.55);
+  }
+  .mc-pick-limit-bar {
+    margin-top: 8px; font-size: 13px; color: rgba(26,46,74,0.65);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .mc-pick-limit-count { font-weight: 700; color: var(--gold); }
+  .mc-pick-limit-count.over { color: #d63030; }
+  .mc-pick-limit-count.ok   { color: #1a9e5c; }
+  .mc-pick-body { flex: 1; overflow-y: auto; padding: 8px 0; }
+  .mc-pick-subtype-label {
+    font-size: 11px; letter-spacing: 2px; font-weight: 700;
+    padding: 6px 18px 3px;
+    color: rgba(26,46,74,0.40);
+  }
+  .mc-pick-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 18px; cursor: pointer;
+    transition: background 0.12s;
+    user-select: none;
+  }
+  .mc-pick-item:hover { background: rgba(26,107,191,0.05); }
+  .mc-pick-item.selected { background: rgba(26,107,191,0.09); }
+  .mc-pick-check {
+    width: 16px; height: 16px; flex-shrink: 0;
+    border: 2px solid rgba(26,107,191,0.30); border-radius: 2px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.12s; font-size: 11px; color: #fff;
+    background: transparent;
+  }
+  .mc-pick-item.selected .mc-pick-check {
+    background: var(--gold); border-color: var(--gold);
+  }
+  .mc-pick-item-name { flex: 1; font-size: 15px; color: var(--white); }
+  .mc-pick-item-cat  { font-size: 12px; color: rgba(26,46,74,0.45); }
+  .mc-pick-empty { text-align: center; padding: 32px 20px; font-size: 14px; color: rgba(26,46,74,0.40); letter-spacing: 1px; }
+  .mc-pick-footer {
+    padding: 12px 18px; border-top: 1px solid rgba(26,107,191,0.10);
+    display: flex; justify-content: flex-end; gap: 8px; flex-shrink: 0;
+  }
+  .mc-pick-cancel {
+    padding: 8px 18px; background: none;
+    border: 1px solid rgba(26,107,191,0.20);
+    color: rgba(26,46,74,0.65); font-family: 'Noto Sans KR', sans-serif;
+    font-size: 14px; cursor: pointer; transition: all 0.15s;
+  }
+  .mc-pick-cancel:hover { border-color: var(--gold); color: var(--gold); }
+  .mc-pick-confirm {
+    padding: 8px 22px;
+    background: linear-gradient(135deg, #1a6bbf, #1052a0);
+    border: none; color: #fff;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 14px; font-weight: 700; cursor: pointer;
+    letter-spacing: 0.5px; transition: opacity 0.15s;
+  }
+  .mc-pick-confirm:hover { opacity: 0.88; }
+
+  /* ── 희망 진로 강조 배너 ── */
+  .mc-career-banner {
+    flex-shrink: 0;
+    display: flex; align-items: center; gap: 20px;
+    padding: 18px 40px;
+    background: linear-gradient(135deg, #1a6bbf 0%, #0e4a8a 100%);
+    border-bottom: 2px solid rgba(255,255,255,0.12);
+    position: relative; z-index: 9;
+  }
+  .mc-career-banner-left {
+    display: flex; align-items: center; gap: 10px;
+    flex-shrink: 0;
+  }
+  .mc-career-banner-icon {
+    font-size: 22px; line-height: 1; flex-shrink: 0;
+  }
+  .mc-career-banner-label {
+    font-size: 12px; letter-spacing: 2.5px; font-weight: 700;
+    color: rgba(255,255,255,0.70); white-space: nowrap;
+    font-family: 'Noto Sans KR', sans-serif;
+  }
+  .mc-career-banner-center {
+    flex: 1; position: relative; min-width: 0;
+  }
+  .mc-career-banner-input {
+    width: 100%; background: transparent; border: none;
+    color: #ffffff; font-family: 'Noto Serif KR', serif;
+    font-size: clamp(18px, 2.2vw, 26px); font-weight: 600;
+    padding: 2px 0 6px; outline: none; letter-spacing: 0.5px;
+  }
+  .mc-career-banner-input::placeholder {
+    color: rgba(255,255,255,0.30);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: clamp(14px, 1.5vw, 18px); font-weight: 400;
+  }
+  .mc-career-banner-underline {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 1.5px;
+    background: rgba(255,255,255,0.25);
+    transition: background 0.2s;
+  }
+  .mc-career-banner-input:focus ~ .mc-career-banner-underline {
+    background: rgba(255,255,255,0.80);
+  }
+  .mc-career-saved {
+    font-size: 12px; color: rgba(255,255,255,0.45); flex-shrink: 0;
+    letter-spacing: 0.5px; transition: color 0.3s;
+  }
+  .mc-career-saved.ok { color: rgba(100,230,160,0.90); }
+
+  /* ── 학기별 메모 영역 ── */
+  .mc-memo-area {
+    flex-shrink: 0;
+    border-top: 1px solid rgba(26,107,191,0.10);
+    background: rgba(26,107,191,0.02);
+    padding: 8px 10px;
+  }
+  .mc-memo-input {
+    width: 100%; min-height: 72px; max-height: 140px;
+    background: transparent; border: none; resize: none;
+    font-family: 'Noto Sans KR', sans-serif; font-size: 12px;
+    line-height: 1.7; color: var(--white); outline: none;
+    placeholder-color: rgba(26,46,74,0.28);
+  }
+  .mc-memo-input::placeholder { color: rgba(26,46,74,0.28); }
+  .mc-memo-input:focus { background: rgba(26,107,191,0.04); }
+
+  .mc-save-bar {
+    display: flex; align-items: center; justify-content: flex-end; gap: 12px;
+    flex-shrink: 0;
+  }
+  .mc-save-status { font-size: 13px; color: #1a9e5c; letter-spacing: 1px; }
+  .mc-btn-save {
+    padding: 10px 26px;
+    background: linear-gradient(135deg, #1a9e5c, #0e7a50);
+    border: none; color: #ffffff;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 15px; font-weight: 700; cursor: pointer;
+    letter-spacing: 1px; transition: opacity 0.2s, transform 0.2s;
+  }
+  .mc-btn-save:hover { opacity: 0.88; transform: translateY(-1px); }
+
+  @media (max-width: 900px) {
+    .mc-semesters { grid-template-columns: repeat(2, 1fr); }
+    .mc-screen-body { padding: 12px 12px 10px; }
+    .mc-modal-box { padding: 28px 20px 24px !important; }
+  }
+  @media (max-width: 520px) {
+    .mc-semesters { grid-template-columns: 1fr; overflow-y: auto; }
+  }
+
 </style>
 </head>
 <body>
@@ -3201,6 +3728,12 @@
   <button id="edit-page-btn" onclick="openPageEditPw()" title="메인 화면 편집">✏️</button>
   <button id="admin-btn" onclick="openPwModal()">🔒 과목 관리</button>
 </div>
+
+<!-- ═══ 나만의 교육과정 — 우측 상단 고정 버튼 ═══ -->
+<button id="mycurriculum-btn" onclick="openMyCurriculumModal()" title="나만의 교육과정 설계">
+  <span class="mc-topbtn-icon">✦</span>
+  <span class="mc-topbtn-text">나만의 교육과정<br><span class="mc-topbtn-sub">설계하기</span></span>
+</button>
 
 <!-- ═══ HERO ═══ -->
 <section id="hero">
@@ -3298,7 +3831,7 @@
         <option value="국어">국어</option>
         <option value="수학">수학</option>
         <option value="영어">영어</option>
-        <option value="사회">사회</option>
+        <option value="사회(역사/도덕 포함)">사회(역사/도덕 포함)</option>
         <option value="과학">과학</option>
         <option value="체육">체육</option>
         <option value="예술">예술</option>
@@ -3333,7 +3866,7 @@
     <button class="detail-back" onclick="closeDetail()">◀ 목록으로</button>
     <div class="detail-header-info">
       <div class="detail-tag" id="detail-cat"></div>
-      <select id="detail-cat-select" style="display:none;font-family:'Noto Sans KR',sans-serif;font-size:11px;padding:4px 8px;border:1px solid rgba(26,107,191,0.3);background:#fff;color:#1a2e4a;cursor:pointer;border-radius:2px;max-width:200px;" onchange="changeSubjectCat(this.value)"></select>
+      <select id="detail-cat-select" style="display:none;font-family:'Noto Sans KR',sans-serif;font-size:11px;padding:4px 8px;border:1px solid rgba(26,107,191,0.3);background:#fff;color:#1a2e4a;cursor:pointer;border-radius:2px;max-width:220px;" onchange="changeSubjectCat(this.value)" title="과목군 변경 (이동)"></select>
       <div class="detail-name" id="detail-name"></div>
     </div>
     <button class="detail-home" onclick="goHome()" title="메인화면으로">🏠</button>
@@ -4698,7 +5231,7 @@ function sbSetQ(key, value, ms) {
    상수 / 상태
 ────────────────────────────── */
 const PASS = '1234';
-const CATS = ['전체','국어','수학','영어','사회','과학','체육','예술','기술ㆍ가정/정보/제2외국어/한문/교양'];
+const CATS = ['전체','국어','수학','영어','사회(역사/도덕 포함)','과학','체육','예술','기술ㆍ가정/정보/제2외국어/한문/교양'];
 let subjects  = [];
 let pageTexts = {};
 let activeCat = '전체';
@@ -5362,12 +5895,13 @@ function applyReadOnly(readOnly) {
     const el = document.getElementById(id);
     if (el) el.readOnly = readOnly;
   });
-  // 과목군 변경 select: 관리자(admin) 모드에서만 표시
+  // 과목군 변경 select: 편집 모드(semester/catsubj)에서도 항상 표시 (과목군 이동 기능)
   const catTag = document.getElementById('detail-cat');
   const catSel = document.getElementById('detail-cat-select');
   if (catTag && catSel) {
-    catTag.style.display = readOnly ? '' : 'none';
-    catSel.style.display = readOnly ? 'none' : '';
+    // 항상 select를 보여주고 tag는 숨김 (관리자/편집 모드 모두 동일하게)
+    catTag.style.display = 'none';
+    catSel.style.display = '';
   }
   // 등급 드롭다운 — 항상 클릭 가능하게 유지 (보기 전용 모드에서도 확인 가능)
   const gradeTrigger = document.getElementById('grade-picker-trigger');
@@ -5382,6 +5916,8 @@ function applyReadOnly(readOnly) {
   // 블록 추가 버튼 영역
   const blockAddBar = document.querySelector('.block-add-bar');
   if (blockAddBar) blockAddBar.style.display = readOnly ? 'none' : 'flex';
+  // 과목군 변경 버튼: readOnly 모드에서도 과목군 select는 항상 활성화
+  if (catSel) catSel.disabled = false;
 }
 
 function closeDetail() {
@@ -5482,8 +6018,13 @@ function changeSubjectCat(newCat) {
     catSel.style.color = CAT_COLORS[newCat] || '#b0b0b0';
     catSel.style.borderColor = CAT_COLORS[newCat] || '#b0b0b0';
   }
-  // admin 목록 새로고침
-  renderSubjectList();
+  // 목록 새로고침 (진입 경로 구분)
+  if (detailFrom === 'catsubj') {
+    renderCatSubjTabs();
+    renderCatSubjList();
+  } else {
+    renderSubjectList();
+  }
 }
 
 /* 기본 정보 저장 */
@@ -6479,9 +7020,9 @@ function hexToRgba(hex, alpha) {
 
 const CAT_COLORS = {
   '국어':'#7eb8e0','수학':'#e07eb8','영어':'#1a9e5c',
-  '사회':'#e0b87e','과학':'#a07ee0','체육':'#e07e7e',
+  '사회(역사/도덕 포함)':'#e0b87e','과학':'#a07ee0','체육':'#e07e7e',
   '예술':'#e09a4a','기술ㆍ가정/정보/제2외국어/한문/교양':'#5ab8a0',
-  /* 구버전 호환 */ '예체능':'#e07e7e','직업':'#7ec8e0','기타':'#b0b0b0'
+  /* 구버전 호환 */ '사회':'#e0b87e','예체능':'#e09a4a','직업':'#7ec8e0','기타':'#5ab8a0'
 };
 let activeCatSubj = '';
 
@@ -9722,6 +10263,12 @@ async function initApp() {
       sbGet('cg_semester'),
     ]);
     subjects     = Array.isArray(subj)  ? subj  : [];
+    // 구버전 과목군 → 신버전 마이그레이션
+    subjects.forEach(s => {
+      if (s.cat === '사회')   s.cat = '사회(역사/도덕 포함)';
+      if (s.cat === '예체능') s.cat = '예술';
+      if (s.cat === '기타')   s.cat = '기술ㆍ가정/정보/제2외국어/한문/교양';
+    });
     pageTexts    = (page && typeof page === 'object' && !Array.isArray(page)) ? page : {};
     semesterData = migrateSemData(sem !== null ? JSON.stringify(sem) : null);
   } catch(e) {
@@ -9730,6 +10277,10 @@ async function initApp() {
     hideLoadingOverlay();
   }
   applyPageTexts();
+  // 나만의 교육과정 화면이 이미 열려 있으면 과목 목록 갱신
+  if (document.getElementById('mycurriculum-screen').classList.contains('open')) {
+    mcRenderAll();
+  }
   // 길라잡이 PDF 복원 (Supabase) - 단일 PDF
   try { await gbLoadSettings(); } catch(_) {}
   try { await loadGbPdfFromStorage('left'); } catch(_) {}
@@ -9981,6 +10532,179 @@ window.addEventListener('resize', function() {
 
 <div id="dept-save-toast"></div>
 
+<!-- ═══════════════════════════════════════
+     나만의 교육과정 설계 — 로그인 / 회원가입 모달
+═══════════════════════════════════════ -->
+<div class="modal-backdrop" id="mycurriculum-modal" onclick="if(event.target===this)closeMyCurriculumModal()">
+  <div class="modal-box mc-modal-box">
+    <button class="modal-close" onclick="closeMyCurriculumModal()">×</button>
+    <div class="mc-modal-header">
+      <div class="mc-modal-icon">✦</div>
+      <div class="mc-modal-label">MY CURRICULUM · 나만의 교육과정</div>
+      <div class="mc-modal-title" id="mc-title">로그인</div>
+    </div>
+    <div class="mc-tabs">
+      <button class="mc-tab active" id="mc-tab-login" onclick="mcSwitchTab('login')">로그인</button>
+      <button class="mc-tab" id="mc-tab-signup" onclick="mcSwitchTab('signup')">회원가입</button>
+    </div>
+    <div id="mc-form-login">
+      <div class="mc-field">
+        <div class="mc-field-label">아이디</div>
+        <input class="mc-input" id="mc-login-id" type="text" placeholder="아이디를 입력하세요" autocomplete="username" />
+      </div>
+      <div class="mc-field">
+        <div class="mc-field-label">비밀번호</div>
+        <input class="mc-input" id="mc-login-pw" type="password" placeholder="비밀번호를 입력하세요" autocomplete="current-password"
+          onkeydown="if(event.key==='Enter')mcDoLogin()" />
+      </div>
+      <div class="mc-msg" id="mc-login-msg"></div>
+      <button class="mc-btn-primary" onclick="mcDoLogin()">로그인</button>
+    </div>
+    <div id="mc-form-signup" style="display:none">
+      <div class="mc-field">
+        <div class="mc-field-label">아이디 <span class="mc-field-hint">영문·숫자 4~16자</span></div>
+        <input class="mc-input" id="mc-signup-id" type="text" placeholder="사용할 아이디를 입력하세요" autocomplete="username" maxlength="16" />
+      </div>
+      <div class="mc-field">
+        <div class="mc-field-label">비밀번호 <span class="mc-field-hint">6자 이상</span></div>
+        <input class="mc-input" id="mc-signup-pw" type="password" placeholder="비밀번호를 입력하세요" autocomplete="new-password" minlength="6" />
+      </div>
+      <div class="mc-field">
+        <div class="mc-field-label">비밀번호 확인</div>
+        <input class="mc-input" id="mc-signup-pw2" type="password" placeholder="비밀번호를 다시 입력하세요" autocomplete="new-password"
+          onkeydown="if(event.key==='Enter')mcDoSignup()" />
+      </div>
+      <div class="mc-msg" id="mc-signup-msg"></div>
+      <button class="mc-btn-primary" onclick="mcDoSignup()">회원가입</button>
+    </div>
+  </div>
+</div>
+
+<!-- 나만의 교육과정 설계 화면 -->
+<div id="mycurriculum-screen">
+  <div class="screen-bg-layer"></div>
+
+  <!-- 헤더 1행: 뒤로 / 제목+학생 / 로그아웃 -->
+  <div class="mc-header-top">
+    <button class="sem-back" onclick="closeMyCurriculumScreen()">◀ 뒤로</button>
+    <div class="mc-header-top-info">
+      <div class="sem-header-label">MY CURRICULUM · 나만의 교육과정 설계</div>
+      <div style="display:flex;align-items:baseline;gap:10px;">
+        <div class="sem-header-title">나만의 교육과정</div>
+        <div class="sem-header-subtitle" id="mc-screen-user"></div>
+      </div>
+    </div>
+    <button class="mc-logout-btn" onclick="mcDoLogout()">로그아웃</button>
+  </div>
+
+  <!-- 헤더 2행: 희망 진로(크게) + 졸업학점 -->
+  <div class="mc-header-bottom">
+    <div class="mc-career-hero">
+      <span class="mc-career-hero-icon">🎯</span>
+      <div class="mc-career-hero-field">
+        <div class="mc-career-hero-label">나의 희망 진로</div>
+        <input class="mc-career-hero-input" id="mc-career-input"
+               type="text" maxlength="80"
+               placeholder="희망하는 진로나 직업을 입력하세요"
+               oninput="mcCareerInput()" />
+      </div>
+      <span class="mc-career-saved" id="mc-career-saved"></span>
+    </div>
+
+    <div class="mc-grad-calc" id="mc-grad-calc">
+      <div class="mc-grad-item">
+        <div class="mc-grad-label">1학년</div>
+        <div class="mc-grad-val">58 <span class="mc-grad-denom">학점</span></div>
+      </div>
+      <div class="mc-grad-item">
+        <div class="mc-grad-label">2학년</div>
+        <div class="mc-grad-val" id="mc-grad-y2-val">0 <span class="mc-grad-denom">학점</span></div>
+      </div>
+      <div class="mc-grad-item">
+        <div class="mc-grad-label">3학년</div>
+        <div class="mc-grad-val" id="mc-grad-y3-val">0 <span class="mc-grad-denom">학점</span></div>
+      </div>
+      <div class="mc-grad-total-item">
+        <div class="mc-grad-total-label">총 이수학점</div>
+        <div class="mc-grad-total-val" id="mc-grad-tot-val">58 <span class="mc-grad-total-denom">/ 192학점</span></div>
+        <div class="mc-grad-total-bar-track">
+          <div class="mc-grad-total-bar-fill" id="mc-grad-tot-bar" style="width:30.2%;"></div>
+        </div>
+        <div class="mc-grad-pct" id="mc-grad-tot-pct" style="margin-top:2px;">30% 달성</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mc-screen-body">
+    <div class="mc-semesters">
+      <!-- 각 학기 카드는 JS가 mcRenderSemCard()로 생성 -->
+      <div class="mc-semester-col" id="mc-col-0">
+        <div class="mc-sem-header mc-sem-1">
+          <div class="mc-sem-grade">2학년</div>
+          <div class="mc-sem-name">1학기</div>
+        </div>
+        <div class="mc-sem-content" id="mc-content-0"></div>
+        <div class="mc-memo-area">
+          <textarea class="mc-memo-input" id="mc-memo-0" placeholder="메모를 입력하세요..." oninput="mcMemoInput(0)"></textarea>
+        </div>
+      </div>
+      <div class="mc-semester-col" id="mc-col-1">
+        <div class="mc-sem-header mc-sem-2">
+          <div class="mc-sem-grade">2학년</div>
+          <div class="mc-sem-name">2학기</div>
+        </div>
+        <div class="mc-sem-content" id="mc-content-1"></div>
+        <div class="mc-memo-area">
+          <textarea class="mc-memo-input" id="mc-memo-1" placeholder="메모를 입력하세요..." oninput="mcMemoInput(1)"></textarea>
+        </div>
+      </div>
+      <div class="mc-semester-col" id="mc-col-2">
+        <div class="mc-sem-header mc-sem-3">
+          <div class="mc-sem-grade">3학년</div>
+          <div class="mc-sem-name">1학기</div>
+        </div>
+        <div class="mc-sem-content" id="mc-content-2"></div>
+        <div class="mc-memo-area">
+          <textarea class="mc-memo-input" id="mc-memo-2" placeholder="메모를 입력하세요..." oninput="mcMemoInput(2)"></textarea>
+        </div>
+      </div>
+      <div class="mc-semester-col" id="mc-col-3">
+        <div class="mc-sem-header mc-sem-4">
+          <div class="mc-sem-grade">3학년</div>
+          <div class="mc-sem-name">2학기</div>
+        </div>
+        <div class="mc-sem-content" id="mc-content-3"></div>
+        <div class="mc-memo-area">
+          <textarea class="mc-memo-input" id="mc-memo-3" placeholder="메모를 입력하세요..." oninput="mcMemoInput(3)"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="mc-save-bar">
+      <span class="mc-save-status" id="mc-save-status"></span>
+      <button class="mc-btn-save" onclick="mcSaveAll()">💾 저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 과목 선택 모달 -->
+<div id="mc-pick-modal" onclick="if(event.target===this)mcPickClose()">
+  <div class="mc-pick-box">
+    <div class="mc-pick-header">
+      <div class="mc-pick-title" id="mc-pick-title"></div>
+      <div class="mc-pick-subtitle" id="mc-pick-subtitle"></div>
+      <div class="mc-pick-limit-bar">
+        선택: <span class="mc-pick-limit-count" id="mc-pick-count">0</span>
+        <span id="mc-pick-limit-text"></span>
+      </div>
+    </div>
+    <div class="mc-pick-body" id="mc-pick-body"></div>
+    <div class="mc-pick-footer">
+      <button class="mc-pick-cancel" onclick="mcPickClose()">취소</button>
+      <button class="mc-pick-confirm" onclick="mcPickConfirm()">확인</button>
+    </div>
+  </div>
+</div>
+
 <div class="sem-dropdown-menu" id="sem-dropdown-menu">
   <button class="sem-dropdown-item" id="sem-tab-0" onclick="setSemFromDropdown(0)">2학년 1학기</button>
   <button class="sem-dropdown-item" id="sem-tab-1" onclick="setSemFromDropdown(1)">2학년 2학기</button>
@@ -10004,6 +10728,517 @@ window.addEventListener('resize', function() {
     </div>
   </div>
 </div>
+
+
+<script>
+/* =================================================
+   나만의 교육과정 설계 — 과목 선택형 UI
+   semesterData(학기별 개설과목)에서 자동으로 과목 목록을 가져와
+   분류별 선택 제한 안에서 학생이 수강 희망 과목을 선택/저장
+================================================= */
+
+const MC_SUPA_URL  = window.__SUPABASE_URL__;
+const MC_SUPA_ANON = window.__SUPABASE_ANON__;
+
+let mcCurrentUser = null;
+let mcSaveTimer   = null;
+
+// mcSelections[colIdx] = { '필수': [...names], '사회&과학': [...], ... }
+let mcSelections = [{},{},{},{}];
+
+/* ── 카테고리 정의 ───────────────────────────────
+   표시 이름 / 데이터 타입 키 / 제한 수 읽는 방법
+   제한은 pageTexts hint 값에서 숫자를 파싱
+────────────────────────────────────────────────── */
+function getMcCategories(colIdx) {
+  const is3 = colIdx >= 2;
+  const p   = (typeof pageTexts === 'object' && pageTexts) ? pageTexts : {};
+  function parseLimit(hint, def) {
+    if (!hint) return def;
+    const m = hint.match(/(\d+)/);
+    return m ? parseInt(m[1]) : def;
+  }
+  const cats = [
+    {
+      key: '필수',
+      label: '필수과목',
+      limit: null  // 제한 없음
+    },
+    {
+      key: is3 ? '사회&과학&예술' : '사회&과학',
+      label: is3 ? (p.hdSS3 || '사회&과학&예술') : (p.hdSS2 || '사회&과학'),
+      limit: parseLimit(is3 ? p.hdSS3Hint : p.hdSS2Hint, 3)
+    },
+    {
+      key: '국&수&영',
+      label: '국&수&영',
+      limit: parseLimit(p.hdKnsHint, 1)
+    },
+    {
+      key: '외국어&교양',
+      label: p.hdForeign || '외국어&교양',
+      limit: parseLimit(p.hdForeignHint, 1)
+    },
+    {
+      key: '음악&미술',
+      label: '음악&미술',
+      limit: parseLimit(p.hdMusHint, 1)
+    },
+  ];
+  // 3학년: 외국어&교양 숨김
+  return is3 ? cats.filter(c => c.key !== '외국어&교양') : cats;
+}
+
+/* ── 해당 학기+카테고리의 개설과목 목록 ─────────── */
+function getMcAvailableSubjects(colIdx, catKey) {
+  if (!Array.isArray(semesterData) || !semesterData[colIdx]) return [];
+  return semesterData[colIdx].filter(item => {
+    if (catKey === '필수') return item.type === '필수';
+    // 사회&과학&예술 포함 처리 (3학년)
+    if (catKey === '사회&과학&예술') return ['사회&과학','사회&과학&예술'].includes(item.type);
+    return item.type === catKey;
+  });
+}
+
+/* ── 학기 카드 UI 렌더링 ─────────────────────────── */
+function mcRenderSemCard(colIdx) {
+  const wrap = document.getElementById('mc-content-' + colIdx);
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  const cats = getMcCategories(colIdx);
+  const sel  = mcSelections[colIdx] || {};
+
+  cats.forEach(cat => {
+    const available = getMcAvailableSubjects(colIdx, cat.key);
+    if (available.length === 0) return; // 개설과목 없으면 섹션 숨김
+
+    const selected = sel[cat.key] || [];
+    const count    = selected.length;
+    const limitNum = cat.limit;
+
+    // 섹션 wrapper
+    const sec = document.createElement('div');
+    sec.className = 'mc-cat-section';
+
+    // 라벨 행
+    const lbl = document.createElement('div');
+    lbl.className = 'mc-cat-label';
+    const limitClass = limitNum === null ? '' : count > limitNum ? ' over' : count === limitNum ? ' ok' : '';
+    const limitText  = limitNum === null ? '제한 없음' : `${count} / ${limitNum}개`;
+    lbl.innerHTML = `
+      <span>${cat.label}</span>
+      <span class="mc-cat-limit${limitClass}">${limitText}</span>`;
+    sec.appendChild(lbl);
+
+    // 선택된 과목 칩 목록
+    const chipList = document.createElement('div');
+    chipList.className = 'mc-selected-list';
+    if (selected.length === 0) {
+      chipList.innerHTML = '<span style="font-size:11px;color:rgba(26,46,74,0.28);padding:2px 0;">선택 없음</span>';
+    } else {
+      selected.forEach(name => {
+        const chip = document.createElement('div');
+        chip.className = 'mc-sel-chip';
+        chip.innerHTML = `<span class="mc-sel-chip-name">${escHtml(name)}</span><button class="mc-sel-chip-del" title="제거">×</button>`;
+        chip.querySelector('.mc-sel-chip-del').addEventListener('click', () => {
+          mcRemoveSubject(colIdx, cat.key, name);
+        });
+        chipList.appendChild(chip);
+      });
+    }
+    sec.appendChild(chipList);
+
+    // 추가 버튼
+    const addBtn = document.createElement('button');
+    addBtn.className = 'mc-add-btn';
+    addBtn.textContent = '＋ 과목 선택';
+    addBtn.addEventListener('click', () => mcPickOpen(colIdx, cat));
+    sec.appendChild(addBtn);
+
+    wrap.appendChild(sec);
+  });
+
+  if (wrap.innerHTML === '') {
+    wrap.innerHTML = '<div style="font-size:12px;color:rgba(26,46,74,0.35);padding:16px 4px;letter-spacing:0.5px;">이 학기에 개설된 과목 정보가 없습니다.<br>학기별 개설과목 안내에서 먼저 과목을 등록해 주세요.</div>';
+  }
+}
+
+function mcRenderAll() {
+  [0,1,2,3].forEach(i => mcRenderSemCard(i));
+  mcUpdateGradCalc();
+}
+
+/* ── 졸업학점 계산기 업데이트 ───────────────────── */
+function mcParseCredit(creditStr) {
+  if (!creditStr) return 0;
+  const m = String(creditStr).match(/(\d+(\.\d+)?)/);
+  return m ? parseFloat(m[1]) : 0;
+}
+
+function mcGetSubjectCredit(name, catKey) {
+  // 1순위: subjects 배열에서 해당 과목의 개별 학점 찾기 (info.credit에 저장됨)
+  if (typeof subjects !== 'undefined' && Array.isArray(subjects)) {
+    const found = subjects.find(s => s.name === name);
+    if (found && found.info && found.info.credit) return mcParseCredit(found.info.credit);
+  }
+  // 2순위: pageTexts의 카테고리별 기본값
+  const pt = (typeof pageTexts === 'object' && pageTexts) ? pageTexts : {};
+  if (catKey === '필수') return mcParseCredit(pt.creditReq || '3학점');
+  if (catKey === '사회&과학' || catKey === '사회&과학&예술') return mcParseCredit(pt.creditSS || '3학점');
+  if (catKey === '국&수&영') return mcParseCredit(pt.creditKns || '3학점');
+  if (catKey === '외국어&교양') return mcParseCredit(pt.creditForeign || '3학점');
+  if (catKey === '음악&미술') return mcParseCredit(pt.creditMus || '2학점');
+  return 3;
+}
+
+function mcCalcColCredits(colIdx) {
+  const sel = mcSelections[colIdx] || {};
+  let total = 0;
+  Object.entries(sel).forEach(([catKey, names]) => {
+    if (!Array.isArray(names)) return;
+    names.forEach(name => {
+      total += mcGetSubjectCredit(name, catKey);
+    });
+  });
+  return total;
+}
+
+function mcUpdateGradCalc() {
+  const YEAR1 = 58;
+  const TOTAL_MAX = 192;
+
+  const y2 = mcCalcColCredits(0) + mcCalcColCredits(1);
+  const y3 = mcCalcColCredits(2) + mcCalcColCredits(3);
+  const tot = YEAR1 + y2 + y3;
+  const totPct = Math.min(100, Math.round((tot / TOTAL_MAX) * 100));
+
+  const y2ValEl  = document.getElementById('mc-grad-y2-val');
+  const y3ValEl  = document.getElementById('mc-grad-y3-val');
+  const totValEl = document.getElementById('mc-grad-tot-val');
+  const totBarEl = document.getElementById('mc-grad-tot-bar');
+  const totPctEl = document.getElementById('mc-grad-tot-pct');
+
+  if (y2ValEl) y2ValEl.innerHTML = y2 + ' <span class="mc-grad-denom">학점</span>';
+  if (y3ValEl) y3ValEl.innerHTML = y3 + ' <span class="mc-grad-denom">학점</span>';
+  if (totValEl) totValEl.innerHTML = tot + ' <span class="mc-grad-total-denom">/ 192학점</span>';
+  if (totBarEl) totBarEl.style.width = totPct + '%';
+  if (totPctEl) totPctEl.textContent = totPct + '% 달성';
+}
+
+
+function mcRemoveSubject(colIdx, catKey, name) {
+  const arr = mcSelections[colIdx][catKey] || [];
+  mcSelections[colIdx][catKey] = arr.filter(n => n !== name);
+  mcRenderSemCard(colIdx);
+  mcUpdateGradCalc();
+  mcAutoSave();
+}
+
+/* ── 과목 선택 모달 ─────────────────────────────── */
+let _pickColIdx = 0;
+let _pickCat    = null;
+let _pickTemp   = [];   // 모달 내 임시 선택
+
+function mcPickOpen(colIdx, cat) {
+  _pickColIdx = colIdx;
+  _pickCat    = cat;
+  _pickTemp   = [...(mcSelections[colIdx][cat.key] || [])];
+
+  document.getElementById('mc-pick-title').textContent =
+    ['2학년 1학기','2학년 2학기','3학년 1학기','3학년 2학기'][colIdx] + ' · ' + cat.label;
+  document.getElementById('mc-pick-subtitle').textContent =
+    cat.limit !== null ? `최대 ${cat.limit}개 선택 가능` : '제한 없이 선택 가능';
+
+  mcPickRenderBody();
+  document.getElementById('mc-pick-modal').classList.add('open');
+}
+
+function mcPickRenderBody() {
+  const available = getMcAvailableSubjects(_pickColIdx, _pickCat.key);
+  const body = document.getElementById('mc-pick-body');
+  body.innerHTML = '';
+
+  if (available.length === 0) {
+    body.innerHTML = '<div class="mc-pick-empty">이 분류의 개설과목이 없습니다.</div>';
+    mcPickUpdateCount();
+    return;
+  }
+
+  // 일반 / 진로 / 융합 그룹으로 묶어 표시
+  const groups = {};
+  available.forEach(item => {
+    const st = item.subtype || '일반';
+    if (!groups[st]) groups[st] = [];
+    groups[st].push(item);
+  });
+
+  ['일반','진로','융합'].forEach(st => {
+    if (!groups[st] || groups[st].length === 0) return;
+    const stLabel = document.createElement('div');
+    stLabel.className = 'mc-pick-subtype-label';
+    stLabel.textContent = '── ' + st + ' 선택과목';
+    body.appendChild(stLabel);
+
+    groups[st].forEach(item => {
+      const name = item.name;
+      const sel  = _pickTemp.includes(name);
+      const s    = (typeof subjects !== 'undefined') ? subjects.find(x => x.name === name) : null;
+      const catLabel = s ? s.cat : '';
+
+      const row = document.createElement('div');
+      row.className = 'mc-pick-item' + (sel ? ' selected' : '');
+      row.innerHTML = `
+        <div class="mc-pick-check">${sel ? '✓' : ''}</div>
+        <div class="mc-pick-item-name">${escHtml(name)}</div>
+        ${catLabel ? `<div class="mc-pick-item-cat">${escHtml(catLabel)}</div>` : ''}`;
+
+      row.addEventListener('click', () => {
+        if (_pickTemp.includes(name)) {
+          _pickTemp = _pickTemp.filter(n => n !== name);
+          row.classList.remove('selected');
+          row.querySelector('.mc-pick-check').textContent = '';
+        } else {
+          const lim = _pickCat.limit;
+          if (lim !== null && _pickTemp.length >= lim) {
+            // 제한 초과 시 맨 앞 제거 후 추가 (replace 방식)
+            _pickTemp.shift();
+          }
+          _pickTemp.push(name);
+          // 전체 재렌더
+          mcPickRenderBody();
+          return;
+        }
+        mcPickUpdateCount();
+      });
+      body.appendChild(row);
+    });
+  });
+
+  mcPickUpdateCount();
+}
+
+function mcPickUpdateCount() {
+  const cnt    = _pickTemp.length;
+  const lim    = _pickCat ? _pickCat.limit : null;
+  const el     = document.getElementById('mc-pick-count');
+  const limTxt = document.getElementById('mc-pick-limit-text');
+  el.textContent = cnt;
+  el.className   = 'mc-pick-limit-count' + (lim !== null && cnt > lim ? ' over' : cnt === lim ? ' ok' : '');
+  limTxt.textContent = lim !== null ? `/ ${lim}개` : '';
+}
+
+function mcPickClose() {
+  document.getElementById('mc-pick-modal').classList.remove('open');
+}
+
+function mcPickConfirm() {
+  if (!_pickCat) { mcPickClose(); return; }
+  const lim = _pickCat.limit;
+  if (lim !== null && _pickTemp.length > lim) {
+    alert(`최대 ${lim}개까지 선택할 수 있습니다. (현재 ${_pickTemp.length}개)`);
+    return;
+  }
+  if (!mcSelections[_pickColIdx]) mcSelections[_pickColIdx] = {};
+  mcSelections[_pickColIdx][_pickCat.key] = [..._pickTemp];
+  mcPickClose();
+  mcRenderSemCard(_pickColIdx);
+  mcUpdateGradCalc();
+  mcAutoSave();
+}
+
+/* ── 모달 열기/닫기 ─────────────────────────────── */
+function openMyCurriculumModal() {
+  const saved = localStorage.getItem('mc_user');
+  if (saved) {
+    try { mcCurrentUser = JSON.parse(saved); mcOpenScreen(); return; } catch(e) {}
+  }
+  mcSwitchTab('login');
+  document.getElementById('mycurriculum-modal').classList.add('open');
+}
+function closeMyCurriculumModal() {
+  document.getElementById('mycurriculum-modal').classList.remove('open');
+}
+
+/* ── 탭 전환 ────────────────────────────────────── */
+function mcSwitchTab(tab) {
+  const isLogin = tab === 'login';
+  document.getElementById('mc-tab-login').classList.toggle('active', isLogin);
+  document.getElementById('mc-tab-signup').classList.toggle('active', !isLogin);
+  document.getElementById('mc-form-login').style.display  = isLogin ? '' : 'none';
+  document.getElementById('mc-form-signup').style.display = isLogin ? 'none' : '';
+  document.getElementById('mc-login-msg').textContent  = '';
+  document.getElementById('mc-signup-msg').textContent = '';
+}
+
+/* ── Supabase REST 헬퍼 ──────────────────────────── */
+async function mcFetch(path, method, body) {
+  const headers = {
+    'apikey': MC_SUPA_ANON,
+    'Authorization': 'Bearer ' + MC_SUPA_ANON,
+    'Content-Type': 'application/json'
+  };
+  if (method === 'POST') headers['Prefer'] = 'return=representation';
+  const res = await fetch(MC_SUPA_URL + path, {
+    method, headers,
+    body: body ? JSON.stringify(body) : undefined
+  });
+  const text = await res.text();
+  return { ok: res.ok, status: res.status, data: text ? JSON.parse(text) : null };
+}
+
+/* ── 회원가입 ───────────────────────────────────── */
+async function mcDoSignup() {
+  const id  = document.getElementById('mc-signup-id').value.trim();
+  const pw  = document.getElementById('mc-signup-pw').value;
+  const pw2 = document.getElementById('mc-signup-pw2').value;
+  const msg = document.getElementById('mc-signup-msg');
+  msg.className = 'mc-msg';
+  if (!/^[a-zA-Z0-9]{4,16}$/.test(id)) { msg.textContent = '아이디: 영문·숫자 4~16자'; return; }
+  if (pw.length < 6) { msg.textContent = '비밀번호는 6자 이상이어야 합니다.'; return; }
+  if (pw !== pw2)    { msg.textContent = '비밀번호가 일치하지 않습니다.'; return; }
+  msg.textContent = '처리 중...';
+  const check = await mcFetch('/rest/v1/mc_users?username=eq.' + encodeURIComponent(id) + '&select=id', 'GET');
+  if (check.ok && check.data && check.data.length > 0) { msg.textContent = '이미 사용 중인 아이디입니다.'; return; }
+  const pwHash = btoa(encodeURIComponent(pw));
+  const ins = await mcFetch('/rest/v1/mc_users', 'POST', { username: id, pw_hash: pwHash, data: [{},{},{},{}] });
+  if (ins.ok) {
+    msg.className = 'mc-msg ok'; msg.textContent = '가입 완료! 로그인해 주세요.';
+    setTimeout(() => mcSwitchTab('login'), 1200);
+  } else {
+    msg.textContent = '가입 실패: ' + (ins.data && ins.data.message ? ins.data.message : ins.status);
+  }
+}
+
+/* ── 로그인 ─────────────────────────────────────── */
+async function mcDoLogin() {
+  const id  = document.getElementById('mc-login-id').value.trim();
+  const pw  = document.getElementById('mc-login-pw').value;
+  const msg = document.getElementById('mc-login-msg');
+  msg.className = 'mc-msg';
+  if (!id || !pw) { msg.textContent = '아이디와 비밀번호를 입력하세요.'; return; }
+  msg.textContent = '확인 중...';
+  const pwHash = btoa(encodeURIComponent(pw));
+  const res = await mcFetch('/rest/v1/mc_users?username=eq.' + encodeURIComponent(id) + '&pw_hash=eq.' + encodeURIComponent(pwHash) + '&select=id,username,data,career,memos', 'GET');
+  if (!res.ok || !res.data || res.data.length === 0) { msg.textContent = '아이디 또는 비밀번호가 틀렸습니다.'; return; }
+  const user = res.data[0];
+  // data: [{},{},{},{}] 형태로 저장
+  let savedData = user.data;
+  if (!Array.isArray(savedData) || savedData.length !== 4) savedData = [{},{},{},{}];
+  mcCurrentUser = { id: user.id, username: user.username, data: savedData, career: user.career || '', memos: Array.isArray(user.memos) ? user.memos : ['','','',''] };
+  localStorage.setItem('mc_user', JSON.stringify(mcCurrentUser));
+  closeMyCurriculumModal();
+  mcOpenScreen();
+}
+
+/* ── 설계 화면 열기 ─────────────────────────────── */
+function mcOpenScreen() {
+  document.getElementById('mc-screen-user').textContent = '학생: ' + mcCurrentUser.username;
+  // 저장된 선택 복원
+  const d = mcCurrentUser.data;
+  if (Array.isArray(d) && d.length === 4) {
+    mcSelections = d.map(item => (typeof item === 'object' && item !== null && !Array.isArray(item)) ? item : {});
+  } else {
+    mcSelections = [{},{},{},{}];
+  }
+  // 희망 진로 복원
+  const careerInput = document.getElementById('mc-career-input');
+  const careerSaved = document.getElementById('mc-career-saved');
+  if (careerInput) careerInput.value = mcCurrentUser.career || '';
+  if (careerSaved) { careerSaved.textContent = ''; careerSaved.className = 'mc-career-saved'; }
+  // 학기별 메모 복원
+  const memos = mcCurrentUser.memos || ['','','',''];
+  for (let i = 0; i < 4; i++) {
+    const el = document.getElementById('mc-memo-' + i);
+    if (el) el.value = memos[i] || '';
+  }
+  document.getElementById('mc-save-status').textContent = '';
+  document.getElementById('mycurriculum-screen').classList.add('open');
+  document.body.classList.add('sem-open');
+  // semesterData 로드 완료 후 렌더 (이미 로드된 경우 즉시)
+  if (Array.isArray(semesterData) && semesterData.length === 4) {
+    mcRenderAll();
+  } else {
+    // 아직 로드 안 됐으면 500ms 후 재시도
+    setTimeout(mcRenderAll, 600);
+  }}
+
+/* ── 설계 화면 닫기 ─────────────────────────────── */
+function closeMyCurriculumScreen() {
+  document.getElementById('mycurriculum-screen').classList.remove('open');
+  document.body.classList.remove('sem-open');
+}
+
+/* ── 자동 저장 (디바운스 2초) ───────────────────── */
+/* ── 학기별 메모 입력 핸들러 ────────────────────── */
+let mcMemoTimers = [null, null, null, null];
+function mcMemoInput(colIdx) {
+  const val = document.getElementById('mc-memo-' + colIdx)?.value || '';
+  if (!mcCurrentUser) return;
+  if (mcMemoTimers[colIdx]) clearTimeout(mcMemoTimers[colIdx]);
+  mcMemoTimers[colIdx] = setTimeout(async () => {
+    if (!mcCurrentUser.memos) mcCurrentUser.memos = ['','','',''];
+    mcCurrentUser.memos[colIdx] = val;
+    await mcFetch('/rest/v1/mc_users?id=eq.' + mcCurrentUser.id, 'PATCH', { memos: mcCurrentUser.memos });
+    localStorage.setItem('mc_user', JSON.stringify(mcCurrentUser));
+  }, 1500);
+}
+
+/* ── 희망 진로 입력 핸들러 ──────────────────────── */
+let mcCareerTimer = null;
+function mcCareerInput() {
+  const val = document.getElementById('mc-career-input').value;
+  const saved = document.getElementById('mc-career-saved');
+  if (saved) { saved.textContent = '입력 중...'; saved.className = 'mc-career-saved'; }
+  if (mcCareerTimer) clearTimeout(mcCareerTimer);
+  mcCareerTimer = setTimeout(async () => {
+    if (!mcCurrentUser) return;
+    if (saved) { saved.textContent = '저장 중...'; }
+    const res = await mcFetch('/rest/v1/mc_users?id=eq.' + mcCurrentUser.id, 'PATCH', { career: val });
+    if (res.ok || res.status === 204) {
+      mcCurrentUser.career = val;
+      localStorage.setItem('mc_user', JSON.stringify(mcCurrentUser));
+      if (saved) { saved.textContent = '저장됨 ✓'; saved.className = 'mc-career-saved ok'; }
+      setTimeout(() => { if (saved) { saved.textContent = ''; saved.className = 'mc-career-saved'; } }, 2000);
+    } else {
+      // DB 컬럼 없어도 로컬에는 저장
+      mcCurrentUser.career = val;
+      localStorage.setItem('mc_user', JSON.stringify(mcCurrentUser));
+      if (saved) { saved.textContent = '저장됨 ✓'; saved.className = 'mc-career-saved ok'; }
+      setTimeout(() => { if (saved) { saved.textContent = ''; saved.className = 'mc-career-saved'; } }, 2000);
+    }
+  }, 1500);
+}
+
+function mcAutoSave() {
+  const s = document.getElementById('mc-save-status');
+  if (s) s.textContent = '저장 준비 중...';
+  if (mcSaveTimer) clearTimeout(mcSaveTimer);
+  mcSaveTimer = setTimeout(mcSaveAll, 2000);
+}
+
+/* ── 저장 ───────────────────────────────────────── */
+async function mcSaveAll() {
+  if (!mcCurrentUser) return;
+  const s = document.getElementById('mc-save-status');
+  if (s) s.textContent = '저장 중...';
+  const res = await mcFetch('/rest/v1/mc_users?id=eq.' + mcCurrentUser.id, 'PATCH', { data: mcSelections });
+  if (res.ok || res.status === 204) {
+    mcCurrentUser.data = mcSelections;
+    localStorage.setItem('mc_user', JSON.stringify(mcCurrentUser));
+    const now = new Date();
+    if (s) s.textContent = '저장됨 ' + now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+  } else {
+    if (s) s.textContent = '저장 실패';
+  }
+}
+
+/* ── 로그아웃 ───────────────────────────────────── */
+function mcDoLogout() {
+  mcCurrentUser = null;
+  localStorage.removeItem('mc_user');
+  closeMyCurriculumScreen();
+}
+</script>
 
 </body>
 </html>
