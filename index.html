@@ -3587,7 +3587,6 @@
     background: rgba(26,107,191,0.05);
     border-top: 2px solid rgba(26,107,191,0.15);
     margin-top: 4px;
-    position: sticky; top: 0; z-index: 1;
   }
   .mc-pick-cat-header:first-child { margin-top: 0; border-top: none; }
   .mc-pick-cat-name {
@@ -10644,13 +10643,17 @@ window.addEventListener('resize', function() {
         <div class="mc-grad-label">3학년</div>
         <div class="mc-grad-val" id="mc-grad-y3-val">0 <span class="mc-grad-denom">학점</span></div>
       </div>
+      <div class="mc-grad-item">
+        <div class="mc-grad-label">창의적 체험활동</div>
+        <div class="mc-grad-val">18 <span class="mc-grad-denom">학점</span></div>
+      </div>
       <div class="mc-grad-total-item">
         <div class="mc-grad-total-label">총 이수학점</div>
-        <div class="mc-grad-total-val" id="mc-grad-tot-val">58 <span class="mc-grad-total-denom">/ 192학점</span></div>
+        <div class="mc-grad-total-val" id="mc-grad-tot-val">76 <span class="mc-grad-total-denom">/ 192학점</span></div>
         <div class="mc-grad-total-bar-track">
-          <div class="mc-grad-total-bar-fill" id="mc-grad-tot-bar" style="width:30.2%;"></div>
+          <div class="mc-grad-total-bar-fill" id="mc-grad-tot-bar" style="width:39.6%;"></div>
         </div>
-        <div class="mc-grad-pct" id="mc-grad-tot-pct" style="margin-top:2px;">30% 달성</div>
+        <div class="mc-grad-pct" id="mc-grad-tot-pct" style="margin-top:2px;">40% 달성</div>
       </div>
     </div>
   </div>
@@ -10915,11 +10918,12 @@ function mcCalcColCredits(colIdx) {
 
 function mcUpdateGradCalc() {
   const YEAR1 = 58;
+  const CREATIVE = 18;
   const TOTAL_MAX = 192;
 
   const y2 = mcCalcColCredits(0) + mcCalcColCredits(1);
   const y3 = mcCalcColCredits(2) + mcCalcColCredits(3);
-  const tot = YEAR1 + y2 + y3;
+  const tot = YEAR1 + CREATIVE + y2 + y3;
   const totPct = Math.min(100, Math.round((tot / TOTAL_MAX) * 100));
 
   const y2ValEl  = document.getElementById('mc-grad-y2-val');
