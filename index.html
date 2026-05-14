@@ -1754,13 +1754,7 @@
   .sem-subj-cat { font-size: 13px; letter-spacing: 0.5px; margin-top: 1px; opacity: 0.75; }
   .sem-subj-arrow { font-size: 13px; color: rgba(201,168,76,0.60); flex-shrink: 0; transition: color 0.2s; }
   .sem-subj-card:hover .sem-subj-arrow { color: var(--gold); }
-  .btn-sem-subj-del {
-    display: none; background: none; border: none; color: rgba(26,46,74,0.30);
-    font-size: 12px; cursor: pointer; padding: 2px 4px; transition: color 0.2s; flex-shrink: 0;
-    line-height: 1;
-  }
-  .sem-subj-card:hover .btn-sem-subj-del { display: flex; }
-  .btn-sem-subj-del:hover { color: var(--danger); }
+  .btn-sem-subj-del { display: none !important; }
   .sem-empty { text-align: center; padding: 20px 6px; color: rgba(26,46,74,0.58); font-size: 10px; letter-spacing: 0.5px; line-height: 2.2; }
 
   /* 과목 선택 모달 */
@@ -4137,6 +4131,14 @@
   .subtype-calc-val.val-진로 { color: #7a3aaa; }
   .subtype-calc-val.val-융합 { color: #1a7a5a; }
   .subtype-calc-unit { font-size: 10px; color: rgba(26,46,74,0.40); font-weight: 400; }
+  .subtype-calc-count {
+    margin-top: 6px;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
+    padding: 2px 9px; border-radius: 99px;
+  }
+  .subtype-calc-count.tag-일반 { background: rgba(74,143,192,0.10); color: #2a6090; }
+  .subtype-calc-count.tag-진로 { background: rgba(154,106,191,0.10); color: #7a3aaa; }
+  .subtype-calc-count.tag-융합 { background: rgba(60,158,122,0.10); color: #1a7a5a; }
   .subtype-calc-notice {
     padding: 8px 14px;
     font-size: 10px; color: rgba(26,46,74,0.42); letter-spacing: 0.3px; line-height: 1.5;
@@ -8319,8 +8321,7 @@ function renderSemCol(colIdx) {
         <div class="sem-subj-cat" style="color:${_catColor}">${cat}</div>
       </div>
       ${gradeIconHtml}
-      <span class="sem-subj-arrow">›</span>
-      <button class="btn-sem-subj-del" onclick="event.stopPropagation();removeSemSubj(${colIdx},${itemIdx})">×</button>`;
+      <span class="sem-subj-arrow">›</span>`;
     card.addEventListener('click', () => {
       if (!s) return;
       openDetail(s, 'semester', colIdx);
@@ -11559,16 +11560,19 @@ window.addEventListener('resize', function() {
             <span class="subtype-calc-tag tag-일반">일반선택</span>
             <div class="subtype-calc-val val-일반" id="subtype-credit-일반">0</div>
             <div class="subtype-calc-unit">학점</div>
+            <div class="subtype-calc-count tag-일반" id="subtype-count-일반">0과목</div>
           </div>
           <div class="subtype-calc-cell">
             <span class="subtype-calc-tag tag-진로">진로선택</span>
             <div class="subtype-calc-val val-진로" id="subtype-credit-진로">0</div>
             <div class="subtype-calc-unit">학점</div>
+            <div class="subtype-calc-count tag-진로" id="subtype-count-진로">0과목</div>
           </div>
           <div class="subtype-calc-cell">
             <span class="subtype-calc-tag tag-융합">융합선택</span>
             <div class="subtype-calc-val val-융합" id="subtype-credit-융합">0</div>
             <div class="subtype-calc-unit">학점</div>
+            <div class="subtype-calc-count tag-융합" id="subtype-count-융합">0과목</div>
           </div>
         </div>
         <div class="subtype-calc-notice">학기별 개설과목에서 각 과목의 선택유형(일반/진로/융합)을 기준으로 학생이 선택한 과목의 학점을 합산합니다.</div>
@@ -12611,8 +12615,9 @@ function mcCalcSubtypeCredits() {
   });
 
   const totals = { '일반': 0, '진로': 0, '융합': 0 };
+  const counts = { '일반': 0, '진로': 0, '융합': 0 };
 
-  // mcSelections를 순회하며 각 과목의 subtype에 따라 학점 합산
+  // mcSelections를 순회하며 각 과목의 subtype에 따라 학점·과목수 합산
   (mcSelections || [{},{},{},{}]).forEach((semSel, colIdx) => {
     Object.entries(semSel).forEach(([catKey, names]) => {
       if (!Array.isArray(names)) return;
@@ -12620,18 +12625,21 @@ function mcCalcSubtypeCredits() {
         const st = subtypeMap[name] || '일반';
         const credit = mcGetSubjectCredit(name, catKey);
         totals[st] = (totals[st] || 0) + credit;
+        counts[st] = (counts[st] || 0) + 1;
       });
     });
   });
 
-  return totals;
+  return { totals, counts };
 }
 
 function renderSubtypeCalc() {
-  const totals = mcCalcSubtypeCredits();
+  const { totals, counts } = mcCalcSubtypeCredits();
   ['일반', '진로', '융합'].forEach(st => {
-    const el = document.getElementById('subtype-credit-' + st);
-    if (el) el.textContent = totals[st];
+    const creditEl = document.getElementById('subtype-credit-' + st);
+    if (creditEl) creditEl.textContent = totals[st];
+    const countEl = document.getElementById('subtype-count-' + st);
+    if (countEl) countEl.textContent = counts[st] + '과목';
   });
 }
 
