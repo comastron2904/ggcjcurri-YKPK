@@ -3955,6 +3955,10 @@
     display: flex; flex-direction: column; overflow: hidden;
     border-radius: 2px;
   }
+  @media (max-width: 600px) {
+    #mc-helper-modal { padding: 12px 10px; align-items: flex-end; }
+    .mc-helper-box { max-height: 92vh; border-radius: 8px 8px 2px 2px; }
+  }
   .mc-helper-header {
     background: linear-gradient(135deg, #1aae8a, #0e7a5c);
     padding: 18px 22px 14px;
@@ -4016,6 +4020,28 @@
   }
   .helper-detail-list {
     margin-top: 8px; display: flex; flex-direction: column; gap: 5px;
+  }
+
+  /* 모바일: 각 카드별 스크롤 영역 */
+  @media (max-width: 600px) {
+    .helper-card {
+      display: flex;
+      flex-direction: column;
+    }
+    .helper-card-head {
+      flex-shrink: 0;
+    }
+    .helper-card-body {
+      max-height: 36vh;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .helper-card-body::-webkit-scrollbar { width: 3px; }
+    .helper-card-body::-webkit-scrollbar-thumb { background: rgba(14,138,122,0.35); border-radius: 2px; }
+    /* 스크롤 가능 표시용 페이드 힌트 */
+    .helper-card-body-wrap {
+      position: relative;
+    }
   }
   .helper-detail-row {
     display: flex; align-items: flex-start; gap: 8px;
