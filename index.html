@@ -3038,12 +3038,17 @@
   @media (max-width:700px) {
     .gb-header {
       flex-wrap: wrap;
-      gap: 10px;
-      padding: 14px 16px 12px;
+      gap: 8px;
+      padding: 12px 14px 10px;
+      align-items: center;
     }
-    .gb-header-info { order: 2; width: 100%; flex: none; }
-    .gb-back-btn { order: 1; }
-    .gb-edit-btn { order: 3; }
+    /* 1행: 뒤로 + 쪽이동 + 다운로드 버튼 */
+    .gb-back-btn { order: 1; flex-shrink: 0; padding: 8px 14px; font-size: 12px; }
+    .gb-jump-trigger-btn { order: 2; flex-shrink: 0; padding: 7px 12px; font-size: 12px; }
+    .gb-download-btn { order: 3; flex-shrink: 0; padding: 7px 12px; font-size: 12px; height: auto; }
+    .gb-edit-btn { order: 4; flex-shrink: 0; padding: 7px 12px; font-size: 12px; }
+    /* 2행: 제목 정보 */
+    .gb-header-info { order: 5; width: 100%; flex: none; }
   }
 
   /* 단일 PDF 스프레드 뷰 레이아웃 */
