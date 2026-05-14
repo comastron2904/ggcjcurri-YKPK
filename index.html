@@ -3685,6 +3685,78 @@
     .mc-career-hero-input { font-size: 16px; }
   }
 
+  /* ══════════════════════════════════════
+     모바일 전용: 헤더 완전 재구성
+  ══════════════════════════════════════ */
+  @media (max-width: 900px) {
+    /* 기존 mc-header-top: 뒤로+제목 한 줄, 나머지 버튼 숨김 */
+    .mc-header-top {
+      padding: 10px 12px 8px !important;
+      gap: 8px !important;
+      flex-wrap: nowrap;
+      align-items: center;
+    }
+    /* 로그아웃, 이수학점 계산기, 세트과목, 도우미 — 1행에서 숨김 */
+    .mc-header-top .mc-logout-btn,
+    .mc-header-top #mc-ai-btn,
+    .mc-header-top #mc-sets-btn,
+    .mc-header-top #mc-helper-btn {
+      display: none !important;
+    }
+    /* 제목 텍스트 간소화 */
+    .mc-header-top .sem-header-label { display: none; }
+    .mc-header-top .sem-header-title { font-size: 16px !important; }
+
+    /* mc-header-bottom: 모바일에서 flex-column */
+    .mc-header-bottom {
+      flex-direction: column !important;
+      align-items: stretch !important;
+      min-height: unset !important;
+      padding: 0 !important;
+      gap: 0 !important;
+    }
+    /* 진로 입력 영역: compact */
+    .mc-career-hero {
+      border-right: none !important;
+      border-bottom: 1px solid rgba(255,255,255,0.12);
+      padding: 10px 14px !important;
+      gap: 10px !important;
+    }
+    .mc-career-hero-icon { font-size: 18px !important; }
+    .mc-career-hero-label { margin-bottom: 1px !important; }
+    .mc-career-hero-input {
+      font-size: 15px !important;
+      font-weight: 600 !important;
+    }
+
+    /* 모바일 전용 버튼 줄 (진로 배너 아래) */
+    .mc-mobile-action-row {
+      display: flex !important;
+      align-items: center;
+      background: rgba(0,0,0,0.15);
+    }
+    .mc-mobile-action-row .mc-mob-btn {
+      flex: 1;
+      padding: 9px 4px;
+      background: none;
+      border: none;
+      border-right: 1px solid rgba(255,255,255,0.10);
+      color: rgba(255,255,255,0.90);
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 11px; font-weight: 600;
+      cursor: pointer; text-align: center;
+      letter-spacing: 0.3px;
+      transition: background 0.15s;
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+    }
+    .mc-mobile-action-row .mc-mob-btn:last-child { border-right: none; }
+    .mc-mobile-action-row .mc-mob-btn:active { background: rgba(255,255,255,0.10); }
+    .mc-mobile-action-row .mc-mob-icon { font-size: 15px; line-height: 1; }
+    .mc-mobile-action-row .mc-mob-logout { color: rgba(255,160,160,0.90); }
+  }
+  /* 데스크탑: 모바일 버튼 줄 숨김 */
+  .mc-mobile-action-row { display: none; }
+
   .mc-logout-btn {
     padding: 8px 16px; height: 36px;
     background: none; border: 1px solid rgba(214,48,48,0.35);
@@ -11517,6 +11589,26 @@ window.addEventListener('resize', function() {
         </div>
         <div class="mc-grad-pct" id="mc-grad-tot-pct" style="margin-top:2px;">40% 달성</div>
       </div>
+    </div>
+
+    <!-- 모바일 전용 버튼 줄 (PC에서는 CSS로 숨김) -->
+    <div class="mc-mobile-action-row">
+      <button class="mc-mob-btn" onclick="openMcAiModal()">
+        <span class="mc-mob-icon">✦</span>
+        <span>이수학점 계산기</span>
+      </button>
+      <button class="mc-mob-btn" onclick="openSetsViewer()">
+        <span class="mc-mob-icon">🔗</span>
+        <span>세트과목</span>
+      </button>
+      <button class="mc-mob-btn" onclick="openMcHelperModal()" style="position:relative;">
+        <span class="mc-mob-icon">💡</span>
+        <span>도우미</span>
+      </button>
+      <button class="mc-mob-btn mc-mob-logout" onclick="mcDoLogout()">
+        <span class="mc-mob-icon">↩</span>
+        <span>로그아웃</span>
+      </button>
     </div>
   </div>
 
