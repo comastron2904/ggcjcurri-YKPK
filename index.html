@@ -3941,6 +3941,11 @@
               </div>
             </div>
           </div>
+          <!-- 읽기 전용 모드에서 등급산출여부를 텍스트박스(아이콘+텍스트)로 표시 -->
+          <div id="grade-readonly-box" style="display:none; background:rgba(26,107,191,0.04); border:1px solid rgba(26,107,191,0.18); padding:10px 14px; align-items:center; gap:8px;">
+            <span id="grade-readonly-badge" style="font-size:11px; font-weight:700; padding:2px 7px; border:1px solid; border-radius:2px;"></span>
+            <span id="grade-readonly-label" style="font-size:14px; font-weight:500; color:var(--white);"></span>
+          </div>
           <input type="hidden" id="info-grade" value="" />
         </div>
         <div class="info-field" style="grid-column:1/-1;">
@@ -5914,20 +5919,47 @@ function applyReadOnly(readOnly) {
     const el = document.getElementById(id);
     if (el) el.readOnly = readOnly;
   });
-  // 과목군 변경 select: 편집 모드(semester/catsubj)에서도 항상 표시 (과목군 이동 기능)
+  // 과목군 변경 select: 편집 모드에서만 드롭다운 표시, 읽기 모드에서는 텍스트 태그만 표시
   const catTag = document.getElementById('detail-cat');
   const catSel = document.getElementById('detail-cat-select');
   if (catTag && catSel) {
-    // 항상 select를 보여주고 tag는 숨김 (관리자/편집 모드 모두 동일하게)
-    catTag.style.display = 'none';
-    catSel.style.display = '';
+    if (readOnly) {
+      // 읽기 전용: 텍스트 태그 보이고, select 드롭다운 숨김
+      catTag.style.display = '';
+      catSel.style.display = 'none';
+    } else {
+      // 편집 모드: select 드롭다운 보이고, 텍스트 태그 숨김
+      catTag.style.display = 'none';
+      catSel.style.display = '';
+    }
   }
-  // 등급 드롭다운 — 항상 클릭 가능하게 유지 (보기 전용 모드에서도 확인 가능)
-  const gradeTrigger = document.getElementById('grade-picker-trigger');
-  if (gradeTrigger) {
-    gradeTrigger.disabled = false;
-    gradeTrigger.style.pointerEvents = '';
-    gradeTrigger.style.opacity = '';
+  // 등급산출여부: 읽기 모드에서는 드롭다운 숨기고 텍스트박스로만 표시
+  const gradePicker = document.getElementById('grade-picker');
+  const gradeReadonlyBox = document.getElementById('grade-readonly-box');
+  if (gradePicker && gradeReadonlyBox) {
+    if (readOnly) {
+      gradePicker.style.display = 'none';
+      const gradeVal = (document.getElementById('info-grade') || {}).value || '';
+      const LABELS = { '등급': '등급&성취도', '성취': '성취도', 'pf': 'P/F' };
+      const BADGES = { '등급': '등급', '성취': '성취', 'pf': 'P/F' };
+      const BADGE_STYLES = {
+        '등급': 'background:rgba(10,160,80,0.12);border-color:rgba(10,160,80,0.55);color:#0a8040;',
+        '성취': 'background:rgba(26,107,191,0.12);border-color:rgba(26,107,191,0.50);color:#1a5faa;',
+        'pf':   'background:rgba(200,120,20,0.12);border-color:rgba(200,120,20,0.50);color:#b06010;'
+      };
+      const badge = document.getElementById('grade-readonly-badge');
+      const label = document.getElementById('grade-readonly-label');
+      if (badge) {
+        badge.textContent = BADGES[gradeVal] || '';
+        badge.style.cssText = 'font-size:11px;font-weight:700;padding:2px 7px;border:1px solid;border-radius:2px;' + (BADGE_STYLES[gradeVal] || 'display:none;');
+        badge.style.display = gradeVal ? '' : 'none';
+      }
+      if (label) label.textContent = LABELS[gradeVal] || gradeVal || '—';
+      gradeReadonlyBox.style.display = 'flex';
+    } else {
+      gradePicker.style.display = '';
+      gradeReadonlyBox.style.display = 'none';
+    }
   }
   // 기본 정보 저장 버튼 영역
   const saveBar = document.querySelector('.info-save-bar');
@@ -5935,8 +5967,6 @@ function applyReadOnly(readOnly) {
   // 블록 추가 버튼 영역
   const blockAddBar = document.querySelector('.block-add-bar');
   if (blockAddBar) blockAddBar.style.display = readOnly ? 'none' : 'flex';
-  // 과목군 변경 버튼: readOnly 모드에서도 과목군 select는 항상 활성화
-  if (catSel) catSel.disabled = false;
 }
 
 function closeDetail() {
