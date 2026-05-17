@@ -3931,7 +3931,26 @@
   @media (max-width: 900px) {
     .mc-teacher-grade-wrap { gap: 7px; }
     .mc-tbar-btn { padding: 4px 9px; font-size: 11px; }
+    /* 모바일: 버튼식 학년/반 숨기고 인풋식 표시 */
+    .mc-tbar-group-btn { display: none !important; }
+    .mc-tbar-group-input { display: flex !important; }
   }
+  @media (min-width: 901px) {
+    /* 데스크탑: 인풋식 학년/반 숨기고 버튼식 표시 */
+    .mc-tbar-group-btn { display: flex; }
+    .mc-tbar-group-input { display: none !important; }
+  }
+  .mc-tbar-group-input {
+    align-items: center; gap: 6px;
+  }
+  .mc-tbar-num-input-sm {
+    width: 52px; padding: 5px 8px; text-align: center;
+    background: rgba(255,255,255,0.90); border: 1px solid rgba(26,107,191,0.28);
+    color: var(--white); font-family: 'Noto Sans KR', sans-serif;
+    font-size: 14px; outline: none;
+    transition: border-color 0.2s;
+  }
+  .mc-tbar-num-input-sm:focus { border-color: var(--gold); }
 
   /* 선생님 모드일 때 저장바 / 진로입력 숨김 */
   .teacher-mode .mc-save-bar { display: none !important; }
@@ -11605,8 +11624,8 @@ window.addEventListener('resize', function() {
   <div class="mc-teacher-bar" id="mc-teacher-bar">
     <span class="mc-teacher-bar-label">👩‍🏫 교사 모드</span>
     <div class="mc-teacher-grade-wrap">
-      <!-- 학년 버튼 -->
-      <div class="mc-tbar-group">
+      <!-- 학년 버튼 (데스크탑) -->
+      <div class="mc-tbar-group mc-tbar-group-btn">
         <span class="mc-tbar-group-label">학년</span>
         <div class="mc-tbar-btn-row" id="mc-grade-btns">
           <button class="mc-tbar-btn" onclick="mcTeacherSelectGrade(1)">1학년</button>
@@ -11614,13 +11633,13 @@ window.addEventListener('resize', function() {
           <button class="mc-tbar-btn" onclick="mcTeacherSelectGrade(3)">3학년</button>
         </div>
       </div>
-      <!-- 반 버튼 (동적 생성) -->
-      <div class="mc-tbar-group" id="mc-class-group" style="display:none;">
+      <!-- 반 버튼 (동적 생성, 데스크탑) -->
+      <div class="mc-tbar-group mc-tbar-group-btn" id="mc-class-group" style="display:none;">
         <span class="mc-tbar-group-label">반</span>
         <div class="mc-tbar-btn-row" id="mc-class-btns"></div>
       </div>
-      <!-- 번호 입력 -->
-      <div class="mc-tbar-group" id="mc-num-group" style="display:none;">
+      <!-- 번호 입력 (데스크탑) -->
+      <div class="mc-tbar-group mc-tbar-group-btn" id="mc-num-group" style="display:none;">
         <span class="mc-tbar-group-label">번호</span>
         <div style="display:flex;align-items:center;gap:6px;">
           <input class="mc-tbar-num-input" id="mc-teacher-num-input"
@@ -11628,6 +11647,22 @@ window.addEventListener('resize', function() {
             onkeydown="if(event.key==='Enter')mcTeacherLookup()" />
           <button class="mc-teacher-search-btn" onclick="mcTeacherLookup()">🔍 조회</button>
         </div>
+      </div>
+      <!-- 학년·반·번호 인풋 (모바일) -->
+      <div class="mc-tbar-group-input" style="display:none;">
+        <span class="mc-tbar-group-label">학년</span>
+        <input class="mc-tbar-num-input-sm" id="mc-m-grade-input"
+          type="number" min="1" max="3" placeholder="1~3"
+          onkeydown="if(event.key==='Enter')document.getElementById('mc-m-class-input').focus()" />
+        <span class="mc-tbar-group-label" style="margin-left:4px;">반</span>
+        <input class="mc-tbar-num-input-sm" id="mc-m-class-input"
+          type="number" min="1" max="20" placeholder="반"
+          onkeydown="if(event.key==='Enter')document.getElementById('mc-m-num-input').focus()" />
+        <span class="mc-tbar-group-label" style="margin-left:4px;">번호</span>
+        <input class="mc-tbar-num-input-sm" id="mc-m-num-input"
+          type="number" min="1" max="40" placeholder="번호"
+          onkeydown="if(event.key==='Enter')mcTeacherLookupMobile()" />
+        <button class="mc-teacher-search-btn" onclick="mcTeacherLookupMobile()">🔍 조회</button>
       </div>
     </div>
     <span id="mc-teacher-viewing" style="font-size:12px;color:#1a5fad;font-weight:700;flex-shrink:0;margin-left:auto;"></span>
@@ -13356,6 +13391,49 @@ async function mcTeacherLookup() {
   }
 }
 
+/* 모바일 조회 버튼 */
+async function mcTeacherLookupMobile() {
+  const grade = parseInt(document.getElementById('mc-m-grade-input').value);
+  const cls   = parseInt(document.getElementById('mc-m-class-input').value);
+  const num   = parseInt(document.getElementById('mc-m-num-input').value);
+
+  if (!grade || grade < 1 || grade > 3) {
+    alert('학년을 1~3 사이로 입력해 주세요.');
+    document.getElementById('mc-m-grade-input').focus();
+    return;
+  }
+  if (!cls || cls < 1 || cls > 20) {
+    alert('올바른 반을 입력해 주세요.');
+    document.getElementById('mc-m-class-input').focus();
+    return;
+  }
+  if (!num || num < 1 || num > 40) {
+    alert('올바른 번호를 입력해 주세요. (1~40)');
+    document.getElementById('mc-m-num-input').focus();
+    return;
+  }
+
+  const btn = document.querySelector('.mc-tbar-group-input .mc-teacher-search-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '조회 중...'; }
+
+  try {
+    const url = `/rest/v1/mc_users?select=id,username,grade,class_num,student_num,data,career,memos`
+              + `&grade=eq.${grade}&class_num=eq.${cls}&student_num=eq.${num}&limit=1`;
+    const res = await mcFetch(url, 'GET');
+
+    if (!res.ok || !Array.isArray(res.data) || res.data.length === 0) {
+      alert(`${grade}학년 ${cls}반 ${num}번 학생을 찾을 수 없습니다.`);
+      return;
+    }
+    mcTeacherViewStudent(JSON.stringify(res.data[0]));
+  } catch(e) {
+    alert('조회 중 오류가 발생했습니다.');
+    console.error(e);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '🔍 조회'; }
+  }
+}
+
 function mcTeacherViewStudent(studentJson) {
   let student;
   try { student = JSON.parse(studentJson); } catch(e) { return; }
@@ -13416,6 +13494,12 @@ function mcTeacherResetView() {
 
   // 번호 입력 초기화
   document.getElementById('mc-teacher-num-input').value = '';
+  const mg = document.getElementById('mc-m-grade-input');
+  const mc = document.getElementById('mc-m-class-input');
+  const mn = document.getElementById('mc-m-num-input');
+  if (mg) mg.value = '';
+  if (mc) mc.value = '';
+  if (mn) mn.value = '';
 
   mcRenderAll();
 }
