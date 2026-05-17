@@ -4,20 +4,18 @@
 <script>
   window.__SUPABASE_URL__  = "https://vogmvbdyktptcajkpvcz.supabase.co";
   window.__SUPABASE_ANON__ = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZvZ212YmR5a3RwdGNhamtwdmN6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MjAzNjAsImV4cCI6MjA5MTM5NjM2MH0.kwlQs-gEs1QeRJDyeiveRZI8pI_WuojrnQR0OxVKYMg";
+  // 터치 반응성 개선
+  document.addEventListener('touchstart', function(){}, {passive: true});
 </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>2026 경기창조고 교육과정 박람회</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;900&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script>
-  // workerSrc를 직접 지정 (Blob fetch 변환 제거 → 초기 로딩 블로킹 해소)
-  pdfjsLib.GlobalWorkerOptions.workerSrc =
-    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-</script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;900&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;900&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet"></noscript>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" onload="pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
   :root {
     --deep-navy: #f0f4f8;
@@ -53,7 +51,7 @@
     color: rgba(26,107,191,0.95);
     font-size: 15px; cursor: pointer;
     /* backdrop-filter 제거: 모바일 합성 비용 절감 */
-    transition: all 0.25s ease;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
   }
   #edit-page-btn:hover {
     background: rgba(26,107,191,0.12); border-color: var(--gold);
@@ -69,7 +67,7 @@
     font-family: 'Noto Sans KR', sans-serif;
     font-size: 13px; font-weight: 700; letter-spacing: 1px;
     cursor: pointer; /* backdrop-filter 제거 */
-    transition: all 0.25s ease;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
   }
   #admin-btn:hover {
     background: rgba(26,107,191,0.12);
@@ -160,7 +158,7 @@
     padding: 5px 13px; font-size: 11px; letter-spacing: 1px;
     background: rgba(26,107,191,0.05); border: 1px solid rgba(26,107,191,0.18);
     color: rgba(26,46,74,0.65); font-family: 'Noto Sans KR', sans-serif;
-    cursor: pointer; transition: all 0.18s;
+    cursor: pointer; transition: background 0.18s, color 0.18s, border-color 0.18s, opacity 0.18s, transform 0.18s;
   }
   .pe-hl-tab:hover { border-color: var(--gold); color: var(--gold); }
   .pe-hl-tab.active { background: rgba(26,107,191,0.12); border-color: var(--gold); color: var(--gold); font-weight: 700; }
@@ -188,7 +186,7 @@
     padding: 5px 13px; font-size: 11px; letter-spacing: 1px;
     background: none; border: 1px solid rgba(214,48,48,0.30);
     color: rgba(214,48,48,0.65); font-family: 'Noto Sans KR', sans-serif;
-    cursor: pointer; transition: all 0.18s;
+    cursor: pointer; transition: background 0.18s, color 0.18s, border-color 0.18s, opacity 0.18s, transform 0.18s;
   }
   .pe-hl-clear-btn:hover { border-color: #d63030; color: #d63030; background: rgba(214,48,48,0.05); }
   .pe-hl-hint { font-size: 10px; letter-spacing: 1px; color: rgba(26,46,74,0.40); }
@@ -269,13 +267,13 @@
     flex: 1; padding: 10px 14px; text-align: left;
     background: rgba(26,107,191,0.05); border: 1px dashed rgba(26,107,191,0.28);
     color: rgba(26,46,74,0.60); font-family: 'Noto Sans KR', sans-serif;
-    font-size: 12px; cursor: pointer; transition: all 0.2s; letter-spacing: 0.5px;
+    font-size: 12px; cursor: pointer; transition: background 0.2s, color 0.2s, border-color 0.2s, opacity 0.2s, transform 0.2s; letter-spacing: 0.5px;
   }
   .btn-pe-bg-upload:hover { border-color: var(--gold); color: var(--gold); background: rgba(26,107,191,0.08); }
   .btn-pe-bg-remove {
     padding: 10px 12px; background: none;
     border: 1px solid rgba(26,107,191,0.15); color: rgba(26,46,74,0.45);
-    font-size: 13px; cursor: pointer; transition: all 0.2s; flex-shrink: 0;
+    font-size: 13px; cursor: pointer; transition: background 0.2s, color 0.2s, border-color 0.2s, opacity 0.2s, transform 0.2s; flex-shrink: 0;
   }
   .btn-pe-bg-remove:hover { border-color: #d63030; color: #d63030; }
 
@@ -302,7 +300,7 @@
     border: 1px solid rgba(214,48,48,0.35); color: rgba(214,48,48,0.70);
     font-family: 'Noto Sans KR', sans-serif;
     font-size: 12px; font-weight: 700; cursor: pointer;
-    transition: all 0.2s; flex-shrink: 0; letter-spacing: 0.5px;
+    transition: background 0.2s, color 0.2s, border-color 0.2s, opacity 0.2s, transform 0.2s; flex-shrink: 0; letter-spacing: 0.5px;
   }
   .btn-pe-main-bg-remove:hover { border-color: #d63030; color: #d63030; background: rgba(214,48,48,0.06); }
   .btn-pe-main-bg-remove:disabled {
@@ -325,7 +323,7 @@
     display: flex; align-items: center; justify-content: center;
     opacity: 0; pointer-events: none;
     transition: opacity 0.28s ease;
-    backdrop-filter: blur(5px);
+    will-change: opacity;
   }
   .modal-backdrop.open { opacity: 1; pointer-events: all; }
 
@@ -338,6 +336,7 @@
     position: relative;
     transform: translateY(20px) scale(0.97);
     transition: transform 0.3s cubic-bezier(0.34,1.36,0.64,1);
+    will-change: transform;
   }
   .modal-backdrop.open .modal-box { transform: translateY(0) scale(1); }
 
@@ -362,7 +361,7 @@
   .pw-dot {
     width: 15px; height: 15px; border-radius: 50%;
     border: 2px solid rgba(26,107,191,0.35);
-    background: transparent; transition: all 0.18s ease;
+    background: transparent; transition: background 0.18s, color 0.18s, border-color 0.18s, opacity 0.18s, transform 0.18s;
   }
   .pw-dot.filled { background: var(--gold); border-color: var(--gold); }
   .pw-dot.error  { border-color: var(--danger); background: var(--danger); }
@@ -377,7 +376,7 @@
     color: var(--white);
     font-family: 'Noto Sans KR', sans-serif;
     font-size: 19px; font-weight: 700;
-    cursor: pointer; transition: all 0.16s ease;
+    cursor: pointer; transition: background 0.16s, color 0.16s, border-color 0.16s, opacity 0.16s, transform 0.16s;
   }
   .pw-key:hover  { background: rgba(26,107,191,0.14); border-color: rgba(26,107,191,0.5); }
   .pw-key:active { transform: scale(0.93); }
@@ -439,7 +438,7 @@
     border: 1px solid rgba(26,107,191,0.18);
     color: rgba(26,46,74,0.80);
     font-size: 12px; font-family: 'Noto Sans KR', sans-serif;
-    cursor: pointer; transition: all 0.2s;
+    cursor: pointer; transition: background 0.2s, color 0.2s, border-color 0.2s, opacity 0.2s, transform 0.2s;
   }
   .cat-tab:hover { border-color: rgba(26,107,191,0.45); color: var(--white); }
   .cat-tab.active { background: rgba(26,107,191,0.15); border-color: var(--gold); color: var(--gold); font-weight: 700; }
@@ -468,7 +467,7 @@
     background: none; border: 1px solid rgba(26,107,191,0.18);
     color: rgba(26,46,74,0.75); font-size: 12px;
     padding: 5px 11px; cursor: pointer;
-    font-family: 'Noto Sans KR', sans-serif; transition: all 0.2s;
+    font-family: 'Noto Sans KR', sans-serif; transition: background 0.2s, color 0.2s, border-color 0.2s, opacity 0.2s, transform 0.2s;
   }
   .btn-edit:hover { border-color: var(--gold); color: var(--gold); }
   .btn-del:hover  { border-color: var(--danger); color: var(--danger); }
@@ -483,7 +482,7 @@
   .btn-close-admin {
     background: none; border: 1px solid rgba(26,107,191,0.20);
     color: rgba(26,46,74,0.75); font-size: 12px; padding: 6px 14px;
-    cursor: pointer; font-family: 'Noto Sans KR', sans-serif; letter-spacing: 1px; transition: all 0.2s;
+    cursor: pointer; font-family: 'Noto Sans KR', sans-serif; letter-spacing: 1px; transition: background 0.2s, color 0.2s, border-color 0.2s, opacity 0.2s, transform 0.2s;
   }
   .btn-close-admin:hover { border-color: rgba(26,107,191,0.50); color: var(--white); }
 
@@ -508,8 +507,9 @@
   #subject-detail {
     position: fixed; inset: 0; background: #f0f4f8; z-index: 750;
     display: flex; flex-direction: column;
-    opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+    opacity: 0; pointer-events: none; transition: opacity 0.18s ease;
     overflow-y: auto;
+    contain: layout style;
   }
   #subject-detail.open { opacity: 1; pointer-events: all; }
 
@@ -520,7 +520,6 @@
     border-bottom: 1px solid rgba(201,168,76,0.14);
     background: rgba(240,244,248,0.97);
     position: sticky; top: 0; z-index: 10;
-    backdrop-filter: blur(10px);
     display: flex; align-items: center; gap: 20px;
   }
   .detail-back {
@@ -528,7 +527,7 @@
     background: linear-gradient(135deg, rgba(26,107,191,0.15), rgba(14,74,138,0.08));
     border: 1.5px solid rgba(26,107,191,0.65); color: var(--gold);
     font-family: 'Noto Sans KR', sans-serif; font-size: 13px; font-weight: 700;
-    cursor: pointer; letter-spacing: 1px; transition: all 0.2s; flex-shrink: 0;
+    cursor: pointer; letter-spacing: 1px; transition: background 0.2s, color 0.2s, border-color 0.2s, opacity 0.2s, transform 0.2s; flex-shrink: 0;
     border-radius: 3px; box-shadow: 0 2px 10px rgba(26,107,191,0.18);
   }
   .detail-back:hover { background: rgba(26,107,191,0.22); border-color: var(--gold); box-shadow: 0 3px 16px rgba(26,107,191,0.30); transform: translateX(-2px); }
@@ -536,7 +535,7 @@
     display: inline-flex; align-items: center; justify-content: center;
     width: 38px; height: 38px; flex-shrink: 0;
     background: none; border: 1px solid rgba(26,107,191,0.30); color: rgba(26,107,191,0.75);
-    font-size: 16px; cursor: pointer; transition: all 0.25s;
+    font-size: 16px; cursor: pointer; transition: background 0.25s, color 0.25s, border-color 0.25s, opacity 0.25s, transform 0.25s;
   }
   .detail-home:hover { background: rgba(26,107,191,0.10); border-color: var(--gold); transform: translateY(-1px); }
   .detail-header-info { flex: 1; }
@@ -622,7 +621,7 @@
     border: 1px solid rgba(26,107,191,0.25);
     color: rgba(26,46,74,0.70);
     font-family: 'Noto Sans KR', sans-serif; font-size: 13px; font-weight: 500;
-    cursor: pointer; letter-spacing: 1px; transition: all 0.22s;
+    cursor: pointer; letter-spacing: 1px; transition: background 0.22s, color 0.22s, border-color 0.22s, opacity 0.22s, transform 0.22s;
     display: flex; align-items: center; gap: 8px;
   }
   .btn-block-add:hover { border-color: var(--gold); color: var(--gold); background: rgba(26,107,191,0.08); }
@@ -646,13 +645,13 @@
     padding: 5px 16px; background: rgba(26,107,191,0.06);
     border: 1px solid rgba(26,107,191,0.28); color: rgba(26,107,191,0.80);
     font-family: 'Noto Sans KR', sans-serif; font-size: 11px; font-weight: 600;
-    cursor: pointer; letter-spacing: 1px; transition: all 0.2s;
+    cursor: pointer; letter-spacing: 1px; transition: background 0.2s, color 0.2s, border-color 0.2s, opacity 0.2s, transform 0.2s;
   }
   .btn-block-save:hover { background: rgba(26,107,191,0.12); border-color: var(--gold); color: var(--gold); }
   .btn-block-del {
     padding: 5px 12px; background: none;
     border: 1px solid rgba(26,107,191,0.12); color: rgba(26,46,74,0.62);
-    font-size: 13px; cursor: pointer; transition: all 0.2s; line-height: 1;
+    font-size: 13px; cursor: pointer; transition: background 0.2s, color 0.2s, border-color 0.2s, opacity 0.2s, transform 0.2s; line-height: 1;
   }
   .btn-block-del:hover { border-color: var(--danger); color: var(--danger); }
 
@@ -763,7 +762,7 @@
   .btn-video-embed {
     padding: 10px 18px; background: rgba(26,158,92,0.1); border: 1px solid rgba(26,158,92,0.3);
     color: #1a9e5c; font-family: 'Noto Sans KR', sans-serif; font-size: 12px;
-    cursor: pointer; white-space: nowrap; transition: all 0.2s;
+    cursor: pointer; white-space: nowrap; transition: background 0.2s, color 0.2s, border-color 0.2s, opacity 0.2s, transform 0.2s;
   }
   .btn-video-embed:hover { background: rgba(26,158,92,0.2); }
   .media-video-frame {
@@ -783,7 +782,7 @@
     position: absolute; top: 8px; right: 8px;
     background: rgba(240,244,248,0.90); border: 1px solid rgba(26,107,191,0.18);
     color: rgba(26,46,74,0.45); font-size: 12px; cursor: pointer; padding: 3px 9px;
-    transition: all 0.2s; z-index: 2;
+    transition: background 0.2s, color 0.2s, border-color 0.2s, opacity 0.2s, transform 0.2s; z-index: 2;
   }
   .btn-media-del-top:hover { border-color: var(--danger); color: var(--danger); }
 
@@ -792,7 +791,7 @@
     padding: 9px 18px; background: rgba(240,248,244,0.70);
     border: 1px dashed rgba(14,138,122,0.25); color: rgba(14,138,122,0.60);
     font-family: 'Noto Sans KR', sans-serif; font-size: 12px; cursor: pointer;
-    transition: all 0.2s; letter-spacing: 0.5px;
+    transition: background 0.2s, color 0.2s, border-color 0.2s, opacity 0.2s, transform 0.2s; letter-spacing: 0.5px;
   }
   .btn-media-add:hover { border-color: rgba(26,158,92,0.55); color: #1a9e5c; background: rgba(26,158,92,0.06); }
 
@@ -873,7 +872,7 @@
     transform: translateX(-50%) translateY(18px);
     background: rgba(255,255,255,0.97); border: 1px solid var(--gold);
     color: var(--white); box-shadow: 0 4px 20px rgba(26,107,191,0.20); padding: 13px 28px; font-size: 13px; letter-spacing: 1px;
-    z-index: 9999; opacity: 0; pointer-events: none; transition: all 0.32s ease; white-space: nowrap;
+    z-index: 9999; opacity: 0; pointer-events: none; transition: background 0.32s, color 0.32s, border-color 0.32s, opacity 0.32s, transform 0.32s; white-space: nowrap;
   }
   #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
@@ -893,7 +892,7 @@
     position: relative; display: flex; align-items: center; gap: 18px; padding: 22px 26px;
     background: rgba(255,255,255,0.80); border: 1px solid rgba(26,107,191,0.30);
     color: var(--white); cursor: pointer; font-family: 'Noto Sans KR', sans-serif; text-align: left;
-    transition: all 0.32s cubic-bezier(0.25,0.46,0.45,0.94); overflow: hidden;
+    transition: max-height 0.32s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.32s cubic-bezier(0.25,0.46,0.45,0.94); overflow: hidden;
     animation: fadeSlideUp 0.6s ease both;
     box-shadow: 0 2px 12px rgba(0,0,0,0.25);
   }
@@ -910,7 +909,7 @@
   .nav-btn:hover .btn-number { opacity: 1; }
   .btn-title { flex: 1; font-size: 15px; font-weight: 700; color: rgba(26,46,74,0.92); letter-spacing: 0.3px; line-height: 1.4; transition: color 0.3s; }
   .nav-btn:hover .btn-title { color: var(--gold); }
-  .btn-arrow { font-size: 18px; color: rgba(201,168,76,0.85); transition: all 0.32s; flex-shrink: 0; }
+  .btn-arrow { font-size: 18px; color: rgba(201,168,76,0.85); transition: background 0.32s, color 0.32s, border-color 0.32s, opacity 0.32s, transform 0.32s; flex-shrink: 0; }
   .nav-btn:hover .btn-arrow { color: var(--gold); transform: translateX(4px); }
 
   .footer { text-align: center; padding: 22px; font-size: 10px; letter-spacing: 2px; color: rgba(26,46,74,0.60); border-top: 1px solid rgba(26,107,191,0.10); }
@@ -938,13 +937,12 @@
   #semester-screen {
     position: fixed; inset: 0; background: #f0f4f8; z-index: 700;
     display: flex; flex-direction: column;
-    opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+    opacity: 0; pointer-events: none; transition: opacity 0.18s ease;
     overflow: hidden;
-    /* will-change:opacity 제거: 항상 GPU 레이어 유지 → 스크롤 중 합성 비용 증가·흰 화면 플래시 */
     transform: translateZ(0);
     -webkit-transform: translateZ(0);
-    /* 배경 이미지 레이어가 absolute이므로 스크롤 컨텍스트 격리 필요 */
     isolation: isolate;
+    contain: layout style;
   }
   @media (max-width: 900px) {
     #semester-screen {
@@ -966,7 +964,7 @@
     background: linear-gradient(135deg, rgba(212,176,90,0.18), rgba(160,120,40,0.10));
     border: 1.5px solid rgba(201,168,76,0.65); color: var(--gold);
     font-family: 'Noto Sans KR', sans-serif; font-size: 13px; font-weight: 700;
-    cursor: pointer; letter-spacing: 1px; transition: all 0.2s; flex-shrink: 0;
+    cursor: pointer; letter-spacing: 1px; transition: background 0.2s, color 0.2s, border-color 0.2s, opacity 0.2s, transform 0.2s; flex-shrink: 0;
     border-radius: 3px; box-shadow: 0 2px 10px rgba(201,168,76,0.18);
   }
   .sem-back:hover { background: rgba(26,107,191,0.28); border-color: var(--gold); box-shadow: 0 3px 16px rgba(201,168,76,0.35); transform: translateX(-2px); }
@@ -983,7 +981,7 @@
     color: var(--gold-light);
     font-family: 'Noto Sans KR', sans-serif;
     font-size: 12px; font-weight: 700; letter-spacing: 1px;
-    cursor: pointer; transition: all 0.22s;
+    cursor: pointer; transition: background 0.22s, color 0.22s, border-color 0.22s, opacity 0.22s, transform 0.22s;
     white-space: nowrap; min-width: 130px; justify-content: space-between;
   }
   .sem-dropdown-btn:hover { background: rgba(201,168,76,0.22); border-color: rgba(201,168,76,1); }
@@ -1004,7 +1002,7 @@
     color: rgba(26,46,74,0.80);
     font-family: 'Noto Sans KR', sans-serif;
     font-size: 12px; font-weight: 700; letter-spacing: 0.8px;
-    cursor: pointer; text-align: left; transition: all 0.18s; white-space: nowrap;
+    cursor: pointer; text-align: left; transition: background 0.18s, color 0.18s, border-color 0.18s, opacity 0.18s, transform 0.18s; white-space: nowrap;
   }
   .sem-dropdown-item:last-child { border-bottom: none; }
   .sem-dropdown-item:hover { background: rgba(201,168,76,0.12); color: var(--gold-light); }
@@ -1020,7 +1018,7 @@
     color: rgba(201,168,76,0.8);
     font-family: 'Noto Sans KR', sans-serif;
     font-size: 12px; font-weight: 700; letter-spacing: 0.5px;
-    cursor: pointer; transition: all 0.22s; margin-left: 4px;
+    cursor: pointer; transition: background 0.22s, color 0.22s, border-color 0.22s, opacity 0.22s, transform 0.22s; margin-left: 4px;
   }
   .btn-sem-col-edit:hover {
     background: rgba(201,168,76,0.13); border-color: var(--gold);
@@ -1030,7 +1028,7 @@
   /* ── 세트과목 모달 ── */
   #sets-modal {
     display: none; position: fixed; inset: 0; z-index: 1100;
-    background: rgba(14,30,60,0.55); backdrop-filter: blur(5px);
+    background: rgba(14,30,60,0.55);
     align-items: center; justify-content: center; padding: 20px;
   }
   #sets-modal.open { display: flex; }
@@ -1085,7 +1083,7 @@
     background: none; border: 1px solid rgba(214,48,48,0.25);
     color: rgba(214,48,48,0.60); font-size: 12px; font-weight: 700;
     padding: 5px 10px; cursor: pointer; white-space: nowrap;
-    transition: all 0.15s;
+    transition: background 0.15s, color 0.15s, border-color 0.15s, opacity 0.15s, transform 0.15s;
   }
   .set-card-del:hover { background: rgba(214,48,48,0.06); border-color: #d63030; color: #d63030; }
 
@@ -1122,7 +1120,7 @@
     background: none; border: 1px dashed rgba(26,107,191,0.25);
     color: rgba(26,107,191,0.50); font-size: 12px; font-family: 'Noto Sans KR', sans-serif;
     padding: 5px 10px; cursor: pointer; text-align: left;
-    transition: all 0.15s;
+    transition: background 0.15s, color 0.15s, border-color 0.15s, opacity 0.15s, transform 0.15s;
   }
   .set-step-add:hover { border-color: #1a6bbf; color: #1a6bbf; background: rgba(26,107,191,0.04); }
 
@@ -1132,7 +1130,7 @@
     background: none; border: 1.5px dashed rgba(201,168,76,0.35);
     color: rgba(201,168,76,0.70); font-family: 'Noto Sans KR', sans-serif;
     font-size: 13px; font-weight: 700; cursor: pointer; margin-bottom: 14px;
-    transition: all 0.15s;
+    transition: background 0.15s, color 0.15s, border-color 0.15s, opacity 0.15s, transform 0.15s;
   }
   .sets-add-btn:hover { border-color: var(--gold); color: var(--gold); background: rgba(201,168,76,0.05); }
 
@@ -1172,7 +1170,7 @@
     background: linear-gradient(135deg, #1a9e5c, #0e7a50);
     border: none; color: #fff; font-family: 'Noto Sans KR', sans-serif;
     font-size: 13px; font-weight: 700; cursor: pointer;
-    box-shadow: 0 3px 10px rgba(26,158,92,0.25); transition: all 0.2s;
+    box-shadow: 0 3px 10px rgba(26,158,92,0.25); transition: background 0.2s, color 0.2s, border-color 0.2s, opacity 0.2s, transform 0.2s;
   }
   .sets-save-btn:hover { box-shadow: 0 5px 16px rgba(26,158,92,0.35); transform: translateY(-1px); }
   .sets-save-ok { font-size: 12px; color: #1a9e5c; font-weight: 700; opacity: 0; transition: opacity 0.3s; }
@@ -1261,7 +1259,7 @@
     background: none; border: none;
     color: rgba(26,46,74,0.40);
     border-bottom: 2px solid transparent;
-    margin-bottom: -2px; transition: all 0.15s;
+    margin-bottom: -2px; transition: background 0.15s, color 0.15s, border-color 0.15s, opacity 0.15s, transform 0.15s;
   }
   .sem-edit-tab:hover { color: rgba(26,46,74,0.70); }
   .sem-edit-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
@@ -1630,7 +1628,7 @@
     padding: 5px 10px; width: 100%;
     background: rgba(255,255,255,0.60); border: 1px solid rgba(26,107,191,0.14);
     color: rgba(26,46,74,0.50); font-family: 'Noto Sans KR', sans-serif;
-    font-size: 10px; font-weight: 600; cursor: pointer; letter-spacing: 0.5px; transition: all 0.22s;
+    font-size: 10px; font-weight: 600; cursor: pointer; letter-spacing: 0.5px; transition: background 0.22s, color 0.22s, border-color 0.22s, opacity 0.22s, transform 0.22s;
   }
   .btn-sem-add.req-add { border-color: rgba(232,130,106,0.28); color: rgba(232,130,106,0.7); background: rgba(232,130,106,0.05); }
   .btn-sem-add.req-add:hover { background: rgba(232,130,106,0.15); border-color: #e8826a; color: #e8826a; }
@@ -1765,7 +1763,7 @@
   .spf-tab {
     padding: 5px 12px; font-size: 11px; font-family: 'Noto Sans KR', sans-serif;
     background: rgba(26,107,191,0.05); border: 1px solid rgba(26,107,191,0.18);
-    color: rgba(26,46,74,0.78); cursor: pointer; transition: all 0.18s;
+    color: rgba(26,46,74,0.78); cursor: pointer; transition: background 0.18s, color 0.18s, border-color 0.18s, opacity 0.18s, transform 0.18s;
   }
   .spf-tab:hover { border-color: rgba(26,107,191,0.45); color: var(--white); }
   .spf-tab.active { background: rgba(26,107,191,0.14); border-color: var(--gold); color: var(--gold); font-weight: 700; }
@@ -1786,7 +1784,7 @@
   .spj-check {
     width: 18px; height: 18px; border: 1.5px solid rgba(26,107,191,0.30);
     display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0; font-size: 11px; transition: all 0.18s;
+    flex-shrink: 0; font-size: 11px; transition: background 0.18s, color 0.18s, border-color 0.18s, opacity 0.18s, transform 0.18s;
   }
   .spj-item.selected .spj-check { background: var(--gold); border-color: var(--gold); color: #ffffff; font-weight: 700; }
   .spj-item.already .spj-check { background: rgba(26,107,191,0.15); border-color: var(--gold); color: var(--gold); font-weight: 700; }
@@ -1995,7 +1993,7 @@
     color: rgba(16,82,160,0.80);
     font-family: 'Noto Sans KR', sans-serif;
     font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
-    cursor: pointer; transition: all 0.18s;
+    cursor: pointer; transition: background 0.18s, color 0.18s, border-color 0.18s, opacity 0.18s, transform 0.18s;
     border-radius: 3px; white-space: nowrap;
   }
   .sem-mobile-tab:hover { background: rgba(201,168,76,0.20); border-color: rgba(201,168,76,0.80); }
@@ -2014,6 +2012,7 @@
     position: fixed; inset: 0; background: #f0f4f8; z-index: 700;
     display: flex; flex-direction: column;
     opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+    will-change: opacity; contain: layout style;
     overflow: hidden;
   }
   #catsubj-screen.open { opacity: 1; pointer-events: all; }
@@ -2033,7 +2032,7 @@
     display: flex; align-items: center; gap: 10px;
     padding: 13px 18px; cursor: pointer;
     border-left: 3px solid transparent;
-    transition: all 0.18s; user-select: none;
+    transition: background 0.18s, color 0.18s, border-color 0.18s, opacity 0.18s, transform 0.18s; user-select: none;
   }
   .catsubj-tab:hover { background: rgba(26,107,191,0.06); }
   .catsubj-tab.active { background: rgba(26,107,191,0.10); border-left-color: var(--gold); }
@@ -2055,7 +2054,7 @@
     padding: 16px 18px; border-left: 3px solid;
     background: rgba(255,255,255,0.82); border-top: 1px solid rgba(26,107,191,0.10);
     border-right: 1px solid rgba(26,107,191,0.10); border-bottom: 1px solid rgba(26,107,191,0.10);
-    cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 12px;
+    cursor: pointer; transition: background 0.2s, color 0.2s, border-color 0.2s, opacity 0.2s, transform 0.2s; display: flex; align-items: center; gap: 12px;
   }
   .catsubj-card:hover { background: rgba(255,255,255,0.98); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(26,107,191,0.18); }
   /* 등급산출 O — 교과별 카드 강조: 색상은 JS에서 인라인으로 적용 */
@@ -2082,6 +2081,7 @@
     position: fixed; inset: 0; background: #f0f4f8; z-index: 700;
     display: flex; flex-direction: column;
     opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+    will-change: opacity; contain: layout style;
     overflow: hidden;
   }
   #dept-screen.open { opacity: 1; pointer-events: all; }
@@ -2090,7 +2090,6 @@
     flex-shrink: 0; padding: 24px 40px 20px;
     border-bottom: 1px solid rgba(201,168,76,0.14);
     background: rgba(240,244,248,0.97);
-    backdrop-filter: blur(10px);
     display: flex; align-items: center; gap: 20px;
   }
   .dept-back {
@@ -2098,7 +2097,7 @@
     background: linear-gradient(135deg, rgba(26,107,191,0.15), rgba(14,74,138,0.08));
     border: 1.5px solid rgba(26,107,191,0.65); color: var(--gold);
     font-family: 'Noto Sans KR', sans-serif; font-size: 13px; font-weight: 700;
-    cursor: pointer; letter-spacing: 1px; transition: all 0.2s; flex-shrink: 0;
+    cursor: pointer; letter-spacing: 1px; transition: background 0.2s, color 0.2s, border-color 0.2s, opacity 0.2s, transform 0.2s; flex-shrink: 0;
     border-radius: 3px; box-shadow: 0 2px 10px rgba(26,107,191,0.15);
   }
   .dept-back:hover { background: rgba(26,107,191,0.22); border-color: var(--gold); box-shadow: 0 3px 16px rgba(26,107,191,0.28); transform: translateX(-2px); }
@@ -2142,7 +2141,7 @@
     border: 1px solid rgba(14,138,122,0.35);
     color: var(--white); cursor: pointer;
     font-family: 'Noto Sans KR', sans-serif;
-    transition: all 0.3s cubic-bezier(0.25,0.46,0.45,0.94);
+    transition: max-height 0.3s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.3s cubic-bezier(0.25,0.46,0.45,0.94);
     overflow: hidden; text-align: center;
     animation: fadeSlideUp 0.5s ease both;
   }
@@ -2195,7 +2194,7 @@
 
   .dept-btn-arrow {
     font-size: 16px; color: rgba(42,138,138,0.4);
-    transition: all 0.3s; position: relative; z-index: 1;
+    transition: background 0.3s, color 0.3s, border-color 0.3s, opacity 0.3s, transform 0.3s; position: relative; z-index: 1;
   }
   .dept-btn:hover .dept-btn-arrow { color: var(--gold); transform: translateY(3px); }
 
@@ -2221,6 +2220,7 @@
     position: fixed; inset: 0; background: var(--deep-navy); z-index: 760;
     display: flex; flex-direction: column;
     opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+    will-change: opacity; contain: layout style;
     overflow: hidden;
   }
   #subject-search-screen.open { opacity: 1; pointer-events: all; }
@@ -2229,14 +2229,14 @@
     flex-shrink: 0; padding: 24px 36px 20px;
     display: flex; align-items: center; gap: 20px;
     border-bottom: 1px solid rgba(201,168,76,0.15);
-    background: rgba(230,240,252,0.62); backdrop-filter: blur(10px);
+    background: rgba(230,240,252,0.62);
   }
   .ss-back {
     display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px;
     background: linear-gradient(135deg, rgba(212,176,90,0.18), rgba(160,120,40,0.10));
     border: 1.5px solid rgba(201,168,76,0.65); color: var(--gold);
     font-family: 'Noto Sans KR', sans-serif; font-size: 13px; font-weight: 700;
-    cursor: pointer; letter-spacing: 1px; transition: all 0.2s; flex-shrink: 0;
+    cursor: pointer; letter-spacing: 1px; transition: background 0.2s, color 0.2s, border-color 0.2s, opacity 0.2s, transform 0.2s; flex-shrink: 0;
     border-radius: 3px; box-shadow: 0 2px 10px rgba(201,168,76,0.18);
   }
   .ss-back:hover { background: rgba(26,107,191,0.28); border-color: var(--gold); box-shadow: 0 3px 16px rgba(201,168,76,0.35); transform: translateX(-2px); }
@@ -2251,7 +2251,7 @@
   .ss-upload-zone {
     border: 2px dashed rgba(42,138,138,0.4);
     padding: 40px; text-align: center;
-    cursor: pointer; transition: all 0.2s;
+    cursor: pointer; transition: background 0.2s, color 0.2s, border-color 0.2s, opacity 0.2s, transform 0.2s;
     margin-bottom: 28px;
   }
   .ss-upload-zone:hover { border-color: var(--accent-teal); background: rgba(42,138,138,0.06); }
@@ -2282,7 +2282,7 @@
     border: 1px solid rgba(26,107,191,0.28);
     color: #1a2e4a;
     font-family: 'Noto Sans KR', sans-serif;
-    font-size: 13px; cursor: pointer; transition: all 0.18s;
+    font-size: 13px; cursor: pointer; transition: background 0.18s, color 0.18s, border-color 0.18s, opacity 0.18s, transform 0.18s;
     font-weight: 500;
   }
   .ss-chip:hover { background: rgba(26,107,191,0.08); border-color: rgba(26,107,191,0.50); color: #0a1a30; }
@@ -2348,7 +2348,7 @@
     margin-top: 24px; padding: 12px 28px;
     background: none; border: 1px solid rgba(26,107,191,0.20);
     color: rgba(26,46,74,0.50); font-family: 'Noto Sans KR', sans-serif;
-    font-size: 12px; cursor: pointer; transition: all 0.2s; letter-spacing: 1px;
+    font-size: 12px; cursor: pointer; transition: background 0.2s, color 0.2s, border-color 0.2s, opacity 0.2s, transform 0.2s; letter-spacing: 1px;
   }
   .ss-reset-btn:hover { border-color: var(--gold); color: #1a4a8a; }
 
@@ -2379,7 +2379,6 @@
     flex-shrink: 0; padding: 24px 48px 20px;
     border-bottom: 1px solid rgba(201,168,76,0.14);
     background: rgba(240,244,248,0.97);
-    backdrop-filter: blur(10px);
     display: flex; align-items: center; gap: 16px;
     position: sticky; top: 0; z-index: 10;
   }
@@ -2388,7 +2387,7 @@
     background: linear-gradient(135deg, rgba(212,176,90,0.18), rgba(160,120,40,0.10));
     border: 1.5px solid rgba(201,168,76,0.65); color: var(--gold);
     font-family: 'Noto Sans KR', sans-serif; font-size: 13px; font-weight: 700;
-    cursor: pointer; letter-spacing: 1px; transition: all 0.2s; flex-shrink: 0;
+    cursor: pointer; letter-spacing: 1px; transition: background 0.2s, color 0.2s, border-color 0.2s, opacity 0.2s, transform 0.2s; flex-shrink: 0;
     border-radius: 3px; box-shadow: 0 2px 10px rgba(201,168,76,0.18);
   }
   .dept-detail-back:hover { background: rgba(26,107,191,0.28); border-color: var(--gold); box-shadow: 0 3px 16px rgba(201,168,76,0.35); transform: translateX(-2px); }
@@ -2472,7 +2471,7 @@
     color: rgba(201,168,76,0.65);
     font-family: 'Noto Sans KR', sans-serif;
     font-size: 12px; font-weight: 700; letter-spacing: 1px;
-    cursor: pointer; transition: all 0.22s; flex-shrink: 0;
+    cursor: pointer; transition: background 0.22s, color 0.22s, border-color 0.22s, opacity 0.22s, transform 0.22s; flex-shrink: 0;
   }
   .dd-edit-btn:hover { background: rgba(201,168,76,0.12); border-color: var(--gold); color: var(--gold); }
   .dd-edit-btn.active { background: rgba(201,168,76,0.18); border-color: var(--gold); color: var(--gold); }
@@ -2481,7 +2480,6 @@
     display: none; flex-shrink: 0;
     background: rgba(230,240,252,0.97);
     border-bottom: 1px solid rgba(26,107,191,0.18);
-    backdrop-filter: blur(8px);
   }
   .dd-toolbar.show { display: block; }
   .dd-toolbar-inner {
@@ -2498,7 +2496,7 @@
     border: 1px solid rgba(26,107,191,0.18);
     color: rgba(26,46,74,0.70);
     font-family: 'Noto Sans KR', sans-serif;
-    font-size: 12px; cursor: pointer; transition: all 0.18s; white-space: nowrap;
+    font-size: 12px; cursor: pointer; transition: background 0.18s, color 0.18s, border-color 0.18s, opacity 0.18s, transform 0.18s; white-space: nowrap;
   }
   .dd-tool-btn:hover { background: rgba(26,107,191,0.08); border-color: rgba(26,107,191,0.40); color: #1a2e4a; }
   .dd-save-btn { border-color: rgba(201,168,76,0.4); color: var(--gold); }
@@ -2530,7 +2528,7 @@
   .dept-block-action-btn {
     background: none; border: 1px solid rgba(26,46,74,0.18);
     color: rgba(26,46,74,0.50); font-size: 11px; padding: 3px 10px;
-    cursor: pointer; font-family: 'Noto Sans KR', sans-serif; transition: all 0.18s;
+    cursor: pointer; font-family: 'Noto Sans KR', sans-serif; transition: background 0.18s, color 0.18s, border-color 0.18s, opacity 0.18s, transform 0.18s;
   }
   .dept-block-action-btn:hover { border-color: rgba(26,46,74,0.45); color: #1a2e4a; }
   .dept-block-action-btn.del:hover { border-color: var(--danger); color: var(--danger); }
@@ -2594,7 +2592,7 @@
     border: 2px dashed rgba(42,138,138,0.3);
     padding: 22px 16px; text-align: center;
     color: rgba(42,138,138,0.6); font-size: 13px; letter-spacing: 1px;
-    cursor: pointer; transition: all 0.2s; margin-bottom: 14px;
+    cursor: pointer; transition: background 0.2s, color 0.2s, border-color 0.2s, opacity 0.2s, transform 0.2s; margin-bottom: 14px;
   }
   .dept-file-upload-zone:hover { border-color: rgba(42,138,138,0.7); color: #4fc4c4; background: rgba(42,138,138,0.05); }
   .editing-mode .dept-file-upload-zone { display: block; }
@@ -2607,7 +2605,7 @@
     display: none; position: absolute; top: 7px; right: 7px;
     background: rgba(230,240,252,0.87); border: 1px solid rgba(224,85,85,0.4);
     color: rgba(224,85,85,0.8); font-size: 12px; padding: 3px 9px;
-    cursor: pointer; transition: all 0.18s; z-index: 2;
+    cursor: pointer; transition: background 0.18s, color 0.18s, border-color 0.18s, opacity 0.18s, transform 0.18s; z-index: 2;
   }
   .editing-mode .dept-file-item-del { display: block; }
   .dept-file-item-del:hover { background: rgba(224,85,85,0.2); color: var(--danger); }
@@ -2647,7 +2645,7 @@
     display: flex; align-items: center; justify-content: center;
     background: none; border: 1px solid rgba(26,107,191,0.30);
     color: rgba(26,107,191,0.65); font-size: 13px; cursor: pointer;
-    transition: all 0.2s; border-radius: 3px;
+    transition: background 0.2s, color 0.2s, border-color 0.2s, opacity 0.2s, transform 0.2s; border-radius: 3px;
   }
   .dept-pdf-fs-btn:hover { background: rgba(26,107,191,0.10); border-color: var(--gold); color: var(--gold); }
 
@@ -2670,7 +2668,7 @@
     padding: 7px 16px; background: none;
     border: 1px solid rgba(26,107,191,0.30); color: rgba(26,46,74,0.65);
     font-family: 'Noto Sans KR', sans-serif; font-size: 12px; cursor: pointer;
-    transition: all 0.2s; flex-shrink: 0; letter-spacing: 1px;
+    transition: background 0.2s, color 0.2s, border-color 0.2s, opacity 0.2s, transform 0.2s; flex-shrink: 0; letter-spacing: 1px;
   }
   #pdf-fs-close:hover { background: rgba(26,107,191,0.08); border-color: var(--gold); color: var(--gold); }
   #pdf-fs-viewer {
@@ -2706,7 +2704,7 @@
     display: flex; align-items: center; justify-content: center;
     background: none; border: 1px solid rgba(26,107,191,0.28);
     color: rgba(26,107,191,0.65); font-size: 12px; cursor: pointer;
-    transition: all 0.2s; border-radius: 3px;
+    transition: background 0.2s, color 0.2s, border-color 0.2s, opacity 0.2s, transform 0.2s; border-radius: 3px;
   }
   .media-pdf-fs-btn:hover { background: rgba(26,107,191,0.10); border-color: var(--gold); color: var(--gold); }
   /* 슬라이드 영역 */
@@ -2734,8 +2732,7 @@
     color: #ffffff;
     font-size: 28px; font-weight: 900; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
-    transition: all 0.2s ease; z-index: 4;
-    backdrop-filter: blur(6px);
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease; z-index: 4;
     box-shadow: 0 4px 20px rgba(26,107,191,0.55), 0 2px 8px rgba(0,0,0,0.25);
   }
   .dept-pdf-nav:hover { 
@@ -2812,7 +2809,7 @@
     background: rgba(255,255,255,0.97); border: 1px solid var(--gold);
     color: var(--white); box-shadow: 0 4px 20px rgba(26,107,191,0.20); padding: 12px 26px;
     font-size: 13px; letter-spacing: 1px;
-    z-index: 9999; opacity: 0; pointer-events: none; transition: all 0.3s;
+    z-index: 9999; opacity: 0; pointer-events: none; transition: background 0.3s, color 0.3s, border-color 0.3s, opacity 0.3s, transform 0.3s;
   }
   #dept-save-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
@@ -2828,6 +2825,7 @@
     position: fixed; inset: 0; background: #f0f4f8; z-index: 700;
     display: flex; flex-direction: column;
     opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+    will-change: opacity; contain: layout style;
     overflow: hidden;
   }
   #enroll-screen.open { opacity: 1; pointer-events: all; }
@@ -2838,6 +2836,7 @@
     position: fixed; inset: 0; background: #f0f4f8; z-index: 700;
     display: flex; flex-direction: column;
     opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+    will-change: opacity; contain: layout style;
     overflow: hidden;
   }
   #suneung-screen.open { opacity: 1; pointer-events: all; }
@@ -2873,7 +2872,7 @@
     background: #ffffff;
     border: 1px solid rgba(26,107,191,0.18);
     cursor: pointer; text-align: left;
-    transition: all 0.22s ease;
+    transition: background 0.22s, color 0.22s, border-color 0.22s, opacity 0.22s, transform 0.22s;
     box-shadow: 0 2px 10px rgba(26,107,191,0.06);
     position: relative;
     width: 100%;
@@ -2939,7 +2938,7 @@
     background: rgba(26,107,191,0.03);
     padding: 10px 14px; cursor: pointer;
     font-size: 12px; color: rgba(26,46,74,0.50);
-    text-align: center; transition: all 0.2s; margin-bottom: 8px;
+    text-align: center; transition: background 0.2s, color 0.2s, border-color 0.2s, opacity 0.2s, transform 0.2s; margin-bottom: 8px;
   }
   .sn-card-file-zone:hover { border-color: var(--gold); color: var(--gold); background: rgba(26,107,191,0.06); }
   .sn-card-file-list { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; }
@@ -2962,7 +2961,7 @@
   .sn-card-act-btn {
     background: rgba(26,107,191,0.07); border: 1px solid rgba(26,107,191,0.15);
     color: rgba(26,46,74,0.60); font-size: 11px; padding: 4px 10px; cursor: pointer;
-    transition: all 0.18s;
+    transition: background 0.18s, color 0.18s, border-color 0.18s, opacity 0.18s, transform 0.18s;
   }
   .sn-card-act-btn:hover { background: rgba(26,107,191,0.14); border-color: var(--gold); color: var(--gold); }
   .sn-card-act-btn.del { color: var(--danger); border-color: rgba(214,48,48,0.20); }
@@ -2980,7 +2979,7 @@
     background: none; border: 1px solid rgba(26,107,191,0.25);
     color: var(--gold); font-family: 'Noto Sans KR', sans-serif;
     font-size: 12px; padding: 7px 14px; cursor: pointer;
-    transition: all 0.18s; flex-shrink: 0;
+    transition: background 0.18s, color 0.18s, border-color 0.18s, opacity 0.18s, transform 0.18s; flex-shrink: 0;
   }
   .sn-fv-back:hover { background: rgba(26,107,191,0.08); border-color: var(--gold); }
   .sn-fv-title {
@@ -2997,6 +2996,7 @@
     position: fixed; inset: 0; background: #f0f4f8; z-index: 700;
     display: flex; flex-direction: column;
     opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+    will-change: opacity; contain: layout style;
     overflow: hidden;
   }
   #guidebook-screen.open { opacity: 1; pointer-events: all; }
@@ -3008,14 +3008,13 @@
     border-bottom: 1px solid rgba(26,107,191,0.15);
     background: rgba(240,244,248,0.97);
     display: flex; align-items: center; gap: 16px;
-    backdrop-filter: blur(10px);
   }
   .gb-back-btn {
     display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px;
     background: linear-gradient(135deg, rgba(26,107,191,0.15), rgba(14,74,138,0.08));
     border: 1.5px solid rgba(26,107,191,0.65); color: var(--gold);
     font-family: 'Noto Sans KR', sans-serif; font-size: 13px; font-weight: 700;
-    cursor: pointer; letter-spacing: 1px; transition: all 0.2s; flex-shrink: 0;
+    cursor: pointer; letter-spacing: 1px; transition: background 0.2s, color 0.2s, border-color 0.2s, opacity 0.2s, transform 0.2s; flex-shrink: 0;
     border-radius: 3px; box-shadow: 0 2px 10px rgba(26,107,191,0.15);
   }
   .gb-back-btn:hover { background: rgba(26,107,191,0.28); border-color: var(--gold); box-shadow: 0 3px 16px rgba(201,168,76,0.35); transform: translateX(-2px); }
@@ -3029,7 +3028,7 @@
     padding: 9px 18px; background: none;
     border: 1px solid rgba(26,107,191,0.30); color: rgba(26,107,191,0.65);
     font-family: 'Noto Sans KR', sans-serif; font-size: 12px;
-    cursor: pointer; letter-spacing: 1px; transition: all 0.25s;
+    cursor: pointer; letter-spacing: 1px; transition: background 0.25s, color 0.25s, border-color 0.25s, opacity 0.25s, transform 0.25s;
   }
   .gb-edit-btn:hover { background: rgba(26,107,191,0.10); border-color: var(--gold); color: var(--gold); }
   .gb-edit-btn.active { background: rgba(26,107,191,0.15); border-color: var(--gold); color: var(--gold); }
@@ -3090,7 +3089,7 @@
     padding: 7px 14px; background: none;
     border: 1px solid rgba(26,107,191,0.28); color: rgba(26,107,191,0.65);
     font-family: 'Noto Sans KR', sans-serif; font-size: 11px;
-    cursor: pointer; transition: all 0.22s; white-space: nowrap;
+    cursor: pointer; transition: background 0.22s, color 0.22s, border-color 0.22s, opacity 0.22s, transform 0.22s; white-space: nowrap;
   }
   .gb-upload-btn:hover { background: rgba(26,107,191,0.10); border-color: var(--gold); color: var(--gold); }
 
@@ -3147,7 +3146,7 @@
     border: none;
     color: #ffffff;
     font-size: 22px; font-weight: 900; cursor: pointer;
-    transition: all 0.2s ease; line-height: 1;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease; line-height: 1;
     border-radius: 4px;
     box-shadow: 0 3px 14px rgba(26,107,191,0.40), 0 1px 5px rgba(0,0,0,0.20);
   }
@@ -3165,7 +3164,7 @@
     display: inline-flex; align-items: center; justify-content: center;
     width: 28px; height: 28px; background: none; flex-shrink: 0;
     border: 1px solid rgba(26,107,191,0.28); color: rgba(26,107,191,0.65);
-    font-size: 13px; cursor: pointer; transition: all 0.2s;
+    font-size: 13px; cursor: pointer; transition: background 0.2s, color 0.2s, border-color 0.2s, opacity 0.2s, transform 0.2s;
   }
   .gb-fullscreen-btn:hover { background: rgba(26,107,191,0.10); border-color: var(--gold); color: var(--gold); }
 
@@ -3176,6 +3175,7 @@
     position: fixed; inset: 0; background: #f0f4f8; z-index: 700;
     display: flex; flex-direction: column;
     opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+    will-change: opacity; contain: layout style;
     overflow: hidden;
   }
   #brochure-screen.open { opacity: 1; pointer-events: all; }
@@ -3200,7 +3200,7 @@
     background: linear-gradient(135deg, rgba(26,107,191,0.15), rgba(14,74,138,0.08));
     border: 1.5px solid rgba(26,107,191,0.65); color: var(--gold);
     font-family: 'Noto Sans KR', sans-serif; font-size: 13px; font-weight: 700;
-    cursor: pointer; letter-spacing: 1px; transition: all 0.2s; flex-shrink: 0;
+    cursor: pointer; letter-spacing: 1px; transition: background 0.2s, color 0.2s, border-color 0.2s, opacity 0.2s, transform 0.2s; flex-shrink: 0;
     border-radius: 3px;
   }
   .iframe-back:hover { background: rgba(26,107,191,0.22); transform: translateX(-2px); }
@@ -3235,7 +3235,7 @@
     padding: 8px 16px; background: none;
     border: 1px solid rgba(26,107,191,0.30); color: rgba(26,46,74,0.65);
     font-family: 'Noto Sans KR', sans-serif; font-size: 12px;
-    cursor: pointer; letter-spacing: 1px; transition: all 0.22s;
+    cursor: pointer; letter-spacing: 1px; transition: background 0.22s, color 0.22s, border-color 0.22s, opacity 0.22s, transform 0.22s;
   }
   .gb-fs-close:hover { background: rgba(26,107,191,0.08); border-color: var(--gold); color: var(--gold); }
   .gb-fs-viewer {
@@ -3276,7 +3276,7 @@
     border: 1px solid rgba(26,107,191,0.22);
     color: rgba(26,46,74,0.55);
     font-family: 'Noto Sans KR', sans-serif; font-size: 11px; font-weight: 500;
-    cursor: pointer; letter-spacing: 0.5px; transition: all 0.18s;
+    cursor: pointer; letter-spacing: 0.5px; transition: background 0.18s, color 0.18s, border-color 0.18s, opacity 0.18s, transform 0.18s;
     border-radius: 2px;
   }
   .gb-settings-btn:hover { background: rgba(26,107,191,0.13); border-color: var(--gold); color: var(--gold); }
@@ -3323,7 +3323,7 @@
     padding: 9px 16px; background: none;
     border: 1px solid rgba(26,107,191,0.30); color: rgba(26,107,191,0.65);
     font-family: 'Noto Sans KR', sans-serif; font-size: 12px;
-    cursor: pointer; letter-spacing: 0.5px; transition: all 0.22s;
+    cursor: pointer; letter-spacing: 0.5px; transition: background 0.22s, color 0.22s, border-color 0.22s, opacity 0.22s, transform 0.22s;
     border-radius: 3px; flex-shrink: 0;
   }
   .gb-jump-trigger-btn:hover { background: rgba(26,107,191,0.10); border-color: var(--gold); color: var(--gold); }
@@ -3339,7 +3339,7 @@
     font-family: 'Noto Sans KR', sans-serif;
     font-size: 12px; font-weight: 600; letter-spacing: 0.5px;
     cursor: pointer;
-    transition: all 0.25s ease; white-space: nowrap;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease, opacity 0.2s ease; white-space: nowrap;
     text-decoration: none;
   }
   .gb-download-btn:hover {
@@ -3358,7 +3358,6 @@
     inset: 0;
     z-index: 9999;
     background: rgba(14,30,60,0.55);
-    backdrop-filter: blur(4px);
     align-items: center;
     justify-content: center;
   }
@@ -3417,7 +3416,7 @@
     border: 1.5px solid rgba(26,107,191,0.25); color: rgba(26,46,74,0.55);
     font-family: 'Noto Sans KR', sans-serif; font-size: 13px; font-weight: 600;
     cursor: pointer; border-radius: 5px; letter-spacing: 0.5px;
-    transition: all 0.18s;
+    transition: background 0.18s, color 0.18s, border-color 0.18s, opacity 0.18s, transform 0.18s;
   }
   .gb-jump-cancel-btn:hover { border-color: rgba(26,107,191,0.50); color: rgba(26,46,74,0.80); }
 
@@ -3433,7 +3432,7 @@
     color: var(--gold);
     font-family: 'Noto Sans KR', sans-serif;
     cursor: pointer;
-    transition: all 0.25s ease;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
     box-shadow: 0 2px 8px rgba(26,107,191,0.10);
   }
   #mycurriculum-btn:hover {
@@ -3489,7 +3488,7 @@
     background: rgba(26,107,191,0.04); border: none;
     color: rgba(26,46,74,0.60); font-family: 'Noto Sans KR', sans-serif;
     font-size: 15px; font-weight: 500; cursor: pointer;
-    transition: all 0.2s; letter-spacing: 0.5px;
+    transition: background 0.2s, color 0.2s, border-color 0.2s, opacity 0.2s, transform 0.2s; letter-spacing: 0.5px;
   }
   .mc-tab:first-child { border-right: 1px solid rgba(26,107,191,0.20); }
   .mc-tab.active {
@@ -3536,8 +3535,9 @@
     background: var(--deep-navy); z-index: 750;
     display: flex; flex-direction: column;
     opacity: 0; pointer-events: none;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.18s ease;
     overflow: hidden;
+    contain: layout style;
   }
   #mycurriculum-screen.open { opacity: 1; pointer-events: all; }
   /* ══════════════════════════════════════
@@ -3766,7 +3766,7 @@
     background: none; border: 1px solid rgba(214,48,48,0.35);
     color: rgba(214,48,48,0.75); font-family: 'Noto Sans KR', sans-serif;
     font-size: 14px; font-weight: 600; cursor: pointer; letter-spacing: 0.5px;
-    transition: all 0.2s; flex-shrink: 0;
+    transition: background 0.2s, color 0.2s, border-color 0.2s, opacity 0.2s, transform 0.2s; flex-shrink: 0;
   }
   .mc-logout-btn:hover { background: rgba(214,48,48,0.07); border-color: #d63030; color: #d63030; }
 
@@ -3780,7 +3780,7 @@
     font-size: 13px; font-weight: 700; letter-spacing: 0.5px;
     cursor: pointer; flex-shrink: 0;
     box-shadow: 0 2px 10px rgba(124,58,237,0.30);
-    transition: all 0.2s;
+    transition: background 0.2s, color 0.2s, border-color 0.2s, opacity 0.2s, transform 0.2s;
   }
   #mc-ai-btn:hover {
     background: linear-gradient(135deg, #6d28d9, #4c1d95);
@@ -3796,7 +3796,7 @@
     font-size: 13px; font-weight: 700; letter-spacing: 0.5px;
     cursor: pointer; flex-shrink: 0;
     box-shadow: 0 2px 10px rgba(176,125,16,0.30);
-    transition: all 0.2s;
+    transition: background 0.2s, color 0.2s, border-color 0.2s, opacity 0.2s, transform 0.2s;
   }
   #mc-sets-btn:hover {
     background: linear-gradient(135deg, #9a6d0e, #74500a);
@@ -3814,7 +3814,7 @@
     font-size: 13px; font-weight: 700; letter-spacing: 0.5px;
     cursor: pointer; flex-shrink: 0;
     box-shadow: 0 2px 10px rgba(14,138,122,0.30);
-    transition: all 0.2s; position: relative;
+    transition: background 0.2s, color 0.2s, border-color 0.2s, opacity 0.2s, transform 0.2s; position: relative;
   }
   #mc-helper-btn:hover {
     background: linear-gradient(135deg, #178f72, #0a6048);
@@ -3861,7 +3861,7 @@
     background: rgba(26,107,191,0.12); border: 1px solid rgba(26,107,191,0.30);
     color: var(--gold); font-family: 'Noto Sans KR', sans-serif;
     font-size: 12px; font-weight: 700; cursor: pointer;
-    transition: all 0.18s; letter-spacing: 0.5px;
+    transition: background 0.18s, color 0.18s, border-color 0.18s, opacity 0.18s, transform 0.18s; letter-spacing: 0.5px;
   }
   .mc-teacher-search-btn:hover { background: rgba(26,107,191,0.22); border-color: var(--gold); }
 
@@ -3914,7 +3914,7 @@
     background: rgba(26,107,191,0.07); border: 1px solid rgba(26,107,191,0.22);
     color: var(--gold); font-family: 'Noto Sans KR', sans-serif;
     cursor: pointer; letter-spacing: 0.3px;
-    transition: all 0.16s; white-space: nowrap;
+    transition: background 0.16s, color 0.16s, border-color 0.16s, opacity 0.16s, transform 0.16s; white-space: nowrap;
   }
   .mc-tbar-btn:hover { background: rgba(26,107,191,0.17); border-color: var(--gold); }
   .mc-tbar-btn.active {
@@ -3964,7 +3964,6 @@
     position: fixed; inset: 0; z-index: 1300;
     background: rgba(180,205,230,0.72);
     display: flex; align-items: center; justify-content: center;
-    backdrop-filter: blur(6px);
     opacity: 0; pointer-events: none;
     transition: opacity 0.22s;
   }
@@ -3997,7 +3996,7 @@
     background: none; border: 1px solid rgba(26,107,191,0.28);
     color: rgba(26,46,74,0.75);
     font-family: 'Noto Sans KR', sans-serif; font-size: 13px; font-weight: 700;
-    cursor: pointer; transition: all 0.18s; letter-spacing: 0.5px;
+    cursor: pointer; transition: background 0.18s, color 0.18s, border-color 0.18s, opacity 0.18s, transform 0.18s; letter-spacing: 0.5px;
   }
   .mc-setwarn-btn-back:hover { border-color: var(--gold); color: var(--gold); }
   .mc-setwarn-btn-save {
@@ -4005,14 +4004,14 @@
     background: rgba(214,120,30,0.10); border: 1px solid rgba(214,120,30,0.40);
     color: #b86010;
     font-family: 'Noto Sans KR', sans-serif; font-size: 13px; font-weight: 700;
-    cursor: pointer; transition: all 0.18s; letter-spacing: 0.5px;
+    cursor: pointer; transition: background 0.18s, color 0.18s, border-color 0.18s, opacity 0.18s, transform 0.18s; letter-spacing: 0.5px;
   }
   .mc-setwarn-btn-save:hover { background: rgba(214,120,30,0.18); border-color: #c07820; }
 
   /* 도우미 모달 */
   #mc-helper-modal {
     display: none; position: fixed; inset: 0; z-index: 1200;
-    background: rgba(14,30,60,0.55); backdrop-filter: blur(5px);
+    background: rgba(14,30,60,0.55);
     align-items: center; justify-content: center; padding: 20px;
   }
   #mc-helper-modal.open { display: flex; }
@@ -4132,7 +4131,7 @@
   /* 분석 도우미 모달 */
   #mc-ai-modal {
     display: none; position: fixed; inset: 0; z-index: 1200;
-    background: rgba(14,30,60,0.55); backdrop-filter: blur(5px);
+    background: rgba(14,30,60,0.55);
     align-items: center; justify-content: center; padding: 20px;
   }
   #mc-ai-modal.open { display: flex; }
@@ -4243,7 +4242,7 @@
     font-family: 'Noto Sans KR', sans-serif;
     font-size: 12px; font-weight: 600; color: rgba(26,46,74,0.55);
     cursor: pointer; border-radius: 99px;
-    transition: all 0.15s;
+    transition: background 0.15s, color 0.15s, border-color 0.15s, opacity 0.15s, transform 0.15s;
   }
   .req-calc-chip:hover { border-color: #7c3aed; color: #5b21b6; background: rgba(124,58,237,0.05); }
   .req-calc-chip.on {
@@ -4387,6 +4386,7 @@
     border-radius: 2px; max-width: 100%;
   }
   .mc-sel-chip-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .mc-sel-chip:hover { background: rgba(26,107,191,0.13); border-color: rgba(26,107,191,0.45); }
   .mc-sel-chip-del {
     cursor: pointer; color: rgba(26,46,74,0.40); font-size: 13px; line-height: 1;
     flex-shrink: 0; background: none; border: none; padding: 0;
@@ -4401,7 +4401,7 @@
     border: 1px dashed rgba(26,107,191,0.30);
     color: rgba(26,107,191,0.75);
     cursor: pointer; font-family: 'Noto Sans KR', sans-serif;
-    transition: all 0.15s; border-radius: 2px;
+    transition: background 0.15s, color 0.15s, border-color 0.15s, opacity 0.15s, transform 0.15s; border-radius: 2px;
   }
   .mc-add-btn:hover { background: rgba(26,107,191,0.13); border-color: var(--gold); color: var(--gold); }
 
@@ -4475,7 +4475,7 @@
     width: 16px; height: 16px; flex-shrink: 0;
     border: 2px solid rgba(26,107,191,0.30); border-radius: 2px;
     display: flex; align-items: center; justify-content: center;
-    transition: all 0.12s; font-size: 11px; color: #fff;
+    transition: background 0.12s, color 0.12s, border-color 0.12s, opacity 0.12s, transform 0.12s; font-size: 11px; color: #fff;
     background: transparent;
   }
   .mc-pick-item.selected .mc-pick-check {
@@ -4492,7 +4492,7 @@
     padding: 8px 18px; background: none;
     border: 1px solid rgba(26,107,191,0.20);
     color: rgba(26,46,74,0.65); font-family: 'Noto Sans KR', sans-serif;
-    font-size: 14px; cursor: pointer; transition: all 0.15s;
+    font-size: 14px; cursor: pointer; transition: background 0.15s, color 0.15s, border-color 0.15s, opacity 0.15s, transform 0.15s;
   }
   .mc-pick-cancel:hover { border-color: var(--gold); color: var(--gold); }
   .mc-pick-confirm {
@@ -4639,6 +4639,29 @@
     .mc-semester-col.mc-col-active {
       display: flex;
     }
+  }
+
+
+  /* ══════════════════════════════════════
+     성능 최적화: 스크롤 및 렌더링
+  ══════════════════════════════════════ */
+  /* 스크롤 가능한 컨테이너에 momentum 스크롤 + GPU 힌트 */
+  .dept-detail-body,
+  .page-edit-scroll,
+  .subject-list-wrap,
+  .mc-modal-box,
+  #gb-left-viewer,
+  #gb-right-viewer {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: auto; /* smooth는 JS 스크롤과 충돌 방지 */
+  }
+  /* 정적 이미지·아이콘은 레이어 분리 불필요 */
+  img { content-visibility: auto; }
+  /* 화면 밖 큰 섹션은 렌더링 지연 (주요 서브화면 body) */
+  .dept-detail-body,
+  .detail-body {
+    content-visibility: auto;
+    contain-intrinsic-size: 0 600px;
   }
 
 </style>
@@ -5527,7 +5550,7 @@
 <!-- ═══════════════════════════════════════
      세트과목 뷰어 모달 (공개)
 ═══════════════════════════════════════ -->
-<div id="sets-viewer-modal" onclick="if(event.target===this)closeSetsViewer()" style="display:none;position:fixed;inset:0;z-index:1100;background:rgba(14,30,60,0.55);backdrop-filter:blur(5px);align-items:center;justify-content:center;padding:20px;">
+<div id="sets-viewer-modal" onclick="if(event.target===this)closeSetsViewer()" style="display:none;position:fixed;inset:0;z-index:1100;background:rgba(14,30,60,0.55);align-items:center;justify-content:center;padding:20px;">
   <div style="background:#f0f4f8;border:1.5px solid rgba(201,168,76,0.30);box-shadow:0 24px 64px rgba(14,30,60,0.35);width:100%;max-width:560px;max-height:86vh;display:flex;flex-direction:column;overflow:hidden;">
     <div style="background:linear-gradient(135deg,#1a2e4a,#0e1e3a);padding:18px 22px 14px;display:flex;align-items:flex-start;justify-content:space-between;flex-shrink:0;border-bottom:1px solid rgba(201,168,76,0.20);">
       <div>
@@ -6116,16 +6139,22 @@ function hideLoadingOverlay() {
 }
 
 // Supabase REST 헬퍼
+// ── 인메모리 캐시: 같은 키 반복 fetch 방지 ──
+const _sbCache = {};
 async function sbGet(key) {
+  if (_sbCache[key] !== undefined) return _sbCache[key];
   const res = await fetch(
     SUPABASE_URL + '/rest/v1/cg_store?key=eq.' + encodeURIComponent(key) + '&select=value',
     { headers: { apikey: SUPABASE_ANON, Authorization: 'Bearer ' + SUPABASE_ANON } }
   );
   if (!res.ok) throw new Error('sbGet failed ' + res.status);
   const data = await res.json();
-  return data.length ? data[0].value : null;
+  const val = data.length ? data[0].value : null;
+  _sbCache[key] = val;
+  return val;
 }
 async function sbSet(key, value) {
+  _sbCache[key] = value; // 캐시 즉시 갱신
   const res = await fetch(
     SUPABASE_URL + '/rest/v1/cg_store',
     {
@@ -6186,7 +6215,7 @@ async function deleteFromStorage(url) {
 const _sq = {};
 function sbSetQ(key, value, ms) {
   clearTimeout(_sq[key]);
-  _sq[key] = setTimeout(() => sbSet(key, value).catch(console.error), ms || 700);
+  _sq[key] = setTimeout(() => sbSet(key, value).catch(console.error), ms || 1200);
 }
 
 /* ──────────────────────────────
@@ -6839,14 +6868,15 @@ function openDetail(s, from, semColIdx) {
   // 블록 렌더
   renderBlocks();
 
-  // 읽기 전용 모드 적용 (학기별·교과별 화면에서 진입 시)
-  const readOnly = (detailFrom === 'semester' || detailFrom === 'catsubj');
+  // 읽기 전용 모드 적용 (학기별·교과별·나만의교육과정 화면에서 진입 시)
+  const readOnly = (detailFrom === 'semester' || detailFrom === 'catsubj' || detailFrom === 'mc');
   applyReadOnly(readOnly);
 
   // 이전 화면 닫고 바로 상세 열기
   document.getElementById('admin-modal').classList.remove('open');
   document.getElementById('semester-screen').classList.remove('open');
   document.getElementById('catsubj-screen').classList.remove('open');
+  document.getElementById('mycurriculum-screen').classList.remove('open');
   document.getElementById('subject-detail').classList.add('open');
   document.getElementById('subject-detail').scrollTop = 0;
 }
@@ -6913,6 +6943,8 @@ function closeDetail() {
     document.getElementById('semester-screen').classList.add('open');
   } else if (detailFrom === 'catsubj') {
     document.getElementById('catsubj-screen').classList.add('open');
+  } else if (detailFrom === 'mc') {
+    document.getElementById('mycurriculum-screen').classList.add('open');
   } else {
     document.getElementById('admin-modal').classList.add('open');
   }
@@ -6922,6 +6954,7 @@ function goHome() {
   document.getElementById('subject-detail').classList.remove('open');
   document.getElementById('semester-screen').classList.remove('open');
   document.getElementById('catsubj-screen').classList.remove('open');
+  document.getElementById('mycurriculum-screen').classList.remove('open');
 }
 
 /* 등급산출여부 드롭다운 피커 */
@@ -7044,7 +7077,7 @@ function renderBlocks() {
   if (!container) return;
   const blocks = getBlocks();
   container.innerHTML = '';
-  const ro = (detailFrom === 'semester' || detailFrom === 'catsubj');
+  const ro = (detailFrom === 'semester' || detailFrom === 'catsubj' || detailFrom === 'mc');
   if (blocks.length === 0) {
     container.innerHTML = ro
       ? '<div class="blocks-empty">등록된 내용이 없습니다</div>'
@@ -7517,7 +7550,7 @@ function rerenderMediaArea(blockIdx) {
   const area = document.getElementById(`media-area-${blockIdx}`);
   if (!area) return;
   const blocks = getBlocks();
-  const ro = (detailFrom === 'semester' || detailFrom === 'catsubj');
+  const ro = (detailFrom === 'semester' || detailFrom === 'catsubj' || detailFrom === 'mc');
   area.innerHTML = (blocks[blockIdx].data || []).map((m, mi) => buildMediaEl(blockIdx, mi, m, ro)).join('');
   // PDF 뷰어 초기화
   (blocks[blockIdx].data || []).forEach((m, mi) => {
@@ -8399,12 +8432,20 @@ function saveSemColEdit() {
 }
 
 function renderAllSemCols() {
-  for (let i = 0; i < 4; i++) renderSemCol(i);
+  renderSemCol(0);
   updateSemGridColumns();
-  // 렌더링 후 현재 학기 표시 상태 재적용
   if (typeof currentSemIdx !== 'undefined') setCurrentSem(currentSemIdx);
-  // 일반/진로/융합 zone 높이 동기화
-  requestAnimationFrame(() => syncSubtypeZoneHeights());
+  // 나머지 3개 학기는 rAF으로 분산해 메인 스레드 블로킹 최소화
+  requestAnimationFrame(() => {
+    renderSemCol(1);
+    requestAnimationFrame(() => {
+      renderSemCol(2);
+      requestAnimationFrame(() => {
+        renderSemCol(3);
+        requestAnimationFrame(() => syncSubtypeZoneHeights());
+      });
+    });
+  });
 }
 
 /* 일반/진로/융합 zone 높이를 실제 block 높이에 맞춰 동기화 */
@@ -8504,10 +8545,13 @@ function renderSemCol(colIdx) {
   const statReq = document.getElementById('sem-stat-req-' + colIdx);
   if (statReq) statReq.textContent = required.length + '개';
 
+  // subjects를 Map으로 캐시 → makeCard 내부의 O(n) find를 O(1)로 개선
+  const _subjectMapLocal = new Map((subjects || []).map(s => [s.name, s]));
+
   function makeCard(item) {
     const name = item.name;
     const itemIdx = items.indexOf(item);
-    const s = subjects.find(x => x.name === name);
+    const s = _subjectMapLocal.get(name);
     const cat = s ? s.cat : '기타';
     const gradeType = getGradeType(s && s.info && s.info.grade);
     const graded = gradeType !== null;
@@ -11272,12 +11316,8 @@ async function initApp() {
   if (document.getElementById('mycurriculum-screen').classList.contains('open')) {
     mcRenderAll();
   }
-  // 길라잡이 PDF 복원 (Supabase) - 단일 PDF
-  try { await gbLoadSettings(); } catch(_) {}
-  try { await loadGbPdfFromStorage('left'); } catch(_) {}
-  // 브로셔 PDF 복원 → lazy: 09번 버튼 클릭 시 처음 로드 (초기화 시간 단축)
-  try { await brLoadSettings(); } catch(_) {}
-  // loadBrPdfFromStorage()는 openBrochureScreen() 최초 호출 시 실행됨
+  // 길라잡이/브로셔 PDF 설정: 화면 열 때 lazy 로드 (초기화 부하 제거)
+  // openGuidebookScreen() / openBrochureScreen() 호출 시 자동으로 로드됨
 }
 
 document.addEventListener('DOMContentLoaded', () => { initApp(); });
@@ -11366,7 +11406,10 @@ document.addEventListener('DOMContentLoaded', () => {
 /* ══════════════════════════════════════
    화면 회전/리사이즈 시 학기 상태 재적용
 ══════════════════════════════════════ */
+let _resizeTimer = null;
 window.addEventListener('resize', function() {
+  if (_resizeTimer) clearTimeout(_resizeTimer);
+  _resizeTimer = setTimeout(function() {
   // 화면 회전/리사이즈 시 스크롤 플래그 리셋 (고착 방지)
   _isScrolling = false;
   // updateSemGridColumns가 isMob 판단을 900px 기준으로 자체 처리
@@ -11387,6 +11430,7 @@ window.addEventListener('resize', function() {
     brSingle.rendering = false;
     brRenderSpread();
   }
+  }, 120);
 });
 </script>
 
@@ -11539,6 +11583,14 @@ window.addEventListener('resize', function() {
       <button class="mc-tab" id="mc-tab-signup" onclick="mcSwitchTab('signup')">회원가입</button>
     </div>
     <div id="mc-form-login">
+      <!-- 이전 세션 빠른 입장 배너 -->
+      <div id="mc-resume-banner" style="display:none;margin-bottom:14px;padding:11px 14px;background:rgba(26,107,191,0.07);border:1px solid rgba(26,107,191,0.22);text-align:center;">
+        <div style="font-size:11px;letter-spacing:1.5px;color:rgba(26,46,74,0.55);margin-bottom:6px;">LAST SESSION</div>
+        <div id="mc-resume-name" style="font-family:'Noto Serif KR',serif;font-size:15px;font-weight:900;color:var(--white);margin-bottom:10px;"></div>
+        <button onclick="mcResumeSession()" style="width:100%;padding:9px;background:var(--gold);border:none;color:#fff;font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.5px;cursor:pointer;">이 계정으로 입장</button>
+        <button onclick="mcClearSession()" style="margin-top:6px;width:100%;padding:6px;background:none;border:1px solid rgba(26,46,74,0.18);color:rgba(26,46,74,0.45);font-family:'Noto Sans KR',sans-serif;font-size:11px;cursor:pointer;">다른 계정으로 로그인</button>
+      </div>
+      <div id="mc-form-login-fields">
       <div class="mc-field">
         <div class="mc-field-label">아이디</div>
         <input class="mc-input" id="mc-login-id" type="text" placeholder="아이디를 입력하세요" autocomplete="username" />
@@ -11550,6 +11602,7 @@ window.addEventListener('resize', function() {
       </div>
       <div class="mc-msg" id="mc-login-msg"></div>
       <button class="mc-btn-primary" onclick="mcDoLogin()">로그인</button>
+      </div>
     </div>
     <div id="mc-form-signup" style="display:none">
       <div class="mc-field">
@@ -11863,17 +11916,6 @@ window.addEventListener('resize', function() {
 </div>
 
 <!-- 과목 수요 팝업 (교사 전용) -->
-<div id="mc-subj-stat-modal" onclick="if(event.target===this)closeMcSubjStat()">
-  <div class="mc-stat-box">
-    <div class="mc-stat-tag">SUBJECT DEMAND · 수요 현황</div>
-    <div class="mc-stat-title" id="mc-stat-subj-name">—</div>
-    <div id="mc-stat-content">
-      <div class="mc-stat-loading">조회 중...</div>
-    </div>
-    <button class="mc-stat-close-btn" onclick="closeMcSubjStat()">닫기</button>
-  </div>
-</div>
-
 <!-- 세트과목 경고 모달 -->
 <div id="mc-set-warn-modal">
   <div class="mc-setwarn-box">
@@ -12034,9 +12076,17 @@ function mcRenderSemCard(colIdx) {
       selected.forEach(name => {
         const chip = document.createElement('div');
         chip.className = 'mc-sel-chip';
+        chip.style.cursor = 'pointer';
         chip.innerHTML = `<span class="mc-sel-chip-name">${escHtml(name)}</span><button class="mc-sel-chip-del" title="제거">×</button>`;
-        chip.querySelector('.mc-sel-chip-del').addEventListener('click', () => {
+        chip.querySelector('.mc-sel-chip-del').addEventListener('click', (e) => {
+          e.stopPropagation();
           mcRemoveSubject(colIdx, cat.key, name);
+        });
+        // 칩 클릭 → 과목 상세 보기
+        chip.addEventListener('click', () => {
+          const s = subjects.find(x => x.name === name);
+          if (!s) return;
+          openDetail(s, 'mc', colIdx);
         });
         chipList.appendChild(chip);
       });
@@ -12055,10 +12105,22 @@ function mcRenderSemCard(colIdx) {
 }
 
 function mcRenderAll() {
-  [0,1,2,3].forEach(i => mcRenderSemCard(i));
-  mcUpdateGradCalc();
-  renderMcSetsDisplay();
-  mcHelperRefreshBadge();
+  // 전역 subjects Map 갱신 (mcGetSubjectCredit 등 O(1) 조회용)
+  window._subjectMapGlobal = new Map((typeof subjects !== 'undefined' ? subjects : []).map(s => [s.name, s]));
+  // 첫 카드 즉시 렌더 (체감 속도 향상), 나머지 3개는 rAF 분산
+  mcRenderSemCard(0);
+  requestAnimationFrame(() => {
+    mcRenderSemCard(1);
+    requestAnimationFrame(() => {
+      mcRenderSemCard(2);
+      requestAnimationFrame(() => {
+        mcRenderSemCard(3);
+        mcUpdateGradCalc();
+        renderMcSetsDisplay();
+        mcHelperRefreshBadge();
+      });
+    });
+  });
 }
 
 /* ── 졸업학점 계산기 업데이트 ───────────────────── */
@@ -12071,7 +12133,8 @@ function mcParseCredit(creditStr) {
 function mcGetSubjectCredit(name, catKey) {
   // 1순위: subjects 배열에서 해당 과목의 개별 학점 찾기 (info.credit에 저장됨)
   if (typeof subjects !== 'undefined' && Array.isArray(subjects)) {
-    const found = subjects.find(s => s.name === name);
+    // _subjectMapGlobal은 mcRenderAll 시작 시 갱신됨
+    const found = (_subjectMapGlobal || new Map()).get(name) || subjects.find(s => s.name === name);
     if (found && found.info && found.info.credit) return mcParseCredit(found.info.credit);
   }
   // 2순위: pageTexts의 카테고리별 기본값
@@ -12168,6 +12231,15 @@ function mcPickRenderBodyAll() {
   const cats = getMcCategories(_pickColIdx);
   let hasAnyCat = false;
 
+  // subjects를 Map으로 캐시 (O(n) → O(1) 조회)
+  const subjectMap = new Map();
+  if (typeof subjects !== 'undefined') {
+    subjects.forEach(s => subjectMap.set(s.name, s));
+  }
+
+  // DocumentFragment로 DOM 조작 최소화
+  const frag = document.createDocumentFragment();
+
   cats.forEach(cat => {
     const available = getMcAvailableSubjects(_pickColIdx, cat.key);
     if (available.length === 0) return;
@@ -12186,7 +12258,7 @@ function mcPickRenderBodyAll() {
     header.innerHTML = `
       <span class="mc-pick-cat-name">${escHtml(cat.label)}</span>
       <span class="mc-pick-cat-count${cntClass}" id="mc-pick-cat-cnt-${escHtml(cat.key)}">${cntText}</span>`;
-    body.appendChild(header);
+    frag.appendChild(header);
 
     // 일반/진로/융합 그룹
     const groups = {};
@@ -12201,12 +12273,12 @@ function mcPickRenderBodyAll() {
       const stLabel = document.createElement('div');
       stLabel.className = 'mc-pick-subtype-label';
       stLabel.textContent = '── ' + st + ' 선택과목';
-      body.appendChild(stLabel);
+      frag.appendChild(stLabel);
 
       groups[st].forEach(item => {
         const name = item.name;
         const isSel = tempList.includes(name);
-        const s = (typeof subjects !== 'undefined') ? subjects.find(x => x.name === name) : null;
+        const s = subjectMap.get(name);
         const catLabel = s ? s.cat : '';
 
         const row = document.createElement('div');
@@ -12221,29 +12293,26 @@ function mcPickRenderBodyAll() {
         row.addEventListener('click', () => {
           const tmp = _pickAllTemp[cat.key] || [];
           if (tmp.includes(name)) {
-            // 선택 해제
             _pickAllTemp[cat.key] = tmp.filter(n => n !== name);
             row.classList.remove('selected');
             row.querySelector('.mc-pick-check').textContent = '';
           } else {
-            // 선택 추가 — 제한 초과 시 막기
-            if (lim !== null && tmp.length >= lim) {
-              return; // 추가 불가, 아무것도 안 함
-            }
+            if (lim !== null && tmp.length >= lim) return;
             _pickAllTemp[cat.key] = [...tmp, name];
             row.classList.add('selected');
             row.querySelector('.mc-pick-check').textContent = '✓';
           }
-          // 해당 분류 카운트 배지만 업데이트
           mcPickUpdateCatCount(cat);
         });
-        body.appendChild(row);
+        frag.appendChild(row);
       });
     });
   });
 
   if (!hasAnyCat) {
     body.innerHTML = '<div class="mc-pick-empty">이 학기에 개설된 과목이 없습니다.</div>';
+  } else {
+    body.appendChild(frag);
   }
 }
 
@@ -12311,15 +12380,70 @@ function mcPickConfirm() {
 
 /* ── 모달 열기/닫기 ─────────────────────────────── */
 function openMyCurriculumModal() {
-  const saved = localStorage.getItem('mc_user');
-  if (saved) {
-    try { mcCurrentUser = JSON.parse(saved); mcOpenScreen(); return; } catch(e) {}
-  }
   mcSwitchTab('login');
-  document.getElementById('mycurriculum-modal').classList.add('open');
+  // 이전 세션이 있으면 빠른 입장 배너만 표시, 로그인 폼은 숨김
+  const saved = localStorage.getItem('mc_user');
+  const banner = document.getElementById('mc-resume-banner');
+  const fields = document.getElementById('mc-form-login-fields');
+  if (saved) {
+    try {
+      const u = JSON.parse(saved);
+      document.getElementById('mc-resume-name').textContent = u.username || '(알 수 없음)';
+      if (banner) banner.style.display = 'block';
+      if (fields) fields.style.display = 'none';  // 배너 있을 때 폼 숨김
+    } catch(e) {
+      if (banner) banner.style.display = 'none';
+      if (fields) fields.style.display = 'block';
+    }
+  } else {
+    if (banner) banner.style.display = 'none';
+    if (fields) fields.style.display = 'block';
+  }
+  const _mcModal = document.getElementById('mycurriculum-modal');
+  // hideMyCurriculumModalNow()가 설정한 인라인 스타일 전부 초기화
+  _mcModal.style.cssText = '';
+  _mcModal.classList.add('open');
+}
+
+function mcResumeSession() {
+  const saved = localStorage.getItem('mc_user');
+  if (!saved) return;
+  try {
+    mcCurrentUser = JSON.parse(saved);
+    hideMyCurriculumModalNow();
+    setTimeout(() => mcOpenScreen(), 50);
+  } catch(e) {}
+}
+
+function mcClearSession() {
+  localStorage.removeItem('mc_user');
+  const banner = document.getElementById('mc-resume-banner');
+  const fields = document.getElementById('mc-form-login-fields');
+  if (banner) banner.style.display = 'none';
+  if (fields) fields.style.display = 'block';  // 로그인 폼 다시 표시
+  document.getElementById('mc-login-id').focus();
 }
 function closeMyCurriculumModal() {
-  document.getElementById('mycurriculum-modal').classList.remove('open');
+  const modal = document.getElementById('mycurriculum-modal');
+  modal.classList.remove('open');
+}
+
+/* 로그인 성공 후 호출 — transition 없이 즉시 숨김 */
+function hideMyCurriculumModalNow() {
+  const modal = document.getElementById('mycurriculum-modal');
+  modal.classList.remove('open');
+  modal.style.transition = 'none';
+  modal.style.opacity    = '0';
+  modal.style.pointerEvents = 'none';
+  modal.style.zIndex     = '-1';
+  // 다음 열기 때를 위해 스타일 초기화 예약
+  clearTimeout(modal._hideTimer);
+  modal._hideTimer = setTimeout(() => {
+    modal.style.transition    = '';
+    modal.style.opacity       = '';
+    modal.style.pointerEvents = '';
+    modal.style.zIndex        = '';
+  }, 100);
 }
 
 /* ── 탭 전환 ────────────────────────────────────── */
@@ -12401,8 +12525,9 @@ async function mcDoLogin() {
       grade: null, class_num: null, student_num: null
     };
     // localStorage에 저장하지 않음 → 기기 간 완전 독립
-    closeMyCurriculumModal();
-    mcOpenScreen();
+    msg.className = 'mc-msg ok'; msg.textContent = '✓ 로그인 완료!';
+    hideMyCurriculumModalNow();
+    setTimeout(() => mcOpenScreen(), 50);
     return;
   }
 
@@ -12416,8 +12541,9 @@ async function mcDoLogin() {
   if (!Array.isArray(savedData) || savedData.length !== 4) savedData = [{},{},{},{}];
   mcCurrentUser = { id: user.id, username: user.username, data: savedData, career: user.career || '', memos: Array.isArray(user.memos) ? user.memos : ['','','',''], grade: user.grade || null, class_num: user.class_num || null, student_num: user.student_num || null };
   localStorage.setItem('mc_user', JSON.stringify(mcCurrentUser));
-  closeMyCurriculumModal();
-  mcOpenScreen();
+  msg.className = 'mc-msg ok'; msg.textContent = '✓ 로그인 완료!';
+  hideMyCurriculumModalNow();
+  setTimeout(() => mcOpenScreen(), 50);
 }
 
 /* ── 설계 화면 열기 ─────────────────────────────── */
@@ -12541,7 +12667,7 @@ function mcAutoSave() {
   const s = document.getElementById('mc-save-status');
   if (s) s.textContent = '저장 준비 중...';
   if (mcSaveTimer) clearTimeout(mcSaveTimer);
-  mcSaveTimer = setTimeout(() => mcSaveAll(true), 2000);
+  mcSaveTimer = setTimeout(() => mcSaveAll(true), 2500);
 }
 
 /* ── 저장 ───────────────────────────────────────── */
