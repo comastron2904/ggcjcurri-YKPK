@@ -3704,6 +3704,7 @@
     .mc-header-top .mc-logout-btn,
     .mc-header-top #mc-ai-btn,
     .mc-header-top #mc-sets-btn,
+    .mc-header-top #mc-rec-btn,
     .mc-header-top #mc-helper-btn {
       display: none !important;
     }
@@ -3802,6 +3803,184 @@
     background: linear-gradient(135deg, #9a6d0e, #74500a);
     box-shadow: 0 4px 18px rgba(176,125,16,0.42);
     transform: translateY(-1px);
+  }
+
+  /* 권장과목 조회 버튼 (데스크탑 헤더) */
+  #mc-rec-btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 8px 16px; height: 36px;
+    background: linear-gradient(135deg, #1a6bbf, #104fa0);
+    border: none; color: #ffffff;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 13px; font-weight: 700; letter-spacing: 0.5px;
+    cursor: pointer; flex-shrink: 0;
+    box-shadow: 0 2px 10px rgba(26,107,191,0.28);
+    transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+  }
+  #mc-rec-btn:hover {
+    background: linear-gradient(135deg, #1458a8, #0c3d82);
+    box-shadow: 0 4px 18px rgba(26,107,191,0.42);
+    transform: translateY(-1px);
+  }
+
+  /* 권장과목 조회 모달 */
+  #mc-rec-modal {
+    display: none; position: fixed; inset: 0; z-index: 1200;
+    background: rgba(14,30,60,0.55);
+    align-items: center; justify-content: center; padding: 20px;
+  }
+  #mc-rec-modal.open { display: flex; }
+  @media (max-width: 600px) {
+    #mc-rec-modal { padding: 12px 10px; align-items: flex-end; }
+    .mc-rec-box { max-height: 92vh !important; border-radius: 8px 8px 2px 2px !important; }
+  }
+  .mc-rec-box {
+    background: #f0f4f8;
+    border: 1.5px solid rgba(26,107,191,0.30);
+    box-shadow: 0 24px 64px rgba(14,30,60,0.35);
+    width: 100%; max-width: 640px; max-height: 88vh;
+    display: flex; flex-direction: column; overflow: hidden;
+    border-radius: 2px;
+  }
+  .mc-rec-header {
+    background: linear-gradient(135deg, #1a6bbf, #104fa0);
+    padding: 18px 22px 14px;
+    display: flex; align-items: flex-start; justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .mc-rec-header-tag { font-size: 9px; letter-spacing: 3px; color: rgba(255,255,255,0.65); font-weight: 700; margin-bottom: 3px; }
+  .mc-rec-header-title { font-family: 'Noto Serif KR', serif; font-size: 20px; font-weight: 900; color: #ffffff; }
+  .mc-rec-close {
+    background: none; border: none; color: rgba(255,255,255,0.65);
+    font-size: 22px; cursor: pointer; padding: 0; line-height: 1;
+    transition: color 0.15s; flex-shrink: 0;
+  }
+  .mc-rec-close:hover { color: #fff; }
+  .mc-rec-body {
+    flex: 1; overflow-y: auto; min-height: 0;
+    padding: 18px 20px 24px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .mc-rec-body::-webkit-scrollbar { width: 4px; }
+  .mc-rec-body::-webkit-scrollbar-thumb { background: rgba(26,107,191,0.20); border-radius: 2px; }
+
+  /* 검색 입력 영역 */
+  .mc-rec-search-row {
+    display: flex; gap: 8px; align-items: center;
+  }
+  .mc-rec-search-input {
+    flex: 1;
+    background: #fff; border: 1.5px solid rgba(26,107,191,0.25);
+    color: #1a2e4a; font-family: 'Noto Sans KR', sans-serif;
+    font-size: 15px; font-weight: 500;
+    padding: 10px 14px; outline: none;
+    transition: border-color 0.2s;
+  }
+  .mc-rec-search-input:focus { border-color: #1a6bbf; }
+  .mc-rec-search-input::placeholder { color: rgba(26,46,74,0.32); font-size: 13px; }
+  .mc-rec-search-btn {
+    padding: 10px 18px; height: 42px;
+    background: #1a6bbf; border: none; color: #fff;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 13px; font-weight: 700; cursor: pointer;
+    transition: background 0.2s;
+  }
+  .mc-rec-search-btn:hover { background: #104fa0; }
+
+  /* 학과 목록 드롭다운 */
+  .mc-rec-dropdown-wrap {
+    position: relative; flex-shrink: 0;
+  }
+  .mc-rec-dropdown-btn {
+    height: 42px; padding: 0 14px;
+    background: #fff; border: 1.5px solid rgba(26,107,191,0.25);
+    color: #1a6bbf; font-family: 'Noto Sans KR', sans-serif;
+    font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .mc-rec-dropdown-btn:hover { background: rgba(26,107,191,0.07); border-color: #1a6bbf; }
+  .mc-rec-dropdown-btn.open { background: rgba(26,107,191,0.10); border-color: #1a6bbf; }
+  .mc-rec-dropdown-list {
+    display: none;
+    position: fixed;
+    width: 220px; max-height: 300px; overflow-y: auto;
+    background: #fff;
+    border: 1.5px solid rgba(26,107,191,0.25);
+    box-shadow: 0 8px 28px rgba(14,30,60,0.18);
+    z-index: 99999;
+    pointer-events: all;
+  }
+  .mc-rec-dropdown-list.open { display: block; }
+  .mc-rec-dropdown-list::-webkit-scrollbar { width: 4px; }
+  .mc-rec-dropdown-list::-webkit-scrollbar-thumb { background: rgba(26,107,191,0.25); border-radius: 2px; }
+  .mc-rec-dropdown-item {
+    display: block; width: 100%; text-align: left;
+    padding: 9px 14px; border: none; background: none;
+    font-family: 'Noto Sans KR', sans-serif; font-size: 13px;
+    color: #1a2e4a; cursor: pointer; border-bottom: 1px solid rgba(26,107,191,0.07);
+    transition: background 0.12s;
+  }
+  .mc-rec-dropdown-item:last-child { border-bottom: none; }
+  .mc-rec-dropdown-item:hover { background: rgba(26,107,191,0.08); color: #1a6bbf; }
+
+  /* 업로드 안내 */
+  .mc-rec-upload-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px;
+    background: rgba(26,107,191,0.05);
+    border: 1px dashed rgba(26,107,191,0.25);
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .mc-rec-upload-row:hover { background: rgba(26,107,191,0.10); }
+  .mc-rec-upload-icon { font-size: 18px; }
+  .mc-rec-upload-text { font-size: 12px; color: rgba(26,46,74,0.60); line-height: 1.5; }
+  .mc-rec-upload-text b { color: #1a6bbf; }
+  .mc-rec-upload-status { margin-left: auto; font-size: 11px; font-weight: 700; color: #1a9e5c; white-space: nowrap; }
+
+  /* 결과 카드 */
+  .mc-rec-result-list { display: flex; flex-direction: column; gap: 10px; }
+  .mc-rec-result-card {
+    background: #fff;
+    border: 1.5px solid rgba(26,107,191,0.15);
+    border-left: 4px solid #1a6bbf;
+    overflow: hidden;
+  }
+  .mc-rec-result-card-header {
+    background: linear-gradient(90deg, rgba(26,107,191,0.08), transparent);
+    padding: 10px 14px 8px;
+    border-bottom: 1px solid rgba(26,107,191,0.10);
+  }
+  .mc-rec-result-univ {
+    font-size: 15px; font-weight: 700; color: #1a2e4a; margin-bottom: 2px;
+  }
+  .mc-rec-result-dept {
+    font-size: 12px; color: rgba(26,46,74,0.60);
+  }
+  .mc-rec-result-body { padding: 10px 14px 12px; display: flex; flex-direction: column; gap: 8px; }
+  .mc-rec-subj-row { display: flex; flex-direction: column; gap: 3px; }
+  .mc-rec-subj-label {
+    font-size: 9px; letter-spacing: 2px; font-weight: 700;
+    color: rgba(26,46,74,0.40);
+  }
+  .mc-rec-subj-label.core { color: #1a6bbf; }
+  .mc-rec-subj-label.rec  { color: #0e8a7a; }
+  .mc-rec-subj-label.int  { color: #7c3aed; }
+  .mc-rec-subj-text {
+    font-size: 13px; color: #1a2e4a; line-height: 1.6;
+  }
+  .mc-rec-note {
+    font-size: 11px; color: rgba(26,46,74,0.50); line-height: 1.5;
+    padding: 6px 10px;
+    background: rgba(26,46,74,0.04);
+    border: 1px solid rgba(26,46,74,0.08);
+  }
+  .mc-rec-empty {
+    text-align: center; padding: 32px 16px;
+    font-size: 14px; color: rgba(26,46,74,0.40); line-height: 1.8;
+  }
+  .mc-rec-count-label {
+    font-size: 11px; color: rgba(26,46,74,0.45); letter-spacing: 1px;
   }
 
   /* 도우미 버튼 */
@@ -4095,6 +4274,7 @@
     .helper-card {
       display: flex;
       flex-direction: column;
+      overflow: visible;
     }
     .helper-card-head {
       flex-shrink: 0;
@@ -11667,6 +11847,7 @@ window.addEventListener('resize', function() {
     <button class="mc-logout-btn" onclick="mcDoLogout()">로그아웃</button>
     <button id="mc-ai-btn" onclick="openMcAiModal()">✦ 이수학점 계산기</button>
     <button id="mc-sets-btn" onclick="openSetsViewer()">🔗 세트과목</button>
+    <button id="mc-rec-btn" onclick="openMcRecModal()">🎓 권장과목 조회</button>
     <button id="mc-helper-btn" onclick="openMcHelperModal()">
       💡 도우미
       <span id="mc-helper-badge"></span>
@@ -11772,6 +11953,10 @@ window.addEventListener('resize', function() {
       <button class="mc-mob-btn" onclick="openSetsViewer()">
         <span class="mc-mob-icon">🔗</span>
         <span>세트과목</span>
+      </button>
+      <button class="mc-mob-btn" onclick="openMcRecModal()">
+        <span class="mc-mob-icon">🎓</span>
+        <span>권장과목</span>
       </button>
       <button class="mc-mob-btn" onclick="openMcHelperModal()" style="position:relative;">
         <span class="mc-mob-icon">💡</span>
@@ -11895,6 +12080,43 @@ window.addEventListener('resize', function() {
         </div>
         <div class="subtype-calc-notice">학기별 개설과목에서 각 과목의 선택유형(일반/진로/융합)을 기준으로 학생이 선택한 과목의 학점을 합산합니다.</div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- 권장과목 조회 모달 (나만의 교육과정 설계) -->
+<div id="mc-rec-modal" onclick="if(event.target===this && !document.getElementById('mc-rec-dropdown-list').classList.contains('open'))closeMcRecModal()">
+  <div class="mc-rec-box">
+    <div class="mc-rec-header">
+      <div>
+        <div class="mc-rec-header-tag">RECOMMENDED SUBJECTS · 2028학년도</div>
+        <div class="mc-rec-header-title">🎓 권장과목 조회</div>
+      </div>
+      <button class="mc-rec-close" onclick="closeMcRecModal()">×</button>
+    </div>
+    <div class="mc-rec-body">
+      <!-- 파일 업로드 안내 -->
+      <div class="mc-rec-upload-row" id="mc-rec-upload-row" onclick="document.getElementById('mc-rec-file-input').click()">
+        <span class="mc-rec-upload-icon">📊</span>
+        <div class="mc-rec-upload-text">
+          <b id="mc-rec-upload-label">엑셀 파일을 업로드하세요</b><br>
+          <span id="mc-rec-upload-desc">2028학년도_권역별_대학별_권장과목.xlsx</span>
+        </div>
+        <span class="mc-rec-upload-status" id="mc-rec-upload-status" style="display:none"></span>
+        <input type="file" id="mc-rec-file-input" accept=".xlsx,.xls" style="display:none" onchange="mcRecHandleFile(this)">
+      </div>
+      <!-- 학과 검색 -->
+      <div class="mc-rec-search-row">
+        <input class="mc-rec-search-input" id="mc-rec-search-input"
+          type="text" placeholder="학과명을 입력하세요 (예: 컴퓨터공학, 경영학, 의학)"
+          onkeydown="if(event.key==='Enter')mcRecSearch()" />
+        <div class="mc-rec-dropdown-wrap" id="mc-rec-dropdown-wrap">
+          <button class="mc-rec-dropdown-btn" onclick="mcRecToggleDropdown()" id="mc-rec-dropdown-btn" title="전체 학과 목록">▾ 목록</button>
+        </div>
+        <button class="mc-rec-search-btn" onclick="mcRecSearch()">🔍 검색</button>
+      </div>
+      <!-- 결과 -->
+      <div id="mc-rec-result"></div>
     </div>
   </div>
 </div>
@@ -13342,6 +13564,214 @@ function closeMcHelperModal() {
 }
 
 /* ══════════════════════════════════════════════════════
+   권장과목 조회 (나만의 교육과정 설계)
+   ssData(학과별 안내의 엑셀 데이터)를 공유해서 사용
+══════════════════════════════════════════════════════ */
+
+function openMcRecModal() {
+  const modal = document.getElementById('mc-rec-modal');
+  modal.classList.add('open');
+
+  // 계정별 마지막 검색어 복원
+  const key = mcCurrentUser ? 'mc_rec_last_' + mcCurrentUser.username : null;
+  if (key) {
+    const last = localStorage.getItem(key);
+    if (last) document.getElementById('mc-rec-search-input').value = last;
+  }
+
+  if (typeof ssData !== 'undefined' && ssData.length > 0) {
+    mcRecSyncUploadStatus();
+    return;
+  }
+
+  document.getElementById('mc-rec-upload-label').textContent = '데이터 불러오는 중...';
+  document.getElementById('mc-rec-upload-desc').textContent = 'Supabase에서 저장된 데이터를 확인하고 있습니다';
+  ssLoadFromDB().then(ok => {
+    mcRecSyncUploadStatus();
+    if (!ok) {
+      document.getElementById('mc-rec-upload-label').textContent = '엑셀 파일을 업로드하세요';
+      document.getElementById('mc-rec-upload-desc').textContent = '2028학년도_권역별_대학별_권장과목.xlsx';
+    }
+  });
+}
+
+function closeMcRecModal() {
+  document.getElementById('mc-rec-modal').classList.remove('open');
+  document.getElementById('mc-rec-search-input').value = '';
+  document.getElementById('mc-rec-result').innerHTML = '';
+}
+
+function mcRecSyncUploadStatus() {
+  if (typeof ssData !== 'undefined' && ssData.length > 0) {
+    document.getElementById('mc-rec-upload-label').textContent = '✓ 데이터 로드 완료';
+    document.getElementById('mc-rec-upload-desc').textContent = `총 ${ssData.length}개 모집단위 · 클릭하여 파일 변경`;
+    const st = document.getElementById('mc-rec-upload-status');
+    st.textContent = ssData.length + '건';
+    st.style.display = '';
+    mcRecRenderDropdown();
+  } else {
+    document.getElementById('mc-rec-upload-label').textContent = '엑셀 파일을 업로드하세요';
+    document.getElementById('mc-rec-upload-desc').textContent = '2028학년도_권역별_대학별_권장과목.xlsx';
+    document.getElementById('mc-rec-upload-status').style.display = 'none';
+    document.getElementById('mc-rec-dropdown-list').innerHTML = '';
+  }
+}
+
+function mcRecRenderDropdown() {
+  const set = new Set();
+  ssData.forEach(d => {
+    if (d.d1) set.add(d.d1.trim());
+    if (d.d2) set.add(d.d2.trim());
+  });
+  const sorted = [...set].sort((a, b) => a.localeCompare(b, 'ko'));
+
+  const list = document.getElementById('mc-rec-dropdown-list');
+  list.innerHTML = '';
+  sorted.forEach(name => {
+    const btn = document.createElement('button');
+    btn.className = 'mc-rec-dropdown-item';
+    btn.textContent = name;
+    btn.addEventListener('mousedown', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      list.classList.remove('open');
+      document.getElementById('mc-rec-dropdown-btn').classList.remove('open');
+      document.getElementById('mc-rec-search-input').value = name;
+      mcRecSearch();
+    });
+    list.appendChild(btn);
+  });
+}
+
+function mcRecToggleDropdown() {
+  const list = document.getElementById('mc-rec-dropdown-list');
+  const btn  = document.getElementById('mc-rec-dropdown-btn');
+  const isOpen = list.classList.toggle('open');
+  btn.classList.toggle('open', isOpen);
+
+  if (isOpen) {
+    // 버튼 위치 기준으로 fixed 좌표 계산
+    const rect = btn.getBoundingClientRect();
+    list.style.top  = (rect.bottom + 4) + 'px';
+    list.style.left = Math.max(4, rect.right - 220) + 'px';
+
+    setTimeout(() => {
+      document.addEventListener('click', mcRecCloseDropdownOutside);
+    }, 0);
+  }
+}
+
+function mcRecCloseDropdownOutside(e) {
+  const list = document.getElementById('mc-rec-dropdown-list');
+  const btn  = document.getElementById('mc-rec-dropdown-btn');
+  if ((list && list.contains(e.target)) || (btn && btn.contains(e.target))) return;
+  if (list) list.classList.remove('open');
+  if (btn)  btn.classList.remove('open');
+  document.removeEventListener('click', mcRecCloseDropdownOutside);
+}
+
+function mcRecSelectFromDropdown(name) {
+  document.getElementById('mc-rec-dropdown-list').classList.remove('open');
+  document.getElementById('mc-rec-dropdown-btn').classList.remove('open');
+  document.removeEventListener('click', mcRecCloseDropdownOutside);
+  document.getElementById('mc-rec-search-input').value = name;
+  mcRecSearch();
+}
+
+function mcRecHandleFile(input) {
+  // 학과별 안내의 handleSSFileUpload 재사용 (ssData 공유)
+  if (typeof handleSSFileUpload === 'function') {
+    handleSSFileUpload(input);
+    // 업로드 완료 후 상태 갱신 (파일 읽기가 비동기이므로 약간 대기)
+    setTimeout(mcRecSyncUploadStatus, 800);
+  }
+}
+
+function mcRecSearch() {
+  const query = (document.getElementById('mc-rec-search-input').value || '').trim();
+  const resultEl = document.getElementById('mc-rec-result');
+
+  if (!query) {
+    resultEl.innerHTML = '<div class="mc-rec-empty">학과명을 입력하고 검색하세요.</div>';
+    return;
+  }
+
+  // 계정별 마지막 검색어 저장
+  if (mcCurrentUser) {
+    localStorage.setItem('mc_rec_last_' + mcCurrentUser.username, query);
+  }
+
+  if (typeof ssData === 'undefined' || ssData.length === 0) {
+    resultEl.innerHTML = '<div class="mc-rec-empty">📊 먼저 엑셀 파일을 업로드해주세요.</div>';
+    return;
+  }
+
+  // 학과명(d1, d2)에 query가 포함된 항목 모두 검색 (대소문자·공백 무시)
+  const q = query.replace(/\s/g, '').toLowerCase();
+  const matched = ssData.filter(d => {
+    const d1 = (d.d1 || '').replace(/\s/g, '').toLowerCase();
+    const d2 = (d.d2 || '').replace(/\s/g, '').toLowerCase();
+    return d1.includes(q) || d2.includes(q);
+  });
+
+  if (matched.length === 0) {
+    resultEl.innerHTML = `<div class="mc-rec-empty">「${escHtml(query)}」와 일치하는 학과가 없습니다.<br><span style="font-size:12px">다른 키워드로 검색해 보세요.</span></div>`;
+    return;
+  }
+
+  // 대학별로 그룹핑 (같은 대학+모집단위 중복 제거)
+  const seen = new Set();
+  const cards = [];
+  matched.forEach(d => {
+    const deptDisplay = d.split ? d.d2 : d.d1;
+    const deptSub     = d.split ? d.d1 : '';
+    const key = `${d.u}||${d.d1}||${d.d2 || ''}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+
+    const isInt = d.int || (!d.rec || d.rec === '-' || d.rec === '');
+    let subjHtml = '';
+    if (isInt) {
+      subjHtml = `
+        <div class="mc-rec-subj-row">
+          <div class="mc-rec-subj-label int">반영과목</div>
+          <div class="mc-rec-subj-text">${escHtml(d.c || '정보 없음')}</div>
+        </div>`;
+    } else {
+      subjHtml = `
+        <div class="mc-rec-subj-row">
+          <div class="mc-rec-subj-label core">핵심과목</div>
+          <div class="mc-rec-subj-text">${escHtml(d.c || '-')}</div>
+        </div>
+        <div class="mc-rec-subj-row">
+          <div class="mc-rec-subj-label rec">권장과목</div>
+          <div class="mc-rec-subj-text">${escHtml(d.rec || '-')}</div>
+        </div>`;
+    }
+    const noteHtml = (d.n && d.n !== '-' && d.n.trim())
+      ? `<div class="mc-rec-note">📌 ${escHtml(d.n).replace(/\n/g,'<br>')}</div>` : '';
+
+    cards.push(`
+      <div class="mc-rec-result-card">
+        <div class="mc-rec-result-card-header">
+          <div class="mc-rec-result-univ">${escHtml(d.u)}</div>
+          <div class="mc-rec-result-dept">${deptSub ? escHtml(deptSub) + ' › ' : ''}${escHtml(deptDisplay)}
+            <span style="margin-left:6px;font-size:10px;color:rgba(26,46,74,0.40);">${escHtml(d.r)} · ${escHtml(d.a || '')}</span>
+          </div>
+        </div>
+        <div class="mc-rec-result-body">
+          ${subjHtml}
+          ${noteHtml}
+        </div>
+      </div>`);
+  });
+
+  resultEl.innerHTML = `
+    <div class="mc-rec-count-label">검색 결과 ${cards.length}개 대학</div>
+    <div class="mc-rec-result-list">${cards.join('')}</div>`;
+}
+
+/* ══════════════════════════════════════════════════════
    세트과목 연계 경고
 ══════════════════════════════════════════════════════ */
 
@@ -13658,6 +14088,8 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 </script>
+<!-- 권장과목 드롭다운 (body 직하 — 모달 backdrop 클릭 간섭 방지) -->
+<div class="mc-rec-dropdown-list" id="mc-rec-dropdown-list"></div>
 
 </body>
 </html>
