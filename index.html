@@ -3831,8 +3831,14 @@
   }
   #mc-rec-modal.open { display: flex; }
   @media (max-width: 600px) {
-    #mc-rec-modal { padding: 12px 10px; align-items: flex-end; }
-    .mc-rec-box { max-height: 92vh !important; border-radius: 8px 8px 2px 2px !important; }
+    #mc-rec-modal { padding: 12px 10px; align-items: center; }
+    .mc-rec-box { max-height: 92vh !important; border-radius: 8px !important; width: calc(100vw - 20px) !important; }
+    .mc-rec-search-row { flex-wrap: nowrap; gap: 6px; }
+    .mc-rec-search-input { min-width: 0; flex: 1 1 0; font-size: 14px; padding: 10px 10px; }
+    .mc-rec-search-btn { flex-shrink: 0; padding: 10px 12px; font-size: 12px; white-space: nowrap; }
+    .mc-rec-dropdown-btn { flex-shrink: 0; font-size: 12px; padding: 0 10px; }
+    .mc-rec-body { padding: 14px 14px 20px; }
+    .mc-rec-header { padding: 14px 16px 12px; }
   }
   .mc-rec-box {
     background: #f0f4f8;
@@ -12085,7 +12091,7 @@ window.addEventListener('resize', function() {
 </div>
 
 <!-- 권장과목 조회 모달 (나만의 교육과정 설계) -->
-<div id="mc-rec-modal" onclick="if(event.target===this && !document.getElementById('mc-rec-dropdown-list').classList.contains('open'))closeMcRecModal()">
+<div id="mc-rec-modal">
   <div class="mc-rec-box">
     <div class="mc-rec-header">
       <div>
@@ -13571,6 +13577,53 @@ function closeMcHelperModal() {
 function openMcRecModal() {
   const modal = document.getElementById('mc-rec-modal');
   modal.classList.add('open');
+
+  // 드래그 후 backdrop에서 마우스/터치가 끝나도 창이 닫히지 않도록 처리
+  // mousedown 위치와 mouseup 위치를 비교해 실제 클릭(이동 거리 < 6px)일 때만 닫힘
+  if (!modal._recDragGuardAttached) {
+    modal._recDragGuardAttached = true;
+    let _recPointerDownTarget = null;
+    let _recPointerDownX = 0;
+    let _recPointerDownY = 0;
+
+    modal.addEventListener('mousedown', function(e) {
+      _recPointerDownTarget = e.target;
+      _recPointerDownX = e.clientX;
+      _recPointerDownY = e.clientY;
+    });
+    modal.addEventListener('mouseup', function(e) {
+      if (e.target !== modal) return;
+      const dx = Math.abs(e.clientX - _recPointerDownX);
+      const dy = Math.abs(e.clientY - _recPointerDownY);
+      const isDrag = dx > 6 || dy > 6;
+      if (!isDrag && _recPointerDownTarget === modal) {
+        if (!document.getElementById('mc-rec-dropdown-list').classList.contains('open')) {
+          closeMcRecModal();
+        }
+      }
+    });
+
+    // 터치 지원
+    let _recTouchStartX = 0, _recTouchStartY = 0, _recTouchOnBackdrop = false;
+    modal.addEventListener('touchstart', function(e) {
+      _recTouchOnBackdrop = e.target === modal;
+      if (e.touches.length > 0) {
+        _recTouchStartX = e.touches[0].clientX;
+        _recTouchStartY = e.touches[0].clientY;
+      }
+    }, { passive: true });
+    modal.addEventListener('touchend', function(e) {
+      if (!_recTouchOnBackdrop) return;
+      const touch = e.changedTouches[0];
+      const dx = Math.abs(touch.clientX - _recTouchStartX);
+      const dy = Math.abs(touch.clientY - _recTouchStartY);
+      if (dx < 6 && dy < 6) {
+        if (!document.getElementById('mc-rec-dropdown-list').classList.contains('open')) {
+          closeMcRecModal();
+        }
+      }
+    }, { passive: true });
+  }
 
   // 계정별 마지막 검색어 복원
   const key = mcCurrentUser ? 'mc_rec_last_' + mcCurrentUser.username : null;
