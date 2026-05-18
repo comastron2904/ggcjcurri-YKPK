@@ -1353,9 +1353,9 @@
     }
     /* 헤더 셀 너비도 JS가 동적으로 조절 */
     .sem-col-header-row .sem-col-header-cell {
-      width: 130px;
-      min-width: 130px;
-      max-width: 130px;
+      width: 200px;
+      min-width: 200px;
+      max-width: 200px;
       flex-shrink: 0 !important;
       box-sizing: border-box !important;
       /* 모바일: border를 1px로 통일 */
@@ -1365,9 +1365,9 @@
       border-right: none !important;
     }
     .sem-col-header-row .sem-col-header-cell:first-child {
-      width: 72px;
-      min-width: 72px;
-      max-width: 72px;
+      width: 90px;
+      min-width: 90px;
+      max-width: 90px;
       /* 학기 헤더 첫 셀: row-head border와 통일 (1px) */
       border-right: 1px solid rgba(26,107,191,0.12) !important;
     }
@@ -1396,9 +1396,9 @@
       display: flex !important;
       flex-direction: column !important;
       flex-shrink: 0 !important;
-      width: 72px !important;
-      min-width: 72px !important;
-      max-width: 72px !important;
+      width: 90px !important;
+      min-width: 90px !important;
+      max-width: 90px !important;
       box-sizing: border-box !important;
       position: static !important;
       border-right: 1px solid rgba(26,107,191,0.12) !important;
@@ -1430,9 +1430,9 @@
     .sem-cell {
       display: flex !important;
       flex-direction: column !important;
-      width: 130px;
-      min-width: 130px;
-      max-width: 130px;
+      width: 200px;
+      min-width: 200px;
+      max-width: 200px;
       flex-shrink: 0 !important;
       box-sizing: border-box !important;
       height: auto !important;
@@ -9079,9 +9079,9 @@ function resetMobileStyles() {
    subtype별 6개 이상 열: 260px, 미만: 140px, 학기명 열: 72px
 ────────────────────────────────────────────── */
 function applyMobileColWidths(maxReq, maxSS, maxKns, maxFor, maxMus, threshold) {
-  const COL_NARROW = 140;
-  const COL_WIDE   = 260; // 2열(.wide) 그리드가 뭉개지지 않도록 충분히 확보
-  const COL_HEAD   = 72;
+  const COL_NARROW = 200;
+  const COL_WIDE   = 320; // 2열(.wide) 그리드가 뭉개지지 않도록 충분히 확보
+  const COL_HEAD   = 90;
 
   // subtype별 max 기준으로 wide 판단: 어떤 subtype이라도 6개 이상이면 WIDE
   function isWideBySubtype(typeFilter) {
