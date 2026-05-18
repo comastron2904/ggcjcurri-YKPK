@@ -2619,6 +2619,82 @@
     padding: 7px 10px; letter-spacing: 0.5px;
   }
 
+  /* ── 이미지 + 텍스트 나란히 블록 ── */
+  .enroll-imgtext-block {
+    padding: 18px 22px;
+  }
+  .enroll-imgtext-layout {
+    display: flex; gap: 18px; align-items: flex-start;
+  }
+  .enroll-imgtext-layout.img-right {
+    flex-direction: row-reverse;
+  }
+  .enroll-imgtext-img-col {
+    flex-shrink: 0; width: 42%; display: flex; flex-direction: column; align-items: center; gap: 0;
+  }
+  .enroll-imgtext-text-col {
+    flex: 1; display: flex; flex-direction: column; gap: 0;
+  }
+  .enroll-imgtext-portrait {
+    width: 100%; max-height: 540px; object-fit: contain;
+    background: rgba(26,107,191,0.04); display: block;
+    border: 1px solid rgba(26,107,191,0.08);
+  }
+  .enroll-imgtext-img-caption {
+    font-size: 11px; color: rgba(26,46,74,0.40); text-align: center;
+    padding: 6px 6px 0; letter-spacing: 0.5px; width: 100%;
+  }
+  .enroll-imgtext-upload-zone {
+    display: none; border: 2px dashed rgba(42,138,138,0.3);
+    padding: 28px 10px; text-align: center; cursor: pointer;
+    color: rgba(42,138,138,0.6); font-size: 12px; letter-spacing: 1px;
+    transition: background 0.2s, color 0.2s, border-color 0.2s; width: 100%;
+  }
+  .editing-mode .enroll-imgtext-upload-zone { display: block; }
+  .enroll-imgtext-upload-zone:hover { border-color: rgba(42,138,138,0.7); color: #4fc4c4; background: rgba(42,138,138,0.04); }
+  .enroll-imgtext-text-view {
+    white-space: pre-wrap; font-size: 14px; line-height: 1.8;
+    color: var(--white); padding: 4px 0;
+    min-height: 40px;
+  }
+  .enroll-imgtext-text-edit {
+    display: none;
+    background: rgba(26,107,191,0.05); border: 1px solid rgba(26,107,191,0.18);
+    color: var(--white); font-family: 'Noto Sans KR', sans-serif;
+    font-size: 14px; line-height: 1.8; padding: 10px 12px; outline: none;
+    resize: vertical; min-height: 120px; width: 100%;
+    transition: border-color 0.2s;
+  }
+  .editing-mode .enroll-imgtext-text-edit { display: block; }
+  .editing-mode .enroll-imgtext-text-view { display: none; }
+  .enroll-imgtext-text-edit:focus { border-color: var(--gold); }
+  .enroll-imgtext-text-edit::placeholder { color: rgba(26,46,74,0.28); font-size: 12px; }
+  .enroll-imgtext-controls {
+    display: none; gap: 6px; flex-wrap: wrap; margin-top: 10px;
+    padding-top: 10px; border-top: 1px dashed rgba(26,107,191,0.15);
+  }
+  .editing-mode .enroll-imgtext-controls { display: flex; }
+  .enroll-imgtext-ctrl-btn {
+    padding: 4px 12px; font-size: 11px; letter-spacing: 0.5px;
+    background: rgba(26,107,191,0.07); border: 1px solid rgba(26,107,191,0.20);
+    color: var(--gold); font-family: 'Noto Sans KR', sans-serif;
+    cursor: pointer; transition: background 0.18s, border-color 0.18s;
+  }
+  .enroll-imgtext-ctrl-btn:hover { background: rgba(26,107,191,0.15); border-color: var(--gold); }
+  .enroll-imgtext-ctrl-btn.active { background: rgba(26,107,191,0.18); border-color: var(--gold); font-weight: 700; }
+  .enroll-imgtext-del-img-btn {
+    padding: 4px 10px; font-size: 11px;
+    background: rgba(214,48,48,0.06); border: 1px solid rgba(214,48,48,0.25);
+    color: rgba(214,48,48,0.75); font-family: 'Noto Sans KR', sans-serif;
+    cursor: pointer; transition: background 0.18s, color 0.18s, border-color 0.18s;
+  }
+  .enroll-imgtext-del-img-btn:hover { background: rgba(214,48,48,0.12); color: var(--danger); border-color: var(--danger); }
+  @media (max-width: 640px) {
+    .enroll-imgtext-layout,
+    .enroll-imgtext-layout.img-right { flex-direction: column; }
+    .enroll-imgtext-img-col { width: 100%; }
+  }
+
   /* PDF 페이지 뷰어 */
   .dept-pdf-viewer {
     position: relative; width: 100%;
@@ -6115,6 +6191,7 @@
       <button class="dd-tool-btn" onclick="enrollAddBlock('title')">＋ 제목</button>
       <button class="dd-tool-btn" onclick="enrollAddBlock('text')">＋ 텍스트</button>
       <button class="dd-tool-btn" onclick="enrollAddBlock('file')">＋ 파일/사진/PDF</button>
+      <button class="dd-tool-btn" onclick="enrollAddBlock('image-text')" style="border-color:rgba(14,138,122,0.4);color:#0e8a7a;">＋ 사진＋텍스트</button>
       <button class="dd-tool-btn dd-save-btn" onclick="saveEnrollBlocks()">💾 저장</button>
       <button class="dd-tool-btn dd-exit-btn" onclick="exitEnrollEdit()">✕ 편집 종료</button>
     </div>
@@ -10099,6 +10176,10 @@ async function saveEnrollBlocks() {
       const ta = document.getElementById('eta-' + b.id);
       if (ta) b.text = ta.value;
     }
+    if (b.type === 'image-text') {
+      const ta = document.getElementById('eit-ta-' + b.id);
+      if (ta) b.text = ta.value;
+    }
   });
   try { await sbSet(ENROLL_KEY, enrollBlocks); }
   catch(e) { alert('저장 공간이 부족합니다.'); return; }
@@ -10122,7 +10203,7 @@ function createEnrollBlockEl(b, idx) {
   div.id = 'eblock-' + b.id;
   div.innerHTML = `
     <div class="dept-block-handle">
-      <span class="dept-block-type-badge">${b.type === 'text' ? 'TEXT' : b.type === 'title' ? 'TITLE' : 'FILE'}</span>
+      <span class="dept-block-type-badge">${b.type === 'text' ? 'TEXT' : b.type === 'title' ? 'TITLE' : b.type === 'image-text' ? 'IMG+TEXT' : 'FILE'}</span>
       <div class="dept-block-actions">
         ${idx > 0 ? `<button class="dept-block-action-btn" onclick="moveEnrollBlock('${b.id}',-1)">▲</button>` : ''}
         ${idx < enrollBlocks.length-1 ? `<button class="dept-block-action-btn" onclick="moveEnrollBlock('${b.id}',1)">▼</button>` : ''}
@@ -10153,6 +10234,11 @@ function createEnrollBlockEl(b, idx) {
       if (ta) { ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; }
       if (ta) ta.addEventListener('input', function(){ this.style.height='auto'; this.style.height=this.scrollHeight+'px'; });
     }, 0);
+  } else if (b.type === 'image-text') {
+    const inner = document.createElement('div');
+    inner.className = 'enroll-imgtext-block';
+    div.appendChild(inner);
+    setTimeout(() => renderEnrollImgTextBlock(b, inner), 0);
   } else {
     const inner = document.createElement('div');
     inner.className = 'dept-file-block';
@@ -10166,6 +10252,104 @@ function createEnrollBlockEl(b, idx) {
     setTimeout(() => renderEnrollFileItems(b), 0);
   }
   return div;
+}
+
+/* ── 이미지+텍스트 블록 렌더 ── */
+function renderEnrollImgTextBlock(b, container) {
+  if (!container) container = document.querySelector('#eblock-' + b.id + ' .enroll-imgtext-block');
+  if (!container) return;
+  const imgPos  = b.imgPos  || 'left';   // 'left' | 'right'
+  const imgUrl  = b.imgUrl  || null;
+  const imgName = b.imgName || '';
+  const text    = b.text    || '';
+  const editing = enrollEditMode;
+
+  const layoutClass = 'enroll-imgtext-layout' + (imgPos === 'right' ? ' img-right' : '');
+
+  container.innerHTML = `
+    <div class="${layoutClass}" id="eit-layout-${b.id}">
+      <!-- 사진 컬럼 -->
+      <div class="enroll-imgtext-img-col" id="eit-img-col-${b.id}">
+        ${imgUrl
+          ? `<img class="enroll-imgtext-portrait" src="${imgUrl}" alt="${escHtml(imgName)}" id="eit-img-${b.id}">
+             <div class="enroll-imgtext-img-caption">${escHtml(imgName)}</div>`
+          : `<div class="enroll-imgtext-upload-zone" id="eit-upzone-${b.id}" onclick="document.getElementById('eit-input-${b.id}').click()">
+               📷<br>클릭하여 세로 사진 추가
+             </div>`
+        }
+        <input type="file" accept="image/*" style="display:none" id="eit-input-${b.id}"
+          onchange="handleEnrollImgTextImage('${b.id}', this)">
+        <!-- 편집 컨트롤 -->
+        <div class="enroll-imgtext-controls" id="eit-ctrl-${b.id}">
+          <span style="font-size:10px;letter-spacing:1px;color:rgba(26,46,74,0.45);margin-right:4px;">사진 위치:</span>
+          <button class="enroll-imgtext-ctrl-btn${imgPos==='left'?' active':''}" onclick="enrollImgTextSetPos('${b.id}','left')">◀ 왼쪽</button>
+          <button class="enroll-imgtext-ctrl-btn${imgPos==='right'?' active':''}" onclick="enrollImgTextSetPos('${b.id}','right')">오른쪽 ▶</button>
+          ${imgUrl ? `<button class="enroll-imgtext-del-img-btn" onclick="enrollImgTextDeleteImg('${b.id}')">사진 삭제</button>` : ''}
+        </div>
+      </div>
+      <!-- 텍스트 컬럼 -->
+      <div class="enroll-imgtext-text-col">
+        <div class="enroll-imgtext-text-view" id="eit-view-${b.id}">${escHtml(text)}</div>
+        <textarea class="enroll-imgtext-text-edit" id="eit-ta-${b.id}"
+          placeholder="사진 옆에 표시할 텍스트를 입력하세요...">${escHtml(text)}</textarea>
+      </div>
+    </div>`;
+
+  // textarea 자동 높이
+  setTimeout(() => {
+    const ta = document.getElementById('eit-ta-' + b.id);
+    if (ta) {
+      ta.style.height = 'auto';
+      ta.style.height = (ta.scrollHeight || 120) + 'px';
+      ta.addEventListener('input', function(){ this.style.height='auto'; this.style.height=this.scrollHeight+'px'; });
+    }
+  }, 0);
+}
+
+async function handleEnrollImgTextImage(blockId, input) {
+  const b = enrollBlocks.find(x => x.id === blockId);
+  if (!b || !input.files[0]) return;
+  const file = input.files[0];
+  input.value = '';
+  // 업로드 중 표시
+  const zone = document.getElementById('eit-upzone-' + blockId);
+  if (zone) zone.textContent = '⏳ 업로드 중...';
+  try {
+    const url = await uploadToStorage(file);
+    b.imgUrl  = url;
+    b.imgName = file.name;
+    await sbSet(ENROLL_KEY, enrollBlocks).catch(console.error);
+    const container = document.querySelector('#eblock-' + blockId + ' .enroll-imgtext-block');
+    renderEnrollImgTextBlock(b, container);
+  } catch(err) {
+    alert('사진 업로드 실패: ' + err.message);
+    const container = document.querySelector('#eblock-' + blockId + ' .enroll-imgtext-block');
+    renderEnrollImgTextBlock(b, container);
+  }
+}
+
+function enrollImgTextSetPos(blockId, pos) {
+  const b = enrollBlocks.find(x => x.id === blockId);
+  if (!b) return;
+  // textarea 내용 먼저 동기화
+  const ta = document.getElementById('eit-ta-' + blockId);
+  if (ta) b.text = ta.value;
+  b.imgPos = pos;
+  const container = document.querySelector('#eblock-' + blockId + ' .enroll-imgtext-block');
+  renderEnrollImgTextBlock(b, container);
+}
+
+function enrollImgTextDeleteImg(blockId) {
+  const b = enrollBlocks.find(x => x.id === blockId);
+  if (!b) return;
+  const ta = document.getElementById('eit-ta-' + blockId);
+  if (ta) b.text = ta.value;
+  if (b.imgUrl) deleteFromStorage(b.imgUrl);
+  b.imgUrl  = null;
+  b.imgName = '';
+  const container = document.querySelector('#eblock-' + blockId + ' .enroll-imgtext-block');
+  renderEnrollImgTextBlock(b, container);
+  sbSet(ENROLL_KEY, enrollBlocks).catch(console.error);
 }
 
 function renderEnrollFileItems(b) {
@@ -10271,7 +10455,13 @@ function enrollAddBlock(type) {
     }
   });
   const id = 'e' + Date.now();
-  enrollBlocks.push(type === 'file' ? { id, type, files: [] } : { id, type, text: '' });
+  if (type === 'file') {
+    enrollBlocks.push({ id, type, files: [] });
+  } else if (type === 'image-text') {
+    enrollBlocks.push({ id, type, imgUrl: null, imgName: '', imgPos: 'left', text: '' });
+  } else {
+    enrollBlocks.push({ id, type, text: '' });
+  }
   renderEnrollBlocks();
   setTimeout(() => {
     const el = document.getElementById('eblock-' + id);
@@ -10286,6 +10476,7 @@ function deleteEnrollBlock(blockId) {
       const ta = document.getElementById('eta-' + b.id);
       if (ta) b.text = ta.value;
     }
+    if (b.type === 'image-text') { const ta = document.getElementById('eit-ta-' + b.id); if (ta) b.text = ta.value; }
   });
   enrollBlocks = enrollBlocks.filter(b => b.id !== blockId);
   renderEnrollBlocks();
@@ -10294,6 +10485,7 @@ function deleteEnrollBlock(blockId) {
 function moveEnrollBlock(blockId, dir) {
   enrollBlocks.forEach(b => {
     if (b.type === 'text' || b.type === 'title') { const ta = document.getElementById('eta-' + b.id); if (ta) b.text = ta.value; }
+    if (b.type === 'image-text') { const ta = document.getElementById('eit-ta-' + b.id); if (ta) b.text = ta.value; }
   });
   const idx = enrollBlocks.findIndex(b => b.id === blockId);
   if (idx < 0) return;
@@ -10320,6 +10512,7 @@ function enterEnrollEdit() {
 function exitEnrollEdit() {
   enrollBlocks.forEach(b => {
     if (b.type === 'text' || b.type === 'title') { const ta = document.getElementById('eta-' + b.id); if (ta) b.text = ta.value; }
+    if (b.type === 'image-text') { const ta = document.getElementById('eit-ta-' + b.id); if (ta) b.text = ta.value; }
   });
   enrollEditMode = false;
   document.getElementById('enroll-edit-btn').classList.remove('active');
