@@ -8952,7 +8952,7 @@ function updateSemGridColumns() {
       });
     });
 
-    // 같은 cell에서 wide가 하나라도 있으면 non-wide list에 half-width 적용
+    // 같은 cell에서 wide가 하나라도 있으면 non-wide list도 모두 wide로 통일
     const allKeys = ['req', ...elecMap.map(e => 'elec-' + e.key)];
     allKeys.forEach(keyPart => {
       const lists = ['일반','진로','융합'].map(st => {
@@ -8962,9 +8962,12 @@ function updateSemGridColumns() {
         return document.getElementById(id);
       }).filter(Boolean);
       const anyWide = lists.some(l => l.classList.contains('wide'));
-      lists.forEach(l => {
-        l.classList.toggle('half-width', anyWide && !l.classList.contains('wide'));
-      });
+      if (anyWide) {
+        lists.forEach(l => {
+          l.classList.add('wide');
+          l.classList.remove('half-width');
+        });
+      }
     });
   });
 
