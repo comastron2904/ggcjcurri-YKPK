@@ -1749,7 +1749,7 @@
   .sem-subj-card.graded .sem-subj-cat  { opacity: 0.8; }
   .sem-subj-info { flex: 1; min-width: 0; }
   .sem-subj-name { font-size: 15px; font-weight: 600; color: #1a2e4a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .sem-subj-cat { font-size: 13px; letter-spacing: 0.5px; margin-top: 1px; opacity: 0.75; }
+  .sem-subj-cat { font-size: 13px; letter-spacing: 0.5px; margin-top: 1px; opacity: 0.75; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
   .sem-subj-arrow { font-size: 13px; color: rgba(201,168,76,0.60); flex-shrink: 0; transition: color 0.2s; }
   .sem-subj-card:hover .sem-subj-arrow { color: var(--gold); }
   .btn-sem-subj-del { display: none !important; }
@@ -1793,7 +1793,7 @@
   .spj-item.to-remove .spj-name { color: #d63030; text-decoration: line-through; }
   .spj-cat-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
   .spj-name { flex: 1; font-size: 13px; color: #1a2e4a; font-weight: 500; }
-  .spj-cat-label { font-size: 10px; letter-spacing: 1px; opacity: 0.80; }
+  .spj-cat-label { font-size: 10px; letter-spacing: 1px; opacity: 0.80; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 9em; flex-shrink: 0; }
 
   .subj-pick-foot {
     display: flex; align-items: center; justify-content: space-between;
@@ -6995,7 +6995,7 @@ function renderList() {
     const row = document.createElement('div');
     row.className = 'subject-item';
     row.innerHTML = `
-      <span class="subject-cat-tag" style="color:${CAT_COLORS[s.cat]||'#b0b0b0'};border-color:${CAT_COLORS[s.cat]||'#b0b0b0'}">${s.cat}</span>
+      <span class="subject-cat-tag" style="color:${CAT_COLORS[s.cat]||'#b0b0b0'};border-color:${CAT_COLORS[s.cat]||'#b0b0b0'}" title="${escHtml(s.cat)}">${escHtml(abbreviateCat(s.cat))}</span>
       <span class="subject-name">${escHtml(s.name)}</span>
       <span class="subj-go-hint">상세보기 →</span>
       <div class="subject-actions" onclick="event.stopPropagation()">
@@ -8307,6 +8307,15 @@ const CAT_COLORS = {
   '예술':'#e07030','기술ㆍ가정/정보/제2외국어/한문/교양':'#5ab8a0',
   /* 구버전 호환 */ '사회':'#e0b87e','예체능':'#e07030','직업':'#7ec8e0','기타':'#5ab8a0'
 };
+
+/* 긴 교과군명 축약 (모바일 버튼 과도한 확장 방지) */
+const CAT_ABBR = {
+  '기술ㆍ가정/정보/제2외국어/한문/교양': '기술ㆍ가정/…/교양',
+  '사회(역사/도덕 포함)': '사회'
+};
+function abbreviateCat(cat) {
+  return CAT_ABBR[cat] || cat;
+}
 let activeCatSubj = '';
 
 function openCatSubjScreen() {
@@ -8847,7 +8856,7 @@ function renderSemCol(colIdx) {
     card.innerHTML = `
       <div class="sem-subj-info">
         <div class="sem-subj-name">${escHtml(name)}</div>
-        <div class="sem-subj-cat" style="color:${_catColor}">${cat}</div>
+        <div class="sem-subj-cat" style="color:${_catColor}" title="${escHtml(cat)}">${escHtml(abbreviateCat(cat))}</div>
       </div>
       ${gradeIconHtml}
       <span class="sem-subj-arrow">›</span>`;
@@ -9288,7 +9297,7 @@ function renderSpjList() {
       <div class="spj-check">${checkMark}</div>
       <div class="spj-cat-dot" style="background:${CAT_COLORS[s.cat]||'#b0b0b0'}"></div>
       <div class="spj-name">${escHtml(s.name)}</div>
-      <div class="spj-cat-label" style="color:${CAT_COLORS[s.cat]||'#b0b0b0'}">${s.cat}</div>`;
+      <div class="spj-cat-label" style="color:${CAT_COLORS[s.cat]||'#b0b0b0'}" title="${escHtml(s.cat)}">${escHtml(abbreviateCat(s.cat))}</div>`;
     row.onclick = () => {
       if (already) {
         if (pickToRemove.has(s.name)) pickToRemove.delete(s.name);
@@ -12712,7 +12721,7 @@ function mcPickRenderBodyAll() {
         row.innerHTML = `
           <div class="mc-pick-check">${isSel ? '✓' : ''}</div>
           <div class="mc-pick-item-name">${escHtml(name)}</div>
-          ${catLabel ? `<div class="mc-pick-item-cat">${escHtml(catLabel)}</div>` : ''}`;
+          ${catLabel ? `<div class="mc-pick-item-cat" title="${escHtml(catLabel)}">${escHtml(abbreviateCat(catLabel))}</div>` : ''}`;
 
         row.addEventListener('click', () => {
           const tmp = _pickAllTemp[cat.key] || [];
