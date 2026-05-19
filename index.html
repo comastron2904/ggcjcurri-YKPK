@@ -3172,6 +3172,53 @@
   }
   .gb-upload-btn:hover { background: rgba(26,107,191,0.10); border-color: var(--gold); color: var(--gold); }
 
+  /* ── PDF 드롭다운 선택기 ── */
+  .gb-dropdown-wrap {
+    position: relative; flex: 1; min-width: 0;
+  }
+  .gb-dropdown-btn {
+    width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    padding: 7px 14px;
+    background: rgba(26,107,191,0.06);
+    border: 1px solid rgba(26,107,191,0.22);
+    color: rgba(26,46,74,0.75);
+    font-family: 'Noto Sans KR', sans-serif; font-size: 12px;
+    cursor: pointer; transition: background 0.18s, border-color 0.18s;
+    text-align: left; white-space: nowrap; overflow: hidden;
+  }
+  .gb-dropdown-btn:hover { background: rgba(26,107,191,0.12); border-color: var(--gold); color: var(--gold); }
+  .gb-dropdown-btn span:first-child { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .gb-dropdown-arrow { font-size: 10px; flex-shrink:0; transition: transform 0.2s; }
+  .gb-dropdown-wrap.open .gb-dropdown-arrow { transform: rotate(180deg); }
+  .gb-dropdown-menu {
+    position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+    background: #ffffff; border: 1px solid rgba(26,107,191,0.22);
+    box-shadow: 0 8px 32px rgba(26,107,191,0.18);
+    z-index: 900; max-height: 260px; overflow-y: auto;
+    display: none; flex-direction: column;
+  }
+  .gb-dropdown-wrap.open .gb-dropdown-menu { display: flex; }
+  .gb-dropdown-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 14px;
+    font-family: 'Noto Sans KR', sans-serif; font-size: 12px;
+    color: rgba(26,46,74,0.75); cursor: pointer;
+    border-bottom: 1px solid rgba(26,107,191,0.07);
+    transition: background 0.15s, color 0.15s;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .gb-dropdown-item:last-child { border-bottom: none; }
+  .gb-dropdown-item:hover { background: rgba(26,107,191,0.08); color: var(--gold); }
+  .gb-dropdown-item.active { background: rgba(26,107,191,0.13); color: var(--gold); font-weight: 700; }
+  .gb-dropdown-item .gb-dd-num {
+    font-size: 10px; color: rgba(26,107,191,0.50); min-width: 18px; text-align: right; flex-shrink: 0;
+  }
+  .gb-dropdown-item .gb-dd-name { flex: 1; overflow: hidden; text-overflow: ellipsis; }
+  .gb-dropdown-empty {
+    padding: 18px 14px; font-size: 12px; color: rgba(26,46,74,0.35);
+    text-align: center; letter-spacing: 0.5px;
+  }
+
   /* 패널 뷰어 영역 */
   .gb-panel-viewer {
     flex: 1; overflow-y: auto; overflow-x: hidden;
@@ -3297,7 +3344,7 @@
   .iframe-no-url span { font-size: 36px; }
 
   .gb-panel-fullscreen {
-    position: fixed; inset: 0; z-index: 1200;
+    position: fixed; inset: 0; z-index: 1500;
     background: #1a2e4a;
     display: none; flex-direction: column;
   }
@@ -6281,13 +6328,33 @@
   <!-- 단일 PDF 스프레드 뷰 -->
   <div class="gb-panels">
 
-    <!-- 상단 바 (파일명 + 업로드) -->
+    <!-- 상단 바 (드롭다운 PDF 선택 + 업로드) -->
     <div class="gb-panel-bar" style="flex-shrink:0;">
-      <span class="gb-panel-label">GUIDEBOOK · 책자</span>
-      <span class="gb-panel-filename" id="gb-left-filename">PDF 없음</span>
+      <span class="gb-panel-label" style="flex-shrink:0;">GUIDEBOOK · 책자</span>
+
+      <!-- PDF 드롭다운 선택 -->
+      <div class="gb-dropdown-wrap" id="gb-dropdown-wrap">
+        <button class="gb-dropdown-btn" id="gb-dropdown-btn" onclick="toggleGbDropdown(event)">
+          <span id="gb-dropdown-label">PDF 선택...</span>
+          <span class="gb-dropdown-arrow" id="gb-dropdown-arrow">▾</span>
+        </button>
+        <div class="gb-dropdown-menu" id="gb-dropdown-menu">
+          <!-- JS로 동적 생성 -->
+          <div class="gb-dropdown-empty" id="gb-dropdown-empty">등록된 PDF가 없습니다</div>
+        </div>
+      </div>
+
+      <!-- 파일명 (숨겨진 레거시 참조용) -->
+      <span class="gb-panel-filename" id="gb-left-filename" style="display:none;">PDF 없음</span>
+
       <button class="gb-fullscreen-btn" id="gb-left-fs-btn" onclick="openGbFullscreen('left')" title="전체화면">⛶</button>
-      <button class="gb-upload-btn" id="gb-left-upload-btn" onclick="triggerGbPdfInput('left')">📂 PDF 업로드</button>
-      <!-- 하위 호환: right 업로드 버튼은 숨김 처리 (코드 호환용) -->
+
+      <!-- 편집 모드: PDF 추가 버튼 -->
+      <button class="gb-upload-btn" id="gb-left-upload-btn" onclick="triggerGbAddPdf()" style="display:none;">📂 PDF 추가</button>
+      <!-- 편집 모드: PDF 삭제 버튼 -->
+      <button class="gb-upload-btn" id="gb-delete-pdf-btn" onclick="gbDeleteCurrentPdf()" style="display:none; border-color:rgba(214,48,48,0.35); color:rgba(214,48,48,0.7);">🗑 삭제</button>
+
+      <!-- 하위 호환 -->
       <button class="gb-upload-btn" id="gb-right-upload-btn" style="display:none;" onclick="triggerGbPdfInput('right')"></button>
     </div>
 
@@ -6341,7 +6408,11 @@
 
   </div>
 
-<!-- 전체화면 PDF 오버레이 -->
+
+</div>
+<!-- guidebook-screen 끝 -->
+
+<!-- 전체화면 PDF 오버레이 (guidebook-screen 밖으로 이동: contain:layout style 격리 해결) -->
 <div id="gb-fs-overlay" class="gb-panel-fullscreen">
   <div class="gb-fs-bar">
     <button class="gb-fs-close" onclick="closeGbFullscreen()">✕ 축소</button>
@@ -6354,8 +6425,6 @@
     <span class="gb-page-info" id="gb-fs-navinfo">0 / 0</span>
     <button class="gb-nav-btn" id="gb-fs-next" onclick="gbFsPageGo(1)" disabled>›</button>
   </div>
-</div>
-
 </div>
 
 <!-- ══════ 공통 PDF 전체화면 오버레이 ══════ -->
@@ -10794,67 +10863,275 @@ function closeSuneungFileView() {
 function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 /* ══════════════════════════════════════
-   선택과목 길라잡이 책자 기능 (단일 PDF 스프레드 뷰)
+   선택과목 길라잡이 책자 기능 (멀티 PDF 드롭다운 뷰)
 ══════════════════════════════════════ */
-const GB_KEY_LEFT  = 'cg_gb_left';
-const GB_KEY_RIGHT = 'cg_gb_right'; // 하위 호환 키 (미사용)
-const GB_KEY_SINGLE = 'cg_gb_single'; // 단일 PDF 키
+const GB_KEY_LEFT    = 'cg_gb_left';
+const GB_KEY_RIGHT   = 'cg_gb_right'; // 하위 호환 키 (미사용)
+const GB_KEY_SINGLE  = 'cg_gb_single'; // 하위 호환 키
+const GB_KEY_LIST    = 'cg_gb_pdf_list'; // 멀티 PDF 목록 키
 let gbEditMode = false;
 
-// 단일 PDF 상태
-const gbState = {
-  left:  { pdfDoc: null, curPage: 1, totalPages: 0, rendering: false },
-  right: { pdfDoc: null, curPage: 1, totalPages: 0, rendering: false }
-};
+// 멀티 PDF 목록 상태
+// 각 항목: { id: string, name: string, url: string }
+let gbPdfList    = [];
+let gbCurrentIdx = -1; // 현재 선택된 인덱스
 
 // 단일 PDF 상태 (스프레드용)
-// coverMode: 'none'=표지없음(2쪽씩 시작), 'single'=1쪽 표지 후 2쪽씩
-// spreadDir: 'odd-even'=홀→짝(기본), 'even-odd'=짝→홀
 let gbSingle = { pdfDoc: null, curPage: 1, totalPages: 0, rendering: false };
 let gbCoverMode = 'none';    // 'none' | 'single'
 let gbSpreadDir = 'odd-even'; // 'odd-even' | 'even-odd'
 const GB_KEY_SETTINGS = 'cg_gb_settings';
 
+// gbState 하위 호환
+const gbState = {
+  left:  { pdfDoc: null, curPage: 1, totalPages: 0, rendering: false },
+  right: { pdfDoc: null, curPage: 1, totalPages: 0, rendering: false }
+};
+
 function isMobileView() { return window.innerWidth < 768; }
 
 // 현재 curPage에서 좌/우 패널에 렌더할 실제 페이지 번호 계산
 function gbGetSpreadPages(curPage) {
-  // coverMode='single'이고 curPage===1 이면 표지: 왼쪽만 단독
   if (gbCoverMode === 'single' && curPage === 1) {
     return { left: 1, right: null, isCover: true };
   }
   return { left: curPage, right: curPage + 1, isCover: false };
 }
 
-// step 계산: 현재 위치에서 다음으로 이동할 페이지 수
 function gbGetStep(curPage) {
   if (isMobileView()) return 1;
-  if (gbCoverMode === 'single' && curPage === 1) return 1; // 표지 → 다음은 1칸
+  if (gbCoverMode === 'single' && curPage === 1) return 1;
   return 2;
 }
 
+/* ── 드롭다운 UI ── */
+function _gbRenderDropdown() {
+  const menu    = document.getElementById('gb-dropdown-menu');
+  const empty   = document.getElementById('gb-dropdown-empty');
+  const label   = document.getElementById('gb-dropdown-label');
+  if (!menu) return;
+
+  // 기존 아이템 제거 (empty 제외)
+  Array.from(menu.querySelectorAll('.gb-dropdown-item')).forEach(el => el.remove());
+
+  if (gbPdfList.length === 0) {
+    if (empty) empty.style.display = '';
+    if (label) label.textContent = 'PDF 없음';
+    return;
+  }
+  if (empty) empty.style.display = 'none';
+
+  gbPdfList.forEach((item, idx) => {
+    const el = document.createElement('div');
+    el.className = 'gb-dropdown-item' + (idx === gbCurrentIdx ? ' active' : '');
+    el.innerHTML = '<span class="gb-dd-num">' + (idx + 1) + '</span><span class="gb-dd-name">📄 ' + _gbEsc(item.name) + '</span>';
+    el.addEventListener('click', function() { gbSelectPdf(idx); });
+    menu.appendChild(el);
+  });
+
+  const cur = gbCurrentIdx >= 0 && gbCurrentIdx < gbPdfList.length ? gbPdfList[gbCurrentIdx] : null;
+  if (label) label.textContent = cur ? '📄 ' + cur.name : 'PDF를 선택하세요';
+}
+
+function _gbEsc(str) {
+  return (str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function toggleGbDropdown(e) {
+  e && e.stopPropagation();
+  const wrap = document.getElementById('gb-dropdown-wrap');
+  if (!wrap) return;
+  wrap.classList.toggle('open');
+}
+
+function closeGbDropdown() {
+  document.getElementById('gb-dropdown-wrap')?.classList.remove('open');
+}
+
+// 드롭다운 외부 클릭 시 닫기
+document.addEventListener('click', function(e) {
+  const wrap = document.getElementById('gb-dropdown-wrap');
+  if (wrap && !wrap.contains(e.target)) closeGbDropdown();
+});
+
+/* ── PDF 선택 ── */
+async function gbSelectPdf(idx) {
+  closeGbDropdown();
+  if (idx < 0 || idx >= gbPdfList.length) return;
+  gbCurrentIdx = idx;
+  _gbRenderDropdown();
+  const item = gbPdfList[idx];
+  await renderGbPdf('left', item.url, item.name);
+  // 삭제 버튼 표시 갱신
+  _gbUpdateDeleteBtn();
+}
+
+function _gbUpdateDeleteBtn() {
+  const btn = document.getElementById('gb-delete-pdf-btn');
+  if (btn) btn.style.display = (gbEditMode && gbCurrentIdx >= 0) ? 'inline-flex' : 'none';
+}
+
+/* ── 화면 열기/닫기 ── */
+let _gbLoaded = false;
 function openGuidebookScreen() {
   document.getElementById('guidebook-screen').classList.add('open');
   gbSingle.rendering = false;
-  // 설정 로드 후 PDF 렌더링
-  gbLoadSettings().then(() => {
-    if (gbSingle.pdfDoc) gbRenderSpread();
-    else loadGbPdfFromStorage('left');
+  gbLoadSettings().then(async () => {
+    if (!_gbLoaded) {
+      _gbLoaded = true;
+      await _gbLoadListFromStorage();
+    } else if (gbSingle.pdfDoc) {
+      gbRenderSpread();
+    }
   });
-  // 편집 버튼 상태 초기화
   gbEditMode = false;
   document.getElementById('gb-edit-btn').classList.remove('active');
   document.getElementById('gb-left-upload-btn').style.display  = 'none';
-  document.getElementById('gb-right-upload-btn').style.display = 'none';
+  const delBtn = document.getElementById('gb-delete-pdf-btn');
+  if (delBtn) delBtn.style.display = 'none';
   const bar = document.getElementById('gb-settings-bar');
   if (bar) bar.style.display = 'none';
 }
 
 function closeGuidebookScreen() {
   document.getElementById('guidebook-screen').classList.remove('open');
+  closeGbDropdown();
   const bar = document.getElementById('gb-settings-bar');
   if (bar) bar.style.display = 'none';
 }
+
+/* ── Supabase에서 목록 로드 ── */
+async function _gbLoadListFromStorage() {
+  // 로딩 표시
+  const lv = document.getElementById('gb-left-viewer');
+  if (lv) lv.innerHTML = '<div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>PDF 목록 불러오는 중...</span></div>';
+
+  try {
+    // 신규: 멀티 목록 키
+    const list = await sbGet(GB_KEY_LIST);
+    if (list && Array.isArray(list) && list.length > 0) {
+      gbPdfList = list;
+      _gbRenderDropdown();
+      // 첫 번째 PDF 자동 로드
+      gbCurrentIdx = 0;
+      _gbRenderDropdown();
+      await renderGbPdf('left', gbPdfList[0].url, gbPdfList[0].name);
+      return;
+    }
+  } catch(_) {}
+
+  // 하위 호환: 기존 단일 키
+  try {
+    const stored = await sbGet(GB_KEY_SINGLE);
+    if (stored && stored.url) {
+      gbPdfList = [{ id: 'legacy_single', name: stored.name || 'PDF', url: stored.url }];
+      gbCurrentIdx = 0;
+      _gbRenderDropdown();
+      await renderGbPdf('left', stored.url, stored.name || 'PDF');
+      return;
+    }
+  } catch(_) {}
+
+  // 하위 호환: 이전 left 키
+  try {
+    const stored = await sbGet(GB_KEY_LEFT);
+    if (stored && stored.url) {
+      gbPdfList = [{ id: 'legacy_left', name: stored.name || 'PDF', url: stored.url }];
+      gbCurrentIdx = 0;
+      _gbRenderDropdown();
+      await renderGbPdf('left', stored.url, stored.name || 'PDF');
+      return;
+    }
+  } catch(_) {}
+
+  // PDF 없음
+  if (lv) {
+    const empty = document.getElementById('gb-left-empty');
+    lv.innerHTML = '';
+    if (empty) { lv.appendChild(empty); empty.style.display = ''; }
+  }
+  _gbRenderDropdown();
+}
+
+/* ── PDF 저장 목록 업데이트 ── */
+async function _gbSaveList() {
+  try { await sbSet(GB_KEY_LIST, gbPdfList); } catch(_) {}
+}
+
+/* ── 편집 모드: PDF 추가 ── */
+function triggerGbPdfInput(side) { triggerGbAddPdf(); } // 하위 호환
+function triggerGbAddPdf() {
+  const prev = document.getElementById('gb-tmp-input-add');
+  if (prev) prev.remove();
+  const tmp = document.createElement('input');
+  tmp.type = 'file';
+  tmp.id   = 'gb-tmp-input-add';
+  tmp.accept = 'application/pdf';
+  tmp.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;';
+  tmp.addEventListener('change', function() {
+    const file = tmp.files[0];
+    tmp.remove();
+    if (file) handleGbAddPdfFile(file);
+  });
+  document.body.appendChild(tmp);
+  tmp.click();
+}
+
+async function handleGbAddPdfFile(file) {
+  if (!file) return;
+  const viewer = document.getElementById('gb-left-viewer');
+  const empty  = document.getElementById('gb-left-empty');
+  if (empty) empty.style.display = 'none';
+  if (viewer) viewer.innerHTML = '<div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>업로드 중...</span></div>';
+  try {
+    const url = await uploadToStorage(file);
+    const newItem = { id: 'gb_' + Date.now(), name: file.name, url };
+    gbPdfList.push(newItem);
+    await _gbSaveList();
+    gbCurrentIdx = gbPdfList.length - 1;
+    _gbRenderDropdown();
+    await renderGbPdf('left', url, file.name);
+    _gbUpdateDeleteBtn();
+    showDeptToast('✓ PDF가 추가되었습니다 (' + gbPdfList.length + '개)');
+  } catch(err) {
+    if (viewer) viewer.innerHTML = '';
+    if (empty) empty.style.display = '';
+    showDeptToast('⚠ 업로드 실패: ' + err.message);
+  }
+}
+
+/* ── 편집 모드: 현재 PDF 삭제 ── */
+async function gbDeleteCurrentPdf() {
+  if (gbCurrentIdx < 0 || gbCurrentIdx >= gbPdfList.length) return;
+  const item = gbPdfList[gbCurrentIdx];
+  if (!confirm('「' + item.name + '」을(를) 삭제하시겠습니까?')) return;
+  try { await deleteFromStorage(item.url); } catch(_) {}
+  gbPdfList.splice(gbCurrentIdx, 1);
+  await _gbSaveList();
+  // 인덱스 조정
+  if (gbPdfList.length === 0) {
+    gbCurrentIdx = -1;
+    gbSingle.pdfDoc = null;
+    gbSingle.totalPages = 0;
+    const viewer = document.getElementById('gb-left-viewer');
+    const empty  = document.getElementById('gb-left-empty');
+    if (viewer) viewer.innerHTML = '';
+    if (empty)  { viewer.appendChild(empty); empty.style.display = ''; }
+    document.getElementById('gb-spread-nav').style.display = 'none';
+  } else {
+    gbCurrentIdx = Math.min(gbCurrentIdx, gbPdfList.length - 1);
+    await gbSelectPdf(gbCurrentIdx);
+  }
+  _gbRenderDropdown();
+  _gbUpdateDeleteBtn();
+  showDeptToast('✓ PDF가 삭제되었습니다');
+}
+
+// handleGbPdfFile 하위 호환
+async function handleGbPdfFile(file) { await handleGbAddPdfFile(file); }
+
+// loadGbPdfFromStorage 하위 호환
+async function loadGbPdfFromStorage(side) { await _gbLoadListFromStorage(); }
 
 /* ══════════════════════════════════════
    브로셔 화면 (메뉴 09) — 6번 길라잡이와 동일 구조
@@ -11271,6 +11548,7 @@ function enterGbEdit() {
   gbEditMode = true;
   document.getElementById('gb-edit-btn').classList.add('active');
   document.getElementById('gb-left-upload-btn').style.display  = 'inline-flex';
+  _gbUpdateDeleteBtn();
   // 스프레드 설정 패널 표시
   _gbShowSettings();
 }
@@ -11328,81 +11606,7 @@ async function gbLoadSettings() {
   } catch(_) {}
 }
 
-// PDF 업로드 input 트리거
-function triggerGbPdfInput(side) {
-  const prev = document.getElementById('gb-tmp-input-' + side);
-  if (prev) prev.remove();
-  const tmp = document.createElement('input');
-  tmp.type = 'file';
-  tmp.id   = 'gb-tmp-input-' + side;
-  tmp.accept = 'application/pdf';
-  tmp.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;';
-  tmp.addEventListener('change', function() {
-    // 파일 객체를 먼저 로컬 변수에 복사한 뒤 DOM에서 제거
-    const file = tmp.files[0];
-    tmp.remove();
-    if (file) handleGbPdfFile(file);
-  });
-  document.body.appendChild(tmp);
-  tmp.click();
-}
-
-// PDF 파일 선택 처리 (단일 PDF)
-async function handleGbPdfFile(file) {
-  if (!file) return;
-
-  const viewer = document.getElementById('gb-left-viewer');
-  const empty  = document.getElementById('gb-left-empty');
-  empty.style.display = 'none';
-  viewer.innerHTML = '<div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>업로드 중...</span></div>';
-
-  try {
-    // 1) Supabase Storage에 업로드
-    const url = await uploadToStorage(file);
-
-    // 2) 이전 파일 삭제
-    try {
-      const prevStored = await sbGet(GB_KEY_SINGLE);
-      if (prevStored && prevStored.url) await deleteFromStorage(prevStored.url);
-    } catch(_) {}
-    // 하위 호환: 이전 left 키 파일도 삭제 시도
-    try {
-      const prevLeft = await sbGet(GB_KEY_LEFT);
-      if (prevLeft && prevLeft.url) await deleteFromStorage(prevLeft.url);
-    } catch(_) {}
-
-    // 3) URL + 파일명을 cg_store에 저장
-    await sbSet(GB_KEY_SINGLE, { name: file.name, url });
-
-    // 4) 렌더링
-    await renderGbPdf('left', url, file.name);
-    showDeptToast('✓ PDF가 저장되었습니다');
-  } catch(err) {
-    viewer.innerHTML = '';
-    empty.style.display = '';
-    showDeptToast('⚠ 업로드 실패: ' + err.message);
-  }
-}
-
-// Supabase에서 PDF URL 로드 (단일 PDF, 하위 호환)
-async function loadGbPdfFromStorage(side) {
-  // 새 단일 키 우선
-  try {
-    const stored = await sbGet(GB_KEY_SINGLE);
-    if (stored && stored.url) {
-      await renderGbPdf('left', stored.url, stored.name || 'PDF');
-      return;
-    }
-  } catch(_) {}
-  // 하위 호환: 이전 left 키
-  try {
-    const stored = await sbGet(GB_KEY_LEFT);
-    if (stored && stored.url) {
-      await renderGbPdf('left', stored.url, stored.name || 'PDF');
-      return;
-    }
-  } catch(_) {}
-}
+// (triggerGbPdfInput, handleGbPdfFile, loadGbPdfFromStorage는 위에서 정의됨)
 
 // PDF 렌더링 (단일 PDF → 스프레드 초기화)
 async function renderGbPdf(side, dataUrl, filename) {
@@ -11413,8 +11617,8 @@ async function renderGbPdf(side, dataUrl, filename) {
   gbSingle.rendering = false;
   gbSingle.pdfDoc    = null;
 
-  empty.style.display = 'none';
-  viewer.innerHTML = '<div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>PDF 불러오는 중...</span></div>';
+  if (empty) empty.style.display = 'none';
+  if (viewer) viewer.innerHTML = '<div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>PDF 불러오는 중...</span></div>';
 
   try {
     const loadingTask = pdfjsLib.getDocument(dataUrl);
@@ -11422,7 +11626,10 @@ async function renderGbPdf(side, dataUrl, filename) {
     gbSingle.pdfDoc     = pdf;
     gbSingle.totalPages = pdf.numPages;
     gbSingle.curPage    = 1;
-    fnEl.textContent = '📄 ' + filename;
+    if (fnEl) fnEl.textContent = '📄 ' + filename;
+    // 드롭다운 라벨 업데이트
+    const ddLabel = document.getElementById('gb-dropdown-label');
+    if (ddLabel) ddLabel.textContent = '📄 ' + filename;
     // 다운로드 버튼 활성화
     const dlBtn = document.getElementById('gb-download-btn');
     if (dlBtn) {
@@ -11430,12 +11637,13 @@ async function renderGbPdf(side, dataUrl, filename) {
       dlBtn.download = filename;
       dlBtn.classList.add('visible');
     }
-    document.getElementById('gb-spread-nav').style.display = 'flex';
+    const navEl = document.getElementById('gb-spread-nav');
+    if (navEl) navEl.style.display = 'flex';
     const jumpBtn = document.getElementById('gb-jump-trigger-btn');
     if (jumpBtn) jumpBtn.classList.add('visible');
     await gbRenderSpread();
   } catch(err) {
-    viewer.innerHTML = '<div class="gb-pdf-loading"><div style="font-size:28px">⚠️</div><span>PDF를 불러오지 못했습니다.</span></div>';
+    if (viewer) viewer.innerHTML = '<div class="gb-pdf-loading"><div style="font-size:28px">⚠️</div><span>PDF를 불러오지 못했습니다.</span></div>';
   }
 }
 
@@ -11610,8 +11818,9 @@ function openGbFullscreen(side) {
   // 단일 PDF 모드: 항상 gbSingle 사용
   if (!gbSingle.pdfDoc) return;
   gbFsSide = 'left';
-  const fnEl = document.getElementById('gb-left-filename');
-  document.getElementById('gb-fs-filename').textContent = fnEl.textContent;
+  const curItem = (gbCurrentIdx >= 0 && gbCurrentIdx < gbPdfList.length) ? gbPdfList[gbCurrentIdx] : null;
+  const curName = curItem ? curItem.name : (document.getElementById('gb-left-filename').textContent || 'PDF');
+  document.getElementById('gb-fs-filename').textContent = '📄 ' + curName;
   document.getElementById('gb-fs-overlay').classList.add('open');
   gbFsRenderPage();
 }
@@ -11903,19 +12112,23 @@ window.addEventListener('resize', function() {
 
   </div>
 
-  <!-- 전체화면 오버레이 -->
-  <div id="br-fs-overlay" class="gb-panel-fullscreen">
-    <div class="gb-fs-bar">
-      <button class="gb-fs-close" onclick="closeBrFullscreen()">✕ 축소</button>
-      <span class="gb-fs-filename" id="br-fs-filename"></span>
-      <span class="gb-page-info" id="br-fs-pageinfo" style="min-width:80px;text-align:right;"></span>
-    </div>
-    <div class="gb-fs-viewer" id="br-fs-viewer"></div>
-    <div class="gb-fs-nav">
-      <button class="gb-nav-btn" id="br-fs-prev" onclick="brFsPageGo(-1)" disabled>‹</button>
-      <span class="gb-page-info" id="br-fs-navinfo">0 / 0</span>
-      <button class="gb-nav-btn" id="br-fs-next" onclick="brFsPageGo(1)" disabled>›</button>
-    </div>
+  </div>
+
+</div>
+<!-- brochure-screen 끝 -->
+
+<!-- 브로셔 전체화면 오버레이 (brochure-screen 밖으로 이동: contain 격리 해결) -->
+<div id="br-fs-overlay" class="gb-panel-fullscreen">
+  <div class="gb-fs-bar">
+    <button class="gb-fs-close" onclick="closeBrFullscreen()">✕ 축소</button>
+    <span class="gb-fs-filename" id="br-fs-filename"></span>
+    <span class="gb-page-info" id="br-fs-pageinfo" style="min-width:80px;text-align:right;"></span>
+  </div>
+  <div class="gb-fs-viewer" id="br-fs-viewer"></div>
+  <div class="gb-fs-nav">
+    <button class="gb-nav-btn" id="br-fs-prev" onclick="brFsPageGo(-1)" disabled>‹</button>
+    <span class="gb-page-info" id="br-fs-navinfo">0 / 0</span>
+    <button class="gb-nav-btn" id="br-fs-next" onclick="brFsPageGo(1)" disabled>›</button>
   </div>
 </div>
 
