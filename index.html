@@ -13094,11 +13094,27 @@ async function mcDoSignup() {
   msg.textContent = '처리 중...';
   const check = await mcFetch('/rest/v1/mc_users?username=eq.' + encodeURIComponent(id) + '&select=id', 'GET');
   if (check.ok && check.data && check.data.length > 0) { msg.textContent = '이미 사용 중인 아이디입니다.'; return; }
+
+  // 동일 연도 내 학년·반·번호 중복 체크
+  const thisSignupYear = new Date().getFullYear();
+  const dupCheck = await mcFetch(
+    '/rest/v1/mc_users?grade=eq.' + encodeURIComponent(grade) +
+    '&class_num=eq.' + encodeURIComponent(cls) +
+    '&student_num=eq.' + encodeURIComponent(numInt) +
+    '&grade_updated_year=eq.' + thisSignupYear +
+    '&select=id&limit=1', 'GET'
+  );
+  if (dupCheck.ok && dupCheck.data && dupCheck.data.length > 0) {
+    msg.textContent = '이미 같은 학년·반·번호로 가입된 계정이 있습니다. 다시 확인해 주세요.';
+    return;
+  }
+
   const pwHash = btoa(encodeURIComponent(pw));
   const ins = await mcFetch('/rest/v1/mc_users', 'POST', {
     username: id, pw_hash: pwHash, data: [{},{},{},{}],
     real_name: name,
-    grade: parseInt(grade, 10), class_num: parseInt(cls, 10), student_num: numInt
+    grade: parseInt(grade, 10), class_num: parseInt(cls, 10), student_num: numInt,
+    grade_updated_year: thisSignupYear
   });
   if (ins.ok) {
     msg.className = 'mc-msg ok'; msg.textContent = '가입 완료! 로그인해 주세요.';
@@ -14269,26 +14285,50 @@ function getSetWarnings(selections, upToSemIdx) {
   subjectSets.forEach(set => {
     const steps = (set.steps || []).filter(s => s.subjectName && s.semIdx >= 0);
     if (steps.length < 2) return;
-    for (let i = 0; i < steps.length - 1; i++) {
-      const prev = steps[i];
-      const next = steps[i + 1];
-      if (upToSemIdx !== undefined) {
-        // prev는 현재 학기 이전이어야 하고,
-        // next는 정확히 현재 학기여야 함
-        // → 현재 학기에 연계과목이 누락됐을 때만 경고 (이전 학기 간 연계는 해당 학기 저장 시에 경고)
-        if (prev.semIdx >= upToSemIdx) continue;
-        if (next.semIdx !== upToSemIdx) continue;
+
+    if (upToSemIdx !== undefined) {
+      // 현재 학기(upToSemIdx) 저장 시:
+      // 이전 학기(prev.semIdx < upToSemIdx)에 선행과목이 선택돼 있으면,
+      // 그 이후 ~ 현재 학기(next.semIdx <= upToSemIdx)의 연계과목이 모두 선택됐는지 체크
+      for (let i = 0; i < steps.length - 1; i++) {
+        const prev = steps[i];
+        if (prev.semIdx >= upToSemIdx) continue; // prev는 현재 학기 이전이어야 함
+        const hasPrev = allSelected.some(s => s.name === prev.subjectName && s.semIdx === prev.semIdx);
+        if (!hasPrev) continue; // 이전 학기에 선행과목 없으면 스킵
+        // prev가 선택돼 있으면, 이후 steps 중 현재 학기 이하인 것들이 모두 선택됐는지 확인
+        for (let j = i + 1; j < steps.length; j++) {
+          const next = steps[j];
+          if (next.semIdx > upToSemIdx) break; // 현재 학기 초과면 더 이상 체크 불필요
+          // 탐색은 이전 학기 전부 하되, 경고는 현재 학기(upToSemIdx)에 누락된 것만 출력
+          if (next.semIdx !== upToSemIdx) continue;
+          const hasNext = allSelected.some(s => s.name === next.subjectName && s.semIdx === next.semIdx);
+          if (!hasNext) {
+            warnings.push({
+              setName: set.name || '(이름 없는 세트)',
+              prevSubj: prev.subjectName,
+              prevSem: SEM_LABELS[prev.semIdx] || '',
+              nextSubj: next.subjectName,
+              nextSem: SEM_LABELS[next.semIdx] || '',
+            });
+          }
+        }
       }
-      const hasPrev = allSelected.some(s => s.name === prev.subjectName && s.semIdx === prev.semIdx);
-      const hasNext = allSelected.some(s => s.name === next.subjectName && s.semIdx === next.semIdx);
-      if (hasPrev && !hasNext) {
-        warnings.push({
-          setName: set.name || '(이름 없는 세트)',
-          prevSubj: prev.subjectName,
-          prevSem: SEM_LABELS[prev.semIdx] || '',
-          nextSubj: next.subjectName,
-          nextSem: SEM_LABELS[next.semIdx] || '',
-        });
+    } else {
+      // upToSemIdx 미지정 시: 기존 인접 쌍 체크
+      for (let i = 0; i < steps.length - 1; i++) {
+        const prev = steps[i];
+        const next = steps[i + 1];
+        const hasPrev = allSelected.some(s => s.name === prev.subjectName && s.semIdx === prev.semIdx);
+        const hasNext = allSelected.some(s => s.name === next.subjectName && s.semIdx === next.semIdx);
+        if (hasPrev && !hasNext) {
+          warnings.push({
+            setName: set.name || '(이름 없는 세트)',
+            prevSubj: prev.subjectName,
+            prevSem: SEM_LABELS[prev.semIdx] || '',
+            nextSubj: next.subjectName,
+            nextSem: SEM_LABELS[next.semIdx] || '',
+          });
+        }
       }
     }
   });
