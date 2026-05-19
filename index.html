@@ -13135,7 +13135,7 @@ async function mcDoLogin() {
 
   msg.textContent = '확인 중...';
   const pwHash = btoa(encodeURIComponent(pw));
-  const res = await mcFetch('/rest/v1/mc_users?username=eq.' + encodeURIComponent(id) + '&pw_hash=eq.' + encodeURIComponent(pwHash) + '&select=id,username,data,career,memos,grade,class_num,student_num', 'GET');
+  const res = await mcFetch('/rest/v1/mc_users?username=eq.' + encodeURIComponent(id) + '&pw_hash=eq.' + encodeURIComponent(pwHash) + '&select=id,username,data,career,memos,grade,class_num,student_num,grade_updated_year', 'GET');
   if (!res.ok || !res.data || res.data.length === 0) { msg.textContent = '아이디 또는 비밀번호가 틀렸습니다.'; return; }
   const user = res.data[0];
 
@@ -13143,34 +13143,30 @@ async function mcDoLogin() {
   const now = new Date();
   const thisYear = now.getFullYear();
   const isMarchOrLater = now.getMonth() >= 2; // 0-indexed: 2 = 3월
-  const gradeKey = 'mc_grade_updated_' + user.id + '_' + thisYear;
-  const alreadyUpdated = localStorage.getItem(gradeKey);
+  const alreadyUpdated = (user.grade_updated_year != null && user.grade_updated_year >= thisYear);
 
   if (isMarchOrLater && !alreadyUpdated) {
-    // 3학년 → 작년에 2학년으로 승급된 계정만 졸업 삭제
-    // (올해 신규 생성된 3학년은 내년 3월 이후에 삭제)
+    // 3학년 → grade_updated_year가 작년이면(작년에 2→3 승급) 졸업 삭제
+    // grade_updated_year가 없거나 올해면 신규 생성 계정 → 연도만 기록 후 정상 로그인
     if (user.grade === 3) {
-      const prevYearKey = 'mc_grade_updated_' + user.id + '_' + (thisYear - 1);
-      const upgradedLastYear = localStorage.getItem(prevYearKey);
-      if (upgradedLastYear) {
-        // 작년에 2→3학년 승급된 계정 → 졸업 처리
+      if (user.grade_updated_year === thisYear - 1) {
+        // 작년에 승급된 계정 → 졸업 처리
         msg.textContent = '처리 중...';
         await mcFetch('/rest/v1/mc_users?id=eq.' + user.id, 'DELETE');
         localStorage.removeItem('mc_user');
-        localStorage.removeItem(prevYearKey);
         msg.className = 'mc-msg';
         msg.innerHTML = '졸업으로 인해 계정이 삭제되었습니다.<br><span style="font-size:11px;opacity:0.7;">이용해 주셔서 감사합니다 🎓</span>';
         return;
       } else {
-        // 올해 신규 생성된 3학년 → 올해 key만 기록하고 정상 로그인
-        localStorage.setItem(gradeKey, '1');
+        // 올해 신규 생성된 3학년 → 연도 기록 후 정상 로그인
+        await mcFetch('/rest/v1/mc_users?id=eq.' + user.id, 'PATCH', { grade_updated_year: thisYear });
+        user.grade_updated_year = thisYear;
       }
     }
-    // 2학년 → 3학년 승급 + 반/번호 NULL
+    // 2학년 → 3학년 승급 + 반/번호 NULL + 연도 기록
     if (user.grade === 2) {
-      await mcFetch('/rest/v1/mc_users?id=eq.' + user.id, 'PATCH', { grade: 3, class_num: null, student_num: null });
-      user.grade = 3; user.class_num = null; user.student_num = null;
-      localStorage.setItem(gradeKey, '1');
+      await mcFetch('/rest/v1/mc_users?id=eq.' + user.id, 'PATCH', { grade: 3, class_num: null, student_num: null, grade_updated_year: thisYear });
+      user.grade = 3; user.class_num = null; user.student_num = null; user.grade_updated_year = thisYear;
     }
     // 1학년 → 재설정 팝업은 mcOpenScreen 이후에 띄움 (아래에서 처리)
   }
@@ -15034,9 +15030,10 @@ async function submitGradeReset() {
       return;
     }
 
-    // DB 업데이트: 2학년으로 승급 + 새 반/번호
+    // DB 업데이트: 2학년으로 승급 + 새 반/번호 + 연도 기록
     const patch = await mcFetch('/rest/v1/mc_users?id=eq.' + mcCurrentUser.id, 'PATCH', {
-      grade: 2, class_num: parseInt(cls, 10), student_num: num
+      grade: 2, class_num: parseInt(cls, 10), student_num: num,
+      grade_updated_year: new Date().getFullYear()
     });
     if (!patch.ok) { msg.textContent = '저장 중 오류가 발생했습니다.'; btn.disabled = false; btn.textContent = '2학년으로 설정 완료'; return; }
 
@@ -15044,11 +15041,8 @@ async function submitGradeReset() {
     mcCurrentUser.grade = 2;
     mcCurrentUser.class_num = parseInt(cls, 10);
     mcCurrentUser.student_num = num;
+    mcCurrentUser.grade_updated_year = new Date().getFullYear();
     localStorage.setItem('mc_user', JSON.stringify(mcCurrentUser));
-
-    // gradeKey 기록 (다시 뜨지 않도록)
-    var gradeKey = 'mc_grade_updated_' + mcCurrentUser.id + '_' + new Date().getFullYear();
-    localStorage.setItem(gradeKey, '1');
 
     // 헤더 업데이트
     var gradeLabel = '2학년 ' + cls + '반 ' + num + '번';
