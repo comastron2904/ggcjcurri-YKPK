@@ -14272,8 +14272,14 @@ function getSetWarnings(selections, upToSemIdx) {
     for (let i = 0; i < steps.length - 1; i++) {
       const prev = steps[i];
       const next = steps[i + 1];
-      // upToSemIdx가 지정된 경우: prev가 해당 학기 이하인 쌍만 체크
-      if (upToSemIdx !== undefined && prev.semIdx > upToSemIdx) continue;
+      // upToSemIdx가 지정된 경우:
+      // prev는 현재 학기(upToSemIdx) 이전 학기에 있어야 하고,
+      // next는 정확히 현재 학기(upToSemIdx)여야 함
+      // → 이전 학기에 세트 선행과목이 존재할 때만, 현재 학기의 연계과목 누락 경고
+      if (upToSemIdx !== undefined) {
+        if (prev.semIdx >= upToSemIdx) continue; // prev가 현재 학기 이상이면 스킵
+        if (next.semIdx !== upToSemIdx) continue; // next가 현재 학기가 아니면 스킵
+      }
       const hasPrev = allSelected.some(s => s.name === prev.subjectName && s.semIdx === prev.semIdx);
       const hasNext = allSelected.some(s => s.name === next.subjectName && s.semIdx === next.semIdx);
       if (hasPrev && !hasNext) {
