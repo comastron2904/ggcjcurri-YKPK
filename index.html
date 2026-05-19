@@ -11996,9 +11996,81 @@ window.addEventListener('resize', function() {
       </div>
       <div class="mc-msg" id="mc-login-msg"></div>
       <button class="mc-btn-primary" onclick="mcDoLogin()">로그인</button>
+      <div style="display:flex;justify-content:center;gap:18px;margin-top:12px;">
+        <button onclick="mcSwitchTab('find-id')" style="background:none;border:none;font-family:'Noto Sans KR',sans-serif;font-size:11px;letter-spacing:0.5px;color:rgba(26,46,74,0.45);cursor:pointer;text-decoration:underline;text-underline-offset:3px;transition:color 0.2s;" onmouseover="this.style.color='#1a6bbf'" onmouseout="this.style.color='rgba(26,46,74,0.45)'">아이디 찾기</button>
+        <span style="color:rgba(26,46,74,0.20);font-size:11px;">|</span>
+        <button onclick="mcSwitchTab('find-pw')" style="background:none;border:none;font-family:'Noto Sans KR',sans-serif;font-size:11px;letter-spacing:0.5px;color:rgba(26,46,74,0.45);cursor:pointer;text-decoration:underline;text-underline-offset:3px;transition:color 0.2s;" onmouseover="this.style.color='#1a6bbf'" onmouseout="this.style.color='rgba(26,46,74,0.45)'">비밀번호 찾기</button>
+      </div>
       </div>
     </div>
+
+    <!-- 아이디 찾기 패널 -->
+    <div id="mc-form-find-id" style="display:none;">
+      <div style="font-size:11px;letter-spacing:2px;color:rgba(26,46,74,0.50);margin-bottom:16px;text-align:center;">학년 · 반 · 번호를 입력하면<br>등록된 아이디를 알려드립니다.</div>
+      <div class="mc-field">
+        <div class="mc-field-label">학년 · 반 · 번호</div>
+        <div style="display:flex;gap:8px;">
+          <select class="mc-input" id="mc-fid-grade" style="flex:1;cursor:pointer;">
+            <option value="">학년</option>
+            <option value="1">1학년</option>
+            <option value="2">2학년</option>
+            <option value="3">3학년</option>
+          </select>
+          <select class="mc-input" id="mc-fid-class" style="flex:1;cursor:pointer;">
+            <option value="">반</option>
+            <option value="1">1반</option><option value="2">2반</option><option value="3">3반</option>
+            <option value="4">4반</option><option value="5">5반</option><option value="6">6반</option>
+            <option value="7">7반</option><option value="8">8반</option><option value="9">9반</option>
+            <option value="10">10반</option>
+          </select>
+          <input class="mc-input" id="mc-fid-num" type="number" placeholder="번호" min="1" max="40"
+            style="flex:1;text-align:center;"
+            onkeydown="if(event.key==='Enter')mcFindId()" />
+        </div>
+      </div>
+      <div class="mc-msg" id="mc-fid-msg"></div>
+      <button class="mc-btn-primary" onclick="mcFindId()">아이디 찾기</button>
+      <button onclick="mcSwitchTab('login')" style="margin-top:10px;width:100%;padding:10px;background:none;border:1px solid rgba(26,46,74,0.18);color:rgba(26,46,74,0.50);font-family:'Noto Sans KR',sans-serif;font-size:13px;cursor:pointer;">← 로그인으로 돌아가기</button>
+    </div>
+
+    <!-- 비밀번호 찾기 패널 -->
+    <div id="mc-form-find-pw" style="display:none;">
+      <div style="font-size:11px;letter-spacing:2px;color:rgba(26,46,74,0.50);margin-bottom:16px;text-align:center;">학년 · 반 · 번호 · 아이디가<br>모두 일치하면 비밀번호를 확인할 수 있습니다.</div>
+      <div class="mc-field">
+        <div class="mc-field-label">학년 · 반 · 번호</div>
+        <div style="display:flex;gap:8px;">
+          <select class="mc-input" id="mc-fpw-grade" style="flex:1;cursor:pointer;">
+            <option value="">학년</option>
+            <option value="1">1학년</option>
+            <option value="2">2학년</option>
+            <option value="3">3학년</option>
+          </select>
+          <select class="mc-input" id="mc-fpw-class" style="flex:1;cursor:pointer;">
+            <option value="">반</option>
+            <option value="1">1반</option><option value="2">2반</option><option value="3">3반</option>
+            <option value="4">4반</option><option value="5">5반</option><option value="6">6반</option>
+            <option value="7">7반</option><option value="8">8반</option><option value="9">9반</option>
+            <option value="10">10반</option>
+          </select>
+          <input class="mc-input" id="mc-fpw-num" type="number" placeholder="번호" min="1" max="40"
+            style="flex:1;text-align:center;"
+            onkeydown="if(event.key==='Enter')document.getElementById('mc-fpw-id').focus()" />
+        </div>
+      </div>
+      <div class="mc-field">
+        <div class="mc-field-label">아이디</div>
+        <input class="mc-input" id="mc-fpw-id" type="text" placeholder="아이디를 입력하세요"
+          onkeydown="if(event.key==='Enter')mcFindPw()" />
+      </div>
+      <div class="mc-msg" id="mc-fpw-msg"></div>
+      <button class="mc-btn-primary" onclick="mcFindPw()">비밀번호 찾기</button>
+      <button onclick="mcSwitchTab('login')" style="margin-top:10px;width:100%;padding:10px;background:none;border:1px solid rgba(26,46,74,0.18);color:rgba(26,46,74,0.50);font-family:'Noto Sans KR',sans-serif;font-size:13px;cursor:pointer;">← 로그인으로 돌아가기</button>
+    </div>
     <div id="mc-form-signup" style="display:none">
+      <div class="mc-field">
+        <div class="mc-field-label">이름</div>
+        <input class="mc-input" id="mc-signup-name" type="text" placeholder="실명을 입력하세요" maxlength="10" />
+      </div>
       <div class="mc-field">
         <div class="mc-field-label">아이디 <span class="mc-field-hint">영문·숫자 4~16자</span></div>
         <input class="mc-input" id="mc-signup-id" type="text" placeholder="사용할 아이디를 입력하세요" autocomplete="username" maxlength="16" />
@@ -12094,6 +12166,17 @@ window.addEventListener('resize', function() {
             type="number" min="1" max="40" placeholder="번호"
             onkeydown="if(event.key==='Enter')mcTeacherLookup()" />
           <button class="mc-teacher-search-btn" onclick="mcTeacherLookup()">🔍 조회</button>
+        </div>
+      </div>
+      <!-- 이름 검색 (3학년 전용, 데스크탑) -->
+      <div class="mc-tbar-group mc-tbar-group-btn" id="mc-name-group" style="display:none;">
+        <span class="mc-tbar-group-label">이름</span>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <input class="mc-tbar-num-input" id="mc-teacher-name-input"
+            type="text" placeholder="학생 이름 입력"
+            style="width:110px;"
+            onkeydown="if(event.key==='Enter')mcTeacherLookupByName()" />
+          <button class="mc-teacher-search-btn" onclick="mcTeacherLookupByName()">🔍 검색</button>
         </div>
       </div>
       <!-- 학년·반·번호 인풋 (모바일) -->
@@ -12884,13 +12967,93 @@ function hideMyCurriculumModalNow() {
 
 /* ── 탭 전환 ────────────────────────────────────── */
 function mcSwitchTab(tab) {
-  const isLogin = tab === 'login';
+  const isLogin  = tab === 'login';
+  const isSignup = tab === 'signup';
+  const isFindId = tab === 'find-id';
+  const isFindPw = tab === 'find-pw';
+
   document.getElementById('mc-tab-login').classList.toggle('active', isLogin);
-  document.getElementById('mc-tab-signup').classList.toggle('active', !isLogin);
-  document.getElementById('mc-form-login').style.display  = isLogin ? '' : 'none';
-  document.getElementById('mc-form-signup').style.display = isLogin ? 'none' : '';
+  document.getElementById('mc-tab-signup').classList.toggle('active', isSignup);
+  document.getElementById('mc-form-login').style.display    = isLogin  ? '' : 'none';
+  document.getElementById('mc-form-signup').style.display   = isSignup ? '' : 'none';
+  document.getElementById('mc-form-find-id').style.display  = isFindId ? '' : 'none';
+  document.getElementById('mc-form-find-pw').style.display  = isFindPw ? '' : 'none';
+
+  // 타이틀 변경
+  const titles = { login:'로그인', signup:'회원가입', 'find-id':'아이디 찾기', 'find-pw':'비밀번호 찾기' };
+  document.getElementById('mc-title').textContent = titles[tab] || '로그인';
+
+  // 탭 버튼은 login/signup 일 때만 활성 표시, 찾기 화면에서는 모두 비활성
+  if (isFindId || isFindPw) {
+    document.getElementById('mc-tab-login').classList.remove('active');
+    document.getElementById('mc-tab-signup').classList.remove('active');
+  }
+
   document.getElementById('mc-login-msg').textContent  = '';
   document.getElementById('mc-signup-msg').textContent = '';
+  if (document.getElementById('mc-fid-msg'))  document.getElementById('mc-fid-msg').textContent  = '';
+  if (document.getElementById('mc-fpw-msg'))  document.getElementById('mc-fpw-msg').textContent  = '';
+}
+
+/* ── 아이디 찾기 ─────────────────────────────────── */
+async function mcFindId() {
+  const grade = document.getElementById('mc-fid-grade').value;
+  const cls   = document.getElementById('mc-fid-class').value;
+  const num   = parseInt(document.getElementById('mc-fid-num').value, 10);
+  const msg   = document.getElementById('mc-fid-msg');
+  msg.className = 'mc-msg';
+
+  if (!grade)              { msg.textContent = '학년을 선택해 주세요.'; return; }
+  if (!cls)                { msg.textContent = '반을 선택해 주세요.'; return; }
+  if (!num || num < 1 || num > 40) { msg.textContent = '번호를 올바르게 입력해 주세요 (1~40).'; return; }
+
+  msg.textContent = '조회 중...';
+  try {
+    const res = await mcFetch(
+      `/rest/v1/mc_users?grade=eq.${grade}&class_num=eq.${cls}&student_num=eq.${num}&select=username&limit=1`, 'GET'
+    );
+    if (!res.ok || !res.data || res.data.length === 0) {
+      msg.textContent = '일치하는 학생 정보를 찾을 수 없습니다.';
+      return;
+    }
+    msg.className = 'mc-msg ok';
+    msg.innerHTML = `등록된 아이디: <strong style="font-size:16px;letter-spacing:1px;">${res.data[0].username}</strong>`;
+  } catch(e) {
+    msg.textContent = '조회 중 오류가 발생했습니다.';
+  }
+}
+
+/* ── 비밀번호 찾기 ───────────────────────────────── */
+async function mcFindPw() {
+  const grade = document.getElementById('mc-fpw-grade').value;
+  const cls   = document.getElementById('mc-fpw-class').value;
+  const num   = parseInt(document.getElementById('mc-fpw-num').value, 10);
+  const id    = document.getElementById('mc-fpw-id').value.trim();
+  const msg   = document.getElementById('mc-fpw-msg');
+  msg.className = 'mc-msg';
+
+  if (!grade)              { msg.textContent = '학년을 선택해 주세요.'; return; }
+  if (!cls)                { msg.textContent = '반을 선택해 주세요.'; return; }
+  if (!num || num < 1 || num > 40) { msg.textContent = '번호를 올바르게 입력해 주세요 (1~40).'; return; }
+  if (!id)                 { msg.textContent = '아이디를 입력해 주세요.'; return; }
+
+  msg.textContent = '조회 중...';
+  try {
+    const res = await mcFetch(
+      `/rest/v1/mc_users?grade=eq.${grade}&class_num=eq.${cls}&student_num=eq.${num}&username=eq.${encodeURIComponent(id)}&select=pw_hash&limit=1`, 'GET'
+    );
+    if (!res.ok || !res.data || res.data.length === 0) {
+      msg.textContent = '입력하신 정보와 일치하는 계정을 찾을 수 없습니다.';
+      return;
+    }
+    // pw_hash는 btoa(encodeURIComponent(pw)) 형태
+    let pw = '';
+    try { pw = decodeURIComponent(atob(res.data[0].pw_hash)); } catch(e) { pw = res.data[0].pw_hash; }
+    msg.className = 'mc-msg ok';
+    msg.innerHTML = `비밀번호: <strong style="font-size:16px;letter-spacing:1px;">${pw}</strong>`;
+  } catch(e) {
+    msg.textContent = '조회 중 오류가 발생했습니다.';
+  }
 }
 
 /* ── Supabase REST 헬퍼 ──────────────────────────── */
@@ -12911,6 +13074,7 @@ async function mcFetch(path, method, body) {
 
 /* ── 회원가입 ───────────────────────────────────── */
 async function mcDoSignup() {
+  const name  = document.getElementById('mc-signup-name').value.trim();
   const id    = document.getElementById('mc-signup-id').value.trim();
   const pw    = document.getElementById('mc-signup-pw').value;
   const pw2   = document.getElementById('mc-signup-pw2').value;
@@ -12919,6 +13083,7 @@ async function mcDoSignup() {
   const num   = document.getElementById('mc-signup-number').value.trim();
   const msg   = document.getElementById('mc-signup-msg');
   msg.className = 'mc-msg';
+  if (!name)  { msg.textContent = '이름을 입력해 주세요.'; return; }
   if (!/^[a-zA-Z0-9]{4,16}$/.test(id)) { msg.textContent = '아이디: 영문·숫자 4~16자'; return; }
   if (pw.length < 6) { msg.textContent = '비밀번호는 6자 이상이어야 합니다.'; return; }
   if (pw !== pw2)    { msg.textContent = '비밀번호가 일치하지 않습니다.'; return; }
@@ -12932,6 +13097,7 @@ async function mcDoSignup() {
   const pwHash = btoa(encodeURIComponent(pw));
   const ins = await mcFetch('/rest/v1/mc_users', 'POST', {
     username: id, pw_hash: pwHash, data: [{},{},{},{}],
+    real_name: name,
     grade: parseInt(grade, 10), class_num: parseInt(cls, 10), student_num: numInt
   });
   if (ins.ok) {
@@ -12972,6 +13138,33 @@ async function mcDoLogin() {
   const res = await mcFetch('/rest/v1/mc_users?username=eq.' + encodeURIComponent(id) + '&pw_hash=eq.' + encodeURIComponent(pwHash) + '&select=id,username,data,career,memos,grade,class_num,student_num', 'GET');
   if (!res.ok || !res.data || res.data.length === 0) { msg.textContent = '아이디 또는 비밀번호가 틀렸습니다.'; return; }
   const user = res.data[0];
+
+  /* ── 학년 자동 처리 (연도 바뀌고 3월 이후) ── */
+  const now = new Date();
+  const thisYear = now.getFullYear();
+  const isMarchOrLater = now.getMonth() >= 2; // 0-indexed: 2 = 3월
+  const gradeKey = 'mc_grade_updated_' + user.id + '_' + thisYear;
+  const alreadyUpdated = localStorage.getItem(gradeKey);
+
+  if (isMarchOrLater && !alreadyUpdated) {
+    // 3학년 → 계정 삭제 후 로그인 차단
+    if (user.grade === 3) {
+      msg.textContent = '처리 중...';
+      await mcFetch('/rest/v1/mc_users?id=eq.' + user.id, 'DELETE');
+      localStorage.removeItem('mc_user');
+      msg.className = 'mc-msg';
+      msg.innerHTML = '졸업으로 인해 계정이 삭제되었습니다.<br><span style="font-size:11px;opacity:0.7;">이용해 주셔서 감사합니다 🎓</span>';
+      return;
+    }
+    // 2학년 → 3학년 승급 + 반/번호 NULL
+    if (user.grade === 2) {
+      await mcFetch('/rest/v1/mc_users?id=eq.' + user.id, 'PATCH', { grade: 3, class_num: null, student_num: null });
+      user.grade = 3; user.class_num = null; user.student_num = null;
+      localStorage.setItem(gradeKey, '1');
+    }
+    // 1학년 → 재설정 팝업은 mcOpenScreen 이후에 띄움 (아래에서 처리)
+  }
+
   // data: [{},{},{},{}] 형태로 저장
   let savedData = user.data;
   if (!Array.isArray(savedData) || savedData.length !== 4) savedData = [{},{},{},{}];
@@ -12979,11 +13172,14 @@ async function mcDoLogin() {
   localStorage.setItem('mc_user', JSON.stringify(mcCurrentUser));
   msg.className = 'mc-msg ok'; msg.textContent = '✓ 로그인 완료!';
   hideMyCurriculumModalNow();
-  setTimeout(() => mcOpenScreen(), 50);
+
+  // 1학년 + 3월 이후 + 미처리 → 재설정 팝업
+  const needsReset = isMarchOrLater && !alreadyUpdated && user.grade === 1;
+  setTimeout(() => mcOpenScreen(needsReset), 50);
 }
 
 /* ── 설계 화면 열기 ─────────────────────────────── */
-function mcOpenScreen() {
+function mcOpenScreen(needsReset) {
   const isTeacher = !!(mcCurrentUser && mcCurrentUser.isTeacher);
 
   // 헤더 사용자 표시
@@ -13053,6 +13249,11 @@ function mcOpenScreen() {
   // 처음 로그인한 계정에게만 온보딩 투어 표시 (교사 계정 제외)
   if (!isTeacher && mcCurrentUser && mcCurrentUser.id && typeof showTourIfFirst === 'function') {
     setTimeout(function() { showTourIfFirst(mcCurrentUser.id); }, 500);
+  }
+
+  // 1학년 → 학년/반/번호 재설정 팝업
+  if (needsReset) {
+    setTimeout(openGradeResetPopup, 600);
   }
 }
 
@@ -14141,22 +14342,32 @@ function mcTeacherSelectGrade(grade) {
     btn.classList.toggle('active', i + 1 === grade);
   });
 
-  // 반 버튼 동적 생성 (1~10반)
-  const classGroup = document.getElementById('mc-class-group');
-  const classRow   = document.getElementById('mc-class-btns');
-  classRow.innerHTML = '';
-  for (let c = 1; c <= 10; c++) {
-    const btn = document.createElement('button');
-    btn.className = 'mc-tbar-btn';
-    btn.textContent = c + '반';
-    btn.onclick = () => mcTeacherSelectClass(c);
-    classRow.appendChild(btn);
-  }
-  classGroup.style.display = 'flex';
-
-  // 번호 입력 숨기기
+  // 번호/이름 입력 초기화
   document.getElementById('mc-num-group').style.display = 'none';
   document.getElementById('mc-teacher-num-input').value = '';
+  document.getElementById('mc-name-group').style.display = 'none';
+  document.getElementById('mc-teacher-name-input').value = '';
+
+  if (grade === 3) {
+    // 3학년: 반 버튼 숨기고 이름 검색 바로 표시
+    document.getElementById('mc-class-group').style.display = 'none';
+    document.getElementById('mc-class-btns').innerHTML = '';
+    document.getElementById('mc-name-group').style.display = 'flex';
+    setTimeout(() => document.getElementById('mc-teacher-name-input').focus(), 60);
+  } else {
+    // 1·2학년: 반 버튼 동적 생성
+    const classGroup = document.getElementById('mc-class-group');
+    const classRow   = document.getElementById('mc-class-btns');
+    classRow.innerHTML = '';
+    for (let c = 1; c <= 10; c++) {
+      const btn = document.createElement('button');
+      btn.className = 'mc-tbar-btn';
+      btn.textContent = c + '반';
+      btn.onclick = () => mcTeacherSelectClass(c);
+      classRow.appendChild(btn);
+    }
+    classGroup.style.display = 'flex';
+  }
 }
 
 /* 반 버튼 클릭 */
@@ -14175,7 +14386,117 @@ function mcTeacherSelectClass(cls) {
   setTimeout(() => document.getElementById('mc-teacher-num-input').focus(), 60);
 }
 
-/* 조회 버튼 */
+/* 3학년 이름 검색 */
+async function mcTeacherLookupByName() {
+  const nameInput = document.getElementById('mc-teacher-name-input');
+  const name = nameInput.value.trim();
+  if (!name) { alert('학생 이름을 입력해 주세요.'); nameInput.focus(); return; }
+
+  const btn = document.querySelector('#mc-name-group .mc-teacher-search-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '검색 중...'; }
+
+  try {
+    const url = `/rest/v1/mc_users?select=id,username,real_name,grade,class_num,student_num,data,career,memos`
+              + `&grade=eq.3&real_name=eq.${encodeURIComponent(name)}`;
+    const res = await mcFetch(url, 'GET');
+
+    if (!res.ok || !Array.isArray(res.data) || res.data.length === 0) {
+      alert(`3학년 중 '${name}' 학생을 찾을 수 없습니다.`);
+      return;
+    }
+
+    if (res.data.length === 1) {
+      // 유일한 학생 → 바로 열람
+      mcTeacherViewStudent(JSON.stringify(res.data[0]));
+    } else {
+      // 동명이인 → 선택 모달
+      mcShowNameDuplicateModal(res.data);
+    }
+  } catch(e) {
+    alert('검색 중 오류가 발생했습니다.');
+    console.error(e);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '🔍 검색'; }
+  }
+}
+
+/* 동명이인 선택 모달 */
+function mcShowNameDuplicateModal(students) {
+  // 기존 모달 제거
+  const existing = document.getElementById('mc-name-dup-modal');
+  if (existing) existing.remove();
+
+  const backdrop = document.createElement('div');
+  backdrop.id = 'mc-name-dup-modal';
+  backdrop.style.cssText = `
+    position:fixed;inset:0;z-index:9000;
+    background:rgba(10,25,55,0.72);
+    display:flex;align-items:center;justify-content:center;
+    opacity:0;transition:opacity 0.3s ease;pointer-events:all;
+  `;
+
+  const box = document.createElement('div');
+  box.style.cssText = `
+    background:#fff;border:2px solid rgba(26,107,191,0.30);
+    box-shadow:0 16px 56px rgba(26,107,191,0.22);
+    width:92%;max-width:380px;padding:36px 28px 28px;
+    position:relative;
+    transform:translateY(20px) scale(0.97);
+    transition:transform 0.35s cubic-bezier(0.34,1.30,0.64,1);
+  `;
+
+  box.innerHTML = `
+    <div style="position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#1a6bbf,#0e8a7a,#1a6bbf);background-size:200% 100%;animation:tour-shimmer 3s linear infinite;"></div>
+    <div style="font-size:10px;letter-spacing:4px;color:#1a6bbf;margin-bottom:8px;font-family:'Noto Sans KR',sans-serif;">동명이인 검색결과</div>
+    <div style="font-family:'Noto Serif KR',serif;font-size:18px;font-weight:900;color:#1a2e4a;margin-bottom:6px;">학생을 선택해 주세요</div>
+    <div style="font-size:12px;color:rgba(26,46,74,0.55);margin-bottom:20px;font-family:'Noto Sans KR',sans-serif;">같은 이름의 학생이 ${students.length}명 있습니다.</div>
+    <div id="mc-dup-list" style="display:flex;flex-direction:column;gap:8px;max-height:280px;overflow-y:auto;"></div>
+    <button onclick="document.getElementById('mc-name-dup-modal').remove()" style="margin-top:18px;width:100%;padding:10px;background:none;border:1px solid rgba(26,46,74,0.18);color:rgba(26,46,74,0.50);font-family:'Noto Sans KR',sans-serif;font-size:13px;cursor:pointer;">닫기</button>
+  `;
+
+  const list = box.querySelector('#mc-dup-list');
+  students.forEach(s => {
+    const item = document.createElement('button');
+    item.style.cssText = `
+      width:100%;padding:13px 16px;text-align:left;cursor:pointer;
+      background:rgba(26,107,191,0.04);border:1px solid rgba(26,107,191,0.18);
+      font-family:'Noto Sans KR',sans-serif;color:#1a2e4a;
+      display:flex;align-items:center;justify-content:space-between;
+      transition:background 0.15s,border-color 0.15s;
+    `;
+    item.onmouseover = () => { item.style.background='rgba(26,107,191,0.10)'; item.style.borderColor='rgba(26,107,191,0.45)'; };
+    item.onmouseout  = () => { item.style.background='rgba(26,107,191,0.04)'; item.style.borderColor='rgba(26,107,191,0.18)'; };
+
+    const nameSpan = document.createElement('span');
+    nameSpan.style.cssText = 'font-weight:700;font-size:15px;';
+    nameSpan.textContent = s.real_name || s.username;
+
+    const infoSpan = document.createElement('span');
+    infoSpan.style.cssText = 'font-size:11px;color:rgba(26,46,74,0.50);letter-spacing:0.5px;';
+    infoSpan.textContent = `3학년 · 아이디: ${s.username}`;
+
+    item.appendChild(nameSpan);
+    item.appendChild(infoSpan);
+    item.onclick = () => {
+      document.getElementById('mc-name-dup-modal').remove();
+      mcTeacherViewStudent(JSON.stringify(s));
+    };
+    list.appendChild(item);
+  });
+
+  backdrop.appendChild(box);
+  document.body.appendChild(backdrop);
+
+  requestAnimationFrame(() => {
+    backdrop.style.opacity = '1';
+    box.style.transform = 'translateY(0) scale(1)';
+  });
+
+  // 배경 클릭 시 닫기
+  backdrop.addEventListener('click', e => { if (e.target === backdrop) backdrop.remove(); });
+}
+
+/* 데스크톱 조회 버튼 */
 async function mcTeacherLookup() {
   if (!_tGrade || !_tClass) {
     alert('학년과 반을 먼저 선택해 주세요.');
@@ -14316,6 +14637,8 @@ function mcTeacherResetView() {
 
   // 번호 입력 초기화
   document.getElementById('mc-teacher-num-input').value = '';
+  const nameInp = document.getElementById('mc-teacher-name-input');
+  if (nameInp) nameInp.value = '';
   const mg = document.getElementById('mc-m-grade-input');
   const mc = document.getElementById('mc-m-class-input');
   const mn = document.getElementById('mc-m-num-input');
@@ -14589,6 +14912,148 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 })();
+</script>
+
+<!-- ══════════════════════════════════════
+     학년/반/번호 재설정 팝업 (1학년 → 2학년 진급)
+══════════════════════════════════════ -->
+<style>
+  #grade-reset-backdrop {
+    position: fixed; inset: 0; z-index: 10001;
+    background: rgba(10,25,55,0.80);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.4s ease;
+  }
+  #grade-reset-backdrop.open { opacity: 1; pointer-events: all; }
+  #grade-reset-box {
+    position: relative;
+    background: #ffffff;
+    border: 2px solid rgba(26,107,191,0.35);
+    box-shadow: 0 16px 64px rgba(26,107,191,0.24);
+    width: 92%; max-width: 440px;
+    padding: 44px 36px 36px;
+    text-align: center;
+    transform: translateY(28px) scale(0.96);
+    transition: transform 0.42s cubic-bezier(0.34,1.30,0.64,1);
+    overflow: hidden;
+  }
+  #grade-reset-backdrop.open #grade-reset-box { transform: translateY(0) scale(1); }
+  #grade-reset-box::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 4px;
+    background: linear-gradient(90deg, #1a6bbf, #0e8a7a, #1a6bbf);
+    background-size: 200% 100%;
+    animation: tour-shimmer 3s linear infinite;
+  }
+  .gr-icon { font-size: 34px; margin-bottom: 12px; }
+  .gr-label { font-size: 10px; letter-spacing: 4px; color: #1a6bbf; margin-bottom: 8px; font-family: 'Noto Sans KR', sans-serif; }
+  .gr-title { font-family: 'Noto Serif KR', serif; font-size: 20px; font-weight: 900; color: #1a2e4a; margin-bottom: 8px; }
+  .gr-desc { font-size: 13px; color: rgba(26,46,74,0.60); line-height: 1.8; margin-bottom: 24px; word-break: keep-all; font-family: 'Noto Sans KR', sans-serif; }
+  .gr-fields { display: flex; gap: 8px; margin-bottom: 10px; }
+  .gr-select, .gr-input {
+    flex: 1; padding: 10px 8px; text-align: center;
+    background: rgba(26,107,191,0.05); border: 1px solid rgba(26,107,191,0.20);
+    color: #1a2e4a; font-family: 'Noto Sans KR', sans-serif; font-size: 14px;
+    outline: none; transition: border-color 0.2s;
+  }
+  .gr-select:focus, .gr-input:focus { border-color: #1a6bbf; background: rgba(26,107,191,0.08); }
+  .gr-msg { font-size: 12px; min-height: 18px; margin-bottom: 14px; color: #d63030; letter-spacing: 0.5px; font-family: 'Noto Sans KR', sans-serif; }
+  .gr-msg.ok { color: #0e8a7a; }
+  .gr-btn {
+    width: 100%; padding: 13px;
+    background: linear-gradient(135deg, #1a6bbf, #0e4a8a);
+    border: none; color: #fff;
+    font-family: 'Noto Sans KR', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 1px;
+    cursor: pointer; box-shadow: 0 4px 16px rgba(26,107,191,0.28);
+    transition: opacity 0.2s, transform 0.2s;
+  }
+  .gr-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+  .gr-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+</style>
+
+<div id="grade-reset-backdrop">
+  <div id="grade-reset-box">
+    <div class="gr-icon">🎒</div>
+    <div class="gr-label">NEW YEAR · 학년 업데이트</div>
+    <div class="gr-title">새 학년 정보를 입력해 주세요</div>
+    <div class="gr-desc">새 학년이 시작되었습니다!<br>2학년 배정된 <strong>반과 번호</strong>를 입력해 주세요.<br>입력 후에는 변경할 수 없으니 정확히 입력해 주세요.</div>
+    <div class="gr-fields">
+      <select class="gr-select" id="gr-class">
+        <option value="">반 선택</option>
+        <option value="1">1반</option><option value="2">2반</option><option value="3">3반</option>
+        <option value="4">4반</option><option value="5">5반</option><option value="6">6반</option>
+        <option value="7">7반</option><option value="8">8반</option><option value="9">9반</option>
+        <option value="10">10반</option>
+      </select>
+      <input class="gr-input" id="gr-num" type="number" placeholder="번호" min="1" max="40"
+        onkeydown="if(event.key==='Enter')submitGradeReset()" />
+    </div>
+    <div class="gr-msg" id="gr-msg"></div>
+    <button class="gr-btn" id="gr-submit-btn" onclick="submitGradeReset()">2학년으로 설정 완료</button>
+  </div>
+</div>
+
+<script>
+function openGradeResetPopup() {
+  var bd = document.getElementById('grade-reset-backdrop');
+  if (bd) bd.classList.add('open');
+}
+
+async function submitGradeReset() {
+  var cls = document.getElementById('gr-class').value;
+  var num = parseInt(document.getElementById('gr-num').value, 10);
+  var msg = document.getElementById('gr-msg');
+  var btn = document.getElementById('gr-submit-btn');
+  msg.className = 'gr-msg';
+
+  if (!cls) { msg.textContent = '반을 선택해 주세요.'; return; }
+  if (!num || num < 1 || num > 40) { msg.textContent = '번호를 올바르게 입력해 주세요 (1~40).'; return; }
+
+  btn.disabled = true; btn.textContent = '저장 중...';
+  msg.textContent = '';
+
+  try {
+    // 중복 확인: 같은 학년(2)/반/번호를 가진 다른 학생이 있는지
+    const check = await mcFetch(
+      '/rest/v1/mc_users?grade=eq.2&class_num=eq.' + cls + '&student_num=eq.' + num + '&id=neq.' + mcCurrentUser.id + '&select=id&limit=1', 'GET'
+    );
+    if (check.ok && check.data && check.data.length > 0) {
+      msg.textContent = '이미 같은 반·번호를 가진 학생이 있습니다. 다시 확인해 주세요.';
+      btn.disabled = false; btn.textContent = '2학년으로 설정 완료';
+      return;
+    }
+
+    // DB 업데이트: 2학년으로 승급 + 새 반/번호
+    const patch = await mcFetch('/rest/v1/mc_users?id=eq.' + mcCurrentUser.id, 'PATCH', {
+      grade: 2, class_num: parseInt(cls, 10), student_num: num
+    });
+    if (!patch.ok) { msg.textContent = '저장 중 오류가 발생했습니다.'; btn.disabled = false; btn.textContent = '2학년으로 설정 완료'; return; }
+
+    // 로컬 상태 갱신
+    mcCurrentUser.grade = 2;
+    mcCurrentUser.class_num = parseInt(cls, 10);
+    mcCurrentUser.student_num = num;
+    localStorage.setItem('mc_user', JSON.stringify(mcCurrentUser));
+
+    // gradeKey 기록 (다시 뜨지 않도록)
+    var gradeKey = 'mc_grade_updated_' + mcCurrentUser.id + '_' + new Date().getFullYear();
+    localStorage.setItem(gradeKey, '1');
+
+    // 헤더 업데이트
+    var gradeLabel = '2학년 ' + cls + '반 ' + num + '번';
+    var userEl = document.getElementById('mc-screen-user');
+    if (userEl) userEl.textContent = '학생: ' + mcCurrentUser.username + ' · ' + gradeLabel;
+
+    msg.className = 'gr-msg ok'; msg.textContent = '✓ 저장 완료!';
+    setTimeout(function() {
+      document.getElementById('grade-reset-backdrop').classList.remove('open');
+    }, 900);
+  } catch(e) {
+    msg.textContent = '오류가 발생했습니다.';
+    btn.disabled = false; btn.textContent = '2학년으로 설정 완료';
+  }
+}
 </script>
 
 <!-- ══════════════════════════════════════
