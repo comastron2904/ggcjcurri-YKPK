@@ -13147,14 +13147,24 @@ async function mcDoLogin() {
   const alreadyUpdated = localStorage.getItem(gradeKey);
 
   if (isMarchOrLater && !alreadyUpdated) {
-    // 3학년 → 계정 삭제 후 로그인 차단
+    // 3학년 → 작년에 2학년으로 승급된 계정만 졸업 삭제
+    // (올해 신규 생성된 3학년은 내년 3월 이후에 삭제)
     if (user.grade === 3) {
-      msg.textContent = '처리 중...';
-      await mcFetch('/rest/v1/mc_users?id=eq.' + user.id, 'DELETE');
-      localStorage.removeItem('mc_user');
-      msg.className = 'mc-msg';
-      msg.innerHTML = '졸업으로 인해 계정이 삭제되었습니다.<br><span style="font-size:11px;opacity:0.7;">이용해 주셔서 감사합니다 🎓</span>';
-      return;
+      const prevYearKey = 'mc_grade_updated_' + user.id + '_' + (thisYear - 1);
+      const upgradedLastYear = localStorage.getItem(prevYearKey);
+      if (upgradedLastYear) {
+        // 작년에 2→3학년 승급된 계정 → 졸업 처리
+        msg.textContent = '처리 중...';
+        await mcFetch('/rest/v1/mc_users?id=eq.' + user.id, 'DELETE');
+        localStorage.removeItem('mc_user');
+        localStorage.removeItem(prevYearKey);
+        msg.className = 'mc-msg';
+        msg.innerHTML = '졸업으로 인해 계정이 삭제되었습니다.<br><span style="font-size:11px;opacity:0.7;">이용해 주셔서 감사합니다 🎓</span>';
+        return;
+      } else {
+        // 올해 신규 생성된 3학년 → 올해 key만 기록하고 정상 로그인
+        localStorage.setItem(gradeKey, '1');
+      }
     }
     // 2학년 → 3학년 승급 + 반/번호 NULL
     if (user.grade === 2) {
