@@ -43,6 +43,9 @@
     position: fixed; bottom: 24px; right: 22px; z-index: 500;
     display: flex; align-items: center; gap: 6px;
   }
+  @media (max-width: 768px) {
+    #top-btn-group { display: none !important; }
+  }
   #edit-page-btn {
     display: flex; align-items: center; justify-content: center;
     width: 38px; height: 38px;
@@ -6484,7 +6487,7 @@ function sbSetQ(key, value, ms) {
 /* ──────────────────────────────
    상수 / 상태
 ────────────────────────────── */
-const PASS = '1234';
+const PASS = '5037';
 const CATS = ['전체','국어','수학','영어','사회(역사/도덕 포함)','과학','체육','예술','기술ㆍ가정/정보/제2외국어/한문/교양'];
 let subjects  = [];
 let pageTexts = {};
@@ -13046,6 +13049,11 @@ function mcOpenScreen() {
   } else {
     setTimeout(mcRenderAll, 600);
   }
+
+  // 처음 로그인한 계정에게만 온보딩 투어 표시 (교사 계정 제외)
+  if (!isTeacher && mcCurrentUser && mcCurrentUser.id && typeof showTourIfFirst === 'function') {
+    setTimeout(function() { showTourIfFirst(mcCurrentUser.id); }, 500);
+  }
 }
 
 /* ── 설계 화면 닫기 ─────────────────────────────── */
@@ -14348,6 +14356,240 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 <!-- 권장과목 드롭다운 (body 직하 — 모달 backdrop 클릭 간섭 방지) -->
 <div class="mc-rec-dropdown-list" id="mc-rec-dropdown-list"></div>
+
+<!-- ══════════════════════════════════════
+     나만의 교육과정 — 온보딩 투어 팝업
+══════════════════════════════════════ -->
+<style>
+  #tour-backdrop {
+    position: fixed; inset: 0; z-index: 10000;
+    background: rgba(10,25,55,0.78);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.4s ease;
+  }
+  #tour-backdrop.open { opacity: 1; pointer-events: all; }
+
+  #tour-box {
+    position: relative;
+    background: #ffffff;
+    border: 2px solid rgba(26,107,191,0.30);
+    box-shadow: 0 16px 64px rgba(26,107,191,0.22);
+    width: 92%; max-width: 520px;
+    padding: 44px 40px 36px;
+    text-align: center;
+    transform: translateY(28px) scale(0.96);
+    transition: transform 0.42s cubic-bezier(0.34,1.30,0.64,1);
+    overflow: hidden;
+  }
+  #tour-backdrop.open #tour-box { transform: translateY(0) scale(1); }
+
+  /* 상단 컬러 바 */
+  #tour-box::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 4px;
+    background: linear-gradient(90deg, #1a6bbf, #0e8a7a, #1a6bbf);
+    background-size: 200% 100%;
+    animation: tour-shimmer 3s linear infinite;
+  }
+  @keyframes tour-shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  .tour-step-indicator {
+    display: flex; justify-content: center; gap: 7px; margin-bottom: 24px;
+  }
+  .tour-step-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: rgba(26,107,191,0.18);
+    transition: background 0.3s, transform 0.3s;
+  }
+  .tour-step-dot.active {
+    background: #1a6bbf; transform: scale(1.3);
+  }
+  .tour-step-dot.done {
+    background: rgba(26,107,191,0.45);
+  }
+
+  .tour-icon {
+    font-size: 36px; margin-bottom: 14px;
+    animation: tour-bounce 1.8s ease-in-out infinite alternate;
+  }
+  @keyframes tour-bounce {
+    0%   { transform: translateY(0); }
+    100% { transform: translateY(-5px); }
+  }
+
+  .tour-label {
+    font-size: 10px; letter-spacing: 4px; color: #1a6bbf;
+    margin-bottom: 8px; font-family: 'Noto Sans KR', sans-serif;
+  }
+  .tour-title {
+    font-family: 'Noto Serif KR', serif;
+    font-size: clamp(17px, 4vw, 21px); font-weight: 900;
+    color: #1a2e4a; margin-bottom: 14px; line-height: 1.4;
+  }
+  .tour-desc {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: clamp(13px, 3vw, 14px); color: rgba(26,46,74,0.72);
+    line-height: 1.8; margin-bottom: 30px; word-break: keep-all;
+  }
+  .tour-desc strong { color: #1a6bbf; font-weight: 700; }
+
+  .tour-btn-row {
+    display: flex; justify-content: center; gap: 10px; align-items: center;
+  }
+  .tour-btn-prev {
+    padding: 10px 22px;
+    background: none; border: 1px solid rgba(26,107,191,0.28);
+    color: rgba(26,46,74,0.55); font-family: 'Noto Sans KR', sans-serif;
+    font-size: 13px; font-weight: 700; cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .tour-btn-prev:hover { border-color: #1a6bbf; color: #1a6bbf; }
+  .tour-btn-next {
+    padding: 11px 32px;
+    background: linear-gradient(135deg, #1a6bbf, #0e4a8a);
+    border: none; color: #fff;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 13px; font-weight: 700; letter-spacing: 1px; cursor: pointer;
+    box-shadow: 0 4px 16px rgba(26,107,191,0.28);
+    transition: opacity 0.2s, transform 0.2s;
+  }
+  .tour-btn-next:hover { opacity: 0.88; transform: translateY(-1px); }
+
+  .tour-skip {
+    position: absolute; top: 14px; right: 16px;
+    background: none; border: none;
+    color: rgba(26,46,74,0.35); font-size: 12px; letter-spacing: 1px;
+    cursor: pointer; font-family: 'Noto Sans KR', sans-serif;
+    transition: color 0.2s;
+  }
+  .tour-skip:hover { color: rgba(26,46,74,0.65); }
+
+  @media (max-width: 480px) {
+    #tour-box { padding: 38px 22px 28px; }
+  }
+</style>
+
+<div id="tour-backdrop">
+  <div id="tour-box">
+    <button class="tour-skip" onclick="closeTour()">건너뛰기 ✕</button>
+    <div class="tour-step-indicator" id="tour-dots"></div>
+    <div class="tour-icon" id="tour-icon"></div>
+    <div class="tour-label" id="tour-label"></div>
+    <div class="tour-title" id="tour-title"></div>
+    <div class="tour-desc" id="tour-desc"></div>
+    <div class="tour-btn-row">
+      <button class="tour-btn-prev" id="tour-prev-btn" onclick="tourPrev()">◀ 이전</button>
+      <button class="tour-btn-next" id="tour-next-btn" onclick="tourNext()">다음 ▶</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  var TOUR_STEPS = [
+    {
+      icon: '📚',
+      label: '기능 안내 1 / 5',
+      title: '학기별 박스에서 과목 추가하기',
+      desc: '화면에는 <strong>1학년 1학기부터 3학년 2학기</strong>까지 6개의 학기 박스가 있습니다.<br>각 박스 안의 <strong>＋ 과목 추가</strong> 버튼을 눌러 수강하고 싶은 과목을 직접 선택하고 나만의 교육과정을 완성해 보세요!'
+    },
+    {
+      icon: '🧮',
+      label: '기능 안내 2 / 5',
+      title: '이수학점 계산기',
+      desc: '상단의 <strong>이수학점 계산기</strong> 버튼을 누르면, 내가 선택한 과목들의 학점을 자동으로 계산해 줍니다.<br>졸업에 필요한 학점을 충족했는지 <strong>한눈에 확인</strong>할 수 있어요.'
+    },
+    {
+      icon: '🔗',
+      label: '기능 안내 3 / 5',
+      title: '세트과목',
+      desc: '<strong>세트과목</strong>은 함께 수강해야 하거나, 연계해서 들으면 좋은 과목 묶음을 보여줍니다.<br>관련 과목들을 놓치지 않고 <strong>효율적으로 계획</strong>할 수 있도록 도와줍니다.'
+    },
+    {
+      icon: '🎓',
+      label: '기능 안내 4 / 5',
+      title: '권장과목 조회',
+      desc: '<strong>권장과목 조회</strong>를 통해 학교에서 추천하는 과목 목록을 확인할 수 있습니다.<br>희망 진로나 계열에 맞는 <strong>추천 과목을 참고</strong>해 교육과정을 설계해 보세요.'
+    },
+    {
+      icon: '💡',
+      label: '기능 안내 5 / 5',
+      title: '도우미',
+      desc: '<strong>도우미</strong>는 교육과정 설계 중 궁금한 점이나 유의사항을 안내해 줍니다.<br>과목 선택이 어려울 때 <strong>도우미의 도움</strong>을 받아 더 스마트하게 설계해 보세요!'
+    }
+  ];
+
+  var _tourStep = 0;
+
+  function renderTour() {
+    var s = TOUR_STEPS[_tourStep];
+    var total = TOUR_STEPS.length;
+
+    document.getElementById('tour-icon').textContent  = s.icon;
+    document.getElementById('tour-label').textContent = s.label;
+    document.getElementById('tour-title').textContent = s.title;
+    document.getElementById('tour-desc').innerHTML    = s.desc;
+
+    // 점 표시
+    var dots = document.getElementById('tour-dots');
+    dots.innerHTML = '';
+    for (var i = 0; i < total; i++) {
+      var d = document.createElement('div');
+      d.className = 'tour-step-dot' + (i === _tourStep ? ' active' : (i < _tourStep ? ' done' : ''));
+      dots.appendChild(d);
+    }
+
+    // 버튼
+    var prevBtn = document.getElementById('tour-prev-btn');
+    var nextBtn = document.getElementById('tour-next-btn');
+    prevBtn.style.display = _tourStep === 0 ? 'none' : '';
+    nextBtn.textContent   = _tourStep === total - 1 ? '시작하기 ✦' : '다음 ▶';
+  }
+
+  window.tourNext = function() {
+    if (_tourStep < TOUR_STEPS.length - 1) {
+      _tourStep++;
+      renderTour();
+    } else {
+      closeTour();
+    }
+  };
+
+  window.tourPrev = function() {
+    if (_tourStep > 0) { _tourStep--; renderTour(); }
+  };
+
+  window.closeTour = function() {
+    var bd = document.getElementById('tour-backdrop');
+    if (bd) bd.classList.remove('open');
+  };
+
+  window.showTourIfFirst = function(userId) {
+    // 계정별로 투어 표시 여부 확인 (localStorage)
+    var key = 'mc_tour_done_' + userId;
+    if (localStorage.getItem(key)) return; // 이미 본 계정
+    localStorage.setItem(key, '1');
+
+    _tourStep = 0;
+    renderTour();
+    var bd = document.getElementById('tour-backdrop');
+    if (bd) setTimeout(function() { bd.classList.add('open'); }, 300);
+  };
+
+  // ?tourtest 로 강제 실행
+  if (window.location.search.indexOf('tourtest') !== -1) {
+    window.addEventListener('load', function() {
+      _tourStep = 0; renderTour();
+      var bd = document.getElementById('tour-backdrop');
+      if (bd) setTimeout(function() { bd.classList.add('open'); }, 800);
+    });
+  }
+})();
+</script>
 
 <!-- ══════════════════════════════════════
      응원 메시지 팝업
