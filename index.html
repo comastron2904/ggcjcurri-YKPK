@@ -2507,6 +2507,17 @@
   .dd-exit-btn { border-color: rgba(224,85,85,0.35); color: rgba(224,85,85,0.7); }
   .dd-exit-btn:hover { background: rgba(224,85,85,0.1); border-color: var(--danger); color: var(--danger); }
 
+  .dd-toolbar-pdf-row {
+    display: flex; align-items: center; gap: 8px; flex-wrap: nowrap;
+    padding: 8px 40px 10px;
+    border-top: 1px solid rgba(26,107,191,0.12);
+    background: rgba(26,107,191,0.04);
+  }
+  @media (max-width: 768px) {
+    .dd-toolbar-pdf-row { padding: 8px 16px 10px; flex-wrap: wrap; }
+    .dd-toolbar-pdf-row input { min-width: 0; }
+  }
+
   /* 블록 공통 */
   .dept-block {
     margin-bottom: 20px;
@@ -2600,6 +2611,9 @@
   .dept-file-upload-zone:hover { border-color: rgba(42,138,138,0.7); color: #4fc4c4; background: rgba(42,138,138,0.05); }
   .editing-mode .dept-file-upload-zone { display: block; }
   .dept-file-input { display: none; }
+  .gdrive-link-zone { display: none; }
+  .editing-mode .gdrive-link-zone { display: flex; }
+  .sn-card-edit-wrap .gdrive-link-zone { display: flex; }
   .dept-file-items { display: flex; flex-direction: column; gap: 10px; }
 
   /* 이미지 미리보기 */
@@ -6201,9 +6215,15 @@
       <span class="dd-toolbar-label">편집 모드</span>
       <button class="dd-tool-btn" onclick="deptAddBlock('title')">＋ 제목</button>
       <button class="dd-tool-btn" onclick="deptAddBlock('text')">＋ 텍스트</button>
-      <button class="dd-tool-btn" onclick="deptAddBlock('file')">＋ 파일/사진/PDF</button>
+      <button class="dd-tool-btn" onclick="deptAddBlock('file')">＋ 파일/사진</button>
       <button class="dd-tool-btn dd-save-btn" onclick="saveDeptBlocks()">💾 저장</button>
       <button class="dd-tool-btn dd-exit-btn" onclick="exitDeptEdit()">✕ 편집 종료</button>
+    </div>
+    <div class="dd-toolbar-pdf-row">
+      <span style="font-size:11px;letter-spacing:1px;color:rgba(255,255,255,0.5);white-space:nowrap;">📄 PDF 추가</span>
+      <input type="text" id="dept-gdrive-input" placeholder="Google Drive 공유 링크 붙여넣기" style="flex:1;padding:8px 12px;font-size:13px;font-family:'Noto Sans KR',sans-serif;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);color:#fff;outline:none;min-width:0;" onfocus="this.style.borderColor='rgba(255,255,255,0.6)'" onblur="this.style.borderColor='rgba(255,255,255,0.2)'">
+      <input type="text" id="dept-gdrive-name" placeholder="PDF 이름 (선택)" style="width:130px;padding:8px 12px;font-size:13px;font-family:'Noto Sans KR',sans-serif;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);color:#fff;outline:none;flex-shrink:0;" onfocus="this.style.borderColor='rgba(255,255,255,0.6)'" onblur="this.style.borderColor='rgba(255,255,255,0.2)'">
+      <button onclick="deptAddDrivePdfFromToolbar()" style="padding:8px 16px;background:linear-gradient(135deg,#1a6bbf,#0e4a8a);border:none;color:#fff;font-family:'Noto Sans KR',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;">추가</button>
     </div>
   </div>
 
@@ -6240,10 +6260,16 @@
       <span class="dd-toolbar-label">편집 모드</span>
       <button class="dd-tool-btn" onclick="enrollAddBlock('title')">＋ 제목</button>
       <button class="dd-tool-btn" onclick="enrollAddBlock('text')">＋ 텍스트</button>
-      <button class="dd-tool-btn" onclick="enrollAddBlock('file')">＋ 파일/사진/PDF</button>
+      <button class="dd-tool-btn" onclick="enrollAddBlock('file')">＋ 파일/사진</button>
       <button class="dd-tool-btn" onclick="enrollAddBlock('image-text')" style="border-color:rgba(14,138,122,0.4);color:#0e8a7a;">＋ 사진＋텍스트</button>
       <button class="dd-tool-btn dd-save-btn" onclick="saveEnrollBlocks()">💾 저장</button>
       <button class="dd-tool-btn dd-exit-btn" onclick="exitEnrollEdit()">✕ 편집 종료</button>
+    </div>
+    <div class="dd-toolbar-pdf-row">
+      <span style="font-size:11px;letter-spacing:1px;color:rgba(255,255,255,0.5);white-space:nowrap;">📄 PDF 추가</span>
+      <input type="text" id="enroll-gdrive-input" placeholder="Google Drive 공유 링크 붙여넣기" style="flex:1;padding:8px 12px;font-size:13px;font-family:'Noto Sans KR',sans-serif;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);color:#fff;outline:none;min-width:0;" onfocus="this.style.borderColor='rgba(255,255,255,0.6)'" onblur="this.style.borderColor='rgba(255,255,255,0.2)'">
+      <input type="text" id="enroll-gdrive-name" placeholder="PDF 이름 (선택)" style="width:130px;padding:8px 12px;font-size:13px;font-family:'Noto Sans KR',sans-serif;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);color:#fff;outline:none;flex-shrink:0;" onfocus="this.style.borderColor='rgba(255,255,255,0.6)'" onblur="this.style.borderColor='rgba(255,255,255,0.2)'">
+      <button onclick="enrollAddDrivePdfFromToolbar()" style="padding:8px 16px;background:linear-gradient(135deg,#1a6bbf,#0e4a8a);border:none;color:#fff;font-family:'Noto Sans KR',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;">추가</button>
     </div>
   </div>
 
@@ -6282,6 +6308,15 @@
       <button class="dd-tool-btn dd-save-btn" onclick="saveSuneungCards()">💾 저장</button>
       <button class="dd-tool-btn dd-exit-btn" onclick="exitSuneungEdit()">✕ 편집 종료</button>
     </div>
+    <div class="dd-toolbar-pdf-row">
+      <span style="font-size:11px;letter-spacing:1px;color:rgba(255,255,255,0.5);white-space:nowrap;">📄 PDF 추가</span>
+      <select id="suneung-gdrive-target" style="padding:8px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);color:#fff;outline:none;flex-shrink:0;max-width:130px;">
+        <option value="">버튼 선택</option>
+      </select>
+      <input type="text" id="suneung-gdrive-input" placeholder="Google Drive 공유 링크 붙여넣기" style="flex:1;padding:8px 12px;font-size:13px;font-family:'Noto Sans KR',sans-serif;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);color:#fff;outline:none;min-width:0;" onfocus="this.style.borderColor='rgba(255,255,255,0.6)'" onblur="this.style.borderColor='rgba(255,255,255,0.2)'">
+      <input type="text" id="suneung-gdrive-name" placeholder="PDF 이름 (선택)" style="width:120px;padding:8px 12px;font-size:13px;font-family:'Noto Sans KR',sans-serif;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);color:#fff;outline:none;flex-shrink:0;" onfocus="this.style.borderColor='rgba(255,255,255,0.6)'" onblur="this.style.borderColor='rgba(255,255,255,0.2)'">
+      <button onclick="suneungAddDrivePdfFromToolbar()" style="padding:8px 16px;background:linear-gradient(135deg,#1a6bbf,#0e4a8a);border:none;color:#fff;font-family:'Noto Sans KR',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;">추가</button>
+    </div>
   </div>
 
   <!-- 메인 뷰: 카드 버튼 목록 -->
@@ -6317,15 +6352,14 @@
       <div class="gb-header-title" id="menu-06-title">선택과목 길라잡이 책자</div>
       <div class="gb-header-subtitle" id="menu-06-subtitle"></div>
     </div>
-    <button class="gb-edit-btn" id="gb-edit-btn" onclick="openGbEditPw()" title="PDF 업로드 편집">🔒 편집</button>
-    <button class="gb-jump-trigger-btn" id="gb-jump-trigger-btn" onclick="toggleGbJumpPopup(event)" title="페이지 이동">↗ 쪽 이동</button>
-    <a class="gb-download-btn" id="gb-download-btn" href="#" download title="PDF 다운로드">⬇ 다운로드</a>
+    <button class="gb-edit-btn" id="gb-edit-btn" onclick="openGbEditPw()" title="Google Drive 링크 등록">🔒 편집</button>
+    <a class="gb-download-btn" id="gb-download-btn" href="#" target="_blank" rel="noopener" title="새 탭에서 열기">↗ 새 탭</a>
     <button class="detail-home" onclick="closeGuidebookScreen()" title="메인화면으로">🏠</button>
   </div>
 
 
 
-  <!-- 단일 PDF 스프레드 뷰 -->
+  <!-- Google Drive iframe 뷰 -->
   <div class="gb-panels">
 
     <!-- 상단 바 (드롭다운 PDF 선택 + 업로드) -->
@@ -6350,7 +6384,7 @@
       <button class="gb-fullscreen-btn" id="gb-left-fs-btn" onclick="openGbFullscreen('left')" title="전체화면">⛶</button>
 
       <!-- 편집 모드: PDF 추가 버튼 -->
-      <button class="gb-upload-btn" id="gb-left-upload-btn" onclick="triggerGbAddPdf()" style="display:none;">📂 PDF 추가</button>
+      <button class="gb-upload-btn" id="gb-left-upload-btn" onclick="triggerGbAddPdf()" style="display:none;">🔗 Drive 링크 추가</button>
       <!-- 편집 모드: PDF 삭제 버튼 -->
       <button class="gb-upload-btn" id="gb-delete-pdf-btn" onclick="gbDeleteCurrentPdf()" style="display:none; border-color:rgba(214,48,48,0.35); color:rgba(214,48,48,0.7);">🗑 삭제</button>
 
@@ -6358,7 +6392,7 @@
       <button class="gb-upload-btn" id="gb-right-upload-btn" style="display:none;" onclick="triggerGbPdfInput('right')"></button>
     </div>
 
-    <!-- 스프레드 설정 바 (편집 모드에서만 표시) -->
+    <!-- 스프레드 설정 바 (Drive 모드 미사용, 숨김) -->
     <div id="gb-settings-bar" class="gb-settings-bar" style="display:none;">
       <div class="gb-settings-group">
         <span class="gb-settings-label">표지</span>
@@ -6374,21 +6408,21 @@
       <span class="gb-settings-hint">설정 변경 시 자동 저장됩니다</span>
     </div>
 
-    <!-- 좌우 뷰어 행 -->
-    <div class="gb-spread-row" id="gb-spread-row">
+    <!-- 뷰어 (Google Drive iframe 단일 뷰) -->
+    <div class="gb-spread-row" id="gb-spread-row" style="display:block;flex:1;overflow:hidden;">
 
-      <!-- 왼쪽 패널 (홀수 페이지) -->
-      <div class="gb-panel" id="gb-panel-left">
-        <div class="gb-panel-viewer" id="gb-left-viewer">
+      <!-- 단일 뷰어 패널 (전체 너비) -->
+      <div class="gb-panel" id="gb-panel-left" style="flex:none;width:100%;height:calc(100vh - 160px);">
+        <div class="gb-panel-viewer" id="gb-left-viewer" style="height:100%;overflow:hidden;">
           <div class="gb-empty" id="gb-left-empty">
             <div class="gb-empty-icon">📄</div>
-            <div class="gb-empty-text">PDF가 없습니다.<br><span style="font-size:10px;opacity:0.6">관리자가 PDF를 업로드할 수 있습니다.</span></div>
+            <div class="gb-empty-text">PDF가 없습니다.<br><span style="font-size:10px;opacity:0.6">관리자가 PDF를 추가할 수 있습니다.</span></div>
           </div>
         </div>
       </div>
 
-      <!-- 오른쪽 패널 (짝수 페이지) — 모바일에서는 CSS로 숨김 -->
-      <div class="gb-panel" id="gb-panel-right">
+      <!-- 오른쪽 패널 (Drive 모드 미사용, 유지용) -->
+      <div class="gb-panel" id="gb-panel-right" style="display:none;">
         <div class="gb-panel-viewer" id="gb-right-viewer">
           <div class="gb-empty" id="gb-right-empty">
             <div class="gb-empty-icon">📄</div>
@@ -6399,7 +6433,7 @@
 
     </div>
 
-    <!-- 하단 통합 네비게이션 -->
+    <!-- 하단 네비게이션 (Drive 모드 미사용, 유지용) -->
     <div class="gb-panel-nav" id="gb-spread-nav" style="display:none;">
       <button class="gb-nav-btn" id="gb-left-prev" onclick="gbSpreadGo(-1)" disabled>‹</button>
       <span class="gb-page-info" id="gb-left-pageinfo">0 / 0</span>
@@ -9548,8 +9582,12 @@ function createBlockEl(b, idx) {
     // 업로드 존
     inner.innerHTML = `
       <div class="dept-file-upload-zone" onclick="document.getElementById('dfi-${b.id}').click()">
-        📎 &nbsp; 클릭하여 사진 · PDF · 파일 추가
-        <input class="dept-file-input" id="dfi-${b.id}" type="file" accept="image/*,application/pdf,*/*" multiple onchange="handleDeptFiles('${b.id}',this)">
+        📎 &nbsp; 클릭하여 사진 · 파일 추가
+        <input class="dept-file-input" id="dfi-${b.id}" type="file" accept="image/*,*/*" multiple onchange="handleDeptFiles('${b.id}',this)">
+      </div>
+      <div class="gdrive-link-zone" style="margin-top:8px;gap:8px;align-items:center;">
+        <input type="text" id="gdrive-${b.id}" placeholder="📄 Google Drive PDF 링크 붙여넣기" style="flex:1;padding:10px 14px;font-size:13px;font-family:'Noto Sans KR',sans-serif;background:rgba(26,107,191,0.05);border:1px dashed rgba(26,107,191,0.28);color:var(--white);outline:none;" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='rgba(26,107,191,0.28)'">
+        <button onclick="addDrivePdf('${b.id}')" style="padding:10px 16px;background:linear-gradient(135deg,#1a6bbf,#0e4a8a);border:none;color:#fff;font-family:'Noto Sans KR',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;letter-spacing:0.5px;">PDF 추가</button>
       </div>
       <div class="dept-file-items" id="dfitems-${b.id}"></div>`;
     div.appendChild(inner);
@@ -9882,6 +9920,205 @@ function resetSSSelection() {
 
 
 
+
+/* ══════════════════════════════════════
+   Google Drive PDF 뷰어 헬퍼
+══════════════════════════════════════ */
+function driveToEmbedUrl(link) {
+  link = link.trim();
+  let fileId = null;
+  const m = link.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if (m) fileId = m[1];
+  if (!fileId) {
+    const m2 = link.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+    if (m2) fileId = m2[1];
+  }
+  if (!fileId) return null;
+  return 'https://drive.google.com/file/d/' + fileId + '/preview';
+}
+
+function driveToViewUrl(link) {
+  if (!link) return '#';
+  const m = link.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if (m) return 'https://drive.google.com/file/d/' + m[1] + '/view';
+  // docs viewer URL에서 fileId 추출
+  try {
+    const u = new URL(link);
+    const inner = u.searchParams.get('url') || '';
+    const m2 = inner.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+    if (m2) return 'https://drive.google.com/file/d/' + m2[1] + '/view';
+  } catch(_) {}
+  return link;
+}
+
+function makeDrivePdfHtml(vid, embedUrl, name, delCallback) {
+  const delBtn = delCallback
+    ? `<button class="dept-pdf-fs-btn" onclick="${delCallback}" style="color:rgba(214,48,48,0.75);border-color:rgba(214,48,48,0.3);margin-left:4px;font-size:12px;padding:5px 10px;">✕ 삭제</button>`
+    : '';
+  const isDrive = embedUrl && (embedUrl.includes('drive.google.com') || embedUrl.includes('docs.google.com'));
+  const viewUrl = driveToViewUrl(embedUrl);
+  const ifrId = vid + '_ifr';
+  const wrapId = vid + '_wrap';
+  // A4 비율(1:1.414) 기반 높이를 JS로 동적 계산, 최소 520px
+  const iframeBlock = isDrive ? `
+    <div id="${wrapId}" style="position:relative;width:100%;padding-top:141.4%;overflow:hidden;">
+      <iframe id="${ifrId}" src="${embedUrl}"
+        style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;"
+        allow="autoplay" allowfullscreen loading="lazy"></iframe>
+      <div id="${ifrId}_fb" style="display:none;position:absolute;top:0;left:0;width:100%;padding:40px 24px;box-sizing:border-box;text-align:center;color:rgba(26,46,74,0.6);font-size:13px;line-height:2;background:rgba(26,107,191,0.04);border:1px solid rgba(26,107,191,0.12);">
+        ⚠️ PDF를 불러오지 못했습니다.<br>
+        <span style="font-size:11px;opacity:0.75;">Google Drive 공유 설정을 <b>「링크가 있는 모든 사용자」→ 뷰어</b>로 변경해 주세요.</span><br><br>
+        <a href="${viewUrl}" target="_blank" rel="noopener" style="color:var(--gold);font-weight:700;font-size:13px;">↗ Drive에서 직접 열기</a>
+      </div>
+    </div>
+    <script>(function(){
+      var ifr=document.getElementById('${ifrId}');
+      var fb=document.getElementById('${ifrId}_fb');
+      if(!ifr||!fb)return;
+      var t=setTimeout(function(){
+        try{
+          var h=ifr.contentDocument&&ifr.contentDocument.body?ifr.contentDocument.body.innerHTML:'';
+          if(h.length>100){ifr.style.display='none';fb.style.display='';}
+        }catch(e){/* cross-origin: 정상 로드 */}
+      },4000);
+      ifr.onload=function(){clearTimeout(t);};
+    })();<\/script>` : `
+    <div style="padding:32px;text-align:center;color:rgba(26,46,74,0.5);font-size:13px;line-height:2;">
+      ⚠️ 이 PDF는 이전 방식으로 등록된 파일입니다.<br>
+      삭제 후 Google Drive 링크로 다시 등록해 주세요.<br><br>
+      <a href="${embedUrl}" target="_blank" rel="noopener" style="color:var(--gold);font-weight:700;">↗ 기존 파일 열기</a>
+    </div>`;
+  return `<div class="dept-pdf-viewer" id="${vid}" style="padding:0;overflow:hidden;border-radius:10px;">
+    <div class="dept-pdf-topbar" style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:rgba(26,46,74,0.04);border-bottom:1px solid rgba(26,46,74,0.08);">
+      <span class="dept-pdf-filename" style="flex:1;font-size:13px;font-weight:600;color:rgba(26,46,74,0.75);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">📄 ${name}</span>
+      ${isDrive ? `<a href="${viewUrl}" target="_blank" rel="noopener"
+          style="display:inline-flex;align-items:center;gap:5px;padding:7px 16px;background:var(--navy,#1a2e4a);color:#fff;border-radius:6px;font-size:13px;font-weight:600;text-decoration:none;white-space:nowrap;flex-shrink:0;">
+          ↗ 새 탭에서 열기
+        </a>` : ''}
+      ${delBtn}
+    </div>
+    ${iframeBlock}
+  </div>`;
+}
+
+function addDrivePdf(blockId) {
+  const inp = document.getElementById('gdrive-' + blockId);
+  if (!inp) return;
+  const link = inp.value.trim();
+  const embedUrl = driveToEmbedUrl(link);
+  if (!embedUrl) { alert('올바른 Google Drive 링크를 붙여넣어 주세요.\n예: https://drive.google.com/file/d/XXXXX/view?usp=sharing'); return; }
+  const b = deptBlocks.find(x => x.id === blockId);
+  if (!b) return;
+  if (!b.files) b.files = [];
+  const name = 'PDF 문서 ' + (b.files.filter(f => f.type === 'pdf').length + 1);
+  b.files.push({ name, type: 'pdf', url: embedUrl, size: '' });
+  inp.value = '';
+  renderDeptFileItems(b);
+  if (currentDeptKey) sbSet(currentDeptKey, deptBlocks).catch(console.error);
+}
+
+function addEnrollDrivePdf(blockId) {
+  const inp = document.getElementById('gdrive-' + blockId);
+  if (!inp) return;
+  const link = inp.value.trim();
+  const embedUrl = driveToEmbedUrl(link);
+  if (!embedUrl) { alert('올바른 Google Drive 링크를 붙여넣어 주세요.\n예: https://drive.google.com/file/d/XXXXX/view?usp=sharing'); return; }
+  const b = enrollBlocks.find(x => x.id === blockId);
+  if (!b) return;
+  if (!b.files) b.files = [];
+  const name = 'PDF 문서 ' + (b.files.filter(f => f.type === 'pdf').length + 1);
+  b.files.push({ name, type: 'pdf', url: embedUrl, size: '' });
+  inp.value = '';
+  renderEnrollFileItems(b);
+  sbSet(ENROLL_KEY, enrollBlocks).catch(console.error);
+}
+
+function addSuneungDrivePdf(cardId) {
+  const inp = document.getElementById('gdrive-' + cardId);
+  if (!inp) return;
+  const link = inp.value.trim();
+  const embedUrl = driveToEmbedUrl(link);
+  if (!embedUrl) { alert('올바른 Google Drive 링크를 붙여넣어 주세요.\n예: https://drive.google.com/file/d/XXXXX/view?usp=sharing'); return; }
+  const c = suneungCards.find(x => x.id === cardId);
+  if (!c) return;
+  if (!c.files) c.files = [];
+  const name = 'PDF 문서 ' + (c.files.filter(f => f.type === 'pdf').length + 1);
+  c.files.push({ name, type: 'pdf', url: embedUrl, size: '' });
+  inp.value = '';
+  renderSuneungCardFileList(c);
+  sbSet(SUNEUNG_KEY, suneungCards).catch(console.error);
+}
+
+function deptAddDrivePdfFromToolbar() {
+  const link = (document.getElementById('dept-gdrive-input').value || '').trim();
+  const name = (document.getElementById('dept-gdrive-name').value || '').trim();
+  const embedUrl = driveToEmbedUrl(link);
+  if (!embedUrl) { alert('올바른 Google Drive 링크를 붙여넣어 주세요.\n예: https://drive.google.com/file/d/XXXXX/view?usp=sharing'); return; }
+  // 파일 블록이 없으면 자동 생성
+  const id = 'b' + Date.now();
+  deptBlocks.push({ id, type: 'file', files: [] });
+  const b = deptBlocks[deptBlocks.length - 1];
+  b.files.push({ name: name || 'PDF 문서', type: 'pdf', url: embedUrl, size: '' });
+  document.getElementById('dept-gdrive-input').value = '';
+  document.getElementById('dept-gdrive-name').value = '';
+  renderDeptBlocks();
+  if (currentDeptKey) sbSet(currentDeptKey, deptBlocks).catch(console.error);
+  setTimeout(() => {
+    const last = document.querySelector('#dept-blocks-wrap .dept-block:last-child');
+    if (last) last.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 80);
+}
+
+function enrollAddDrivePdfFromToolbar() {
+  const link = (document.getElementById('enroll-gdrive-input').value || '').trim();
+  const name = (document.getElementById('enroll-gdrive-name').value || '').trim();
+  const embedUrl = driveToEmbedUrl(link);
+  if (!embedUrl) { alert('올바른 Google Drive 링크를 붙여넣어 주세요.\n예: https://drive.google.com/file/d/XXXXX/view?usp=sharing'); return; }
+  const id = 'b' + Date.now();
+  enrollBlocks.push({ id, type: 'file', files: [] });
+  const b = enrollBlocks[enrollBlocks.length - 1];
+  b.files.push({ name: name || 'PDF 문서', type: 'pdf', url: embedUrl, size: '' });
+  document.getElementById('enroll-gdrive-input').value = '';
+  document.getElementById('enroll-gdrive-name').value = '';
+  renderEnrollBlocks();
+  sbSet(ENROLL_KEY, enrollBlocks).catch(console.error);
+  setTimeout(() => {
+    const last = document.querySelector('#enroll-blocks-wrap .dept-block:last-child');
+    if (last) last.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 80);
+}
+
+function suneungAddDrivePdfFromToolbar() {
+  const cardId = document.getElementById('suneung-gdrive-target').value;
+  const link = (document.getElementById('suneung-gdrive-input').value || '').trim();
+  const name = (document.getElementById('suneung-gdrive-name').value || '').trim();
+  const embedUrl = driveToEmbedUrl(link);
+  if (!embedUrl) { alert('올바른 Google Drive 링크를 붙여넣어 주세요.'); return; }
+  if (!cardId) { alert('PDF를 추가할 버튼을 선택해 주세요.'); return; }
+  const c = suneungCards.find(x => x.id === cardId);
+  if (!c) return;
+  if (!c.files) c.files = [];
+  c.files.push({ name: name || 'PDF 문서', type: 'pdf', url: embedUrl, size: '' });
+  document.getElementById('suneung-gdrive-input').value = '';
+  document.getElementById('suneung-gdrive-name').value = '';
+  renderSuneungCards();
+  sbSet(SUNEUNG_KEY, suneungCards).catch(console.error);
+}
+
+function updateSuneungToolbarSelect() {
+  const sel = document.getElementById('suneung-gdrive-target');
+  if (!sel) return;
+  const prev = sel.value;
+  sel.innerHTML = '<option value="">버튼 선택</option>';
+  suneungCards.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c.id;
+    opt.textContent = c.title || '(제목 없음)';
+    sel.appendChild(opt);
+  });
+  if (prev) sel.value = prev;
+}
+
 /* PDF 뷰어 상태 (blockId+fileIdx → {pdfDoc, currentPage, totalPages, canvases[]}) */
 const pdfViewerState = {};
 
@@ -9907,32 +10144,19 @@ function renderDeptFileItems(b) {
       return;
     }
 
-    const delBtn = `<button class="dept-file-item-del" onclick="deleteDeptFile('${b.id}',${fi})">✕ 삭제</button>`;
+    // 삭제 버튼 — 편집 모드에서만 표시
+    const delBtn = deptEditMode
+      ? `<button class="dept-file-item-del" onclick="deleteDeptFile('${b.id}',${fi})">✕ 삭제</button>`
+      : '';
 
     if (f.type === 'image') {
       item.innerHTML = `${delBtn}<img class="dept-img-preview" src="${f.url}" alt="${escHtml(f.name)}"><div class="dept-img-caption">${escHtml(f.name)}</div>`;
     } else if (f.type === 'pdf') {
       const vid = 'pdfv-' + b.id + '-' + fi;
-      item.innerHTML = `${delBtn}
-        <div class="dept-pdf-viewer" id="${vid}">
-          <div class="dept-pdf-topbar">
-            <span class="dept-pdf-filename">📄 ${escHtml(f.name)}</span>
-            <span class="dept-pdf-pageinfo" id="${vid}-pi">로딩 중...</span>
-            <button class="dept-pdf-fs-btn" onclick="openPdfFs('${vid}','pdfv')" title="전체화면">⛶</button>
-          </div>
-          <div class="dept-pdf-stage" id="${vid}-stage">
-            <div class="dept-pdf-loading" id="${vid}-loading">
-              <div class="dept-pdf-spinner"></div>
-              <span>PDF 불러오는 중</span>
-            </div>
-            <button class="dept-pdf-nav prev" id="${vid}-prev" onclick="pdfGo('${vid}',-1)" disabled>‹</button>
-            <div class="dept-pdf-canvas-wrap" id="${vid}-wrap"></div>
-            <button class="dept-pdf-nav next" id="${vid}-next" onclick="pdfGo('${vid}',1)" disabled>›</button>
-          </div>
-          <div class="dept-pdf-botbar" id="${vid}-dots"></div>
-        </div>`;
+      // 편집 모드일 때만 삭제 콜백 전달
+      const delCb = deptEditMode ? `deleteDeptFile('${b.id}',${fi})` : null;
+      item.innerHTML = makeDrivePdfHtml(vid, f.url, escHtml(f.name), delCb);
       wrap.appendChild(item);
-      requestAnimationFrame(() => setTimeout(() => initPdfViewer(vid, f.url), 50));
       return;
     } else {
       item.innerHTML = `${delBtn}
@@ -10211,11 +10435,11 @@ function enterDeptEdit() {
   document.getElementById('dd-edit-btn').classList.add('active');
   document.getElementById('dd-toolbar').classList.add('show');
   document.getElementById('dept-blocks-wrap').classList.add('editing-mode');
-  // 기존 블록에 editing 클래스
   document.querySelectorAll('.dept-block').forEach(el => el.classList.add('editing'));
+  // PDF 뷰어 재렌더 (삭제 버튼 추가)
+  deptBlocks.forEach(b => { if (b.type === 'file') renderDeptFileItems(b); });
 }
 function exitDeptEdit() {
-  // textarea 동기화 후 렌더
   deptBlocks.forEach(b => {
     if (b.type === 'text' || b.type === 'title') {
       const ta = document.getElementById('dta-' + b.id);
@@ -10328,8 +10552,12 @@ function createEnrollBlockEl(b, idx) {
     inner.className = 'dept-file-block';
     inner.innerHTML = `
       <div class="dept-file-upload-zone" onclick="document.getElementById('efi-${b.id}').click()">
-        📎 &nbsp; 클릭하여 사진 · PDF · 파일 추가
-        <input class="dept-file-input" id="efi-${b.id}" type="file" accept="image/*,application/pdf,*/*" multiple onchange="handleEnrollFiles('${b.id}',this)">
+        📎 &nbsp; 클릭하여 사진 · 파일 추가
+        <input class="dept-file-input" id="efi-${b.id}" type="file" accept="image/*,*/*" multiple onchange="handleEnrollFiles('${b.id}',this)">
+      </div>
+      <div class="gdrive-link-zone" style="margin-top:8px;gap:8px;align-items:center;">
+        <input type="text" id="gdrive-${b.id}" placeholder="📄 Google Drive PDF 링크 붙여넣기" style="flex:1;padding:10px 14px;font-size:13px;font-family:'Noto Sans KR',sans-serif;background:rgba(26,107,191,0.05);border:1px dashed rgba(26,107,191,0.28);color:var(--white);outline:none;" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='rgba(26,107,191,0.28)'">
+        <button onclick="addEnrollDrivePdf('${b.id}')" style="padding:10px 16px;background:linear-gradient(135deg,#1a6bbf,#0e4a8a);border:none;color:#fff;font-family:'Noto Sans KR',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;letter-spacing:0.5px;">PDF 추가</button>
       </div>
       <div class="dept-file-items" id="efitems-${b.id}"></div>`;
     div.appendChild(inner);
@@ -10455,28 +10683,16 @@ function renderEnrollFileItems(b) {
       wrap.appendChild(item);
       return;
     }
-    const delBtn = `<button class="dept-file-item-del" onclick="deleteEnrollFile('${b.id}',${fi})">✕ 삭제</button>`;
+    const delBtn = enrollEditMode
+      ? `<button class="dept-file-item-del" onclick="deleteEnrollFile('${b.id}',${fi})">✕ 삭제</button>`
+      : '';
     if (f.type === 'image') {
       item.innerHTML = `${delBtn}<img class="dept-img-preview" src="${f.url}" alt="${escHtml(f.name)}"><div class="dept-img-caption">${escHtml(f.name)}</div>`;
     } else if (f.type === 'pdf') {
       const vid = 'epdfv-' + b.id + '-' + fi;
-      item.innerHTML = `${delBtn}
-        <div class="dept-pdf-viewer" id="${vid}">
-          <div class="dept-pdf-topbar">
-            <span class="dept-pdf-filename">📄 ${escHtml(f.name)}</span>
-            <span class="dept-pdf-pageinfo" id="${vid}-pi">로딩 중...</span>
-            <button class="dept-pdf-fs-btn" onclick="openPdfFs('${vid}','pdfv')" title="전체화면">⛶</button>
-          </div>
-          <div class="dept-pdf-stage" id="${vid}-stage">
-            <div class="dept-pdf-loading" id="${vid}-loading"><div class="dept-pdf-spinner"></div><span>PDF 불러오는 중</span></div>
-            <button class="dept-pdf-nav prev" id="${vid}-prev" onclick="pdfGo('${vid}',-1)" disabled>‹</button>
-            <div class="dept-pdf-canvas-wrap" id="${vid}-wrap"></div>
-            <button class="dept-pdf-nav next" id="${vid}-next" onclick="pdfGo('${vid}',1)" disabled>›</button>
-          </div>
-          <div class="dept-pdf-botbar" id="${vid}-dots"></div>
-        </div>`;
+      const delCb = enrollEditMode ? `deleteEnrollFile('${b.id}',${fi})` : null;
+      item.innerHTML = makeDrivePdfHtml(vid, f.url, escHtml(f.name), delCb);
       wrap.appendChild(item);
-      requestAnimationFrame(() => setTimeout(() => initPdfViewer(vid, f.url), 50));
       return;
     } else {
       item.innerHTML = `${delBtn}
@@ -10649,6 +10865,7 @@ function renderSuneungCards() {
   wrap.innerHTML = '';
   empty.style.display = suneungCards.length === 0 ? 'block' : 'none';
   suneungCards.forEach((c, idx) => wrap.appendChild(suneungEditMode ? createSuneungCardEdit(c, idx) : createSuneungCardView(c)));
+  if (suneungEditMode) updateSuneungToolbarSelect();
 }
 
 /* 일반 보기: 클릭 → 파일 뷰어 */
@@ -10678,8 +10895,12 @@ function createSuneungCardEdit(c, idx) {
       <input class="sn-card-title-input" id="sn-title-${c.id}" value="${escHtml(c.title||'')}" placeholder="버튼 제목을 입력하세요">
     </div>
     <div class="sn-card-file-zone" onclick="document.getElementById('snfi-${c.id}').click()">
-      📎 &nbsp; 클릭하여 파일 · 사진 · PDF 추가
-      <input type="file" id="snfi-${c.id}" style="display:none" accept="image/*,application/pdf,*/*" multiple onchange="handleSuneungCardFiles('${c.id}',this)">
+      📎 &nbsp; 클릭하여 파일 · 사진 추가
+      <input type="file" id="snfi-${c.id}" style="display:none" accept="image/*,*/*" multiple onchange="handleSuneungCardFiles('${c.id}',this)">
+    </div>
+    <div class="gdrive-link-zone" style="margin-top:8px;display:flex;gap:8px;align-items:center;">
+      <input type="text" id="gdrive-${c.id}" placeholder="📄 Google Drive PDF 링크 붙여넣기" style="flex:1;padding:10px 14px;font-size:13px;font-family:'Noto Sans KR',sans-serif;background:rgba(26,107,191,0.05);border:1px dashed rgba(26,107,191,0.28);color:var(--white);outline:none;" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='rgba(26,107,191,0.28)'">
+      <button onclick="addSuneungDrivePdf('${c.id}')" style="padding:10px 16px;background:linear-gradient(135deg,#1a6bbf,#0e4a8a);border:none;color:#fff;font-family:'Noto Sans KR',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;letter-spacing:0.5px;">PDF 추가</button>
     </div>
     <div class="sn-card-file-list" id="snfl-${c.id}"></div>
     <div class="sn-card-actions">
@@ -10821,23 +11042,8 @@ function openSuneungFileView(c) {
     } else if (f.type === 'pdf') {
       const vid = 'snpdf-' + fi;
       const pdiv = document.createElement('div');
-      pdiv.className = 'dept-pdf-viewer';
-      pdiv.id = vid;
-      pdiv.innerHTML = `
-        <div class="dept-pdf-topbar">
-          <span class="dept-pdf-filename">📄 ${escHtml(f.name)}</span>
-          <span class="dept-pdf-pageinfo" id="${vid}-pi">로딩 중...</span>
-          <button class="dept-pdf-fs-btn" onclick="openPdfFs('${vid}','pdfv')" title="전체화면">⛶</button>
-        </div>
-        <div class="dept-pdf-stage" id="${vid}-stage">
-          <div class="dept-pdf-loading" id="${vid}-loading"><div class="dept-pdf-spinner"></div><span>PDF 불러오는 중</span></div>
-          <button class="dept-pdf-nav prev" id="${vid}-prev" onclick="pdfGo('${vid}',-1)" disabled>‹</button>
-          <div class="dept-pdf-canvas-wrap" id="${vid}-wrap"></div>
-          <button class="dept-pdf-nav next" id="${vid}-next" onclick="pdfGo('${vid}',1)" disabled>›</button>
-        </div>
-        <div class="dept-pdf-botbar" id="${vid}-dots"></div>`;
-      body.appendChild(pdiv);
-      requestAnimationFrame(() => setTimeout(() => initPdfViewer(vid, f.url), 50));
+      pdiv.innerHTML = makeDrivePdfHtml(vid, f.url, escHtml(f.name), null);
+      body.appendChild(pdiv.firstElementChild);
     } else {
       const a = document.createElement('a');
       a.href = f.url; a.target = '_blank'; a.rel = 'noopener';
@@ -10976,21 +11182,22 @@ let _gbLoaded = false;
 function openGuidebookScreen() {
   document.getElementById('guidebook-screen').classList.add('open');
   gbSingle.rendering = false;
-  gbLoadSettings().then(async () => {
-    if (!_gbLoaded) {
-      _gbLoaded = true;
-      await _gbLoadListFromStorage();
-    } else if (gbSingle.pdfDoc) {
-      gbRenderSpread();
+  if (!_gbLoaded) {
+    _gbLoaded = true;
+    _gbLoadListFromStorage();
+  } else if (gbCurrentIdx >= 0 && gbCurrentIdx < gbPdfList.length) {
+    // 이미 로드된 항목이면 iframe 재렌더 (화면 재진입 시)
+    const item = gbPdfList[gbCurrentIdx];
+    const lv = document.getElementById('gb-left-viewer');
+    if (lv && !lv.querySelector('iframe')) {
+      renderGbPdf('left', item.url, item.name);
     }
-  });
+  }
   gbEditMode = false;
   document.getElementById('gb-edit-btn').classList.remove('active');
   document.getElementById('gb-left-upload-btn').style.display  = 'none';
   const delBtn = document.getElementById('gb-delete-pdf-btn');
   if (delBtn) delBtn.style.display = 'none';
-  const bar = document.getElementById('gb-settings-bar');
-  if (bar) bar.style.display = 'none';
 }
 
 function closeGuidebookScreen() {
@@ -11061,43 +11268,39 @@ async function _gbSaveList() {
 /* ── 편집 모드: PDF 추가 ── */
 function triggerGbPdfInput(side) { triggerGbAddPdf(); } // 하위 호환
 function triggerGbAddPdf() {
-  const prev = document.getElementById('gb-tmp-input-add');
-  if (prev) prev.remove();
-  const tmp = document.createElement('input');
-  tmp.type = 'file';
-  tmp.id   = 'gb-tmp-input-add';
-  tmp.accept = 'application/pdf';
-  tmp.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;';
-  tmp.addEventListener('change', function() {
-    const file = tmp.files[0];
-    tmp.remove();
-    if (file) handleGbAddPdfFile(file);
-  });
-  document.body.appendChild(tmp);
-  tmp.click();
+  // Google Drive URL 입력 프롬프트
+  const link = prompt('Google Drive PDF 링크를 붙여넣으세요:\n예: https://drive.google.com/file/d/XXXXX/view?usp=sharing');
+  if (!link) return;
+  const embedUrl = driveToEmbedUrl(link.trim());
+  if (!embedUrl) { alert('올바른 Google Drive 링크를 입력해 주세요.\n예: https://drive.google.com/file/d/XXXXX/view?usp=sharing'); return; }
+  const name = prompt('이 PDF의 이름을 입력하세요:', 'PDF 문서 ' + (gbPdfList.length + 1)) || ('PDF 문서 ' + (gbPdfList.length + 1));
+  handleGbAddDriveUrl(embedUrl, name);
 }
 
-async function handleGbAddPdfFile(file) {
-  if (!file) return;
+async function handleGbAddDriveUrl(embedUrl, name) {
   const viewer = document.getElementById('gb-left-viewer');
   const empty  = document.getElementById('gb-left-empty');
   if (empty) empty.style.display = 'none';
-  if (viewer) viewer.innerHTML = '<div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>업로드 중...</span></div>';
+  if (viewer) viewer.innerHTML = '<div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>등록 중...</span></div>';
   try {
-    const url = await uploadToStorage(file);
-    const newItem = { id: 'gb_' + Date.now(), name: file.name, url };
+    const newItem = { id: 'gb_' + Date.now(), name: name, url: embedUrl };
     gbPdfList.push(newItem);
     await _gbSaveList();
     gbCurrentIdx = gbPdfList.length - 1;
     _gbRenderDropdown();
-    await renderGbPdf('left', url, file.name);
+    await renderGbPdf('left', embedUrl, name);
     _gbUpdateDeleteBtn();
     showDeptToast('✓ PDF가 추가되었습니다 (' + gbPdfList.length + '개)');
   } catch(err) {
     if (viewer) viewer.innerHTML = '';
     if (empty) empty.style.display = '';
-    showDeptToast('⚠ 업로드 실패: ' + err.message);
+    showDeptToast('⚠ 등록 실패: ' + err.message);
   }
+}
+
+async function handleGbAddPdfFile(file) {
+  // Drive 모드에서는 파일 업로드 대신 URL 입력 안내
+  showDeptToast('⚠ Google Drive 링크 방식으로 변경되었습니다. 편집 버튼 클릭 후 PDF 추가를 이용하세요.');
 }
 
 /* ── 편집 모드: 현재 PDF 삭제 ── */
@@ -11105,7 +11308,7 @@ async function gbDeleteCurrentPdf() {
   if (gbCurrentIdx < 0 || gbCurrentIdx >= gbPdfList.length) return;
   const item = gbPdfList[gbCurrentIdx];
   if (!confirm('「' + item.name + '」을(를) 삭제하시겠습니까?')) return;
-  try { await deleteFromStorage(item.url); } catch(_) {}
+  // Drive 링크는 외부 URL이므로 Storage 삭제 불필요
   gbPdfList.splice(gbCurrentIdx, 1);
   await _gbSaveList();
   // 인덱스 조정
@@ -11117,7 +11320,6 @@ async function gbDeleteCurrentPdf() {
     const empty  = document.getElementById('gb-left-empty');
     if (viewer) viewer.innerHTML = '';
     if (empty)  { viewer.appendChild(empty); empty.style.display = ''; }
-    document.getElementById('gb-spread-nav').style.display = 'none';
   } else {
     gbCurrentIdx = Math.min(gbCurrentIdx, gbPdfList.length - 1);
     await gbSelectPdf(gbCurrentIdx);
@@ -11345,87 +11547,56 @@ async function brSetSpreadDir(dir) {
   await brSaveSettings();
 }
 
-/* ── PDF 업로드 ── */
-let _brPdfInput = null;
+/* ── PDF 등록 (Google Drive 링크 방식) ── */
+let _brPdfInput = null; // 하위 호환 (미사용)
 function triggerBrPdfInput() {
-  if (!_brPdfInput) {
-    _brPdfInput = document.createElement('input');
-    _brPdfInput.type   = 'file';
-    _brPdfInput.accept = 'application/pdf';
-    _brPdfInput.style.display = 'none';
-    document.body.appendChild(_brPdfInput);
-    _brPdfInput.addEventListener('change', async e => {
-      const file = e.target.files[0];
-      _brPdfInput.value = '';
-      if (!file) return;
-      const fnEl = document.getElementById('br-left-filename');
-      if (fnEl) fnEl.textContent = '⏳ 업로드 중...';
-      try {
-        const prevStored = await sbGet(BR_KEY_SINGLE);
-        if (prevStored && prevStored.url) await deleteFromStorage(prevStored.url).catch(() => {});
-        const url = await uploadToStorage(file);
-        await sbSet(BR_KEY_SINGLE, { name: file.name, url });
-        if (fnEl) fnEl.textContent = file.name;
-        // 다운로드 버튼 활성화
-        const dlBtn = document.getElementById('br-download-btn');
-        if (dlBtn) {
-          dlBtn.href = url;
-          dlBtn.download = file.name;
-          dlBtn.classList.add('visible');
-        }
-        // 업로드 직후: 이미 메모리에 있는 File을 ArrayBuffer로 직접 파싱 (재 fetch 불필요)
-        try {
-          const arrayBuf = await file.arrayBuffer();
-          const pdfDoc   = await pdfjsLib.getDocument({ data: arrayBuf }).promise;
-          brSingle.pdfDoc     = pdfDoc;
-          brSingle.totalPages = pdfDoc.numPages;
-          brSingle.curPage    = 1;
-          brSingle.rendering  = false;
-          _brLoaded = true;
-          _brUpdateSpreadNav();
-          if (document.getElementById('brochure-screen').classList.contains('open')) {
-            await brRenderSpread();
-          }
-        } catch(_) {
-          await loadBrPdfFromStorage();
-        }
-      } catch(err) {
-        if (fnEl) fnEl.textContent = 'PDF 없음';
-        alert('PDF 업로드 실패: ' + err.message);
-      }
-    });
+  const link = prompt('Google Drive PDF 링크를 붙여넣으세요:\n예: https://drive.google.com/file/d/XXXXX/view?usp=sharing');
+  if (!link) return;
+  const embedUrl = driveToEmbedUrl(link.trim());
+  if (!embedUrl) { alert('올바른 Google Drive 링크를 입력해 주세요.\n예: https://drive.google.com/file/d/XXXXX/view?usp=sharing'); return; }
+  const name = 'brochure.pdf';
+  loadBrDriveUrl(embedUrl, name);
+}
+
+async function loadBrDriveUrl(embedUrl, name) {
+  const fnEl = document.getElementById('br-left-filename');
+  if (fnEl) fnEl.textContent = name;
+  // Supabase에 저장
+  try { await sbSet(BR_KEY_SINGLE, { name, url: embedUrl }); } catch(_) {}
+  // 다운로드 버튼 → 새 탭 버튼으로
+  const dlBtn = document.getElementById('br-download-btn');
+  if (dlBtn) {
+    dlBtn.href = driveToViewUrl(embedUrl);
+    dlBtn.removeAttribute('download');
+    dlBtn.target = '_blank';
+    dlBtn.rel = 'noopener';
+    dlBtn.textContent = '↗ 새 탭';
+    dlBtn.classList.add('visible');
   }
-  _brPdfInput.click();
+  // iframe으로 렌더링
+  const lv = document.getElementById('br-left-viewer');
+  if (lv) {
+    lv.innerHTML = `<iframe src="${embedUrl}" style="width:100%;height:100%;min-height:520px;border:none;display:block;" allow="autoplay" allowfullscreen loading="lazy"></iframe>`;
+  }
+  // 우측 패널 숨김
+  const rv = document.getElementById('br-right-viewer');
+  if (rv) rv.innerHTML = '';
+  // 페이지 네비 숨김
+  const nav = document.getElementById('br-spread-nav');
+  if (nav) nav.style.display = 'none';
+  const jumpBtn = document.getElementById('br-jump-trigger-btn');
+  if (jumpBtn) jumpBtn.classList.remove('visible');
+  // 메모리 상태에 embedUrl 저장 (화면 재진입 시 재사용)
+  brSingle._driveUrl = embedUrl;
+  brSingle._driveName = name;
 }
 
 async function loadBrPdfFromStorage() {
   try {
     const stored = await sbGet(BR_KEY_SINGLE);
     if (!stored || !stored.url) return;
-    const fnEl = document.getElementById('br-left-filename');
-    if (fnEl) fnEl.textContent = stored.name || 'brochure.pdf';
-    // 다운로드 버튼 활성화
-    const dlBtn = document.getElementById('br-download-btn');
-    if (dlBtn) {
-      dlBtn.href = stored.url;
-      dlBtn.download = stored.name || 'brochure.pdf';
-      dlBtn.classList.add('visible');
-    }
-    // rangeChunkSize 증가로 첫 페이지까지 왕복 횟수 감소, 스트리밍 활성화
-    const pdfDoc = await pdfjsLib.getDocument({
-      url: stored.url,
-      rangeChunkSize: 262144,   // 256 KB 청크 (기본 64KB → 4배)
-      disableAutoFetch: false,
-      disableStream: false
-    }).promise;
-    brSingle.pdfDoc      = pdfDoc;
-    brSingle.totalPages  = pdfDoc.numPages;
-    brSingle.curPage     = 1;
-    brSingle.rendering   = false;
-    _brUpdateSpreadNav();
-    if (document.getElementById('brochure-screen').classList.contains('open')) {
-      await brRenderSpread();
-    }
+    const embedUrl = driveToEmbedUrl(stored.url) || stored.url;
+    await loadBrDriveUrl(embedUrl, stored.name || 'brochure.pdf');
   } catch(_) {}
 }
 
@@ -11434,23 +11605,18 @@ let _brLoaded = false; // lazy load 플래그: 최초 1회만 Supabase에서 PDF
 function openBrochureScreen() {
   document.getElementById('brochure-screen').classList.add('open');
   brSingle.rendering = false;
-  brLoadSettings().then(async () => {
-    if (brSingle.pdfDoc) {
-      brRenderSpread();
-    } else if (!_brLoaded) {
-      // 최초 진입 시만 Supabase에서 PDF 로드 (이후엔 메모리에 유지)
-      _brLoaded = true;
-      // 로딩 중 표시
-      const lv = document.getElementById('br-left-viewer');
-      const rv = document.getElementById('br-right-viewer');
-      const spinner = '<div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>PDF 불러오는 중...</span></div>';
-      if (lv) lv.innerHTML = spinner;
-      if (rv) rv.innerHTML = '';
-      await loadBrPdfFromStorage();
-    } else {
-      // 이미 로드 시도했지만 PDF 없음 → 빈 상태 유지
+  if (brSingle._driveUrl) {
+    // 이미 로드된 Drive URL이 있으면 iframe 재렌더
+    const lv = document.getElementById('br-left-viewer');
+    if (lv && !lv.querySelector('iframe')) {
+      lv.innerHTML = `<iframe src="${brSingle._driveUrl}" style="width:100%;height:100%;min-height:520px;border:none;display:block;" allow="autoplay" allowfullscreen loading="lazy"></iframe>`;
     }
-  });
+  } else if (!_brLoaded) {
+    _brLoaded = true;
+    const lv = document.getElementById('br-left-viewer');
+    if (lv) lv.innerHTML = '<div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>PDF 불러오는 중...</span></div>';
+    loadBrPdfFromStorage();
+  }
   brEditMode = false;
   document.getElementById('br-edit-btn').classList.remove('active');
   document.getElementById('br-left-upload-btn').style.display = 'none';
@@ -11476,8 +11642,7 @@ function enterBrEdit() {
   brEditMode = true;
   document.getElementById('br-edit-btn').classList.add('active');
   document.getElementById('br-left-upload-btn').style.display = 'inline-flex';
-  const bar = document.getElementById('br-settings-bar');
-  if (bar) { bar.style.display = 'flex'; _brSyncSettingsUI(); }
+  // Drive 모드: 설정 바 미사용
 }
 
 /* ── 쪽 이동 팝업 ── */
@@ -11549,16 +11714,12 @@ function enterGbEdit() {
   document.getElementById('gb-edit-btn').classList.add('active');
   document.getElementById('gb-left-upload-btn').style.display  = 'inline-flex';
   _gbUpdateDeleteBtn();
-  // 스프레드 설정 패널 표시
-  _gbShowSettings();
+  // Drive 모드: 스프레드 설정 패널 미사용
 }
 
-// 설정 패널 렌더링 (편집 모드 진입 시)
+// 설정 패널 렌더링 (Drive 모드 미사용, 하위 호환 유지)
 function _gbShowSettings() {
-  const bar = document.getElementById('gb-settings-bar');
-  if (!bar) return;
-  bar.style.display = 'flex';
-  _gbSyncSettingsUI();
+  // Drive 모드에서는 설정 바 숨김
 }
 
 function _gbSyncSettingsUI() {
@@ -11615,36 +11776,44 @@ async function renderGbPdf(side, dataUrl, filename) {
   const fnEl   = document.getElementById('gb-left-filename');
 
   gbSingle.rendering = false;
-  gbSingle.pdfDoc    = null;
+  gbSingle.pdfDoc    = null; // Drive 모드에서는 미사용
 
   if (empty) empty.style.display = 'none';
-  if (viewer) viewer.innerHTML = '<div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>PDF 불러오는 중...</span></div>';
 
-  try {
-    const loadingTask = pdfjsLib.getDocument(dataUrl);
-    const pdf = await loadingTask.promise;
-    gbSingle.pdfDoc     = pdf;
-    gbSingle.totalPages = pdf.numPages;
-    gbSingle.curPage    = 1;
-    if (fnEl) fnEl.textContent = '📄 ' + filename;
-    // 드롭다운 라벨 업데이트
-    const ddLabel = document.getElementById('gb-dropdown-label');
-    if (ddLabel) ddLabel.textContent = '📄 ' + filename;
-    // 다운로드 버튼 활성화
-    const dlBtn = document.getElementById('gb-download-btn');
-    if (dlBtn) {
-      dlBtn.href = dataUrl;
-      dlBtn.download = filename;
-      dlBtn.classList.add('visible');
-    }
-    const navEl = document.getElementById('gb-spread-nav');
-    if (navEl) navEl.style.display = 'flex';
-    const jumpBtn = document.getElementById('gb-jump-trigger-btn');
-    if (jumpBtn) jumpBtn.classList.add('visible');
-    await gbRenderSpread();
-  } catch(err) {
-    if (viewer) viewer.innerHTML = '<div class="gb-pdf-loading"><div style="font-size:28px">⚠️</div><span>PDF를 불러오지 못했습니다.</span></div>';
+  // Google Drive 링크 → embed URL 변환
+  const embedUrl = driveToEmbedUrl(dataUrl);
+
+  if (!embedUrl) {
+    if (viewer) viewer.innerHTML = '<div class="gb-pdf-loading"><div style="font-size:28px">⚠️</div><span>올바른 Google Drive 링크가 아닙니다.</span></div>';
+    return;
   }
+
+  // iframe으로 렌더링
+  if (viewer) {
+    viewer.innerHTML = `<iframe src="${embedUrl}" style="width:100%;height:100%;min-height:520px;border:none;display:block;" allow="autoplay" allowfullscreen loading="lazy"></iframe>`;
+  }
+
+  // 파일명 업데이트
+  if (fnEl) fnEl.textContent = '📄 ' + filename;
+  const ddLabel = document.getElementById('gb-dropdown-label');
+  if (ddLabel) ddLabel.textContent = '📄 ' + filename;
+
+  // 새 탭 버튼 활성화 (다운로드 버튼 대신)
+  const dlBtn = document.getElementById('gb-download-btn');
+  if (dlBtn) {
+    dlBtn.href = driveToViewUrl(embedUrl);
+    dlBtn.removeAttribute('download');
+    dlBtn.target = '_blank';
+    dlBtn.rel = 'noopener';
+    dlBtn.textContent = '↗ 새 탭';
+    dlBtn.classList.add('visible');
+  }
+
+  // 페이지 네비/점프는 Drive 모드에서 불필요하므로 숨김
+  const navEl = document.getElementById('gb-spread-nav');
+  if (navEl) navEl.style.display = 'none';
+  const jumpBtn = document.getElementById('gb-jump-trigger-btn');
+  if (jumpBtn) jumpBtn.classList.remove('visible');
 }
 
 // 스프레드 렌더링: 표지/방향 설정 반영
@@ -12022,17 +12191,7 @@ window.addEventListener('resize', function() {
     setCurrentSem(currentSemIdx);
   }
   requestAnimationFrame(() => syncSubtypeZoneHeights());
-
-  // 길라잡이 스프레드: 화면 크기 변경 시 재렌더링 (모바일↔PC 전환 대응)
-  if (gbSingle.pdfDoc && document.getElementById('guidebook-screen').classList.contains('open')) {
-    gbSingle.rendering = false;
-    gbRenderSpread();
-  }
-  // 브로셔 스프레드: 화면 크기 변경 시 재렌더링
-  if (brSingle.pdfDoc && document.getElementById('brochure-screen').classList.contains('open')) {
-    brSingle.rendering = false;
-    brRenderSpread();
-  }
+  // Drive iframe 모드: resize 시 별도 재렌더 불필요 (iframe이 자동 대응)
   }, 120);
 });
 </script>
@@ -12050,24 +12209,22 @@ window.addEventListener('resize', function() {
       <div class="gb-header-title" id="menu-09-title">2026 교육과정 안내 브로셔</div>
       <div class="gb-header-subtitle" id="menu-09-subtitle"></div>
     </div>
-    <button class="gb-edit-btn" id="br-edit-btn" onclick="openBrochureEditPw()" title="PDF 업로드 편집">🔒 편집</button>
-    <button class="gb-jump-trigger-btn" id="br-jump-trigger-btn" onclick="toggleBrJumpPopup(event)" title="페이지 이동">↗ 쪽 이동</button>
-    <a class="gb-download-btn" id="br-download-btn" href="#" download title="PDF 다운로드">⬇ 다운로드</a>
+    <button class="gb-edit-btn" id="br-edit-btn" onclick="openBrochureEditPw()" title="Google Drive 링크 등록">🔒 편집</button>
+    <a class="gb-download-btn" id="br-download-btn" href="#" target="_blank" rel="noopener" title="새 탭에서 열기">↗ 새 탭</a>
     <button class="detail-home" onclick="closeBrochureScreen()" title="메인화면으로">🏠</button>
   </div>
 
-  <!-- 단일 PDF 스프레드 뷰 -->
+  <!-- Google Drive iframe 뷰 -->
   <div class="gb-panels">
 
     <!-- 상단 바 -->
     <div class="gb-panel-bar" style="flex-shrink:0;">
       <span class="gb-panel-label">BROCHURE · 브로셔</span>
       <span class="gb-panel-filename" id="br-left-filename">PDF 없음</span>
-      <button class="gb-fullscreen-btn" id="br-left-fs-btn" onclick="openBrFullscreen()" title="전체화면">⛶</button>
-      <button class="gb-upload-btn" id="br-left-upload-btn" style="display:none;" onclick="triggerBrPdfInput()">📂 PDF 업로드</button>
+      <button class="gb-upload-btn" id="br-left-upload-btn" style="display:none;" onclick="triggerBrPdfInput()">🔗 Drive 링크 등록</button>
     </div>
 
-    <!-- 스프레드 설정 바 (편집 모드에서만 표시) -->
+    <!-- 스프레드 설정 바 (Drive 모드 미사용, 숨김) -->
     <div id="br-settings-bar" class="gb-settings-bar" style="display:none;">
       <div class="gb-settings-group">
         <span class="gb-settings-label">표지</span>
@@ -12083,17 +12240,18 @@ window.addEventListener('resize', function() {
       <span class="gb-settings-hint">설정 변경 시 자동 저장됩니다</span>
     </div>
 
-    <!-- 좌우 뷰어 행 -->
-    <div class="gb-spread-row" id="br-spread-row">
-      <div class="gb-panel" id="br-panel-left">
-        <div class="gb-panel-viewer" id="br-left-viewer">
+    <!-- 뷰어 (Google Drive iframe 단일 뷰) -->
+    <div class="gb-spread-row" id="br-spread-row" style="display:block;flex:1;overflow:hidden;">
+      <div class="gb-panel" id="br-panel-left" style="flex:none;width:100%;height:calc(100vh - 160px);">
+        <div class="gb-panel-viewer" id="br-left-viewer" style="height:100%;overflow:hidden;">
           <div class="gb-empty" id="br-left-empty">
             <div class="gb-empty-icon">📄</div>
-            <div class="gb-empty-text">PDF가 없습니다.<br><span style="font-size:10px;opacity:0.6">관리자가 PDF를 업로드할 수 있습니다.</span></div>
+            <div class="gb-empty-text">PDF가 없습니다.<br><span style="font-size:10px;opacity:0.6">관리자가 PDF를 추가할 수 있습니다.</span></div>
           </div>
         </div>
       </div>
-      <div class="gb-panel" id="br-panel-right">
+      <!-- 우측 패널 (Drive 모드 미사용, 유지용) -->
+      <div class="gb-panel" id="br-panel-right" style="display:none;">
         <div class="gb-panel-viewer" id="br-right-viewer">
           <div class="gb-empty" id="br-right-empty">
             <div class="gb-empty-icon">📄</div>
@@ -12103,7 +12261,7 @@ window.addEventListener('resize', function() {
       </div>
     </div>
 
-    <!-- 하단 네비게이션 -->
+    <!-- 하단 네비게이션 (Drive 모드 미사용, 유지용) -->
     <div class="gb-panel-nav" id="br-spread-nav" style="display:none;">
       <button class="gb-nav-btn" id="br-left-prev" onclick="brSpreadGo(-1)" disabled>‹</button>
       <span class="gb-page-info" id="br-left-pageinfo">0 / 0</span>
