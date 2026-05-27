@@ -3949,6 +3949,168 @@
     transform: translateY(-1px);
   }
 
+  /* 대학별 이수 가이드 버튼 */
+  #mc-univ-guide-btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 8px 16px; height: 36px;
+    background: linear-gradient(135deg, #0e8a7a, #076b5e);
+    border: none; color: #ffffff;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 13px; font-weight: 700; letter-spacing: 0.5px;
+    cursor: pointer; flex-shrink: 0;
+    box-shadow: 0 2px 10px rgba(14,138,122,0.28);
+    transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+  }
+  #mc-univ-guide-btn:hover {
+    background: linear-gradient(135deg, #0a7268, #055248);
+    box-shadow: 0 4px 18px rgba(14,138,122,0.42);
+    transform: translateY(-1px);
+  }
+
+  /* 대학별 이수 가이드 모달 */
+  #mc-univ-guide-modal {
+    display: none; position: fixed; inset: 0; z-index: 1200;
+    background: rgba(14,30,60,0.55);
+    align-items: center; justify-content: center; padding: 20px;
+  }
+  #mc-univ-guide-modal.open { display: flex; }
+  .ug-box {
+    background: #ffffff; width: 100%; max-width: 780px;
+    max-height: 90vh; display: flex; flex-direction: column;
+    box-shadow: 0 20px 60px rgba(14,138,122,0.18), 0 4px 20px rgba(0,0,0,0.12);
+    border-top: 3px solid #0e8a7a;
+  }
+  .ug-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 24px 16px; border-bottom: 1px solid rgba(14,138,122,0.12);
+    flex-shrink: 0;
+  }
+  .ug-header-tag {
+    font-size: 9px; letter-spacing: 3px; color: #0e8a7a;
+    margin-bottom: 4px; font-family: 'Noto Sans KR', sans-serif;
+  }
+  .ug-header-title {
+    font-family: 'Noto Serif KR', serif; font-size: 20px;
+    font-weight: 900; color: #1a2e4a;
+  }
+  .ug-close {
+    background: none; border: none; font-size: 24px;
+    color: rgba(26,46,74,0.45); cursor: pointer; padding: 4px 8px;
+    line-height: 1; transition: color 0.15s;
+  }
+  .ug-close:hover { color: #1a2e4a; }
+  .ug-body { flex: 1; overflow-y: auto; padding: 20px 24px; }
+
+  /* 대학 선택 그리드 */
+  .ug-step-label {
+    font-size: 10px; letter-spacing: 2.5px; color: #0e8a7a;
+    margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
+  }
+  .ug-step-label::after { content:''; flex:1; height:1px; background:rgba(14,138,122,0.15); }
+  .ug-univ-grid {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px;
+  }
+  .ug-univ-chip {
+    padding: 8px 16px; font-size: 13px; font-weight: 600;
+    border: 1.5px solid rgba(14,138,122,0.25); background: #fff;
+    color: #1a2e4a; cursor: pointer; font-family: 'Noto Sans KR', sans-serif;
+    transition: all 0.15s;
+  }
+  .ug-univ-chip:hover { border-color: #0e8a7a; color: #0e8a7a; background: rgba(14,138,122,0.05); }
+  .ug-univ-chip.active {
+    background: #0e8a7a; border-color: #0e8a7a; color: #fff;
+    box-shadow: 0 2px 10px rgba(14,138,122,0.30);
+  }
+
+  /* 모집단위 선택 */
+  .ug-dept-wrap {
+    display: flex; gap: 10px; margin-bottom: 20px; align-items: flex-start;
+  }
+  .ug-dept-select {
+    flex: 1; padding: 10px 14px; font-size: 14px;
+    border: 1.5px solid rgba(14,138,122,0.25); background: #fff;
+    color: #1a2e4a; font-family: 'Noto Sans KR', sans-serif;
+    cursor: pointer; outline: none;
+    transition: border-color 0.15s;
+  }
+  .ug-dept-select:focus { border-color: #0e8a7a; }
+
+  /* 권장과목 결과 카드 */
+  .ug-result-card {
+    border: 1.5px solid rgba(14,138,122,0.20); padding: 18px 20px;
+    margin-bottom: 16px; background: rgba(14,138,122,0.03);
+  }
+  .ug-result-dept-name {
+    font-size: 16px; font-weight: 700; color: #1a2e4a;
+    margin-bottom: 4px; font-family: 'Noto Serif KR', serif;
+  }
+  .ug-result-dept-sub {
+    font-size: 11px; color: rgba(26,46,74,0.50); margin-bottom: 14px;
+    letter-spacing: 0.5px;
+  }
+  .ug-subject-rows { display: flex; flex-direction: column; gap: 8px; }
+  .ug-subject-row {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 8px 12px; background: #fff;
+    border-left: 3px solid rgba(14,138,122,0.30);
+  }
+  .ug-subject-row-label {
+    font-size: 10px; letter-spacing: 1px; color: #0e8a7a;
+    font-weight: 700; min-width: 54px; padding-top: 1px; flex-shrink: 0;
+  }
+  .ug-subject-tags { display: flex; flex-wrap: wrap; gap: 5px; flex: 1; }
+  .ug-subject-tag {
+    display: inline-block; padding: 3px 10px;
+    font-size: 12px; font-family: 'Noto Sans KR', sans-serif;
+    border: 1px solid rgba(14,138,122,0.30); color: #1a2e4a;
+    background: rgba(14,138,122,0.05);
+  }
+  .ug-subject-tag.match {
+    background: #0e8a7a; border-color: #0e8a7a; color: #fff; font-weight: 700;
+  }
+  .ug-subject-tag.no-match {
+    background: rgba(214,48,48,0.06); border-color: rgba(214,48,48,0.35); color: #d63030;
+  }
+
+  /* 검사 결과 */
+  .ug-check-bar {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 16px;
+  }
+  .ug-check-btn {
+    padding: 10px 20px; font-size: 13px; font-weight: 700;
+    background: linear-gradient(135deg, #0e8a7a, #076b5e);
+    border: none; color: #fff; cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif;
+    transition: opacity 0.15s, transform 0.15s;
+    box-shadow: 0 2px 10px rgba(14,138,122,0.25);
+  }
+  .ug-check-btn:hover { opacity: 0.87; transform: translateY(-1px); }
+  .ug-check-summary {
+    font-size: 13px; color: #1a2e4a; font-weight: 500;
+  }
+  .ug-check-summary.ok { color: #0e8a7a; }
+  .ug-check-summary.warn { color: #d63030; }
+
+  .ug-empty {
+    text-align: center; padding: 32px 20px;
+    color: rgba(26,46,74,0.42); font-size: 14px;
+  }
+  .ug-info-text {
+    font-size: 12px; color: rgba(26,46,74,0.55); line-height: 1.7;
+    padding: 10px 14px; background: rgba(14,138,122,0.05);
+    border-left: 3px solid rgba(14,138,122,0.30); margin-bottom: 14px;
+    white-space: pre-wrap;
+  }
+
+  @media (max-width: 600px) {
+    #mc-univ-guide-modal { padding: 10px 8px; }
+    .ug-box { max-height: 95vh; }
+    .ug-header { padding: 16px 16px 12px; }
+    .ug-body { padding: 14px 16px; }
+    #mc-univ-guide-btn { display: none; }
+  }
+
   /* 권장과목 조회 모달 */
   #mc-rec-modal {
     display: none; position: fixed; inset: 0; z-index: 1200;
@@ -12347,6 +12509,7 @@ window.addEventListener('resize', function() {
     <button id="mc-ai-btn" onclick="openMcAiModal()">✦ 이수학점 계산기</button>
     <button id="mc-sets-btn" onclick="openSetsViewer()">🔗 세트과목</button>
     <button id="mc-rec-btn" onclick="openMcRecModal()">🎓 권장과목 조회</button>
+    <button id="mc-univ-guide-btn" onclick="openUnivGuideModal()">🏫 대학별 이수 가이드</button>
     <button id="mc-helper-btn" onclick="openMcHelperModal()">
       💡 도우미
       <span id="mc-helper-badge"></span>
@@ -15474,5 +15637,531 @@ async function submitGradeReset() {
 })();
 </script>
 
+<!-- ══════════════════════════════════════
+     대학별 이수 가이드 모달
+══════════════════════════════════════ -->
+<div id="mc-univ-guide-modal" onclick="if(event.target===this)closeUnivGuideModal()">
+  <div class="ug-box">
+    <div class="ug-header">
+      <div>
+        <div class="ug-header-tag">UNIVERSITY GUIDE · 2028학년도</div>
+        <div class="ug-header-title">🏫 대학별 이수 가이드</div>
+      </div>
+      <button class="ug-close" onclick="closeUnivGuideModal()">×</button>
+    </div>
+    <div class="ug-body" id="ug-body">
+      <!-- STEP 1: 대학 선택 -->
+      <div class="ug-step-label">STEP 1 · 대학 선택</div>
+      <div class="ug-univ-grid" id="ug-univ-grid"></div>
+
+      <!-- STEP 2: 모집단위 선택 -->
+      <div id="ug-dept-section" style="display:none">
+        <div class="ug-step-label">STEP 2 · 모집단위 선택</div>
+        <div class="ug-dept-wrap">
+          <select class="ug-dept-select" id="ug-dept-select" onchange="ugShowResult()">
+            <option value="">-- 모집단위를 선택하세요 --</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- STEP 3: 결과 -->
+      <div id="ug-result-section" style="display:none">
+        <div class="ug-step-label">STEP 3 · 권장 이수 과목</div>
+        <div id="ug-result-content"></div>
+        <div class="ug-check-bar">
+          <button class="ug-check-btn" onclick="ugCheckMySubjects()">✓ 내 선택 과목 충족 여부 검사</button>
+          <span class="ug-check-summary" id="ug-check-summary"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════
+   대학별 이수 가이드 — 데이터 & 로직
+══════════════════════════════════════ */
+(function() {
+
+// ── 엑셀 원본 데이터 (파이썬으로 추출) ──
+const UG_RAW = {"경기대학교": [["구분", "모집단위", "일반선택", "진로선택", "융합선택"], ["수원\n캠퍼스", "국어국문학과", "사회 교과 2개 과목 이상 이수", null, null], [null, "영어영문학과", null, null, null], [null, "사학과", null, null, null], [null, "문헌정보학과", null, null, null], [null, "글로벌어문학부", null, null, null], [null, "유아교육과", null, null, null], [null, "디자인비즈학부", null, null, null], [null, "Fine Arts 학부", null, null, null], [null, "법학과", null, null, null], [null, "무역학과", null, null, null], [null, "공공안전학부", null, null, null], [null, "휴먼서비스학부", null, null, null], [null, "공공인재학부", null, null, null], [null, "경제학부", null, null, null], [null, "경영학부", null, null, null], [null, "산업경영공학과", "과학 교과 3개 과목 이상 이수", null, null], [null, "AI컴퓨터공학과", null, null, null], [null, "화학과", null, null, null], [null, "바이오융합학부", null, null, null], [null, "건축학과(5년제)", null, null, null], [null, "사회에너지시스템공학과", null, null, null], [null, "기계시스템공학과", null, null, null], [null, "전자공학과", null, null, null], [null, "신소재화학공학부", null, null, null], [null, "스마트시티공학부", null, null, null], [null, "수학과", "기하, 미적분Ⅱ 중 1개 과목 이상 이수", null, null], ["서울\n캠퍼스", "미디어영상학과", "사회 교과 2개 과목 이상 이수", null, null], [null, "관광개발경영학과", null, null, null], [null, "관광문화콘텐츠학과", null, null, null], [null, "호텔외식경영학부", null, null, null]], "경북대학교": [["단과대학", "모집단위", "과목선택 안내", "비고"], ["인문대학", "독어독문학과", "전공관련 제2외국어/한문 교과(군)", "1과목 이상 이수권장"], [null, "중어중문학과, 일어일문학과", "전공관련 제2외국어/한문 교과(군)", "2과목 이상 이수권장"], [null, "사학과, 고고인류학과", "세계사, 사회와 문화, 동아시아역사기행", "2과목 이상 이수권장"], ["사회과학대학", "전 모집단위", "사회와 문화, 세계시민과 지리, 현대사회와 윤리, 정치, 국제 관계의 이해, 한국지리 탐구, 도시의 미래 탐구, 인문학과 윤리, 인간과 심리", "3과목 이상 이수권장"], ["자연과학대학", "수학과,통계학과,물리학과", "대수, 미적분Ⅰ, 확률과 통계, 미적분Ⅱ, 기하, 인공지능 수학, 물리학", "3과목 이상 이수권장"], [null, "화학과,생명공학부,생물학과", "미적분Ⅰ, 화학, 생명과학, 화학반응의 세계, 세포와 물질대사, 생물의 유전", "3과목 이상 이수권장"], ["공과대학", "전 모집단위", "대수, 미적분Ⅰ, 확률과 통계, 미적분Ⅱ, 기하, 인공지능 수학, 물리학, 화학, 전자기와 양자, 화학 반응의 세계,역학과 에너지, 물질과 에너지", "3과목 이상 이수권장"], ["IT대학", "전 모집단위", "대수, 미적분Ⅰ, 확률과 통계, 미적분Ⅱ, 기하, 물리학, 화학, 역학과 에너지,전자기와 양자", "3과목 이상 이수권장"], ["농업생명과학대학", "전 모집단위(식품자원경제학과 제외)", "대수, 미적분Ⅰ, 확률과 통계, 미적분Ⅱ, 물리학, 화학, 생명과학, 화학반응의 세계, 세포와 물질대사, 생물의 유전, 물질과 에너지", "3과목 이상 이수권장"], [null, "식품자원경제학과", "미적분Ⅰ, 확률과 통계, 미적분Ⅱ, 경제수학", "3과목 이상 이수권장"], ["사범대학", "전모집단위", "교육의 이해 및 학과의 특성에 맞는 교과목\n\n★ 학과의 특성 맞는 교과목 ★\n예) 국어교육과: [국어] 교과(군) 일반선택, 진로선택과목\n수학교육과: [수학] 교과(군) 일반선택, 진로선택과목\n정보·컴퓨터교육과: [정보] 교과(군) 일반선택, 진로선택과목", "3과목 이상 이수권장"], ["의과대학\n치과대학\n수의과대학\n약학대학", null, "대수, 미적분Ⅰ, 확률과 통계, 미적분Ⅱ\n물리학, 화학, 생명과학, 물질과 에너지, 화학반응의 세계, 세포와 물질대사, 생물의 유전", "3과목 이상 이수권장"], ["생활과학대학", "식품영양학과", "화학, 생명과학,세포와 물질대사,생물의 유전,물질과 에너지,화학 반응의 세계", "3과목 이상 이수권장"], ["간호대학", null, "생명과학, 화학,세포와 물질대사,생물의 유전,화학 반응의 세계", "3과목 이상 이수권장"], ["생태환경대학", "전모집단위", "대수, 미적분Ⅰ, 확률과 통계, 생명과학, 화학, 세포와 물질대사, 생물의 유전", "2과목 이상 이수권장"], ["과학기술대학", "전모집단위(치위생학과, 식품외식학과 제외)", "대수, 미적분Ⅰ, 확률과 통계, 미적분Ⅱ,기하, 인공지능 수학, 물리학, 화학, 역학과 에너지,전자기와 양자, 물질과 에너지, 화학 반응의 세계", "2과목 이상 이수권장"], [null, "치위생학과,식품외식산업학과", "화학, 생명과학, 세포와 물질대사, 생물의 유전", "2과목 이상 이수권장"]], "경희대학교": [["학문\n분야", "모집단위", "2022 개정 교육과정 변경 (2025.8월말)", null, null, null], [null, null, "핵심과목", null, "권장과목", null], [null, null, "수학교과", "과학교과", "수학교과", "과학교과"], ["수학", "<경희대>\n수학과,\n응용수학과", "대수, 미적분Ⅰ,\n확률과 통계,\n미적분Ⅱ, 기하", "-", "-", "-"], ["컴퓨터", "<경희대>\n소프트웨어융합학과,\n인공지능학과,\n컴퓨터공학과", "대수, 미적분Ⅰ,\n확률과 통계,\n미적분Ⅱ, 기하", "-", "인공지능\n수학", "-"], ["산업", "<경희대>\n산업경영공학과", "대수, 미적분Ⅰ,\n확률과 통계,\n미적분Ⅱ", "-", "-", "-"], ["물리", "<경희대>\n물리학과,\n응용물리학과", "대수, 미적분Ⅰ,\n확률과 통계,\n미적분Ⅱ, 기하", "물리학,\n역학과 에너지,\n전자기와 양자", "-", "화학,\n물질과 에너지"], ["기계", "<경희대>\n기계공학과", "대수, 미적분Ⅰ,\n확률과 통계,\n미적분Ⅱ, 기하", "물리학, 화학,\n역학과 에너지,\n전자기와 양자", "-", "물질과 에너지,\n화학 반응의 세계"], ["전기\n전자", "<경희대>\n미래정보디스플레이학부,\n생체의공학과,\n전자공학과,\n반도체공학과", "대수, 미적분Ⅰ,\n확률과 통계,\n미적분Ⅱ, 기하", "물리학, 화학,\n역학과 에너지,\n전자기와 양자", "-", "-"], ["건설/\n건축", "<경희대>\n사회기반시스템공학과,\n건축공학과", "대수, 미적분Ⅰ,\n확률과 통계,\n미적분Ⅱ", "물리학", "기하", "-"], [null, "<경희대>\n건축학과", "대수, 미적분Ⅰ,\n확률과 통계", "-", "미적분Ⅱ,\n기하", "물리학"], ["화학", "<경희대>\n화학과,\n응용화학과", "대수, 미적분Ⅰ,\n확률과 통계,\n미적분Ⅱ", "화학,\n물질과 에너지,\n화학 반응의 세계", "기하", "물질과\n생명과학,\n[역학과 에너지,\n전자기와 양자]\n중 1과목"], ["재료\n/화공\n/\n고분자\n/\n에너지", "<경희대>\n원자력공학과,\n신소재공학과", "대수, 미적분Ⅰ,\n확률과 통계,\n미적분Ⅱ, 기하", "화학, 물리학,\n물질과 에너지,\n역학과 에너지", "-", "전자기와 양자,\n화학반응의 세계"], [null, "<경희대>\n화학공학과", "대수, 미적분Ⅰ,\n확률과 통계,\n미적분Ⅱ", "물리학, 화학,\n화학 반응의 세계", "기하", "역학과 에너지,\n전자기와 양자"], ["생명\n과학\n/\n환경\n/\n생활\n과학\n/\n농림", "<경희대>\n생물학과,\n스마트팜과학과", "대수, 미적분Ⅰ,\n확률과 통계", "화학, 생명과학,\n세포와 물질대사,\n생물의 유전", "미적분Ⅱ", "물리학"], [null, "<경희대>\n식품영양학과,\n식품생명공학과,\n유전생명공학과,\n환경학및환경공학과", "대수, 미적분Ⅰ,\n확률과 통계", "화학, 생명과학,\n세포와 물질대사,\n생물의 유전", "미적분Ⅱ", "물질과 에너지,\n화학 반응의 세계"], [null, "<경희대>\n융합바이오,\n신소재공학과", "대수, 미적분Ⅰ,\n확률과 통계", "화학, 생명과학,\n세포와 물질대사,\n생물의 유전,\n물질과 에너지,\n화학반응의 세계", "미적분Ⅱ", "-"], ["천문\n지구", "<경희대>\n지리학과", "대수, 미적분Ⅰ,\n확률과 통계", "지구과학", "-", "-"], [null, "<경희대>\n우주과학과", "대수, 미적분Ⅰ,\n확률과 통계,\n미적분Ⅱ", "물리학, 화학,\n지구과학,\n역학과 에너지,\n전자기와 양자", "기하", "[지구시스템과학,\n행성우주과학]\n중 1과목"], ["의학", "<경희대>\n의예과", "대수, 미적분Ⅰ,\n확률과 통계,\n미적분Ⅱ", "화학, 생명과학,\n[물질과 에너지,\n화학 반응의 세계,\n세포와 물질대사,\n생물의 유전]\n중 3과목", "-", "물리학"], [null, "<경희대>\n한의예과,\n치의예과", "대수, 미적분Ⅰ,\n확률과 통계,\n미적분Ⅱ", "화학, 생명과학,\n세포와 물질대사,\n생물의 유전", "-", "물리학,\n[물질과 에너지,\n화학 반응의 세계]\n중 1과목"], ["약학", "<경희대>\n약학과,\n한약학과,\n약과학과", "대수, 미적분Ⅰ,\n확률과 통계,\n미적분Ⅱ", "화학, 생명과학,\n[물질과 에너지,\n화학 반응의 세계,\n세포와 물질대사,\n생물의 유전]\n중 3과목", "-", "물리학"], ["간호\n/\n보건", "<경희대>\n간호학과", "대수, 미적분Ⅰ,\n확률과 통계", "생명과학,\n세포와 물질대사,\n생물의 유전", "미적분Ⅱ", "화학,\n물질과 에너지,\n화학 반응의 세계"]], "고려대학교": [["대학(학부)", "모집단위", "2022 개정 교육과정", null], [null, null, "수학", "과학(진로선택)"], ["생명과학대학", "생명과학부", "-", "물질과 에너지, 화학반응의 세계, 세포와 물질대사, 생물의 유전 中 2개 과목 이상"], [null, "생명공학부", "-", "물질과 에너지, 화학반응의 세계, 세포와 물질대사, 생물의 유전 中 2개 과목 이상"], [null, "식품공학과", "-", "물질과 에너지, 화학반응의 세계, 세포와 물질대사, 생물의 유전 中 2개 과목 이상"], [null, "환경생태공학부", "-", "물질과 에너지, 화학반응의 세계, 세포와 물질대사, 생물의 유전 中 2개 과목 이상"], ["이과대학", "수학과", "기하", "-"], [null, "물리학과", "-", "역학과 에너지, 전자기와 양자"], [null, "화학과", "-", "물질과 에너지, 화학반응의 세계"], [null, "지구환경과학과", "-", "지구시스템과학, 행성우주과학"], ["공과대학", "공과대학\n(전공자율선택제)", "-", "역학과 에너지, 전자기와 양자, 물질과 에너지, 화학반응의 세계, 세포와 물질대사, 생물의 유전 中 2개 과목 이상"], [null, "화공생명공학과", "기하", "역학과 에너지, 전자기와 양자, 물질과 에너지, 화학반응의 세계, 中 2개 과목 이상"], [null, "신소재공학부", "-", "역학과 에너지, 전자기와 양자, 물질과 에너지, 화학반응의 세계, 中 2개 과목 이상"], [null, "건축사회환경공학부", "-", "역학과 에너지"], [null, "건축학과", "-", "-"], [null, "기계공학부", "-", "역학과 에너지, 전자기와 양자"], [null, "산업경영공학부", "-", "-"], [null, "전기전자공학부", "기하", "역학과 에너지, 전자기와 양자, 물질과 에너지, 화학반응의 세계, 中 2개 과목 이상"], [null, "반도체공학과", "-", "역학과 에너지, 전자기와 양자"], [null, "융합에너지공학과", "-", "역학과 에너지, 전자기와 양자, 물질과 에너지, 화학반응의 세계, 中 2개 과목 이상"], [null, "차세대통신학과", "-", "역학과 에너지, 전자기와 양자"], ["의과대학", "의과대학", "-", "물질과 에너지, 화학반응의 세계, 세포와 물질대사, 생물의 유전 中 2개 과목 이상"], ["사범대학", "가정교육과", "-", "-"], [null, "수학교육과", "기하", "-"], ["간호대학", "간호대학", "-", "물질과 에너지, 화학반응의 세계, 세포와 물질대사, 생물의 유전 中 2개 과목 이상"], ["정보대학", "컴퓨터학과", "기하", "-"], [null, "데이터과학과", "기하", "-"], [null, "인공지능학과", "기하", "-"], ["보건과학대학", "바이오의공학부", "-", "역학과 에너지, 전자기와 양자, 물질과 에너지, 화학반응의 세계, 中 2개 과목 이상"], [null, "바이오시스템의과학부", "-", "물질과 에너지, 화학반응의 세계, 세포와 물질대사, 생물의 유전 中 2개 과목 이상"], [null, "보건환경융합과학부", "-", "물질과 에너지, 화학반응의 세계, 세포와 물질대사, 생물의 유전 中 2개 과목 이상"], ["스마트보안학부", "사이버국방학과", "기하", "-"], [null, "스마트보안학부", "기하", "-"], ["스마트모빌리티학부", "스마트모빌리티학부", "-", "역학과 에너지, 전자기와 양자, 물질과 에너지, 화학반응의 세계, 中 2개 과목 이상"]], "동국대학교": [["계열", "단과대학", "모집단위", "전공관련 교과영역(자체 기준)", "비고"], ["인문", "불교", "불교학부", "역사, 윤리", null], [null, "불교", "문화유산학과", "국어, 사회문화, 역사, 한문", null], [null, "문과", "국어국문·문예창작학부", "국어, 역사, 사회문화, 한문", null], [null, null, "영어영문학부", "국어, 영어, 사회문화", null], [null, null, "일본학과", "국어, 역사, 사회문화, 정치, 법, 경제, 일본어", null], [null, null, "중어중문학과", "국어, 역사, 중국어", null], [null, null, "철학과", "국어, 윤리, 한문, 철학, 논리학", null], [null, null, "사학과", "국어, 역사, 한문", null], [null, "법과", "법학과", "국어, 역사, 윤리, 정치, 법", null], [null, "사회과학", "정치외교학전공", "역사, 사회문화, 정치, 법, 경제, 윤리", null], [null, null, "행정학전공", "사회문화, 정치, 법, 경제", null], [null, null, "북한학전공", "국어, 역사, 사회문화, 지리", null], [null, null, "경제학과", "국어, 수학, 영어, 경제", null], [null, null, "국제통상학과", "수학, 영어, 정치, 법, 경제, 사회문화", null], [null, null, "사회학전공", "사회문화, 윤리", null], [null, null, "미디어커뮤니케이션학전공", "국어, 사회문화, 정치, 법, 경제", null], [null, null, "식품산업관리학과", "수학, 사회문화, 경제", null], [null, null, "광고홍보학과", "국어, 영어, 사회문화", null], [null, null, "사회복지학과", "윤리, 사회문화, 정치, 법, 경제", null], [null, "경찰사법", "경찰행정학부", "수학, 영어, 사회문화, 정치, 법", null], [null, "경영", "경영학과", "국어, 수학, 영어, 사회문화, 경제", null], [null, null, "회계학과", "국어, 수학, 영어", null], [null, null, "경영정보학과", "수학, 사회문화, 경제", null], [null, "사범", "교육학과", "역사, 윤리, 사회문화", null], [null, null, "국어교육과", "국어, 역사, 윤리, 사회문화", null], [null, null, "역사교육과", "역사", null], [null, null, "지리교육과", "지리, 역사, 사회문화, 경제, 정치, 법", null], ["예체능", "예술", "연극학부", "국어, 영어, 역사, 윤리, 사회문화, 정치, 법, 경제, 지리", null], [null, "예술", "영화영상학과", "국어, 역사, 윤리, 사회문화", null], ["인문", "-", "열린전공학부(인문)", "국어, 영어, 사회문화, 정치, 법, 경제, 역사, 윤리, 지리, 제2외국어", "2025 신설 모집단위"], ["자연", "이과", "수학과", "수학", null], [null, "이과", "화학과", "수학, 물리학, 화학, 생명과학", null], [null, null, "통계학과", "수학", null], [null, null, "물리학학과", "수학, 물리학, 화학", null], [null, "바이오\n시스템", "바이오시스템대학(단과대학)", "수학, 화학, 생명과학", "2025 신설 모집단위/광역화"], [null, null, "바이오환경과학과", "수학, 화학, 생명과학, 지구과학", null], [null, null, "생명과학과", "수학, 물리학, 화학, 생명과학", null], [null, null, "식품생명공학과", "수학, 화학, 생명과학", null], [null, null, "의생명공학과", "수학, 물리학, 화학, 생명과학", null], [null, "공과", "전자전기공학부", "수학, 물리학, 화학", null], [null, null, "정보통신공학과", "수학, 물리학", null], [null, null, "건설환경공학과", "수학, 물리학, 화학, 지구과학", null], [null, null, "화공생물공학과", "수학, 물리학, 화학, 생명과학", null], [null, null, "기계로봇에너지공학과", "수학, 물리학, 화학", null], [null, null, "건축공학부", "수학, 물리학", null], [null, null, "산업시스템공학과", "수학", null], [null, null, "에너지신소재공학과", "수학, 물리학, 화학", null], [null, "첨단융합", "컴퓨터·AI학부", "수학", null], [null, null, "시스템반도체학부", "수학, 물리학, 화학", null], [null, "사범", "수학교육과", "수학", null], [null, null, "가정교육과", "사회문화, 화학, 생명과학, 가정", null], [null, "약학", "약학과", "수학, 화학, 생명과학", null], [null, "-", "열린전공학부(자연)", "수학, 물리학, 화학", "2025 신설 모집단위/광역화"]], "부산대학교": [["연번", "모집단위", null, "과목 선택 가이드"], [null, null, null, null], ["1", "경제통상대학", "경제학부", "확률과 통계, 미적분Ⅰ, 미적분Ⅱ 중 1과목 이상 이수"], [null, "경영대학", "경영학과", null], ["2", "자연과학대학", "수학과, 통계학과", "확률과 통계, 기하, 미적분Ⅱ 중 2과목 이상 이수"], [null, "공과대학", "산업공학과", null], [null, "사범대학", "수학교육과", null], [null, "생명자원과학대학", "IT응용공학과", null], [null, "정보의생명공학대학", "정보컴퓨터공학부(컴퓨터공학전공, 인공지능전공, 디자인테크놀로지전공)", null], ["3", "자연과학대학", "화학과, 생명과학과, 미생물학과, 분자생물학과", "화학, 생명과학 관련 일반선택과목 및 진로선택과목 중\n3과목 이상 이수"], [null, "사범대학", "생물교육과", null], [null, "생활과학대학", "식품영양학과", null], [null, "간호대학", "간호학과", null], [null, "생명자원과학대학", "원예생명과학과, 식품공학과, 생명환경화학과, 바이오소재과학과, 바이오환경에너지학과, 조경학과", null], [null, "약학부", "약학부", null], [null, "의과대학", "의예과", null], [null, "치과대학", "치의예과", null], [null, "한의학전문대학원", "한의학전문대학원 학·석사통합과정", null], ["4", "자연과학대학", "물리학과", "기하, 미적분Ⅱ 중 1과목 이상 이수하고,\n물리학, 화학 관련 일반선택과목 및 진로선택과목 중\n3과목 이상 이수"], [null, "공과대학", "기계공학부, 고분자공학과, 유기소재시스템공학과, 화공생명공학과, 환경공학과, 재료공학부, 전기전자공학부(전기공학전공, 전자공학전공, 반도체공학전공), 건축공학과, 사회기반시스템공학과, 항공우주공학과, 조선·해양공학과, 첨단IT자율전공, 첨단소재자율전공, 첨단모빌리티자율전공", null], [null, "사범대학", "물리교육과, 화학교육과", null], [null, "생명자원과학대학", "바이오산업기계공학과", null], [null, "학부대학", "첨단융합학부", null], ["5", "자연과학대학", "지질환경과학과, 해양학과, 대기환경과학과", "물리학, 지구과학 관련 일반선택과목 및 진로선택과목 중\n1과목 이상 이수"], [null, "사범대학", "지구과학교육과", null], ["6", "정보의생명공학대학", "의생명융합공학부", "물리학, 화학, 생명과학 관련 일반선택과목 및 진로선택과목 중\n3과목 이상 이수"], [null, "학부대학", "응용생명융합학부", null]], "서울과학기술대학교": [["단과\n대학", "모집단위", "권장과목", null, null, null], [null, null, "수학", null, "과학", null], [null, null, "일반선택", "진로선택", "일반선택", "진로선택"], ["공과\n대학", "기계시스템공학부\n(지능형로봇전공)", "• 대수,\n• 미적분Ⅰ\n• 확률과 통계", "• 미적분Ⅱ\n• 기하", "• 물리학\n• 화학", "• 역학과 에너지\n• 전자기와 양자"], [null, "기계시스템공학부\n(미래자동차전공)", "• 대수,\n• 미적분Ⅰ\n• 확률과 통계", "• 미적분Ⅱ\n• 기하", "• 물리학\n• 화학", "• 역학과 에너지\n• 전자기와 양자"], [null, "기계공학과", null, null, null, null], [null, "안전공학과", null, null, null, "• 역학과 에너지\n• 전자기와 양자\n• 물질과 에너지,\n• 화학 반응의 세계"], [null, "신소재공학과", null, null, null, null], [null, "건설시스템공학과", null, null, null, "• 역학과 에너지"], [null, "건축학부\n(건축공학전공)", null, null, null, null], [null, "건축학부\n(건축학전공)", null, null, null, null], ["정보\n통신\n대학", "전기정보공학과", "• 대수,\n• 미적분Ⅰ\n• 확률과 통계", "• 미적분Ⅱ\n• 기하", "• 물리학\n• 화학", "• 역학과 에너지\n• 전자기와 양자"], [null, "전자공학과", "• 대수,\n• 미적분Ⅰ\n• 확률과 통계", "• 미적분Ⅱ\n• 기하", "• 물리학\n• 화학", "• 역학과 에너지\n• 전자기와 양자"], [null, "스마트ICT융합공학과", null, null, "• 물리학", "-"], [null, "컴퓨터공학과", null, null, null, null], ["에너지\n바이오\n대학", "화공생명공학과", "• 대수,\n• 미적분Ⅰ\n• 확률과 통계", "• 미적분Ⅱ\n• 기하", "• 물리학\n• 화학\n• 생명과학", "• 물질과 에너지,\n• 화학 반응의 세계\n• 세포와 물질대사"], [null, "환경공학과", "• 대수,\n• 미적분Ⅰ\n• 확률과 통계", "• 미적분Ⅱ", "• 물리학\n• 화학\n• 생명과학", "• 물질과 에너지,\n• 화학 반응의 세계\n• 세포와 물질대사"], [null, "식품생명공학과", null, null, "• 화학\n• 생명과학", "• 물질과 에너지,\n• 화학 반응의 세계\n• 세포와 물질대사\n• 생물의 유전"], [null, "정밀화학과", null, null, "• 물리학\n• 화학", "• 물질과 에너지,\n• 화학 반응의 세계"], [null, "안경광학과", null, null, null, "• 역학과 에너지\n• 전자기와 양자"], [null, "바이오메디컬학과", null, null, "• 화학\n• 생명과학", "• 물질과 에너지,\n• 화학 반응의 세계\n• 세포와 물질대사\n• 생물의 유전"], ["기술\n경영\n융합\n대학", "산업공학과\n(산업정보시스템전공)", "• 대수,\n• 미적분Ⅰ\n• 확률과 통계", "• 미적분Ⅱ", "-", "-"], [null, "산업공학과\n(ITM전공)", "• 대수,\n• 미적분Ⅰ\n• 확률과 통계", "• 미적분Ⅱ", "-", "-"], [null, "MSDE학과", null, "• 미적분Ⅱ\n• 기하", "• 물리학", "• 역학과 에너지\n• 전자기와 양자"], [null, "경영학과\n(글로벌테크노경영전공)", null, "• 미적분Ⅱ", "-", "-"], ["창의\n융합\n대학", "인공지능응용학과", "• 대수,\n• 미적분Ⅰ\n• 확률과 통계", "• 미적분Ⅱ\n• 기하", "• 물리학", "• 역학과 에너지\n• 전자기와 양자"], [null, "지능형반도체공학과", "• 대수,\n• 미적분Ⅰ\n• 확률과 통계", "• 미적분Ⅱ\n• 기하", "• 물리학\n• 화학", "• 역학과 에너지\n• 전자기와 양자\n• 물질과 에너지\n• 화학 반응의 세계"], [null, "미래에너지융합학과", null, null, null, null]], "서울대학교": [["유형", "모집단위", "교과(군)", "권장과목", null, null], [null, null, null, "일반 선택", "진로 선택", "융합 선택"], ["①", "인문대학\n사회과학대학\n간호대학\n경영대학\n농업생명과학대학\n  농경제사회학부\n사범대학\n  교육학과, 국어교육과, 영어교육과, 독어교육과, 불어교육과, 사회교육과, 역사교육과, 지리교육과, 윤리교육과\n생활과학대학\n  소비자아동학부, 식품영양학과, 의류학과", "[제2외국어/한문]", "1과목 이상", null, null], ["②", "자연과학대학\n간호대학\n공과대학\n농업생명과학대학\n  식물생산과학부, 산림과학부, 식품·동물생명공학부, 응용생물화학부, 조경·지역시스템공학부, 바이오시스템·소재학부, 스마트시스템과학과\n사범대학\n  수학교육과, 물리교육과, 화학교육과, 생물교육과, 지구과학교육과\n생활과학대학\n  식품영양학과, 의류학과\n수의과대학\n약학대학\n의과대학\n첨단융합학부\n치의학대학원 치의학과", "[수학]", "-", "기하, 미적분Ⅱ\n(단, 간호대학, 치의학대학원 치의학과는 '기하' 또는 '미적분Ⅱ')", "-"], [null, null, "[과학]", "* 아래 모집단위의 경우 제시한 일반 선택 과목을 우선 이수하는 것을 권장함\n\n■ 자연과학대학(물리·천문학부 물리학전공), 공과대학(기계공학부, 전기·정보공학부, 원자핵공학과, 조선해양공학과, 항공우주공학과), 사범대학(물리교육과) -> [물리학]\n\n■ 자연과학대학(화학부), 사범대학(화학교육과) -> [화학]\n\n■ 자연과학대학(생명과학부), 사범대학(생물교육과), 의과대학 -> [생명과학]\n\n■ 자연과학대학(물리·천문학부 천문학전공, 지구환경과학부), 사범대학(지구과학교육과) -> [지구과학]\n\n■ 약학대학 -> [화학 또는 생명과학]", "3과목 이상\n\n(단, 의과대학은 '세포와 물질대사', '생물의 유전'을 포함하여 3과목 이상)", "-"], ["③", "미술대학\n사범대학\n  체육교육과\n음악대학\n학부대학", "-", "-", "-", "-"]], "연세대학교": [["계열", "대학", "모집단위", "수학", "과학", null], [null, null, null, "진로선택", "일반선택", "진로선택"], ["인문(인문·사회),\n통합", "문과대학", "전 모집단위", "전공연계과목 미제시\n(자신의 진로와 적성에 따라 과목 선택 및 이수 권장)", null, null], [null, "상경대학", "전 모집단위", null, null, null], [null, "경영대학", "전 모집단위", null, null, null], [null, "신과대학", "전 모집단위", null, null, null], [null, "사회과학대학", "전 모집단위", null, null, null], [null, "음악대학", "전 모집단위", null, null, null], [null, "생활과학대학", "전 모집단위", null, null, null], [null, "교육과학대학", "전 모집단위", null, null, null], [null, "언더우드국제대학", "언더우드학부(인문·사회)\n아시아학전공\n융합인문사회과학부(HASS)", null, null, null], [null, "글로벌인재대학", "전 모집단위", null, null, null], [null, "간호대학", "전 모집단위", null, null, null], [null, "진리자유학부(인문)", null, null, null, null], ["자연\n(이학·공학)", "이과대학", "수학과", "기하, 미적분Ⅱ", "자율선택", "3과목 이상"], [null, null, "물리학과", "기하, 미적분Ⅱ", "물리학", "3과목 이상"], [null, null, "화학과", "기하, 미적분Ⅱ", "화학", "3과목 이상"], [null, null, "지구시스템과학과", "기하, 미적분Ⅱ", "지구과학", "3과목 이상"], [null, null, "천문우주학과", "기하, 미적분Ⅱ", "지구과학", "3과목 이상"], [null, null, "대기과학과", "기하, 미적분Ⅱ", "지구과학", "3과목 이상"], [null, "공과대학", "화공생명공학부", "기하, 미적분Ⅱ", "화학", "3과목 이상"], [null, null, "전기전자공학부", "기하, 미적분Ⅱ", "물리학", "3과목 이상"], [null, null, "건축공학과", "기하, 미적분Ⅱ", "자율선택", "3과목 이상"], [null, null, "도시공학과", "기하, 미적분Ⅱ", "자율선택", "3과목 이상"], [null, null, "사회환경시스템공학부", "기하, 미적분Ⅱ", "자율선택", "3과목 이상"], [null, null, "기계공학부", "기하, 미적분Ⅱ", "물리학", "3과목 이상"], [null, null, "신소재공학부", "기하, 미적분Ⅱ", "화학", "3과목 이상"], [null, null, "산업공학과", "기하, 미적분Ⅱ", "자율선택", "3과목 이상"], [null, null, "시스템반도체공학과", "기하, 미적분Ⅱ", "물리학", "3과목 이상"], [null, null, "디스플레이융합공학과", "기하, 미적분Ⅱ", "물리학", "3과목 이상"], [null, "생명시스템대학", "생명과학부", "기하, 미적분Ⅱ", "생명과학", "3과목 이상"], [null, null, "시스템생물학과", "기하, 미적분Ⅱ", "생명과학", "3과목 이상"], [null, null, "생화학과", "기하, 미적분Ⅱ", "생명과학", "3과목 이상"], [null, null, "생명공학과", "기하, 미적분Ⅱ", "생명과학", "3과목 이상"], [null, "인공지능융합대학", "컴퓨터과학과", "기하, 미적분Ⅱ", "자율선택", "3과목 이상"], [null, null, "인공지능학과", "기하, 미적분Ⅱ", "자율선택", "3과목 이상"], [null, null, "인공지능시스템학과", "기하, 미적분Ⅱ", "자율선택", "3과목 이상"], [null, null, "IT융합공학전공", "기하, 미적분Ⅱ", "자율선택", "3과목 이상"], [null, null, "지능형반도체전공", "기하, 미적분Ⅱ", "자율선택", "3과목 이상"], [null, null, "모빌리티시스템전공", "기하, 미적분Ⅱ", "자율선택", "3과목 이상"], [null, "언더우드국제대학", "언더우드학부(생명과학공학)", "기하, 미적분Ⅱ", "자율선택", "3과목 이상"], [null, null, "융합과학공학부(ISE)", "기하, 미적분Ⅱ", "자율선택", "3과목 이상"], [null, "진리자유학부(자연)", null, "기하, 미적분Ⅱ", "자율선택", "3과목 이상"], [null, "진리자유학부(자연)", null, "기하, 미적분Ⅱ", "생명과학", "3과목 이상"], ["의·치·약", "치과대학", "치의예과", "기하, 미적분Ⅱ", "물리학, 화학, 생명과학 中 택 1", "3과목 이상"], [null, "약학대학", "약학과", "기하, 미적분Ⅱ", "생명과학 또는 화학", "3과목 이상"], [null, "약학대학", "첨단약학과", "기하, 미적분Ⅱ", "생명과학 또는 화학", "3과목 이상"]], "이화여자대학교": [["모집단위", "권장 이수과목", null, null], [null, "수학", "과학", null], [null, null, "일반선택", "진로선택"], ["자연과학대학\n  수학과\n  통계학과\n공과대학\n  건축학과\n  건축도시시스템공학과\n  환경공학과\n  기후에너지시스템공학과\n신산업융합대학\n  식품영양학과\n  융합보건학과\n사범대학\n  과학교육과\n  수학교육과", "미적분Ⅱ\n또는\n기하", "물리학, 화학,\n생명과학, 지구과학\n중 1과목", "역학과 에너지, 전자기와 양자,\n물질과 에너지, 화학 반응의 세계,\n세포와 물질대사, 생물의 유전,\n지구시스템과학, 행성우주과학\n중 2과목"], ["자연과학대학\n  물리학과\n  화학·나노과학과\n  생명과학과\n공과대학\n  전자전기공학전공\n  지능형반도체공학전공\n  식품생명공학과\n  화공신소재공학과\n  휴먼기계바이오공학과\n인공지능대학\n  컴퓨터공학과\n  사이버보안학과\n  인공지능데이터사이언스학부\n간호대학\n  간호학부\n스크랜튼대학\n  뇌·인지과학부", null, "물리학, 화학, 생명과학\n중 1과목", "역학과 에너지, 전자기와 양자,\n물질과 에너지, 화학 반응의 세계,\n세포와 물질대사, 생물의 유전\n중 2과목"], ["의과대학\n  의예과\n약학대학\n  약학전공", null, "화학, 생명과학", "물질과 에너지, 화학 반응의 세계,\n세포와 물질대사, 생물의 유전\n중 2과목"]], "전남대학교": [["캠퍼스", "단과대학", "모집단위", "2028학년도 이후 관련 교과(군) 및 과목", null, null], [null, null, null, "교과 1", "교과 2", "교과 3"], ["광주", "간호대학", "간호학과", "영어", "수학", "과학"], [null, "경영대학", "경영학부", "수학", "사회", "-"], [null, null, "경제학부", "수학", "영어", "사회"], [null, "공과대학", "건축학부", "수학", "영어", "사회"], [null, null, "토목공학과", "수학", "물리학", "-"], [null, null, "환경에너지공학과", "수학", "화학", "-"], [null, null, "에너지자원공학과", "수학", "물리학", "화학"], [null, null, "기계공학부", "수학", "물리학", "-"], [null, null, "신소재공학과", "수학", "물리학", "화학"], [null, null, "전자컴퓨터공학부", "수학", "물리학", "-"], [null, null, "화학공학부", "수학", "물리학", "화학"], [null, null, "고분자융합소재공학부", "수학", "화학", "-"], [null, null, "산업공학과", "수학", "영어", "-"], [null, null, "전기공학과", "수학", "물리학", "-"], [null, null, "생물공학과", "수학", "화학", "생명과학"], [null, "농업생명과학대학", "응용식물학과", "영어", "화학", "생명과학"], [null, null, "원예생명공학과", "영어", "화학", "생명과학"], [null, null, "응용생물학과", "영어", "화학", "생명과학"], [null, null, "산림자원학과", "영어", "화학", "생명과학"], [null, null, "임산공학과", "수학", "영어", "과학"], [null, null, "조경학과", "영어", "생명과학", "지구과학\n(행성우주과학 불요)"], [null, null, "농생명화학과", "영어", "화학", "생명과학"], [null, null, "식품공학과", "영어", "화학", "생명과학"], [null, null, "분자생명공학과", "영어", "화학", "생명과학"], [null, null, "동물자원학부", "영어", "화학", "생명과학"], [null, null, "지역·바이오시스템공학과", "수학", "물리학", "-"], [null, null, "바이오에너지공학과", "영어", "화학", "생명과학"], [null, null, "농업경제학과", "수학", "영어", "사회"], [null, null, "융합바이오시스템기계공학과", "수학", "물리학", "생명과학"], [null, "사범대학", "국어교육과", "국어", "-", "-"], [null, null, "영어교육과", "영어", "-", "-"], [null, null, "교육학과", "국어", "영어", "사회"], [null, null, "유아교육과", "국어", "영어", "-"], [null, null, "지리교육과", "국어", "영어", "지리"], [null, null, "역사교육과", "국어", "역사", "-"], [null, null, "윤리교육과", "윤리", "-", "-"], [null, null, "수학교육과", "수학", "-", "-"], [null, null, "물리교육과", "수학", "물리학", "-"], [null, null, "화학교육과", "수학", "화학", "-"], [null, null, "생물교육과", "영어", "생명과학", "-"], [null, null, "지구과학교육과", "수학", "물리학", "지구과학"], [null, null, "가정교육과", "사회", "화학", "기술·가정/정보"], [null, null, "특수교육학부", "국어", "사회", "윤리"], [null, "사회과학대학", "정치외교학과", "영어", "사회", "-"], [null, null, "사회학과", "영어", "사회", "-"], [null, null, "심리학과", "영어", "사회", "-"], [null, null, "문헌정보학과", "국어", "영어", "사회"], [null, null, "미디어커뮤니케이션학과", "국어", "영어", "사회"], [null, null, "지리학과", "지리", "-", "-"], [null, null, "문화인류고고학과", "영어", "사회", "역사"], [null, null, "행정학과", "영어", "사회", "-"], [null, "생활과학대학", "생활복지학과", "국어", "영어", "사회"], [null, null, "식품영양과학부", "화학", "생명과학", "-"], [null, null, "외류학과", "영어", "화학", "기술·가정/정보"], [null, "수의과대학", "수의예과", "영어", "화학", "생명과학"], [null, "약학대학", "약학부", "수학", "화학", "생명과학"], [null, "외과대학", "의예과", "수학", "영어", "생명과학"], [null, "인문대학", "국어국문학과", "국어", "-", "-"], [null, null, "영어영문학과", "영어", "사회", "-"], [null, null, "독일언어문학과", "영어", "독일어", "-"], [null, null, "불어불문학과", "영어", "프랑스어", "-"], [null, null, "중어중문학과", "국어", "중국어", "한문"], [null, null, "일어일문학과", "일본어", "-", "-"], [null, null, "사학과", "역사", "-", "-"], [null, null, "철학과", "국어", "윤리", "-"], [null, "자연과학대학", "수학과", "수학", "물리학", "-"], [null, null, "통계학과", "수학", "영어", "-"], [null, null, "물리학과", "수학", "영어", "물리학"], [null, null, "지구환경과학부", "수학", "물리학", "지구과학"], [null, null, "생물학과", "영어", "화학", "생명과학"], [null, null, "화학과", "화학", "-", "-"], [null, null, "생명과학기술학부", "영어", "화학", "생명과학"], [null, "AI융합대학", "인공지능학부", "수학", "영어", "-"], [null, null, "미래모빌리티학과", "수학", "물리학", "-"], [null, null, "빅데이터융합학과", "수학", "영어", "-"], [null, "전남대학교", "자율전공학부(4년)", "국어", "영어", "-"], [null, "치의학전문대학원", "치의학전문대학원(학·석사통합과정)", "수학", "화학", "생명과학"], ["여수", "공과대학", "공학계열", "수학", "물리학", "화학"], [null, "공과대학", "건축디자인학과", "국어", "사회", "-"], [null, null, "화공학부", "수학", "영어", "-"], [null, null, "석유화학소재공학과", "수학", "화학", "-"], [null, "문화사회과학대학", "국제학부(영어학전공)", "영어", "-", "-"], [null, null, "국제학부(일본학전공)", "일본어", "-", "-"], [null, null, "국제학부(중국학전공)", "중국어", "-", "-"], [null, null, "글로벌비즈니스학부", "국어", "영어", "사회"], [null, null, "물류교통학과", "국어", "영어", "사회"], [null, null, "문화콘텐츠학부", "국어", "영어", "-"], [null, null, "문화관광경영학과", "사회", "-", "-"], [null, "수산해양대학", "해양수산관련", "영어", "생명과학", "지구과학\n(행성우주과학 불요)"], [null, null, "기관시스템공학과", "수학", "영어", "-"], [null, null, "조선해양공학과", "영어", "물리학", "-"], [null, null, "수산생명의학과", "화학", "생명과학", "-"], [null, null, "스마트수산자원관리학과", "수학", "생명과학", "지구과학\n(행성우주과학 불요)"], [null, "전남대학교", "창의융합학부", "수학", "영어", "사회"], [null, "조기취업형계약학과", "스마트융합공학과", "수학", "물리학", "-"], [null, null, "스마트ICT융합공학과", "수학", "물리학", "-"], [null, null, "스마트전기제어공학과", "수학", "물리학", "-"], [null, null, "디지털융합정보학과", "수학", "물리학", "-"]], "중앙대학교": [["모집단위", "이수 권장과목", null, null], [null, "수학", "과학", null], [null, null, "일반 선택", "진로 선택"], ["기계공학부\n물리학과\n사회기반시스템공학부(건설환경플랜트공학)\n전자전기공학부\n지능형반도체공학과", "미적분Ⅱ, 기하", "물리학, 화학", "역학과 에너지, 전자기와 양자"], ["에너지시스템공학부\n첨단소재공학과\n화학공학과", "미적분Ⅱ, 기하", "화학, 물리학", "물질과 에너지, 화학 반응의 세계"], ["융합공학부", "미적분Ⅱ, 기하", "화학, 물리학 또는\n화학, 생명과학", null], ["건축학부\n사회기반시스템공학부(도시시스템공학)\n소프트웨어학부", "미적분Ⅱ, 기하", "물리학", "역학과 에너지, 전자기와 양자"], ["AI학과\n산업보안학과(자연)\n수학과\n예술공학부", "미적분Ⅱ, 기하", "-", "-"], ["약학부\n의학부", "미적분Ⅱ, 기하", "생명과학, 화학", "물질과 에너지, 화학 반응의 세계\n세포와 물질대사, 생물의 유전\n중 3과목 이상"], ["생명과학과", "미적분Ⅱ", "생명과학, 화학", "물질과 에너지, 화학 반응의 세계\n세포와 물질대사, 생물의 유전\n중 2과목 이상"], ["화학과", "미적분Ⅱ", "화학, 물리학 또는\n화학, 생명과학", null], ["시스템생명공학과\n식품공학부(식품공학, 식품영양)", "미적분Ⅱ\n또는 기하", "생명과학, 화학", null], ["간호학과", "미적분Ⅱ", "생명과학", "세포와 물질대사, 생물의 유전"], ["생명자원공학부(동물생명공학, 식물생명공학)", "미적분Ⅱ", "생명과학, 화학", null]], "충남대학교": [["모집단위", "교과(군)", "선택과목", null, null], [null, null, "일반선택", "진로선택", "융합선택"], ["인문대학\n사범대학\n(국어교육과,\n영어교육과,\n교육학과)", "국어", "2과목 이상", null, null], [null, "영어", "2과목 이상", null, null], [null, "제2외국어/한문", "1과목 이상", null, null], ["사회과학대학\n국가안보융합학부", "국어", "2과목 이상", null, null], [null, "영어", "2과목 이상", null, null], [null, "사회\n(역사/도덕 포함)", "2과목 이상", null, null], [null, "수학", "확률과 통계\n(사회학과, 심리학과,\n사회복지학과, 행정학부)", null, null], ["자연과학대학", "수학", "대수, 미적분Ⅰ,\n확률과 통계", "기하, 미적분Ⅱ\n(수학과, 정보통계학과,\n물리학과)\n미적분Ⅱ(천문우주과학과)", null], [null, "과학", "적성과 진로에 맞게 일반선택과목 이수 후 진로선택과목 1과목 이상 이수", null, null], ["경상대학", "영어", "2과목 이상", null, null], [null, "수학", "확률과 통계", null, null], ["공과대학", "수학", "대수, 미적분Ⅰ,\n확률과 통계", "미적분Ⅱ", null], [null, "과학", "적성과 진로에 맞게 일반선택과목 이수 후 진로선택과목 1과목 이상 이수", null, null], ["의과대학\n약학대학\n수의과대학", "수학", "대수, 미적분Ⅰ,\n확률과 통계", "기하, 미적분Ⅱ", null], [null, "과학", "화학, 생명과학", "물질과 에너지,\n화학반응의 세계,\n세포와 물질대사,\n생물의 유전 중\n2과목 이상", null], ["생활과학대학\n(소비자학과,\n의류학과)", "영어", "2과목 이상", null, null], ["생활과학대학\n(식품영양학과)", "영어", "2과목 이상", null, null], [null, "수학", "대수, 미적분Ⅰ,\n확률과 통계", null, null], [null, "과학", "적성과 진로에 맞게 일반선택과목 이수 후 진로선택과목 1과목 이상 이수", null, null], ["사범대학\n(수학교육과)", "수학", "대수, 미적분Ⅰ,\n확률과 통계", "기하, 미적분Ⅱ", null], [null, "과학", "적성과 진로에 맞게 일반선택과목 이수 후 진로(융합)선택과목 1과목 이상 이수", null, null], ["사범대학\n(건설공학교육과,\n기계공학교육과,\n전기·전자·통신\n공학교육과,\n화학공학교육과,\n기술교육과)", "수학", "대수, 미적분Ⅰ,\n확률과 통계", null, null], [null, "과학", "적성과 진로에 맞게 일반선택과목 이수 후 진로선택과목 1과목 이상 이수", null, null], ["간호대학", "수학", "대수, 미적분Ⅰ,\n확률과 통계", null, null], [null, "과학", "생명과학", "세포와 물질대사,\n생물의 유전 중\n1과목 이상", null], ["생명시스템과학대학", "수학", "대수, 미적분Ⅰ,\n확률과 통계", "미적분Ⅱ", null], [null, "과학", "화학, 생명과학", "물질과 에너지,\n화학반응의 세계,\n세포와 물질대사,\n생물의 유전 중\n2과목 이상", null], ["지식융합학부", "영어", "2과목 이상", null, null], [null, "수학", "확률과 통계", null, null], ["국제학부", "영어", "3과목 이상", null, null], ["인문사회융합학부", "국어", "2과목 이상", null, null], [null, "영어", "2과목 이상", null, null], [null, "사회\n(역사/도덕 포함)", "2과목 이상", null, null], [null, "수학", "적성과 진로에 맞게\n확률과 통계 이수", null, null], ["자연과학융합학부", "수학", "대수, 미적분Ⅰ,\n확률과 통계", null, null], [null, "과학", "적성과 진로에 맞게 일반선택과목 이수 후 진로선택과목 1과목 이상 이수", null, null], ["공학융합학부", "수학", "대수, 미적분Ⅰ,\n확률과 통계", "미적분Ⅱ", null], [null, "과학", "적성과 진로에 맞게 일반선택과목 이수 후 진로선택과목 1과목 이상 이수", null, null], ["영농창업인재전형\n농업생명과학대학\n(농업경제학과)", "영어", "2과목 이상", null, null], [null, "사회\n(역사/도덕 포함)", "2과목 이상", null, null], [null, "수학", "확률과 통계", null, null], ["영농창업인재전형\n농업생명과학대학\n(원예학과,\n생물환경화학과)", "영어", "2과목 이상", null, null], [null, "수학", "대수, 미적분Ⅰ,\n확률과 통계", null, null], [null, "과학", "적성과 진로에 맞게 일반선택과목 이수 후 진로선택과목 1과목 이상 이수", null, null], ["농생명융합학부\n(농업경제학과\n진로희망자 제외)", "수학", "대수, 미적분Ⅰ,\n확률과 통계", "적성과 진로에 맞게\n기하, 미적분Ⅱ 이수", null], [null, "과학", "적성과 진로에 맞게 일반선택과목 이수 후 진로선택과목 1과목 이상 이수", null, null], ["농생명융합학부\n(농업경제학과\n진로희망자)", "영어", "2과목 이상", null, null], [null, "사회\n(역사/도덕 포함)", "2과목 이상", null, null], [null, "수학", "확률과 통계", null, null]]};
+
+// ── 내가 선택한 과목 가져오기 (기존 mcCurrentUser, mcUserSubjects 활용) ──
+function ugGetMySubjects() {
+  // mcSelections에서 현재 선택된 과목명 추출
+  // mcSelections = [{ '필수': ['과목명',...], '사회&과학': [...] }, ...] (학기 4개)
+  function extractFromMcSelections(sel) {
+    const result = [];
+    if (!Array.isArray(sel)) return result;
+    sel.forEach(semObj => {
+      if (!semObj || typeof semObj !== 'object') return;
+      Object.values(semObj).forEach(arr => {
+        if (Array.isArray(arr)) arr.forEach(name => {
+          if (name && typeof name === 'string') result.push(name.trim());
+        });
+      });
+    });
+    return result;
+  }
+
+  // 1순위: 메모리에 있는 mcSelections (가장 최신 — 과목 추가/삭제 즉시 반영)
+  try {
+    if (typeof mcSelections !== 'undefined' && Array.isArray(mcSelections)) {
+      const subjects = extractFromMcSelections(mcSelections);
+      console.log('[ugGetMySubjects] 소스: mcSelections (' + subjects.length + '개):', subjects.join(', '));
+      return subjects;
+    }
+  } catch(e) { console.warn('[ugGetMySubjects] mcSelections 읽기 실패:', e); }
+
+  // 2순위: localStorage의 mc_user.data (페이지 새로고침 직후 mcSelections 로드 전)
+  try {
+    const raw = localStorage.getItem('mc_user');
+    if (raw) {
+      const user = JSON.parse(raw);
+      if (user && Array.isArray(user.data)) {
+        const subjects = extractFromMcSelections(user.data);
+        console.log('[ugGetMySubjects] 소스: localStorage mc_user (' + subjects.length + '개)');
+        return subjects;
+      }
+    }
+  } catch(e) {}
+
+  console.warn('[ugGetMySubjects] 과목 목록을 찾지 못했습니다.');
+  return [];
+}
+
+// ── 과목군 이름 → 해당 과목군에 속한 과목들 매핑 ──
+const UG_SUBJECT_GROUPS = {
+  '수학': ['대수', '미적분Ⅰ', '확률과 통계', '수학과 문화', '실용 수학'],
+  '과학': ['물리학', '화학', '생명과학', '지구과학'],
+  '사회': ['통합사회', '한국사', '사회와 문화', '생활과 윤리', '윤리와 사상', '한국지리', '세계지리', '동아시아사', '세계사', '경제', '정치와 법', '사회문화'],
+  '영어': ['영어', '영어 회화', '영어 독해와 작문', '영어권 문화', '진로 영어'],
+  '국어': ['국어', '화법과 작문', '독서', '언어와 매체', '문학', '실용 국어', '심화 국어'],
+  '한국사': ['한국사'],
+  '물리학': ['물리학', '역학과 에너지', '전자기와 양자', '물질과 에너지'],
+  '화학': ['화학', '물질과 에너지', '화학 반응의 세계'],
+  '생명과학': ['생명과학', '세포와 물질대사', '생물의 유전'],
+  '지구과학': ['지구과학', '지구시스템과학', '행성우주과학'],
+  '제2외국어/한문': ['독일어', '프랑스어', '스페인어', '중국어', '일본어', '러시아어', '아랍어', '베트남어', '한문'],
+  '사회문화': ['사회와 문화', '사회문화'],
+  '윤리': ['생활과 윤리', '윤리와 사상', '현대사회와 윤리'],
+  '역사': ['한국사', '동아시아사', '세계사'],
+  '지리': ['한국지리', '세계지리', '세계시민과 지리', '한국지리 탐구'],
+  '정치': ['정치와 법'],
+  '법': ['정치와 법'],
+  '경제': ['경제'],
+  '한문': ['한문'],
+  '정보': ['정보', '인공지능 기초'],
+};
+
+// ── 특정 과목이 "과목명" 또는 "과목군 명칭"인지 판단하고 실제 과목 목록 반환 ──
+function ugExpandSubject(subjectStr) {
+  const s = subjectStr.trim();
+  if (UG_SUBJECT_GROUPS[s]) return UG_SUBJECT_GROUPS[s];
+  return [s];
+}
+
+// ── 텍스트에서 조건 파싱 ──
+// 반환 형태: [ { type: 'minCount', group: '과학', count: 3 } | { type: 'minCountFrom', subjects:[...], count:N } | { type: 'subject', name: '물리학' } ]
+function ugParseConditions(text) {
+  if (!text || text === '-' || text === 'NaN') return [];
+  const conditions = [];
+  // 파이프(|) 단위로 분리된 조건 블록 처리
+  const blocks = text.split(/\|/g).map(s => s.trim()).filter(Boolean);
+  blocks.forEach(block => {
+    // 패턴1: "과학 교과 N개 과목 이상 이수" / "사회 교과 2개 과목 이상"
+    const groupMatch = block.match(/^([가-힣/·]+)\s*교과\s*(\d+)\s*개\s*과목?\s*이상/);
+    if (groupMatch) {
+      conditions.push({ type: 'minCount', group: groupMatch[1].trim(), count: parseInt(groupMatch[2]) });
+      return;
+    }
+    // 패턴2: "A, B, C 中 N개/N과목 이상" 또는 "A, B 관련 ... 중 N과목 이상"
+    const listMatch = block.match(/^(.*?)\s*(?:관련[^중中]*)?[중中]\s*(\d+)\s*(?:개\s*)?과목?\s*이상/);
+    if (listMatch) {
+      const raw = listMatch[1].replace(/관련.*$/, '').trim();
+      const count = parseInt(listMatch[2]);
+      const items = raw.split(/[,，\n•·]+/).map(s => s.trim()).filter(s => s && s !== '-' && s.length > 0);
+      if (items.length > 0) {
+        conditions.push({ type: 'minCountFrom', subjects: items, count });
+        return;
+      }
+    }
+    // 패턴3: 일반 과목 목록 (쉼표 등으로 구분, "이상/이수" 포함 토큰 제거)
+    block.split(/[,，\n•·]/g)
+      .map(s => s.replace(/•/g, '').trim())
+      .filter(s => s && s !== '-' && s !== '' && !/^\d+(?:과목|개)/.test(s) && !/이상/.test(s) && !/이수/.test(s))
+      .forEach(name => conditions.push({ type: 'subject', name }));
+  });
+  return conditions;
+}
+
+// 하위 호환: subjects 배열 반환 (type=subject 항목만)
+function ugParseSubjects(text) {
+  return ugParseConditions(text)
+    .filter(c => c.type === 'subject')
+    .map(c => c.name);
+}
+
+// ── 대학별 모집단위 파싱 ──
+let ugParsed = {}; // { university: [ { dept: string, info: string, subjects: string[] } ] }
+
+function ugParseAll() {
+  const universities = Object.keys(UG_RAW);
+  universities.forEach(univ => {
+    const rows = UG_RAW[univ];
+    const entries = [];
+
+    // 각 대학의 구조가 다양하므로 범용 파싱
+    // 헤더 행(row 0) 스킵, 이후부터 실제 데이터
+    for (let i = 1; i < rows.length; i++) {
+      const row = rows[i];
+      const nonNull = row.filter(v => v !== null && v !== undefined);
+      if (nonNull.length === 0) continue;
+
+      // 모집단위 찾기
+      let dept = null;
+      let info = '';
+
+      // 대부분의 시트에서 두 번째 열이 모집단위
+      // 단, 경기대는 [구분, 모집단위, 일반선택, 진로선택, 융합선택]
+      // 동국대는 [계열, 단과대학, 모집단위, 전공관련 교과영역, 비고]
+      // 전남대는 [캠퍼스, 단과대학, 모집단위, 교과1, 교과2, 교과3]
+
+      // 모집단위 열 + 과목 정보 열을 찾아서 통합
+      const allText = row.map((v, idx) => {
+        if (v === null || v === undefined) return null;
+        const s = String(v).trim();
+        if (s === '' || s === 'NaN') return null;
+        return { idx, val: s };
+      }).filter(Boolean);
+
+      if (allText.length === 0) continue;
+
+      // 첫 번째 비null 값이 모집단위일 가능성
+      // → 여러 셀을 합쳐서 "표시용 모집단위 + 전체 정보" 생성
+      const firstVal = allText[0].val;
+
+      // 숫자만인 경우(연번 등) 스킵
+      if (/^[\d①②③]+$/.test(firstVal) && allText.length === 1) continue;
+
+      // 모집단위 이름: 숫자/캠퍼스 접두사 제외하고 가장 적합한 텍스트 찾기
+      let deptVal = null;
+      let infoVals = [];
+
+      for (let j = 0; j < allText.length; j++) {
+        const v = allText[j].val;
+        // 숫자/연번/캠퍼스 구분자인 경우 건너뜀
+        if (/^[①②③\d]+$/.test(v)) continue;
+        if (['광주', '여수', '수원\n캠퍼스', '서울\n캠퍼스'].includes(v)) continue;
+
+        if (deptVal === null) {
+          deptVal = v;
+        } else {
+          infoVals.push(v);
+        }
+      }
+
+      if (!deptVal) continue;
+
+      dept = deptVal.replace(/\n/g, ' / ').replace(/<경희대>\s*/g, '').trim();
+      info = infoVals.join(' | ').replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
+
+      if (!dept) continue;
+
+      // 부모에서 내려받은 info 없으면 위 행의 조건을 그대로 상속 (병합셀 방식)
+      let conditions, subjects;
+      if (!info && entries.length > 0) {
+        info = entries[entries.length - 1].info;
+        conditions = entries[entries.length - 1].conditions;
+        subjects = entries[entries.length - 1].subjects;
+      } else {
+        conditions = ugParseConditions(info);
+        subjects = conditions.filter(c => c.type === 'subject').map(c => c.name);
+      }
+      entries.push({ dept, info, subjects, conditions });
+    }
+
+    ugParsed[univ] = entries;
+  });
+}
+
+// ── UI 변수 ──
+let ugSelectedUniv = null;
+let ugSelectedDeptEntry = null;
+
+function openUnivGuideModal() {
+  document.getElementById('mc-univ-guide-modal').classList.add('open');
+  if (Object.keys(ugParsed).length === 0) ugParseAll();
+  ugRenderUnivGrid();
+  ugResetDeptSection();
+}
+
+function closeUnivGuideModal() {
+  document.getElementById('mc-univ-guide-modal').classList.remove('open');
+}
+
+function ugRenderUnivGrid() {
+  const grid = document.getElementById('ug-univ-grid');
+  grid.innerHTML = '';
+  Object.keys(UG_RAW).forEach(univ => {
+    const btn = document.createElement('button');
+    btn.className = 'ug-univ-chip';
+    btn.textContent = univ;
+    btn.onclick = function() { ugSelectUniv(univ, btn); };
+    grid.appendChild(btn);
+  });
+}
+
+function ugSelectUniv(univ, btn) {
+  ugSelectedUniv = univ;
+  ugSelectedDeptEntry = null;
+  document.querySelectorAll('.ug-univ-chip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  ugRenderDeptSelect(univ);
+  document.getElementById('ug-dept-section').style.display = '';
+  document.getElementById('ug-result-section').style.display = 'none';
+}
+
+function ugRenderDeptSelect(univ) {
+  const sel = document.getElementById('ug-dept-select');
+  sel.innerHTML = '<option value="">-- 모집단위를 선택하세요 --</option>';
+  const entries = ugParsed[univ] || [];
+  entries.forEach((entry, idx) => {
+    const opt = document.createElement('option');
+    opt.value = idx;
+    opt.textContent = entry.dept;
+    sel.appendChild(opt);
+  });
+}
+
+function ugResetDeptSection() {
+  document.getElementById('ug-dept-section').style.display = 'none';
+  document.getElementById('ug-result-section').style.display = 'none';
+  document.getElementById('ug-check-summary').textContent = '';
+}
+
+function ugShowResult() {
+  const sel = document.getElementById('ug-dept-select');
+  const idx = parseInt(sel.value, 10);
+  if (isNaN(idx) || idx < 0) {
+    document.getElementById('ug-result-section').style.display = 'none';
+    return;
+  }
+  const entries = ugParsed[ugSelectedUniv];
+  ugSelectedDeptEntry = entries[idx];
+  document.getElementById('ug-check-summary').textContent = '';
+  ugRenderResultCard(ugSelectedDeptEntry, []);
+  document.getElementById('ug-result-section').style.display = '';
+}
+
+function ugRenderResultCard(entry, mySubjects) {
+  const el = document.getElementById('ug-result-content');
+  el.innerHTML = '';
+
+  const card = document.createElement('div');
+  card.className = 'ug-result-card';
+
+  const deptName = document.createElement('div');
+  deptName.className = 'ug-result-dept-name';
+  deptName.textContent = entry.dept;
+  card.appendChild(deptName);
+
+  const deptSub = document.createElement('div');
+  deptSub.className = 'ug-result-dept-sub';
+  deptSub.textContent = ugSelectedUniv;
+  card.appendChild(deptSub);
+
+  // 원본 텍스트 표시
+  if (entry.info) {
+    const infoBox = document.createElement('div');
+    infoBox.className = 'ug-info-text';
+    infoBox.textContent = '📋 권장 과목 안내: ' + entry.info;
+    card.appendChild(infoBox);
+  }
+
+  // 조건 기반 렌더링
+  const conditions = entry.conditions || entry.subjects.map(s => ({ type: 'subject', name: s }));
+  if (conditions.length > 0) {
+    const rows = document.createElement('div');
+    rows.className = 'ug-subject-rows';
+    const rowEl = document.createElement('div');
+    rowEl.className = 'ug-subject-row';
+    const label = document.createElement('span');
+    label.className = 'ug-subject-row-label';
+    label.textContent = '권장과목';
+    rowEl.appendChild(label);
+    const tags = document.createElement('div');
+    tags.className = 'ug-subject-tags';
+
+    conditions.forEach(cond => {
+      if (cond.type === 'minCount') {
+        // "과학 교과 N개 이상" 조건
+        const groupSubjects = UG_SUBJECT_GROUPS[cond.group] || [];
+        const matchedCount = mySubjects.length > 0
+          ? groupSubjects.filter(gs => mySubjects.some(ms => ugSubjectMatch(gs, ms))).length
+          : 0;
+        const satisfied = matchedCount >= cond.count;
+        const tag = document.createElement('span');
+        tag.className = 'ug-subject-tag';
+        tag.textContent = cond.group + ' 교과 ' + cond.count + '개 과목 이상 이수';
+        if (mySubjects.length > 0) {
+          tag.classList.add(satisfied ? 'match' : 'no-match');
+          tag.title = satisfied
+            ? '✓ 충족 (' + matchedCount + '/' + cond.count + '개)'
+            : '✗ 미충족 (' + matchedCount + '/' + cond.count + '개) — ' + (groupSubjects.join(', ') || '');
+        }
+        tags.appendChild(tag);
+        // 소속 과목 힌트
+        if (groupSubjects.length > 0) {
+          const hint = document.createElement('span');
+          hint.className = 'ug-subject-tag';
+          hint.style.cssText = 'font-size:10px;opacity:0.55;border-style:dashed;padding:2px 7px;';
+          hint.textContent = '(' + groupSubjects.join(', ') + ')';
+          tags.appendChild(hint);
+        }
+      } else if (cond.type === 'minCountFrom') {
+        // "A, B, C 중 N개 이상" 조건
+        const matchedCount = mySubjects.length > 0
+          ? cond.subjects.filter(s => mySubjects.some(ms => ugSubjectMatch(s, ms))).length
+          : 0;
+        const satisfied = matchedCount >= cond.count;
+        const tag = document.createElement('span');
+        tag.className = 'ug-subject-tag';
+        tag.textContent = cond.subjects.join(', ') + ' 中 ' + cond.count + '개 이상';
+        if (mySubjects.length > 0) {
+          tag.classList.add(satisfied ? 'match' : 'no-match');
+          tag.title = satisfied
+            ? '✓ 충족 (' + matchedCount + '/' + cond.count + '개)'
+            : '✗ 미충족 (' + matchedCount + '/' + cond.count + '개)';
+        }
+        tags.appendChild(tag);
+      } else {
+        // 개별 과목
+        const sub = cond.name;
+        const expanded = ugExpandSubject(sub);
+        const anyMatch = mySubjects.length > 0 && expanded.some(es =>
+          mySubjects.some(ms => ugSubjectMatch(es, ms))
+        );
+        const directMatch = mySubjects.length > 0 && mySubjects.some(ms => ugSubjectMatch(sub, ms));
+        const tag = document.createElement('span');
+        tag.className = 'ug-subject-tag';
+        tag.textContent = sub;
+        if (mySubjects.length > 0) {
+          tag.classList.add((anyMatch || directMatch) ? 'match' : 'no-match');
+          tag.title = (anyMatch || directMatch) ? '✓ 선택한 과목에 포함됨' : '✗ 미이수 과목';
+        }
+        tags.appendChild(tag);
+        if (UG_SUBJECT_GROUPS[sub] && UG_SUBJECT_GROUPS[sub].length > 1) {
+          const groupLabel = document.createElement('span');
+          groupLabel.className = 'ug-subject-tag';
+          groupLabel.style.cssText = 'font-size:10px;opacity:0.55;border-style:dashed;padding:2px 7px;';
+          groupLabel.textContent = '(' + UG_SUBJECT_GROUPS[sub].slice(0, 3).join(', ') + (UG_SUBJECT_GROUPS[sub].length > 3 ? '…' : '') + ')';
+          tags.appendChild(groupLabel);
+        }
+      }
+    });
+
+    rowEl.appendChild(tags);
+    rows.appendChild(rowEl);
+    card.appendChild(rows);
+  } else {
+    const empty = document.createElement('div');
+    empty.className = 'ug-empty';
+    empty.textContent = '이 모집단위는 별도의 권장 과목이 지정되어 있지 않습니다.';
+    card.appendChild(empty);
+  }
+
+  el.appendChild(card);
+}
+
+function ugSubjectMatch(a, b) {
+  // 정규화: 공백 제거 + 로마자 숫자 통일 + 전각/반각 통일
+  const normalize = s => s
+    .replace(/\s+/g, '')
+    .replace(/Ⅰ/g, '1').replace(/Ⅱ/g, '2').replace(/Ⅲ/g, '3')
+    .replace(/[Ⅳ]/g, '4')
+    .replace(/[I]/g, '1').replace(/[II]/g, '2')  // 영문 로마자 표기도 통일
+    .toLowerCase();
+  // 정확히 일치하는 경우만 매칭 (부분 문자열 오탐 방지)
+  return normalize(a) === normalize(b);
+}
+
+function ugCheckMySubjects() {
+  if (!ugSelectedDeptEntry) return;
+  const mySubjects = ugGetMySubjects();
+  const summary = document.getElementById('ug-check-summary');
+
+  ugRenderResultCard(ugSelectedDeptEntry, mySubjects);
+
+  if (mySubjects.length === 0) {
+    summary.className = 'ug-check-summary warn';
+    summary.textContent = '⚠ 선택한 과목을 불러오지 못했습니다. 나만의 교육과정에서 과목을 추가한 뒤 다시 시도하세요.';
+    return;
+  }
+
+  // 현재 인식된 과목 목록을 콘솔에 출력 (디버그)
+  console.log('[대학별 이수 가이드] 인식된 내 과목 목록 (' + mySubjects.length + '개):', mySubjects.join(', '));
+
+  const conditions = ugSelectedDeptEntry.conditions
+    || (ugSelectedDeptEntry.subjects || []).map(s => ({ type: 'subject', name: s }));
+
+  if (!conditions || conditions.length === 0) {
+    summary.className = 'ug-check-summary ok';
+    summary.textContent = '✓ 별도 권장 과목이 없어 이수 조건 해당 없음';
+    return;
+  }
+
+  let totalConds = 0, metConds = 0;
+  const failedLabels = [];
+
+  conditions.forEach(cond => {
+    totalConds++;
+    if (cond.type === 'minCount') {
+      const groupSubjects = UG_SUBJECT_GROUPS[cond.group] || [];
+      const cnt = groupSubjects.filter(gs => mySubjects.some(ms => ugSubjectMatch(gs, ms))).length;
+      if (cnt >= cond.count) {
+        metConds++;
+      } else {
+        failedLabels.push(cond.group + ' 교과 ' + cond.count + '개 이상 (현재 ' + cnt + '개)');
+      }
+    } else if (cond.type === 'minCountFrom') {
+      const cnt = cond.subjects.filter(s => mySubjects.some(ms => ugSubjectMatch(s, ms))).length;
+      if (cnt >= cond.count) {
+        metConds++;
+      } else {
+        failedLabels.push(cond.subjects.join(', ') + ' 中 ' + cond.count + '개 이상 (현재 ' + cnt + '개)');
+      }
+    } else {
+      const sub = cond.name;
+      const expanded = ugExpandSubject(sub);
+      const ok = mySubjects.some(ms =>
+        expanded.some(es => ugSubjectMatch(es, ms)) || ugSubjectMatch(sub, ms)
+      );
+      if (ok) {
+        metConds++;
+      } else {
+        failedLabels.push(sub);
+      }
+    }
+  });
+
+  if (failedLabels.length === 0) {
+    summary.className = 'ug-check-summary ok';
+    summary.textContent = `✓ 전체 ${totalConds}개 조건 모두 충족! (${metConds}/${totalConds})`;
+  } else {
+    summary.className = 'ug-check-summary warn';
+    summary.textContent = `⚠ ${metConds}/${totalConds}개 충족 · 미충족: ${failedLabels.slice(0, 3).join(' / ')}${failedLabels.length > 3 ? ' 등' : ''}`;
+  }
+}
+
+// 전역으로 노출
+window.openUnivGuideModal = openUnivGuideModal;
+window.closeUnivGuideModal = closeUnivGuideModal;
+window.ugSelectUniv = ugSelectUniv;
+window.ugShowResult = ugShowResult;
+window.ugCheckMySubjects = ugCheckMySubjects;
+
+})();
+</script>
+
 </body>
-</html>
