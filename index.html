@@ -7024,7 +7024,7 @@ async function openMenu08() {
   const titleEl  = document.getElementById('iframe-screen-title');
   if (titleEl) titleEl.textContent = title;
 
-  const iframeEl = document.getElementById('iframe-embed');
+  const iframeEl = _freshIframeEmbed();
   const noUrlEl  = document.getElementById('iframe-no-url');
 
   document.getElementById('iframe-screen').classList.add('open');
@@ -7066,9 +7066,21 @@ async function openMenu08() {
 function closeIframeScreen() {
   document.getElementById('iframe-screen').classList.remove('open');
   setTimeout(() => {
-    const iframeEl = document.getElementById('iframe-embed');
-    if (iframeEl) { iframeEl.removeAttribute('srcdoc'); iframeEl.src = ''; }
+    // src를 바꾸면 방문 기록이 쌓여 뒤로가기가 막히므로 iframe 자체를 새로 교체
+    if (!document.getElementById('iframe-screen').classList.contains('open')) _freshIframeEmbed();
   }, 300);
+}
+
+/* 방문 기록이 없는 새 iframe으로 교체 (뒤로가기가 iframe 안에서 소모되지 않도록) */
+function _freshIframeEmbed() {
+  const old = document.getElementById('iframe-embed');
+  if (!old) return old;
+  const fresh = old.cloneNode(false);
+  fresh.removeAttribute('src');
+  fresh.removeAttribute('srcdoc');
+  fresh.style.display = 'none';
+  old.replaceWith(fresh);
+  return fresh;
 }
 
 /* ── 08번 HTML 파일 처리 (Storage 업로드 → fetch → srcdoc) ── */
@@ -16169,6 +16181,224 @@ window.ugSelectUniv = ugSelectUniv;
 window.ugShowResult = ugShowResult;
 window.ugCheckMySubjects = ugCheckMySubjects;
 
+})();
+</script>
+
+<script>
+/* ══════════════════════════════════════════════════════════════
+   뒤로가기(브라우저 · 휴대폰) 지원
+   - 화면/팝업이 열리면 주소(#/...)를 하나씩 쌓고,
+     뒤로가기를 누르면 맨 위 화면/팝업부터 닫습니다.
+   - 기존 open/close 함수는 그대로 두고, 각 요소의 열림 상태를
+     감시(MutationObserver)해서 히스토리를 자동으로 맞춥니다.
+══════════════════════════════════════════════════════════════ */
+(function () {
+  if (!window.history || !history.pushState) return;
+
+  function call(name) {
+    return function () { if (typeof window[name] === 'function') window[name](); };
+  }
+  function removeOpen() {
+    var ids = arguments;
+    return function () {
+      for (var i = 0; i < ids.length; i++) {
+        var el = document.getElementById(ids[i]);
+        if (el) el.classList.remove('open');
+      }
+    };
+  }
+  function byDisplay(el) { return !!el.style.display && el.style.display !== 'none'; }
+
+  /* 순서 = 같은 순간에 여러 개가 열릴 때 쌓이는 순서(아래 → 위) */
+  var LAYERS = [
+    /* ── 메인 메뉴 화면 ── */
+    { id: 'semester-screen',       path: 'semester',          close: call('closeSemesterScreen') },
+    { id: 'catsubj-screen',        path: 'subjects',          close: call('closeCatSubjScreen') },
+    { id: 'dept-screen',           path: 'dept',              close: call('closeDeptScreen') },
+    { id: 'enroll-screen',         path: 'enroll',            close: call('closeEnrollScreen') },
+    { id: 'suneung-screen',        path: 'suneung',           close: call('closeSuneungScreen') },
+    { id: 'guidebook-screen',      path: 'guidebook',         close: call('closeGuidebookScreen') },
+    { id: 'brochure-screen',       path: 'brochure',          close: call('closeBrochureScreen') },
+    { id: 'iframe-screen',         path: 'test',              close: call('closeIframeScreen') },
+    { id: 'mycurriculum-screen',   path: 'my-curriculum',     close: call('closeMyCurriculumScreen') },
+
+    /* ── 화면 안의 하위 화면 ── */
+    { id: 'subject-detail',        path: 'subject',           close: call('closeDetail') },
+    { id: 'dept-detail-panel',     path: 'dept-detail',       close: call('closeDeptDetail') },
+    { id: 'subject-search-screen', path: 'univ-search',       close: call('closeSubjectSearch') },
+    { id: 'suneung-file-view',     path: 'file',              close: call('closeSuneungFileView'), isOpen: byDisplay },
+
+    /* ── 모달 / 팝업 ── */
+    { id: 'mycurriculum-modal',    path: 'login',             close: call('closeMyCurriculumModal') },
+    { id: 'admin-modal',           path: 'admin',             close: call('closeAdminModal') },
+    { id: 'page-edit-modal',       path: 'page-edit',         close: call('closePageEdit') },
+    { id: 'sem-col-edit-modal',    path: 'semester-edit',     close: call('closeSemColEdit') },
+    { id: 'subj-pick-modal',       path: 'subject-pick',      close: call('closeSubjPick') },
+    { id: 'sets-viewer-modal',     path: 'sets',              close: call('closeSetsViewer'), isOpen: byDisplay },
+    { id: 'mc-pick-modal',         path: 'pick',              close: call('mcPickClose') },
+    { id: 'mc-ai-modal',           path: 'credits',           close: call('closeMcAiModal') },
+    { id: 'mc-helper-modal',       path: 'helper',            close: call('closeMcHelperModal') },
+    { id: 'mc-rec-modal',          path: 'recommend',         close: call('closeMcRecModal') },
+    { id: 'mc-univ-guide-modal',   path: 'univ-guide',        close: call('closeUnivGuideModal') },
+    { id: 'mc-set-warn-modal',     path: 'set-warning',       close: call('closeSetWarnModal') },
+    { id: 'pw-modal',              path: 'password',          close: call('closePwModal') },
+
+    /* ── 전체화면 PDF ── */
+    { id: 'pdf-fs-overlay',        path: 'fullscreen',        close: call('closePdfFs') },
+    { id: 'gb-fs-overlay',         path: 'fullscreen',        close: call('closeGbFullscreen') },
+    { id: 'br-fs-overlay',         path: 'fullscreen',        close: call('closeBrFullscreen') },
+
+    /* ── 작은 팝업 / 드롭다운 ── */
+    { id: 'gb-jump-popup',         path: 'page-jump',         close: call('closeGbJumpPopup') },
+    { id: 'br-jump-popup',         path: 'page-jump',         close: call('closeBrJumpPopup') },
+    { id: 'gb-dropdown-wrap',      path: 'list',              close: call('closeGbDropdown') },
+    { id: 'sem-dropdown-menu',     path: 'select',            close: removeOpen('sem-dropdown-menu', 'sem-dropdown-arrow') },
+    { id: 'grade-picker',          path: 'select',            close: call('closeGradePicker') },
+    { id: 'sets-subj-picker',      path: 'select',            close: call('closeSubjPicker') },
+    { id: 'mc-rec-dropdown-list',  path: 'select',            close: function () {
+        removeOpen('mc-rec-dropdown-list', 'mc-rec-dropdown-btn')();
+        if (typeof window.mcRecCloseDropdownOutside === 'function')
+          document.removeEventListener('click', window.mcRecCloseDropdownOutside);
+      } },
+
+    /* ── 안내 팝업 ── */
+    { id: 'tour-backdrop',         path: 'tour',              close: call('closeTour') },
+    { id: 'cheer-popup-backdrop',  path: 'notice',            close: removeOpen('cheer-popup-backdrop') },
+    /* 반·번호 입력은 필수라 뒤로가기로 닫히지 않음 */
+    { id: 'grade-reset-backdrop',  path: 'grade-update',      block: true }
+  ];
+
+  var byId = {};
+  LAYERS.forEach(function (l) {
+    l.el = document.getElementById(l.id);
+    if (!l.isOpen) l.isOpen = function (el) { return el.classList.contains('open'); };
+    byId[l.id] = l;
+  });
+  LAYERS = LAYERS.filter(function (l) { return !!l.el; });
+
+  var BASE = location.pathname + location.search;
+  var KEY = '__layerDepth';
+  var stack = [];        // 현재 열린 레이어 id (아래 → 위)
+  var depth = 0;         // 기본 주소 위에 쌓아 둔 히스토리 개수
+  var pending = false;   // 직접 실행한 history.go()의 popstate 대기 중
+  var pendingTimer = null;
+  var lastUrl = null;
+
+  function urlFor(list) {
+    if (!list.length) return BASE;
+    return BASE + '#/' + list.map(function (id) { return byId[id].path; }).join('/');
+  }
+  function replace(d, list) {
+    var url = urlFor(list);
+    var st = history.state;
+    if (url === lastUrl && st && st[KEY] === d) return;
+    history.replaceState(stateFor(d), '', url);
+    lastUrl = url;
+  }
+  function stateFor(d) {
+    var o = {}; o[KEY] = d; return o;
+  }
+  function isLayerOpen(l) { try { return l.isOpen(l.el); } catch (e) { return false; } }
+
+  function startTraverse(delta) {
+    pending = true;
+    clearTimeout(pendingTimer);
+    // 혹시 popstate가 오지 않을 경우를 대비한 안전장치
+    pendingTimer = setTimeout(function () {
+      if (!pending) return;
+      pending = false;
+      var st = history.state;
+      if (st && typeof st[KEY] === 'number') depth = st[KEY];
+      sync();
+    }, 1500);
+    history.go(delta);
+  }
+
+  /* 실제 화면 상태 ↔ 히스토리 맞추기 */
+  function sync() {
+    if (pending) return;
+    var openIds = LAYERS.filter(isLayerOpen).map(function (l) { return l.id; });
+    var next = stack.filter(function (id) { return openIds.indexOf(id) !== -1; });
+    openIds.forEach(function (id) { if (next.indexOf(id) === -1) next.push(id); });
+    stack = next;
+
+    var target = stack.length;
+    if (target > depth) {
+      replace(depth, stack.slice(0, depth));
+      for (var d = depth + 1; d <= target; d++) {
+        var url = urlFor(stack.slice(0, d));
+        history.pushState(stateFor(d), '', url);
+        lastUrl = url;
+      }
+      depth = target;
+    } else if (target < depth) {
+      // 닫기 버튼 등으로 닫힌 만큼 히스토리도 되돌림
+      var diff = depth - target;
+      depth = target;
+      startTraverse(-diff);
+    } else {
+      replace(depth, stack);
+    }
+  }
+
+  window.addEventListener('popstate', function (e) {
+    var st = e.state;
+    var hasDepth = st && typeof st[KEY] === 'number';
+
+    if (pending) {
+      pending = false;
+      clearTimeout(pendingTimer);
+      if (hasDepth) depth = st[KEY];
+      lastUrl = null;
+      replace(depth, stack.slice(0, depth));
+      sync();
+      return;
+    }
+
+    if (!hasDepth) {           // 이 스크립트가 만든 기록이 아님 → 현재 상태로 덮어씀
+      lastUrl = null;
+      replace(depth, stack.slice(0, depth));
+      return;
+    }
+
+    var d = st[KEY];
+    if (d >= depth) {          // 앞으로 가기 등 → 현재 상태 유지
+      if (d > depth) startTraverse(depth - d);
+      return;
+    }
+
+    // 뒤로가기: 맨 위부터 닫기
+    var toClose = stack.slice(d).reverse();
+    depth = d;
+    stack = stack.slice(0, d);
+    toClose.forEach(function (id) {
+      var l = byId[id];
+      if (!l || l.block) return;
+      try { if (l.close) l.close(); } catch (err) { console.warn('[history] close 실패:', id, err); }
+      if (isLayerOpen(l)) {    // 닫기 함수가 실패했을 때 강제로 닫기
+        if (l.isOpen === byDisplay) l.el.style.display = 'none';
+        else l.el.classList.remove('open');
+      }
+    });
+    lastUrl = null;
+    sync();
+  });
+
+  /* 열림/닫힘 감시 */
+  var scheduled = false;
+  var mo = new MutationObserver(function () {
+    if (scheduled) return;
+    scheduled = true;
+    Promise.resolve().then(function () { scheduled = false; sync(); });
+  });
+  LAYERS.forEach(function (l) {
+    mo.observe(l.el, { attributes: true, attributeFilter: ['class', 'style'] });
+  });
+
+  /* 새로고침 시에는 첫 화면에서 시작 */
+  history.replaceState(stateFor(0), '', BASE);
+  lastUrl = BASE;
+  sync();
 })();
 </script>
 
