@@ -2917,6 +2917,112 @@
   #enroll-screen.open { opacity: 1; pointer-events: all; }
   #enroll-screen .dept-detail-body { overflow-y: auto; flex: 1; }
 
+  /* ── 수강신청 안내(09): 팝업 형식 ── */
+  #enroll-screen {
+    background: rgba(10,26,48,0.55);
+    -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+    align-items: center; justify-content: center;
+    padding: 3vh 3vw;
+    transition: opacity 0.35s ease;
+  }
+  .enroll-popup-card {
+    position: relative; overflow: hidden;
+    width: min(1280px, 100%); height: min(900px, 100%);
+    display: flex; flex-direction: column;
+    background: #f0f4f8; border-radius: 20px;
+    box-shadow: 0 30px 80px rgba(5,15,35,0.45), 0 0 0 1px rgba(255,255,255,0.35) inset;
+    transform-origin: 0% 100%;
+    transform: translate(-6vw, 6vh) scale(0.6);
+    opacity: 0;
+    transition: transform 0.5s cubic-bezier(0.22,1,0.36,1), opacity 0.3s ease;
+  }
+  #enroll-screen.open .enroll-popup-card { transform: none; opacity: 1; }
+  .enroll-popup-card > *:not(.screen-bg-layer) { position: relative; z-index: 1; }
+  .enroll-popup-card .detail-home { display: none; }
+  .enroll-popup-card .dept-detail-header { border-radius: 20px 20px 0 0; }
+  @media (max-width: 768px) {
+    #enroll-screen { padding: 10px; }
+    .enroll-popup-card { border-radius: 14px; }
+    .enroll-popup-card .dept-detail-header { border-radius: 14px 14px 0 0; }
+  }
+
+  /* ── 좌측 하단 입체 원형 버튼 ── */
+  #enroll-fab {
+    position: fixed; left: 24px; bottom: 24px; z-index: 500;
+    width: 68px; height: 68px; border-radius: 50%; border: none; padding: 0;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    background:
+      radial-gradient(circle at 32% 28%, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0) 42%),
+      radial-gradient(circle at 50% 120%, #0a3d7a 0%, #1a6bbf 55%, #3d95e6 100%);
+    box-shadow:
+      0 10px 24px rgba(10,50,110,0.38),
+      0 3px 6px rgba(10,50,110,0.30),
+      inset 0 -6px 12px rgba(5,25,60,0.45),
+      inset 0 4px 8px rgba(255,255,255,0.35);
+    transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.35s ease;
+    animation: enrollFabIn 0.7s cubic-bezier(0.34,1.56,0.64,1) 0.6s backwards;
+    -webkit-tap-highlight-color: transparent;
+  }
+  #enroll-fab::before {           /* 바깥 링 (은은한 맥박) */
+    content: ''; position: absolute; inset: -6px; border-radius: 50%;
+    border: 2px solid rgba(26,107,191,0.35);
+    animation: enrollFabPulse 2.8s ease-out infinite;
+    pointer-events: none;
+  }
+  #enroll-fab::after {            /* 윗면 광택 */
+    content: ''; position: absolute; top: 6px; left: 14px; right: 14px; height: 24px;
+    border-radius: 50%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.55), rgba(255,255,255,0));
+    pointer-events: none;
+  }
+  .enroll-fab-icon {
+    font-size: 30px; line-height: 1; position: relative; z-index: 1;
+    filter: drop-shadow(0 2px 2px rgba(0,0,0,0.30));
+    transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .enroll-fab-label {
+    position: absolute; left: calc(100% + 14px); top: 50%;
+    transform: translate(-8px, -50%); opacity: 0; pointer-events: none;
+    white-space: nowrap; padding: 8px 14px; border-radius: 999px;
+    background: rgba(255,255,255,0.96); color: #0e3a7a;
+    font-family: 'Noto Sans KR', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 0.3px;
+    box-shadow: 0 6px 18px rgba(10,50,110,0.18);
+    transition: opacity 0.25s ease, transform 0.35s cubic-bezier(0.22,1,0.36,1);
+  }
+  #enroll-fab:hover {
+    transform: translateY(-4px) scale(1.06);
+    box-shadow:
+      0 16px 32px rgba(10,50,110,0.42),
+      0 5px 10px rgba(10,50,110,0.30),
+      inset 0 -6px 12px rgba(5,25,60,0.45),
+      inset 0 4px 8px rgba(255,255,255,0.40);
+  }
+  #enroll-fab:hover .enroll-fab-icon { transform: rotate(-8deg) scale(1.08); }
+  #enroll-fab:hover .enroll-fab-label,
+  #enroll-fab:focus-visible .enroll-fab-label { opacity: 1; transform: translate(0, -50%); }
+  #enroll-fab:active {
+    transform: translateY(1px) scale(0.95); transition-duration: 0.1s;
+    box-shadow:
+      0 4px 10px rgba(10,50,110,0.35),
+      inset 0 -3px 8px rgba(5,25,60,0.45),
+      inset 0 3px 6px rgba(255,255,255,0.30);
+  }
+  #enroll-fab:focus-visible { outline: 3px solid rgba(26,107,191,0.45); outline-offset: 4px; }
+  @keyframes enrollFabIn { from { opacity: 0; transform: translateY(30px) scale(0.5); } to { opacity: 1; transform: none; } }
+  @keyframes enrollFabPulse {
+    0%   { transform: scale(0.95); opacity: 0.9; }
+    70%  { transform: scale(1.25); opacity: 0; }
+    100% { transform: scale(1.25); opacity: 0; }
+  }
+  @media (max-width: 768px) {
+    #enroll-fab { left: 16px; bottom: 16px; width: 58px; height: 58px; }
+    .enroll-fab-icon { font-size: 26px; }
+    #enroll-fab::after { top: 5px; left: 12px; right: 12px; height: 20px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #enroll-fab, #enroll-fab::before, .enroll-popup-card { animation: none !important; transition-duration: 0.01ms !important; }
+  }
+
   /* 2028년 수능 화면 */
   /* 학과별 안내 화면 안의 카테고리 탭 */
   .dept-cat-tabs {
@@ -3325,6 +3431,7 @@
     overflow: hidden;
   }
   #brochure-screen.open { opacity: 1; pointer-events: all; }
+
 
   /* ══════════════════════════════════════
      외부 사이트 iframe 화면 (메뉴 08)
@@ -5268,15 +5375,16 @@
 <section id="nav-section">
   <p class="section-label" id="txt-section-label">원하는 항목을 선택하세요</p>
   <div class="buttons-grid">
+    <!-- 내부 번호(data-menu)와 화면 번호가 같도록 정리됨 -->
     <button class="nav-btn" data-menu="1" onclick="openSemesterScreen()"><span class="btn-number">01</span><span class="btn-title" id="menu-01">학기별 개설과목 안내</span><span class="btn-arrow">›</span></button>
     <button class="nav-btn" data-menu="2"><span class="btn-number">02</span><span class="btn-title" id="menu-02">교과별 선택과목 안내</span><span class="btn-arrow">›</span></button>
     <button class="nav-btn" data-menu="3" onclick="openDeptScreen()"><span class="btn-number">03</span><span class="btn-title" id="menu-03">학과별 안내</span><span class="btn-arrow">›</span></button>
-    <button class="nav-btn" data-menu="4" onclick="openEnrollScreen()"><span class="btn-number">04</span><span class="btn-title" id="menu-04">수강신청 안내</span><span class="btn-arrow">›</span></button>
-    <button class="nav-btn" data-menu="5"><span class="btn-number">05</span><span class="btn-title" id="menu-05">2028년 수능</span><span class="btn-arrow">›</span></button>
-    <button class="nav-btn" data-menu="6" onclick="openGuidebookScreen()"><span class="btn-number">06</span><span class="btn-title" id="menu-06">선택과목 길라잡이 책자</span><span class="btn-arrow">›</span></button>
-    <button class="nav-btn" data-menu="7" id="nav-btn-07" onclick="openMenu07()"><span class="btn-number">07</span><span class="btn-title" id="menu-07">창조고 선택과목 이수 경로</span><span class="btn-arrow">›</span></button>
-    <button class="nav-btn" data-menu="8" id="nav-btn-08" onclick="openMenu08()"><span class="btn-number">08</span><span class="btn-title" id="menu-08">테스트</span><span class="btn-arrow">›</span></button>
-    <button class="nav-btn" data-menu="9" onclick="openBrochureScreen()"><span class="btn-number">09</span><span class="btn-title" id="menu-09">2026 교육과정 안내 브로셔</span><span class="btn-arrow">›</span></button>
+    <button class="nav-btn" data-menu="4" onclick="openBrochureScreen()"><span class="btn-number">04</span><span class="btn-title" id="menu-04">2026 교육과정 안내 브로셔</span><span class="btn-arrow">›</span></button>
+    <button class="nav-btn" data-menu="5"><span class="btn-number">05</span><span class="btn-title" id="menu-05">2028 대학별 교과 이수 권장 과목</span><span class="btn-arrow">›</span></button>
+    <button class="nav-btn" data-menu="6" onclick="openGuidebookScreen()"><span class="btn-number">06</span><span class="btn-title" id="menu-06">선택과목 안내서</span><span class="btn-arrow">›</span></button>
+    <button class="nav-btn" data-menu="7" id="nav-btn-07" onclick="openMenu07()"><span class="btn-number">07</span><span class="btn-title" id="menu-07">창조고 교과목 선택 도우미 (gemini)</span><span class="btn-arrow">›</span></button>
+    <button class="nav-btn" data-menu="8" id="nav-btn-08" onclick="openMenu08()"><span class="btn-number">08</span><span class="btn-title" id="menu-08">2028 대입전형 시행계획</span><span class="btn-arrow">›</span></button>
+    <button class="nav-btn" data-menu="9"><span class="btn-number">09</span><span class="btn-title" id="menu-09">수강신청 안내</span><span class="btn-arrow">›</span></button>
   </div>
 </section>
 
@@ -5561,19 +5669,19 @@
         <div class="pe-menu-sub-row"><span class="pe-menu-sub-label">소제목</span><input class="pe-menu-subtitle-input" id="pe-menu-02-sub" placeholder="화면 상단에 표시될 소제목 (선택)" /></div>
         <div class="pe-menu-item"><span class="pe-menu-num">03</span><input class="pe-menu-input" id="pe-menu-03" placeholder="학과별 안내" /></div>
         <div class="pe-menu-sub-row"><span class="pe-menu-sub-label">소제목</span><input class="pe-menu-subtitle-input" id="pe-menu-03-sub" placeholder="화면 상단에 표시될 소제목 (선택)" /></div>
-        <div class="pe-menu-item"><span class="pe-menu-num">04</span><input class="pe-menu-input" id="pe-menu-04" placeholder="수강신청 안내" /></div>
+        <div class="pe-menu-item"><span class="pe-menu-num">04</span><input class="pe-menu-input" id="pe-menu-04" placeholder="2026 교육과정 안내 브로셔" /></div>
         <div class="pe-menu-sub-row"><span class="pe-menu-sub-label">소제목</span><input class="pe-menu-subtitle-input" id="pe-menu-04-sub" placeholder="화면 상단에 표시될 소제목 (선택)" /></div>
-        <div class="pe-menu-item"><span class="pe-menu-num">05</span><input class="pe-menu-input" id="pe-menu-05" placeholder="2028년 수능" /></div>
+        <div class="pe-menu-item"><span class="pe-menu-num">05</span><input class="pe-menu-input" id="pe-menu-05" placeholder="2028 대학별 교과 이수 권장 과목" /></div>
         <div class="pe-menu-sub-row"><span class="pe-menu-sub-label">소제목</span><input class="pe-menu-subtitle-input" id="pe-menu-05-sub" placeholder="화면 상단에 표시될 소제목 (선택)" /></div>
-        <div class="pe-menu-item"><span class="pe-menu-num">06</span><input class="pe-menu-input" id="pe-menu-06" placeholder="선택과목 길라잡이 책자" /></div>
+        <div class="pe-menu-item"><span class="pe-menu-num">06</span><input class="pe-menu-input" id="pe-menu-06" placeholder="선택과목 안내서" /></div>
         <div class="pe-menu-sub-row"><span class="pe-menu-sub-label">소제목</span><input class="pe-menu-subtitle-input" id="pe-menu-06-sub" placeholder="화면 상단에 표시될 소제목 (선택)" /></div>
-        <div class="pe-menu-item"><span class="pe-menu-num">07</span><input class="pe-menu-input" id="pe-menu-07" placeholder="창조고 선택과목 이수 경로" /></div>
+        <div class="pe-menu-item"><span class="pe-menu-num">07</span><input class="pe-menu-input" id="pe-menu-07" placeholder="창조고 교과목 선택 도우미 (gemini)" /></div>
         <div class="pe-menu-sub-row"><span class="pe-menu-sub-label">소제목</span><input class="pe-menu-subtitle-input" id="pe-menu-07-sub" placeholder="화면 상단에 표시될 소제목 (선택)" /></div>
         <div class="pe-menu-item" style="margin-top:6px">
           <span class="pe-menu-num" style="font-size:10px;color:rgba(201,168,76,0.35);letter-spacing:1px">URL</span>
           <input class="pe-menu-input" id="pe-menu-07-url" placeholder="https://example.com (비워두면 비활성)" style="font-size:12px;color:rgba(255,255,255,0.55);" />
         </div>
-        <div class="pe-menu-item" style="margin-top:10px"><span class="pe-menu-num">08</span><input class="pe-menu-input" id="pe-menu-08" placeholder="테스트" /></div>
+        <div class="pe-menu-item" style="margin-top:10px"><span class="pe-menu-num">08</span><input class="pe-menu-input" id="pe-menu-08" placeholder="2028 대입전형 시행계획" /></div>
         <div class="pe-menu-sub-row"><span class="pe-menu-sub-label">소제목</span><input class="pe-menu-subtitle-input" id="pe-menu-08-sub" placeholder="화면 상단에 표시될 소제목 (선택)" /></div>
         <div class="pe-menu-item" style="margin-top:6px">
           <span class="pe-menu-num" style="font-size:10px;color:rgba(201,168,76,0.35);letter-spacing:1px">URL</span>
@@ -5593,7 +5701,7 @@
           <div id="pe-menu-08-file-status" style="font-size:11px;color:rgba(26,107,191,0.75);letter-spacing:0.3px;min-height:16px;"></div>
           <input type="file" id="pe-menu-08-file-input" accept=".html,.htm" style="display:none" onchange="onMenu08FileChange(this)">
         </div>
-        <div class="pe-menu-item" style="margin-top:10px"><span class="pe-menu-num">09</span><input class="pe-menu-input" id="pe-menu-09" placeholder="2026 교육과정 안내 브로셔" /></div>
+        <div class="pe-menu-item" style="margin-top:10px"><span class="pe-menu-num">09</span><input class="pe-menu-input" id="pe-menu-09" placeholder="수강신청 안내" /></div>
         <div class="pe-menu-sub-row"><span class="pe-menu-sub-label">소제목</span><input class="pe-menu-subtitle-input" id="pe-menu-09-sub" placeholder="화면 상단에 표시될 소제목 (선택)" /></div>
       </div>
 
@@ -6298,7 +6406,7 @@
   <!-- 카테고리 탭 -->
   <div class="dept-cat-tabs" id="dept-cat-tabs">
     <button class="dept-cat-tab active" data-cat="dept" onclick="switchDeptCategory('dept')"><span id="menu-03-tab">학과별 안내</span></button>
-    <button class="dept-cat-tab" data-cat="suneung" onclick="switchDeptCategory('suneung')"><span id="menu-05-tab">2028년 수능</span></button>
+    <button class="dept-cat-tab" data-cat="suneung" onclick="switchDeptCategory('suneung')"><span id="menu-05-tab">2028 대학별 교과 이수 권장 과목</span></button>
   </div>
 
   <!-- 카테고리: 2028년 수능 -->
@@ -6506,15 +6614,16 @@
 <!-- ═══════════════════════════════════════
      수강신청 안내 화면
 ═══════════════════════════════════════ -->
-<div id="enroll-screen">
+<div id="enroll-screen" onclick="if(event.target===this) closeEnrollScreen()">
+ <div class="enroll-popup-card" role="dialog" aria-modal="true" aria-label="수강신청 안내">
   <div class="screen-bg-layer" id="bg-enroll-screen"></div>
   <div class="dept-detail-header">
-    <button class="dept-detail-back" onclick="closeEnrollScreen()">◀ 뒤로</button>
+    <button class="dept-detail-back" onclick="closeEnrollScreen()">✕ 닫기</button>
     <div class="dept-detail-icon">📝</div>
     <div class="dept-detail-header-info">
       <div class="dept-detail-label">COURSE REGISTRATION · 수강신청 안내</div>
-      <div class="dept-detail-name" id="menu-04-title">수강신청 안내</div>
-      <div class="dept-detail-subtitle" id="menu-04-subtitle"></div>
+      <div class="dept-detail-name" id="menu-09-title">수강신청 안내</div>
+      <div class="dept-detail-subtitle" id="menu-09-subtitle"></div>
     </div>
     <button class="dd-edit-btn" id="enroll-edit-btn" onclick="openEnrollEditPw()" title="편집 모드">🔒 편집</button>
     <button class="detail-home" onclick="closeEnrollScreen()" title="메인화면으로">🏠</button>
@@ -6541,7 +6650,14 @@
       <span style="font-size:11px;color:rgba(255,255,255,0.15)">관리자가 편집 모드에서 내용을 추가할 수 있습니다</span>
     </div>
   </div>
+ </div>
 </div>
+
+<!-- 좌측 하단 수강신청 안내(09) 원형 버튼 -->
+<button id="enroll-fab" onclick="openEnrollScreen()" title="수강신청 안내" aria-label="수강신청 안내 열기">
+  <span class="enroll-fab-icon">📝</span>
+  <span class="enroll-fab-label" id="menu-09-fab">수강신청 안내</span>
+</button>
 
 <!-- ═══════════════════════════════════════
      선택과목 길라잡이 책자 화면
@@ -6888,7 +7004,7 @@ function applyPageTexts() {
   if (p.footer)       document.getElementById('txt-footer').textContent       = p.footer;
   // 강조 적용 (텍스트 설정 후)
   if (p.highlights) applyHighlights();
-  for (let i = 1; i <= 8; i++) {
+  for (let i = 1; i <= 9; i++) {
     const k = 'menu' + String(i).padStart(2,'0');
     const id = 'menu-' + String(i).padStart(2,'0');
     if (p[k]) {
@@ -6931,18 +7047,12 @@ function applyPageTexts() {
       btn08.title = 'URL이 설정되지 않았습니다';
     }
   }
-  // 09 브로셔 화면 제목 동기화
+  // 09 수강신청 안내: 좌측 하단 원형 버튼 이름표 동기화
   if (p.menu09) {
-    const el09 = document.getElementById('menu-09');
-    if (el09) el09.textContent = p.menu09;
-    const t09 = document.getElementById('menu-09-title');
-    if (t09) t09.textContent = p.menu09;
-  }
-  // 09 소제목 동기화
-  const sub09 = document.getElementById('menu-09-subtitle');
-  if (sub09) {
-    sub09.textContent = p.menu09sub || '';
-    sub09.style.display = p.menu09sub ? '' : 'none';
+    const f09 = document.getElementById('menu-09-fab');
+    if (f09) f09.textContent = p.menu09;
+    const fab = document.getElementById('enroll-fab');
+    if (fab) { fab.title = p.menu09; fab.setAttribute('aria-label', p.menu09 + ' 열기'); }
   }
   // 08 iframe 소제목 동기화
   const sub08 = document.getElementById('menu-08-subtitle');
@@ -6990,19 +7100,44 @@ function applyPageTexts() {
 // applyPageTexts() — Supabase 로드 후 호출됨
 
 /* ──────────────────────────────
+   메뉴 번호 체계 변환
+   구버전: 4번 = 수강신청 안내, 9번 = 브로셔
+   신버전: 화면 번호와 같게 → 4번 = 브로셔, 9번 = 수강신청 안내
+   저장된 이름·소제목·순서를 한 번만 맞바꾸고 menuSlotVer = 2로 표시합니다.
+────────────────────────────── */
+const MENU_SLOT_VER = 2;
+function migrateMenuSlots(p) {
+  if (!p || typeof p !== 'object' || p.menuSlotVer >= MENU_SLOT_VER) return false;
+  const swap = (a, b) => {
+    const hasA = Object.prototype.hasOwnProperty.call(p, a);
+    const hasB = Object.prototype.hasOwnProperty.call(p, b);
+    const va = p[a], vb = p[b];
+    if (hasB) p[a] = vb; else delete p[a];
+    if (hasA) p[b] = va; else delete p[b];
+  };
+  swap('menu04', 'menu09');
+  swap('menu04sub', 'menu09sub');
+  if (Array.isArray(p.menuOrder)) {
+    p.menuOrder = p.menuOrder.map(n => n === 4 ? 9 : n === 9 ? 4 : n);
+  }
+  p.menuSlotVer = MENU_SLOT_VER;
+  return true;
+}
+
+/* ──────────────────────────────
    메뉴 순서 조절
 ────────────────────────────── */
 // 각 슬롯 번호(1~9)에 해당하는 고정 정보
 const MENU_META = {
-  1: { label: '학기별 개설과목 안내',     fn: 'openSemesterScreen()' },
-  2: { label: '교과별 선택과목 안내',     fn: 'openCatSubjScreen()' },
-  3: { label: '학과별 안내',              fn: 'openDeptScreen()' },
-  4: { label: '수강신청 안내',            fn: 'openEnrollScreen()' },
-  5: { label: '2028년 수능',              fn: 'openSuneungScreen()' },
-  6: { label: '선택과목 길라잡이 책자',   fn: 'openGuidebookScreen()' },
-  7: { label: '창조고 선택과목 이수 경로',fn: 'openMenu07()' },
-  8: { label: '테스트',                   fn: 'openMenu08()' },
-  9: { label: '2026 교육과정 안내 브로셔',fn: 'openBrochureScreen()' },
+  1: { label: '학기별 개설과목 안내',              fn: 'openSemesterScreen()' },
+  2: { label: '교과별 선택과목 안내',              fn: '(비활성)' },
+  3: { label: '학과별 안내',                       fn: 'openDeptScreen()' },   // 탭: 학과별 안내 / 05 내용
+  4: { label: '2026 교육과정 안내 브로셔',         fn: 'openBrochureScreen()' },
+  5: { label: '2028 대학별 교과 이수 권장 과목',   fn: '(비활성 · 03 화면의 탭으로 이동)' },
+  6: { label: '선택과목 안내서',                   fn: 'openGuidebookScreen()' },
+  7: { label: '창조고 교과목 선택 도우미 (gemini)',fn: 'openMenu07()' },
+  8: { label: '2028 대입전형 시행계획',            fn: 'openMenu08()' },
+  9: { label: '수강신청 안내',                     fn: '(비활성 · 좌측 하단 원형 버튼 팝업)' },
 };
 
 let _dragSrcIdx = null; // 드래그 중인 아이템의 배열 인덱스
@@ -10528,6 +10663,17 @@ function openEnrollScreen() {
   loadEnrollBlocks();
   document.getElementById('enroll-screen').classList.add('open');
 }
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  const scr = document.getElementById('enroll-screen');
+  if (!scr || !scr.classList.contains('open')) return;
+  // 위에 다른 창(전체화면 PDF, 비밀번호 등)이 떠 있으면 그것부터 닫히도록 양보
+  const pdfFs = document.getElementById('pdf-fs-overlay');
+  const pw = document.getElementById('pw-modal');
+  if ((pdfFs && pdfFs.classList.contains('open')) || (pw && pw.classList.contains('open'))) return;
+  closeEnrollScreen();
+});
+
 function closeEnrollScreen() {
   if (enrollEditMode) exitEnrollEdit();
   document.getElementById('enroll-screen').classList.remove('open');
@@ -12185,6 +12331,7 @@ async function initApp() {
       if (s.cat === '기타')   s.cat = '기술ㆍ가정/정보/제2외국어/한문/교양';
     });
     pageTexts    = (page && typeof page === 'object' && !Array.isArray(page)) ? page : {};
+    migrateMenuSlots(pageTexts);
     semesterData = migrateSemData(sem !== null ? JSON.stringify(sem) : null);
     subjectSets  = Array.isArray(sets) ? sets : [];
   } catch(e) {
@@ -12327,8 +12474,8 @@ window.addEventListener('resize', function() {
     <button class="gb-back-btn" onclick="closeBrochureScreen()">◀ 뒤로</button>
     <div class="gb-header-info">
       <div class="gb-header-label">BROCHURE · 안내 브로셔</div>
-      <div class="gb-header-title" id="menu-09-title">2026 교육과정 안내 브로셔</div>
-      <div class="gb-header-subtitle" id="menu-09-subtitle"></div>
+      <div class="gb-header-title" id="menu-04-title">2026 교육과정 안내 브로셔</div>
+      <div class="gb-header-subtitle" id="menu-04-subtitle"></div>
     </div>
     <button class="gb-edit-btn" id="br-edit-btn" onclick="openBrochureEditPw()" title="PDF 업로드 편집">🔒 편집</button>
     <button class="gb-jump-trigger-btn" id="br-jump-trigger-btn" onclick="toggleBrJumpPopup(event)" title="페이지 이동">↗ 쪽 이동</button>
