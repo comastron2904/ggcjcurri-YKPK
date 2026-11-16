@@ -8352,7 +8352,7 @@ async function renderMediaPdfPage(vid) {
   viewerEl.innerHTML = '<div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>' + st.curPage + ' / ' + st.totalPages + ' 페이지</span></div>';
   try {
     const page     = await st.pdfDoc.getPage(st.curPage);
-    let dpr = pdfRenderRatio();   // 고화질 렌더 배율 (화면 배율 × 오버샘플링)
+    let dpr = pdfRenderRatio();   // 화면 픽셀 배율
     const vw       = (viewerEl.clientWidth || viewerEl.offsetWidth || 300) - 4;
     const viewport = page.getViewport({ scale: 1 });
     const scale    = Math.max(vw / viewport.width, 0.5);
@@ -8366,6 +8366,7 @@ async function renderMediaPdfPage(vid) {
     await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
     viewerEl.innerHTML = '';
     viewerEl.appendChild(canvas);
+    pdfSharpen(canvas, page);   // 실제 표시 크기에 맞춰 선명하게 다시 그림
     if (piEl) piEl.textContent = st.curPage + ' / ' + st.totalPages;
     if (prevBtn) prevBtn.disabled = (st.curPage <= 1);
     if (nextBtn) nextBtn.disabled = (st.curPage >= st.totalPages);
@@ -8440,7 +8441,7 @@ async function pdfFsSync() {
   try {
     const page     = await pdfDoc.getPage(curPage);
     const vp0      = page.getViewport({ scale: 1 });
-    let dpr = pdfRenderRatio();   // 고화질 렌더 배율 (화면 배율 × 오버샘플링)
+    let dpr = pdfRenderRatio();   // 화면 픽셀 배율
     const isDesktop = window.innerWidth >= 768;
     const elW = viewerEl.clientWidth || viewerEl.offsetWidth || window.innerWidth;
     const elH = viewerEl.clientHeight || viewerEl.offsetHeight || window.innerHeight;
@@ -8463,6 +8464,7 @@ async function pdfFsSync() {
     await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
     viewerEl.innerHTML = '';
     viewerEl.appendChild(canvas);
+    pdfSharpen(canvas, page);   // 실제 표시 크기에 맞춰 선명하게 다시 그림
     if (piNav) piNav.textContent = curPage + ' / ' + total;
     if (piBar) piBar.textContent = curPage + ' / ' + total;
     if (prevBtn) prevBtn.disabled = (curPage <= 1);
@@ -10647,7 +10649,7 @@ async function initPdfViewer(vid, dataUrl) {
 
       const page   = await pdfDoc.getPage(p);
       const vp     = page.getViewport({ scale: 1 });
-      let dpr = pdfRenderRatio();   // 고화질 렌더 배율 (화면 배율 × 오버샘플링)
+      let dpr = pdfRenderRatio();   // 화면 픽셀 배율
       const safeSlotW = slotW || stageEl.offsetWidth || 300;
       const contentW = safeSlotW - 80;
       const scale    = Math.min(contentW / vp.width, 2.5);
@@ -10666,6 +10668,7 @@ async function initPdfViewer(vid, dataUrl) {
       wrap.appendChild(slot);
 
       await page.render({ canvasContext: canvas.getContext('2d'), viewport: scaled }).promise;
+      pdfSharpen(canvas, page);
     }
 
     // 로딩 숨김
@@ -11530,14 +11533,50 @@ function closeSuneungFileView() {
 
 /* ──────────────────────────────
    PDF 고화질 렌더링 공통 설정
-   - 화면 배율(devicePixelRatio)보다 크게 그린 뒤 축소해서 보여줌(오버샘플링)
-     → 일반 모니터·프로젝터에서도 글자가 선명해짐
+   - 화면 픽셀 1:1 렌더 + 실제 표시 크기 보정(pdfSharpen)
    - 캔버스가 너무 커지면 기기가 멈출 수 있어 픽셀 수 상한을 둠
 ────────────────────────────── */
 const PDF_MAX_PIXELS = (window.innerWidth < 768) ? 8e6 : 16e6;   // 캔버스 1장 최대 픽셀 수
 function pdfRenderRatio() {
-  const d = Math.max(window.devicePixelRatio || 1, 1);
-  return Math.min(d < 2 ? d * 2 : d * 1.5, 4);   // 1x→2, 1.5x→3, 2x→3, 3x→4
+  // 화면 픽셀과 1:1로 그려야 가장 선명함 (크게 그려 축소하면 오히려 글자가 뭉개짐)
+  return Math.max(window.devicePixelRatio || 1, 1);
+}
+
+/* 그린 뒤 실제로 화면에 보이는 크기를 재서
+   ① CSS 때문에 늘어나거나 줄어든 경우 → 보이는 크기 그대로 화면 픽셀 1:1로 다시 그림
+   ② 가운데 정렬 등으로 반 픽셀 어긋난 경우 → 픽셀 격자에 맞춰 살짝 이동 (번짐 방지) */
+async function pdfSharpen(canvas, page) {
+  try {
+    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+    if (!canvas.isConnected || !page) return;
+    const d = Math.max(window.devicePixelRatio || 1, 1);
+    let rect = canvas.getBoundingClientRect();
+    if (rect.width < 20 || rect.height < 20) return;   // 숨겨진 슬라이드 등은 건너뜀
+    const targetW = Math.round(rect.width * d);
+    if (Math.abs(targetW - canvas.width) > 2) {
+      const base = page.getViewport({ scale: 1 });
+      let sc = targetW / base.width;
+      const px = base.width * sc * base.height * sc;
+      if (px > PDF_MAX_PIXELS) sc *= Math.sqrt(PDF_MAX_PIXELS / px);
+      const vp  = page.getViewport({ scale: sc });
+      const off = document.createElement('canvas');
+      off.width  = Math.floor(vp.width);
+      off.height = Math.floor(vp.height);
+      await page.render({ canvasContext: off.getContext('2d'), viewport: vp }).promise;
+      if (!canvas.isConnected) return;
+      canvas.width  = off.width;
+      canvas.height = off.height;
+      canvas.getContext('2d').drawImage(off, 0, 0);
+    }
+    // 표시 크기 = 캔버스 픽셀 ÷ 화면 배율 (소수점 오차까지 정확히 1:1)
+    canvas.style.setProperty('width',  (canvas.width  / d) + 'px', 'important');
+    canvas.style.setProperty('height', (canvas.height / d) + 'px', 'important');
+    rect = canvas.getBoundingClientRect();
+    const fx = (rect.left * d) % 1, fy = (rect.top * d) % 1;
+    const dx = fx > 0.01 && fx < 0.99 ? -(fx < 0.5 ? fx : fx - 1) / d : 0;
+    const dy = fy > 0.01 && fy < 0.99 ? -(fy < 0.5 ? fy : fy - 1) / d : 0;
+    if (dx || dy) canvas.style.translate = dx.toFixed(3) + 'px ' + dy.toFixed(3) + 'px';
+  } catch(_) {}
 }
 function pdfCapRatio(page, cssScale, ratio) {
   try {
@@ -12052,7 +12091,7 @@ async function _brRenderPanel(viewerId, emptyId, pageNum) {
   try {
     const page     = await sp.pdfDoc.getPage(pageNum);
     const viewport = page.getViewport({ scale: 1 });
-    let dpr = pdfRenderRatio();   // 고화질 렌더 배율 (화면 배율 × 오버샘플링)
+    let dpr = pdfRenderRatio();   // 화면 픽셀 배율
     const vElW     = viewer.clientWidth  || viewer.offsetWidth  || window.innerWidth;
     const vElH     = viewer.clientHeight || viewer.offsetHeight || window.innerHeight;
     const isDesktop = window.innerWidth >= 768;
@@ -12073,6 +12112,7 @@ async function _brRenderPanel(viewerId, emptyId, pageNum) {
     await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
     viewer.innerHTML = '';
     viewer.appendChild(canvas);
+    pdfSharpen(canvas, page);   // 실제 표시 크기에 맞춰 선명하게 다시 그림
   } catch(e) {
     viewer.innerHTML = '<div class="gb-pdf-loading"><span>렌더링 실패</span></div>';
   }
@@ -12111,7 +12151,7 @@ async function brFsRenderPage() {
   try {
     const page     = await sp.pdfDoc.getPage(sp.curPage);
     const viewport = page.getViewport({ scale: 1 });
-    let dpr = pdfRenderRatio();   // 고화질 렌더 배율 (화면 배율 × 오버샘플링)
+    let dpr = pdfRenderRatio();   // 화면 픽셀 배율
     const vElW     = viewer.clientWidth  || window.innerWidth;
     const vElH     = viewer.clientHeight || window.innerHeight;
     const isDesktop = window.innerWidth >= 768;
@@ -12132,6 +12172,7 @@ async function brFsRenderPage() {
     await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
     viewer.innerHTML = '';
     viewer.appendChild(canvas);
+    pdfSharpen(canvas, page);   // 실제 표시 크기에 맞춰 선명하게 다시 그림
     navinfo.textContent = sp.curPage + ' / ' + sp.totalPages;
     document.getElementById('br-fs-prev').disabled = (sp.curPage <= 1);
     document.getElementById('br-fs-next').disabled = (sp.curPage >= sp.totalPages);
@@ -12541,7 +12582,7 @@ async function _gbRenderSinglePanel(viewerId, sp, pageNum) {
   viewer.innerHTML = '<div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>' + pageNum + ' / ' + sp.totalPages + ' 페이지</span></div>';
   try {
     const page     = await sp.pdfDoc.getPage(pageNum);
-    let dpr = pdfRenderRatio();   // 고화질 렌더 배율 (화면 배율 × 오버샘플링)
+    let dpr = pdfRenderRatio();   // 화면 픽셀 배율
     const vw       = (viewer.clientWidth || viewer.offsetWidth || 300) - 24;
     const vh       = (viewer.clientHeight || viewer.offsetHeight || 600) - 40;
     const viewport = page.getViewport({ scale: 1 });
@@ -12560,6 +12601,7 @@ async function _gbRenderSinglePanel(viewerId, sp, pageNum) {
     await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
     viewer.innerHTML = '';
     viewer.appendChild(canvas);
+    pdfSharpen(canvas, page);   // 실제 표시 크기에 맞춰 선명하게 다시 그림
   } catch(e) {
     viewer.innerHTML = '<div class="gb-pdf-loading"><span>페이지 렌더링 실패</span></div>';
   }
@@ -12696,7 +12738,7 @@ async function gbFsRenderPage() {
   try {
     const page = await sp.pdfDoc.getPage(sp.curPage);
     const viewport = page.getViewport({ scale: 1 });
-    let dpr = pdfRenderRatio();   // 고화질 렌더 배율 (화면 배율 × 오버샘플링)
+    let dpr = pdfRenderRatio();   // 화면 픽셀 배율
     const isDesktop = window.innerWidth >= 768;
     const vElW = viewer.clientWidth || viewer.offsetWidth || window.innerWidth;
     const vElH = viewer.clientHeight || viewer.offsetHeight || window.innerHeight;
@@ -12719,6 +12761,7 @@ async function gbFsRenderPage() {
     await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
     viewer.innerHTML = '';
     viewer.appendChild(canvas);
+    pdfSharpen(canvas, page);   // 실제 표시 크기에 맞춰 선명하게 다시 그림
     navinfo.textContent = sp.curPage + ' / ' + sp.totalPages;
     document.getElementById('gb-fs-prev').disabled = (sp.curPage <= 1);
     document.getElementById('gb-fs-next').disabled = (sp.curPage >= sp.totalPages);
