@@ -5444,6 +5444,32 @@
   @media (prefers-reduced-motion: reduce) {
     .nav-btn, .nav-btn *, #mycurriculum-btn, #edit-page-btn, #admin-btn { transition-duration: 0.01ms !important; animation: none !important; }
   }
+  /* ── 수강신청 안내 원형 버튼: 이름표 항상 표시 ── */
+  #enroll-fab .enroll-fab-label {
+    opacity: 1; pointer-events: none;
+    transform: translate(0, -50%);
+    display: flex; flex-direction: column; align-items: flex-start; gap: 1px;
+    left: calc(100% + 10px);
+    padding: 9px 18px;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #ffffff 0%, #eef4fb 100%);
+    border: 1px solid rgba(26,107,191,0.25);
+    box-shadow: inset 0 1px 0 #ffffff, 0 3px 0 rgba(26,107,191,0.16), 0 8px 18px rgba(16,52,102,0.16);
+    transition: transform 0.35s cubic-bezier(0.22,1,0.36,1), box-shadow 0.3s ease;
+  }
+  .enroll-fab-name { font-size: 14px; font-weight: 800; color: #0e3a7a; letter-spacing: 0.3px; line-height: 1.25; }
+  .enroll-fab-hint { font-size: 10.5px; font-weight: 500; color: rgba(26,107,191,0.70); letter-spacing: 0.5px; line-height: 1.2; }
+  .enroll-fab-hint::after { content: ' ›'; }
+  #enroll-fab:hover .enroll-fab-label,
+  #enroll-fab:focus-visible .enroll-fab-label {
+    opacity: 1; transform: translate(4px, -50%);
+    box-shadow: inset 0 1px 0 #ffffff, 0 4px 0 rgba(26,107,191,0.20), 0 12px 24px rgba(16,52,102,0.20);
+  }
+  @media (max-width: 768px) {
+    #enroll-fab .enroll-fab-label { padding: 7px 14px; left: calc(100% + 8px); }
+    .enroll-fab-name { font-size: 13px; }
+    .enroll-fab-hint { font-size: 10px; }
+  }
 </style>
 </head>
 <body>
@@ -6772,7 +6798,10 @@
 <!-- 좌측 하단 수강신청 안내(09) 원형 버튼 -->
 <button id="enroll-fab" onclick="openEnrollScreen()" title="수강신청 안내" aria-label="수강신청 안내 열기">
   <span class="enroll-fab-icon">📝</span>
-  <span class="enroll-fab-label" id="menu-09-fab">수강신청 안내</span>
+  <span class="enroll-fab-label">
+    <span class="enroll-fab-name" id="menu-09-fab">수강신청 안내</span>
+    <span class="enroll-fab-hint">눌러서 보기</span>
+  </span>
 </button>
 
 <!-- ═══════════════════════════════════════
@@ -7155,9 +7184,10 @@ function applyPageTexts() {
   // 08 버튼 링크 유무에 따라 스타일 처리
   const btn08 = document.getElementById('nav-btn-08');
   if (btn08) {
-    if (p.menu08url) {
+    // URL을 입력했거나 HTML 파일을 업로드했으면 정상 표시
+    if (p.menu08url || p.menu08storageUrl) {
       btn08.style.opacity = '';
-      btn08.title = p.menu08url;
+      btn08.title = p.menu08url || p.menu08filename || '';
     } else {
       btn08.style.opacity = '0.45';
       btn08.title = 'URL이 설정되지 않았습니다';
