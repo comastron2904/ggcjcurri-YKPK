@@ -5158,6 +5158,69 @@
     contain-intrinsic-size: 0 600px;
   }
 
+  /* ══════════════════════════════════════
+     학과별 안내(3번) 화면 · 부드러운 등장/동작
+  ══════════════════════════════════════ */
+  @keyframes deptPanelIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  @keyframes deptItemIn  { from { opacity: 0; transform: translateY(18px) scale(0.97); } to { opacity: 1; transform: none; } }
+
+  /* 패널(탭 내용) 전환 시 페이드 */
+  #dept-screen .dept-cat-panel.anim-in { animation: deptPanelIn 0.35s cubic-bezier(0.22,1,0.36,1) backwards; }
+  #dept-screen .dept-cat-panel.anim-in .dept-intro { animation: deptPanelIn 0.45s cubic-bezier(0.22,1,0.36,1) 0.04s backwards; }
+
+  /* 계열 버튼: 열 때마다 차례로 등장 (끝난 뒤엔 hover 효과가 정상 동작하도록 backwards) */
+  .dept-btn {
+    animation: none;
+    transition: transform 0.35s cubic-bezier(0.22,1,0.36,1), box-shadow 0.35s ease,
+                border-color 0.3s ease, background 0.3s ease;
+    will-change: transform;
+  }
+  #dept-screen .dept-cat-panel.anim-in .dept-btn {
+    animation: deptItemIn 0.55s cubic-bezier(0.22,1,0.36,1) backwards;
+    animation-delay: calc(var(--i, 0) * 55ms + 80ms);
+  }
+  .dept-btn:nth-child(1){--i:0} .dept-btn:nth-child(2){--i:1} .dept-btn:nth-child(3){--i:2}
+  .dept-btn:nth-child(4){--i:3} .dept-btn:nth-child(5){--i:4} .dept-btn:nth-child(6){--i:5}
+  .dept-btn:nth-child(7){--i:6} .dept-btn:nth-child(8){--i:7} .dept-btn:nth-child(9){--i:8}
+  .dept-btn:active { transform: translateY(-1px) scale(0.98); transition-duration: 0.12s; }
+  .dept-btn-icon { transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+  .dept-btn:hover .dept-btn-icon { transform: scale(1.15) translateY(-2px); }
+  .dept-btn::after { transition: transform 0.4s cubic-bezier(0.22,1,0.36,1); }
+
+  /* 카테고리 탭 */
+  .dept-cat-tab { transition: color 0.25s ease, border-color 0.3s ease, background 0.25s ease, transform 0.15s ease; }
+  .dept-cat-tab:active { transform: scale(0.96); }
+
+  /* 2028년 수능 카드 */
+  .sn-card-btn {
+    transition: transform 0.35s cubic-bezier(0.22,1,0.36,1), box-shadow 0.35s ease,
+                border-color 0.3s ease, background 0.3s ease;
+  }
+  .sn-card-btn:hover { transform: translateY(-4px); }
+  .sn-card-btn:active { transform: translateY(-1px) scale(0.98); transition-duration: 0.12s; }
+  .sn-card-arrow { transition: transform 0.3s cubic-bezier(0.22,1,0.36,1), color 0.3s; }
+  .sn-card-btn:hover .sn-card-arrow { transform: translateX(4px); color: var(--gold); }
+  .sn-cards-grid.anim-in > * {
+    animation: deptItemIn 0.5s cubic-bezier(0.22,1,0.36,1) backwards;
+    animation-delay: calc(var(--i, 0) * 50ms + 40ms);
+  }
+  #suneung-file-view, #suneung-main-view { animation: deptPanelIn 0.35s cubic-bezier(0.22,1,0.36,1) backwards; }
+  #dept-screen .dd-toolbar.show { animation: deptPanelIn 0.3s ease backwards; }
+
+  /* 권장과목 검색: 단계가 나타날 때 부드럽게, 선택 칩 눌림 효과 */
+  .ss-step { animation: deptPanelIn 0.35s cubic-bezier(0.22,1,0.36,1) backwards; }
+  .ss-chip { transition: background 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s, transform 0.15s; }
+  .ss-chip:hover { transform: translateY(-1px); }
+  .ss-chip:active { transform: scale(0.95); }
+
+  /* 뒤로/목록 버튼 */
+  .dept-back, .sn-fv-back, .dd-edit-btn, .dd-tool-btn { transition: background 0.25s, color 0.25s, border-color 0.25s, box-shadow 0.25s, transform 0.25s cubic-bezier(0.22,1,0.36,1); }
+
+  /* 움직임 줄이기 설정을 켠 사용자 배려 */
+  @media (prefers-reduced-motion: reduce) {
+    #dept-screen *, #dept-screen *::before, #dept-screen *::after,
+    #subject-search-screen * { animation: none !important; transition-duration: 0.01ms !important; }
+  }
 </style>
 </head>
 <body>
@@ -5209,7 +5272,7 @@
     <button class="nav-btn" data-menu="2"><span class="btn-number">02</span><span class="btn-title" id="menu-02">교과별 선택과목 안내</span><span class="btn-arrow">›</span></button>
     <button class="nav-btn" data-menu="3" onclick="openDeptScreen()"><span class="btn-number">03</span><span class="btn-title" id="menu-03">학과별 안내</span><span class="btn-arrow">›</span></button>
     <button class="nav-btn" data-menu="4" onclick="openEnrollScreen()"><span class="btn-number">04</span><span class="btn-title" id="menu-04">수강신청 안내</span><span class="btn-arrow">›</span></button>
-    <button class="nav-btn" data-menu="5" onclick="openSuneungScreen()"><span class="btn-number">05</span><span class="btn-title" id="menu-05">2028년 수능</span><span class="btn-arrow">›</span></button>
+    <button class="nav-btn" data-menu="5"><span class="btn-number">05</span><span class="btn-title" id="menu-05">2028년 수능</span><span class="btn-arrow">›</span></button>
     <button class="nav-btn" data-menu="6" onclick="openGuidebookScreen()"><span class="btn-number">06</span><span class="btn-title" id="menu-06">선택과목 길라잡이 책자</span><span class="btn-arrow">›</span></button>
     <button class="nav-btn" data-menu="7" id="nav-btn-07" onclick="openMenu07()"><span class="btn-number">07</span><span class="btn-title" id="menu-07">창조고 선택과목 이수 경로</span><span class="btn-arrow">›</span></button>
     <button class="nav-btn" data-menu="8" id="nav-btn-08" onclick="openMenu08()"><span class="btn-number">08</span><span class="btn-title" id="menu-08">테스트</span><span class="btn-arrow">›</span></button>
@@ -9625,6 +9688,14 @@ function closeDeptScreen() {
   document.getElementById('dept-screen').classList.remove('open');
 }
 
+/* 요소의 등장 애니메이션을 처음부터 다시 재생 */
+function replayAnim(el) {
+  if (!el) return;
+  el.classList.remove('anim-in');
+  void el.offsetWidth;
+  el.classList.add('anim-in');
+}
+
 /* 카테고리 탭 전환: 'dept' = 학과별 안내, 'suneung' = 2028년 수능 */
 function switchDeptCategory(cat) {
   document.querySelectorAll('#dept-cat-tabs .dept-cat-tab').forEach(t =>
@@ -9633,6 +9704,7 @@ function switchDeptCategory(cat) {
   document.getElementById('dept-cat-panel-dept').style.display = isSn ? 'none' : '';
   document.getElementById('dept-cat-panel-suneung').style.display = isSn ? '' : 'none';
   document.getElementById('suneung-edit-btn').style.display = isSn ? '' : 'none';
+  replayAnim(document.getElementById(isSn ? 'dept-cat-panel-suneung' : 'dept-cat-panel-dept'));
   if (isSn) {
     suneungEditMode = false;
     document.getElementById('suneung-edit-btn').classList.remove('active');
@@ -10851,7 +10923,12 @@ function renderSuneungCards() {
   const empty = document.getElementById('suneung-cards-empty');
   wrap.innerHTML = '';
   empty.style.display = suneungCards.length === 0 ? 'block' : 'none';
-  suneungCards.forEach((c, idx) => wrap.appendChild(suneungEditMode ? createSuneungCardEdit(c, idx) : createSuneungCardView(c)));
+  suneungCards.forEach((c, idx) => {
+    const el = suneungEditMode ? createSuneungCardEdit(c, idx) : createSuneungCardView(c);
+    el.style.setProperty('--i', Math.min(idx, 12));
+    wrap.appendChild(el);
+  });
+  replayAnim(wrap);
 }
 
 /* 일반 보기: 클릭 → 파일 뷰어 */
