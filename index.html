@@ -256,7 +256,6 @@
   #dept-screen > *:not(.screen-bg-layer),
   #subject-search-screen > *:not(.screen-bg-layer),
   #enroll-screen > *:not(.screen-bg-layer),
-  #suneung-screen > *:not(.screen-bg-layer),
   #guidebook-screen > *:not(.screen-bg-layer) {
     position: relative; z-index: 1;
   }
@@ -2919,15 +2918,28 @@
   #enroll-screen .dept-detail-body { overflow-y: auto; flex: 1; }
 
   /* 2028년 수능 화면 */
-  #suneung-screen {
-    position: fixed; inset: 0; background: #f0f4f8; z-index: 700;
-    display: flex; flex-direction: column;
-    opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
-    will-change: opacity; contain: layout style;
-    overflow: hidden;
+  /* 학과별 안내 화면 안의 카테고리 탭 */
+  .dept-cat-tabs {
+    flex-shrink: 0; display: flex; gap: 8px; padding: 14px 40px 0;
+    background: rgba(240,244,248,0.97);
+    border-bottom: 1px solid rgba(26,107,191,0.14);
   }
-  #suneung-screen.open { opacity: 1; pointer-events: all; }
-  #suneung-screen .dept-detail-body { overflow-y: auto; flex: 1; max-width: 100%; margin: 0; padding: 0; }
+  .dept-cat-tab {
+    padding: 11px 22px; background: transparent; border: none;
+    border-bottom: 3px solid transparent; margin-bottom: -1px;
+    font-family: 'Noto Sans KR', sans-serif; font-size: 14px; font-weight: 700;
+    color: rgba(26,46,74,0.45); cursor: pointer; letter-spacing: 0.5px;
+    transition: color 0.2s, border-color 0.2s, background 0.2s;
+  }
+  .dept-cat-tab:hover { color: var(--gold); background: rgba(26,107,191,0.05); }
+  .dept-cat-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+  #dept-cat-panel-suneung { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  #dept-screen .dept-header .dd-edit-btn { margin-left: auto; flex-shrink: 0; }
+  @media (max-width: 768px) {
+    .dept-cat-tabs { padding: 10px 16px 0; gap: 4px; }
+    .dept-cat-tab { flex: 1; padding: 10px 8px; font-size: 13px; }
+  }
+  #dept-cat-panel-suneung .dept-detail-body { overflow-y: auto; flex: 1; max-width: 100%; margin: 0; padding: 0; }
   #suneung-main-view { flex: 1; overflow-y: auto; }
 
   /* 카드 그리드 */
@@ -6217,8 +6229,49 @@
       <div class="dept-header-title" id="menu-03-title">학과별 안내</div>
       <div class="dept-header-subtitle" id="menu-03-subtitle"></div>
     </div>
+    <button class="dd-edit-btn" id="suneung-edit-btn" onclick="openSuneungEditPw()" title="편집 모드" style="display:none">🔒 편집</button>
   </div>
-  <div class="dept-body">
+
+  <!-- 카테고리 탭 -->
+  <div class="dept-cat-tabs" id="dept-cat-tabs">
+    <button class="dept-cat-tab active" data-cat="dept" onclick="switchDeptCategory('dept')"><span id="menu-03-tab">학과별 안내</span></button>
+    <button class="dept-cat-tab" data-cat="suneung" onclick="switchDeptCategory('suneung')"><span id="menu-05-tab">2028년 수능</span></button>
+  </div>
+
+  <!-- 카테고리: 2028년 수능 -->
+  <div class="dept-cat-panel" id="dept-cat-panel-suneung" style="display:none">
+  <!-- 편집 툴바 -->
+    <div class="dd-toolbar" id="suneung-toolbar">
+      <div class="dd-toolbar-inner">
+        <span class="dd-toolbar-label">편집 모드</span>
+        <button class="dd-tool-btn" onclick="suneungAddCard()">＋ 버튼 추가</button>
+        <button class="dd-tool-btn dd-save-btn" onclick="saveSuneungCards()">💾 저장</button>
+        <button class="dd-tool-btn dd-exit-btn" onclick="exitSuneungEdit()">✕ 편집 종료</button>
+      </div>
+    </div>
+
+    <!-- 메인 뷰: 카드 버튼 목록 -->
+    <div class="dept-detail-body" id="suneung-main-view">
+      <div id="suneung-cards-wrap" class="sn-cards-grid"></div>
+      <div class="dept-blocks-empty" id="suneung-cards-empty">
+        <span style="font-size:32px;display:block;margin-bottom:14px;opacity:0.4">📚</span>
+        등록된 버튼이 없습니다.<br>
+        <span style="font-size:11px;color:rgba(26,46,74,0.35)">편집 모드에서 ＋ 버튼 추가를 눌러 항목을 만드세요</span>
+      </div>
+    </div>
+
+    <!-- 파일 뷰어 화면 (버튼 클릭 시 전환) -->
+    <div id="suneung-file-view" style="display:none;flex:1;flex-direction:column;overflow:hidden;">
+      <div class="sn-fv-header">
+        <button class="sn-fv-back" onclick="closeSuneungFileView()">◀ 목록으로</button>
+        <div class="sn-fv-title" id="sn-fv-title-text"></div>
+      </div>
+      <div class="sn-fv-body" id="sn-fv-body"></div>
+    </div>
+  </div>
+
+  <!-- 카테고리: 학과별 안내 -->
+  <div class="dept-body dept-cat-panel" id="dept-cat-panel-dept">
     <div class="dept-intro">
       <div class="dept-intro-sub">DEPARTMENT SELECTION</div>
       <div class="dept-intro-title">학과 계열을 선택하세요</div>
@@ -6424,53 +6477,6 @@
       등록된 내용이 없습니다.<br>
       <span style="font-size:11px;color:rgba(255,255,255,0.15)">관리자가 편집 모드에서 내용을 추가할 수 있습니다</span>
     </div>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════
-     2028년 수능 화면
-═══════════════════════════════════════ -->
-<div id="suneung-screen">
-  <div class="screen-bg-layer" id="bg-suneung-screen"></div>
-  <div class="dept-detail-header">
-    <button class="dept-detail-back" onclick="closeSuneungScreen()">◀ 뒤로</button>
-    <div class="dept-detail-icon">📚</div>
-    <div class="dept-detail-header-info">
-      <div class="dept-detail-label">SUNEUNG 2028 · 수능 안내</div>
-      <div class="dept-detail-name" id="menu-05-title">2028년 수능</div>
-      <div class="dept-detail-subtitle" id="menu-05-subtitle"></div>
-    </div>
-    <button class="dd-edit-btn" id="suneung-edit-btn" onclick="openSuneungEditPw()" title="편집 모드">🔒 편집</button>
-    <button class="detail-home" onclick="closeSuneungScreen()" title="메인화면으로">🏠</button>
-  </div>
-
-  <!-- 편집 툴바 -->
-  <div class="dd-toolbar" id="suneung-toolbar">
-    <div class="dd-toolbar-inner">
-      <span class="dd-toolbar-label">편집 모드</span>
-      <button class="dd-tool-btn" onclick="suneungAddCard()">＋ 버튼 추가</button>
-      <button class="dd-tool-btn dd-save-btn" onclick="saveSuneungCards()">💾 저장</button>
-      <button class="dd-tool-btn dd-exit-btn" onclick="exitSuneungEdit()">✕ 편집 종료</button>
-    </div>
-  </div>
-
-  <!-- 메인 뷰: 카드 버튼 목록 -->
-  <div class="dept-detail-body" id="suneung-main-view">
-    <div id="suneung-cards-wrap" class="sn-cards-grid"></div>
-    <div class="dept-blocks-empty" id="suneung-cards-empty">
-      <span style="font-size:32px;display:block;margin-bottom:14px;opacity:0.4">📚</span>
-      등록된 버튼이 없습니다.<br>
-      <span style="font-size:11px;color:rgba(26,46,74,0.35)">편집 모드에서 ＋ 버튼 추가를 눌러 항목을 만드세요</span>
-    </div>
-  </div>
-
-  <!-- 파일 뷰어 화면 (버튼 클릭 시 전환) -->
-  <div id="suneung-file-view" style="display:none;flex:1;flex-direction:column;overflow:hidden;">
-    <div class="sn-fv-header">
-      <button class="sn-fv-back" onclick="closeSuneungFileView()">◀ 목록으로</button>
-      <div class="sn-fv-title" id="sn-fv-title-text"></div>
-    </div>
-    <div class="sn-fv-body" id="sn-fv-body"></div>
   </div>
 </div>
 
@@ -6744,7 +6750,7 @@ function savePage() { sbSetQ('cg_page', pageTexts); }
 const SUB_SCREEN_IDS = [
   'semester-screen','catsubj-screen','subject-detail',
   'dept-screen','subject-search-screen',
-  'enroll-screen','suneung-screen','guidebook-screen','brochure-screen'
+  'enroll-screen','guidebook-screen','brochure-screen'
 ];
 
 let pendingBgFile = null;       // 업로드 대기 중인 File 객체
@@ -6829,6 +6835,8 @@ function applyPageTexts() {
       // 각 화면 헤더 제목도 동기화
       const titleEl = document.getElementById(id + '-title');
       if (titleEl) titleEl.textContent = p[k];
+      const tabEl = document.getElementById(id + '-tab');
+      if (tabEl) tabEl.textContent = p[k];
     }
     // 소제목 동기화
     const subKey = k + 'sub';
@@ -9607,11 +9615,34 @@ let currentDeptKey = '';   // localStorage 키 (학과명 기반)
 let deptEditMode   = false;
 let deptBlocks     = [];   // [{id, type, ...data}]
 
-function openDeptScreen() {
+function openDeptScreen(cat) {
+  switchDeptCategory(cat === 'suneung' ? 'suneung' : 'dept');
   document.getElementById('dept-screen').classList.add('open');
 }
 function closeDeptScreen() {
+  if (suneungEditMode) exitSuneungEdit();
+  closeSuneungFileView();
   document.getElementById('dept-screen').classList.remove('open');
+}
+
+/* 카테고리 탭 전환: 'dept' = 학과별 안내, 'suneung' = 2028년 수능 */
+function switchDeptCategory(cat) {
+  document.querySelectorAll('#dept-cat-tabs .dept-cat-tab').forEach(t =>
+    t.classList.toggle('active', t.dataset.cat === cat));
+  const isSn = cat === 'suneung';
+  document.getElementById('dept-cat-panel-dept').style.display = isSn ? 'none' : '';
+  document.getElementById('dept-cat-panel-suneung').style.display = isSn ? '' : 'none';
+  document.getElementById('suneung-edit-btn').style.display = isSn ? '' : 'none';
+  if (isSn) {
+    suneungEditMode = false;
+    document.getElementById('suneung-edit-btn').classList.remove('active');
+    document.getElementById('suneung-toolbar').classList.remove('show');
+    closeSuneungFileView();
+    loadSuneungCards();
+  } else {
+    if (suneungEditMode) exitSuneungEdit();
+    closeSuneungFileView();
+  }
 }
 
 function openDeptDetail(name, icon) {
@@ -10793,19 +10824,9 @@ const SUNEUNG_KEY = 'cg_suneung';
 let suneungEditMode = false;
 let suneungCards = []; // [{id, title, files:[{name,type,url,size}]}]
 
-function openSuneungScreen() {
-  suneungEditMode = false;
-  document.getElementById('suneung-edit-btn').classList.remove('active');
-  document.getElementById('suneung-toolbar').classList.remove('show');
-  closeSuneungFileView();
-  loadSuneungCards();
-  document.getElementById('suneung-screen').classList.add('open');
-}
-function closeSuneungScreen() {
-  if (suneungEditMode) exitSuneungEdit();
-  closeSuneungFileView();
-  document.getElementById('suneung-screen').classList.remove('open');
-}
+// 2028년 수능은 학과별 안내 화면의 카테고리로 통합됨
+function openSuneungScreen() { openDeptScreen('suneung'); }
+function closeSuneungScreen() { closeDeptScreen(); }
 
 async function loadSuneungCards() {
   try { const _s = await sbGet(SUNEUNG_KEY); suneungCards = Array.isArray(_s) ? _s : []; }
@@ -16216,7 +16237,6 @@ window.ugCheckMySubjects = ugCheckMySubjects;
     { id: 'catsubj-screen',        path: 'subjects',          close: call('closeCatSubjScreen') },
     { id: 'dept-screen',           path: 'dept',              close: call('closeDeptScreen') },
     { id: 'enroll-screen',         path: 'enroll',            close: call('closeEnrollScreen') },
-    { id: 'suneung-screen',        path: 'suneung',           close: call('closeSuneungScreen') },
     { id: 'guidebook-screen',      path: 'guidebook',         close: call('closeGuidebookScreen') },
     { id: 'brochure-screen',       path: 'brochure',          close: call('closeBrochureScreen') },
     { id: 'iframe-screen',         path: 'test',              close: call('closeIframeScreen') },
