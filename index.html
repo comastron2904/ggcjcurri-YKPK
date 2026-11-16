@@ -5596,6 +5596,10 @@
   .gb-original-btn.visible { display: inline-flex; }
   .gb-original-btn:hover { background: rgba(26,107,191,0.08); border-color: var(--gold); }
   .gb-original-btn:active { transform: scale(0.96); }
+  /* 브라우저 PDF 보기 모드: 위쪽 줄을 얇게 해서 PDF 영역을 최대한 크게 */
+  #guidebook-screen.gb-native-mode .gb-panel-bar { padding: 6px 16px; }
+  #guidebook-screen.gb-native-mode .gb-native-wrap { padding: 8px 12px 10px; }
+  #guidebook-screen.gb-native-mode .gb-item-row { padding-top: 10px; padding-bottom: 10px; }
 </style>
 </head>
 <body>
@@ -12588,7 +12592,7 @@ async function _gbShowNative(url, filename, token) {
   const old = document.getElementById('gb-native-frame');
   const fr = document.createElement('iframe');
   fr.id = 'gb-native-frame'; fr.title = filename;
-  fr.src = _gbNativeBlobUrl + '#view=FitH&pagemode=none';
+  fr.src = _gbNativeBlobUrl + '#page=1&view=Fit&zoom=page-fit&pagemode=none';   // 처음 열 때 한 쪽 전체가 보이도록
   old.replaceWith(fr);
   _gbSetDocLinks(url, filename);
   document.getElementById('gb-jump-trigger-btn')?.classList.remove('visible');
