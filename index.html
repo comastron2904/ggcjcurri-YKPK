@@ -5571,6 +5571,31 @@
     .gb-edit-bar { padding: 8px 12px; }
     .gb-edit-bar-hint { flex-basis: 100%; order: 3; }
   }
+  /* ── 선택과목 안내서: 브라우저 내장 PDF 보기 ── */
+  .gb-native-wrap {
+    flex: 1; min-height: 0; display: flex; padding: 12px 16px 16px;
+    background: rgba(220,230,242,0.55);
+  }
+  .gb-native-wrap iframe {
+    flex: 1; width: 100%; height: 100%; border: none; border-radius: 10px;
+    background: #525659;
+    box-shadow: 0 6px 24px rgba(16,52,102,0.18);
+  }
+  .gb-native-wrap:fullscreen { padding: 0; background: #000; }
+  .gb-native-wrap:fullscreen iframe { border-radius: 0; }
+  /* 표지·펼침 방향 설정은 그림 방식에서만 의미가 있으므로 숨김 */
+  #guidebook-screen.gb-native-mode #gb-settings-bar { display: none !important; }
+  .gb-original-btn {
+    display: none; align-items: center; gap: 5px; flex-shrink: 0;
+    padding: 6px 12px; margin-right: 6px; border-radius: 999px;
+    border: 1px solid rgba(26,107,191,0.35); background: #fff;
+    color: var(--gold); font-size: 12px; font-weight: 700; text-decoration: none;
+    font-family: 'Noto Sans KR', sans-serif;
+    transition: background 0.2s, border-color 0.2s, transform 0.15s;
+  }
+  .gb-original-btn.visible { display: inline-flex; }
+  .gb-original-btn:hover { background: rgba(26,107,191,0.08); border-color: var(--gold); }
+  .gb-original-btn:active { transform: scale(0.96); }
 </style>
 </head>
 <body>
@@ -6946,6 +6971,7 @@
       <!-- 현재 보고 있는 자료 이름 -->
       <span class="gb-panel-filename" id="gb-left-filename">자료 없음</span>
 
+      <a class="gb-original-btn" id="gb-original-btn" href="#" target="_blank" rel="noopener" title="원본 PDF를 새 탭에서 열기">↗ 원본으로 보기</a>
       <button class="gb-fullscreen-btn" id="gb-left-fs-btn" onclick="openGbFullscreen('left')" title="전체화면">⛶</button>
 
       <!-- 편집 모드: PDF 추가 버튼 -->
@@ -6996,6 +7022,11 @@
         </div>
       </div>
 
+    </div>
+
+    <!-- PC: 브라우저 내장 PDF 보기 (원본 화질 · 확대/검색/인쇄 가능) -->
+    <div class="gb-native-wrap" id="gb-native-wrap" style="display:none;">
+      <iframe id="gb-native-frame" title="선택과목 안내서 PDF"></iframe>
     </div>
 
     <!-- 하단 통합 네비게이션 -->
@@ -11744,6 +11775,9 @@ function _gbRenderItemChips() {
 
 /* ── 자료가 없을 때 뷰어 비우기 ── */
 function _gbShowEmpty(msgHtml) {
+  _gbRenderToken++;
+  _gbSetViewMode(false);
+  document.getElementById('gb-original-btn')?.classList.remove('visible');
   gbSingle.pdfDoc = null; gbSingle.totalPages = 0; gbSingle.rendering = false;
   const lv = document.getElementById('gb-left-viewer');
   const empty = document.getElementById('gb-left-empty');
@@ -12505,7 +12539,75 @@ async function gbLoadSettings() {
 // (triggerGbPdfInput, handleGbPdfFile, loadGbPdfFromStorage는 위에서 정의됨)
 
 // PDF 렌더링 (단일 PDF → 스프레드 초기화)
+/* ──────────────────────────────
+   PDF 보기 방식
+   - PC(마우스 사용 + 브라우저에 PDF 보기 기능 있음): 브라우저 내장 PDF 보기로 원본 그대로 표시
+   - 휴대폰·태블릿: 브라우저가 화면 안 PDF 표시를 지원하지 않아 기존 방식(그림으로 그리기) 사용
+────────────────────────────── */
+let _gbNativeBlobUrl = null;
+let _gbRenderToken = 0;
+function gbUseNativeViewer() {
+  const fine = window.matchMedia ? window.matchMedia('(pointer: fine)').matches : true;
+  const pdfOk = ('pdfViewerEnabled' in navigator) ? navigator.pdfViewerEnabled : true;
+  return window.innerWidth >= 768 && fine && pdfOk;
+}
+function _gbSetViewMode(native) {
+  const wrap = document.getElementById('gb-native-wrap');
+  const row  = document.getElementById('gb-spread-row');
+  const nav  = document.getElementById('gb-spread-nav');
+  if (wrap) wrap.style.display = native ? 'flex' : 'none';
+  if (row)  row.style.display  = native ? 'none' : '';
+  if (native && nav) nav.style.display = 'none';
+  document.getElementById('guidebook-screen')?.classList.toggle('gb-native-mode', !!native);
+  if (!native) {
+    const fr = document.getElementById('gb-native-frame');
+    if (fr) fr.removeAttribute('src');
+    if (_gbNativeBlobUrl) { URL.revokeObjectURL(_gbNativeBlobUrl); _gbNativeBlobUrl = null; }
+  }
+}
+function _gbSetDocLinks(url, filename) {
+  const fnEl = document.getElementById('gb-left-filename');
+  if (fnEl) fnEl.textContent = '📄 ' + filename;
+  const dlBtn = document.getElementById('gb-download-btn');
+  if (dlBtn) { dlBtn.href = url; dlBtn.download = filename; dlBtn.classList.add('visible'); }
+  const og = document.getElementById('gb-original-btn');
+  if (og) { og.href = url; og.classList.add('visible'); }
+}
+async function _gbShowNative(url, filename, token) {
+  // 파일을 받아 'PDF 형식'으로 명시한 주소를 만들어 넣음
+  // (저장소가 다운로드 방식으로 응답해도 화면 안에서 열리도록)
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  const blob = new Blob([await res.arrayBuffer()], { type: 'application/pdf' });
+  if (token !== _gbRenderToken) return true;   // 그 사이 다른 자료를 선택함
+  if (_gbNativeBlobUrl) URL.revokeObjectURL(_gbNativeBlobUrl);
+  _gbNativeBlobUrl = URL.createObjectURL(blob);
+  gbSingle.pdfDoc = null; gbSingle.totalPages = 0;
+  _gbSetViewMode(true);
+  // 새 iframe으로 교체해야 이전 문서의 스크롤·확대 상태가 남지 않음
+  const old = document.getElementById('gb-native-frame');
+  const fr = document.createElement('iframe');
+  fr.id = 'gb-native-frame'; fr.title = filename;
+  fr.src = _gbNativeBlobUrl + '#view=FitH&pagemode=none';
+  old.replaceWith(fr);
+  _gbSetDocLinks(url, filename);
+  document.getElementById('gb-jump-trigger-btn')?.classList.remove('visible');
+  return true;
+}
+
 async function renderGbPdf(side, dataUrl, filename) {
+  const token = ++_gbRenderToken;
+  if (gbUseNativeViewer()) {
+    const lv = document.getElementById('gb-left-viewer');
+    try {
+      if (await _gbShowNative(dataUrl, filename, token)) return;
+    } catch(e) {
+      console.warn('브라우저 PDF 보기 실패 → 기존 방식으로 표시', e);
+    }
+  }
+  _gbSetViewMode(false);
+  const _og = document.getElementById('gb-original-btn');
+  if (_og) { _og.href = dataUrl; _og.classList.add('visible'); }   // 휴대폰: 원본(선명) 보기 링크 먼저 표시
   const viewer = document.getElementById('gb-left-viewer');
   const empty  = document.getElementById('gb-left-empty');
   const fnEl   = document.getElementById('gb-left-filename');
@@ -12522,7 +12624,10 @@ async function renderGbPdf(side, dataUrl, filename) {
     gbSingle.pdfDoc     = pdf;
     gbSingle.totalPages = pdf.numPages;
     gbSingle.curPage    = 1;
+    if (token !== _gbRenderToken) return;
     if (fnEl) fnEl.textContent = '📄 ' + filename;
+    const og = document.getElementById('gb-original-btn');
+    if (og) { og.href = dataUrl; og.classList.add('visible'); }
     // 드롭다운 라벨 업데이트
     const ddLabel = document.getElementById('gb-dropdown-label');
     if (ddLabel) ddLabel.textContent = '📄 ' + filename;
@@ -12712,6 +12817,13 @@ async function gbPageGo(side, dir) { await gbSpreadGo(dir); }
 let gbFsSide = null;
 
 function openGbFullscreen(side) {
+  // 브라우저 PDF 보기 모드: PDF 영역 자체를 전체화면으로
+  const nw = document.getElementById('gb-native-wrap');
+  if (nw && nw.style.display !== 'none') {
+    const req = nw.requestFullscreen || nw.webkitRequestFullscreen;
+    if (req) req.call(nw);
+    return;
+  }
   // 단일 PDF 모드: 항상 gbSingle 사용
   if (!gbSingle.pdfDoc) return;
   gbFsSide = 'left';
