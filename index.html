@@ -5600,6 +5600,57 @@
   #guidebook-screen.gb-native-mode .gb-panel-bar { padding: 6px 16px; }
   #guidebook-screen.gb-native-mode .gb-native-wrap { padding: 8px 12px 10px; }
   #guidebook-screen.gb-native-mode .gb-item-row { padding-top: 10px; padding-bottom: 10px; }
+  /* ══════════════════════════════════════
+     선택과목 안내서: 얇은 상단 구성
+     헤더(한 줄) → 카테고리 탭 → 자료 버튼 + [원본으로 보기][⛶]  →  PDF
+  ══════════════════════════════════════ */
+  #guidebook-screen .gb-header { padding: 8px 20px; gap: 10px; min-height: 0; }
+  #guidebook-screen .gb-header-label { display: none; }
+  #guidebook-screen .gb-header-info { display: flex; align-items: baseline; gap: 10px; min-width: 0; }
+  #guidebook-screen .gb-header-title { font-size: 18px; line-height: 1.3; white-space: nowrap; }
+  #guidebook-screen .gb-header-subtitle { margin-top: 0; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #guidebook-screen .gb-back-btn { padding: 6px 12px; font-size: 12px; letter-spacing: 0.5px; }
+  #guidebook-screen .gb-edit-btn,
+  #guidebook-screen .gb-jump-trigger-btn,
+  #guidebook-screen .gb-download-btn { padding: 0 12px; height: 30px; font-size: 12px; }
+  #guidebook-screen .detail-home { width: 30px; height: 30px; font-size: 14px; }
+
+  #guidebook-screen .gb-cat-tabs { padding: 2px 20px 0; gap: 2px; }
+  #guidebook-screen .gb-cat-tab-btn { padding: 7px 14px; font-size: 13px; }
+  #guidebook-screen .gb-cat-count { min-width: 18px; height: 18px; font-size: 10.5px; }
+  #guidebook-screen .gb-cat-add { padding: 5px 12px; margin-bottom: 4px; font-size: 12px; }
+
+  .gb-sub-row {
+    flex-shrink: 0; display: flex; align-items: center; gap: 10px;
+    padding: 0 16px 0 0; background: rgba(248,250,253,0.95);
+    border-bottom: 1px solid rgba(26,107,191,0.10);
+  }
+  #guidebook-screen .gb-item-row {
+    flex: 1; min-width: 0; padding: 7px 20px; gap: 8px;
+    background: none; border-bottom: none; max-height: 22vh;
+  }
+  #guidebook-screen .gb-item-btn { padding: 5px 13px; font-size: 12.5px; }
+  #guidebook-screen .gb-item-add { padding: 5px 12px; margin: 0; font-size: 12px; }
+  .gb-sub-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+  .gb-sub-actions .gb-original-btn { margin: 0; padding: 5px 12px; }
+  .gb-sub-fs { width: 28px; height: 28px; padding: 0; display: inline-flex; align-items: center; justify-content: center; }
+
+  /* 예전 정보 줄(GUIDEBOOK · 책자 / 파일명)은 숨김 — 자료 버튼이 같은 정보를 보여줌 */
+  #guidebook-screen .gb-panel-bar { display: none !important; }
+
+  #guidebook-screen .gb-edit-bar { padding: 5px 20px; }
+  #guidebook-screen.gb-native-mode .gb-native-wrap { padding: 6px 8px 8px; }
+  #guidebook-screen .gb-native-wrap iframe { border-radius: 6px; }
+
+  @media (max-width: 700px) {
+    #guidebook-screen .gb-header { padding: 8px 12px; }
+    #guidebook-screen .gb-header-info { flex-wrap: wrap; row-gap: 0; }
+    #guidebook-screen .gb-header-title { font-size: 16px; }
+    #guidebook-screen .gb-cat-tabs { padding: 2px 10px 0; }
+    #guidebook-screen .gb-item-row { padding: 6px 12px; }
+    .gb-sub-row { padding-right: 10px; }
+    .gb-sub-actions .gb-original-btn { padding: 5px 10px; font-size: 11px; }
+  }
 </style>
 </head>
 <body>
@@ -6962,8 +7013,14 @@
   <!-- 1단계: 카테고리 탭 -->
   <div class="gb-cat-tabs" id="gb-cat-tabs"></div>
 
-  <!-- 2단계: 카테고리 안의 자료 선택 -->
-  <div class="gb-item-row" id="gb-item-row"></div>
+  <!-- 2단계: 카테고리 안의 자료 선택 + 오른쪽 동작 버튼 -->
+  <div class="gb-sub-row" id="gb-sub-row">
+    <div class="gb-item-row" id="gb-item-row"></div>
+    <div class="gb-sub-actions">
+      <a class="gb-original-btn" id="gb-original-btn" href="#" target="_blank" rel="noopener" title="원본 PDF를 새 탭에서 열기">↗ 원본으로 보기</a>
+      <button class="gb-fullscreen-btn gb-sub-fs" onclick="openGbFullscreen('left')" title="전체화면">⛶</button>
+    </div>
+  </div>
 
   <!-- 단일 PDF 스프레드 뷰 -->
   <div class="gb-panels">
@@ -6975,7 +7032,6 @@
       <!-- 현재 보고 있는 자료 이름 -->
       <span class="gb-panel-filename" id="gb-left-filename">자료 없음</span>
 
-      <a class="gb-original-btn" id="gb-original-btn" href="#" target="_blank" rel="noopener" title="원본 PDF를 새 탭에서 열기">↗ 원본으로 보기</a>
       <button class="gb-fullscreen-btn" id="gb-left-fs-btn" onclick="openGbFullscreen('left')" title="전체화면">⛶</button>
 
       <!-- 편집 모드: PDF 추가 버튼 -->
@@ -11737,8 +11793,10 @@ function _gbRenderItemChips() {
   row.innerHTML = '';
   row.classList.toggle('editing', gbEditMode);
   const c = _gbCat();
-  if (!c) { row.style.display = 'none'; return; }
+  const sub = document.getElementById('gb-sub-row');
+  if (!c) { row.style.display = 'none'; if (sub) sub.style.display = 'none'; return; }
   row.style.display = '';
+  if (sub) sub.style.display = '';
   c.items.forEach((it, i) => {
     const chip = document.createElement('div');
     chip.className = 'gb-item-chip' + (i === gbCurrentIdx ? ' active' : '');
