@@ -5666,6 +5666,27 @@
     pointer-events: none;
   }
   .gb-native-loading.show { display: flex; }
+  /* ── 02 학과별 안내 / 03 권장 이수과목: 같은 화면을 모드로 나눔 ── */
+  #dept-screen.mode-dept #dept-cat-tabs { display: none; }
+  #dept-screen.mode-rec .dept-cat-tab[data-cat="dept"] { display: none; }
+  #dept-cat-panel-rec { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-height: 0; }
+  #dept-cat-panel-rec .rec-item-row { flex: 1; min-width: 0; padding: 8px 24px; gap: 8px; background: none; border-bottom: none; max-height: 22vh; }
+  #dept-cat-panel-rec .gb-item-btn { padding: 6px 13px; font-size: 12.5px; }
+  #dept-cat-panel-rec .gb-item-add { padding: 6px 12px; margin: 0; font-size: 12px; }
+  #dept-cat-panel-rec .rec-edit-bar { padding: 6px 24px; }
+  .rec-viewer {
+    flex: 1; min-height: 0; position: relative; display: flex; flex-direction: column;
+    padding: 8px 10px 10px; background: rgba(220,230,242,0.55); overflow: auto;
+  }
+  .rec-viewer iframe.rec-frame { flex: 1; width: 100%; border: none; border-radius: 6px; background: #525659; box-shadow: 0 6px 24px rgba(16,52,102,0.18); }
+  .rec-viewer:fullscreen { padding: 0; background: #000; }
+  .rec-viewer:fullscreen iframe.rec-frame { border-radius: 0; }
+  .rec-viewer .gb-pdf-loading, .rec-viewer .gb-empty { margin: auto; }
+  .rec-viewer .rec-pdf-viewer { margin: 0 auto; width: 100%; max-width: 900px; }
+  @media (max-width: 700px) {
+    #dept-cat-panel-rec .rec-item-row { padding: 6px 12px; flex-wrap: nowrap; overflow-x: auto; }
+    .rec-viewer { padding: 6px; }
+  }
 </style>
 </head>
 <body>
@@ -5715,8 +5736,8 @@
   <div class="buttons-grid">
     <!-- 내부 번호(data-menu)와 화면 번호가 같도록 정리됨 -->
     <button class="nav-btn" data-menu="1" onclick="openSemesterScreen()"><span class="btn-number">01</span><span class="btn-title" id="menu-01">학기별 개설과목 안내</span><span class="btn-arrow">›</span></button>
-    <button class="nav-btn" data-menu="2"><span class="btn-number">02</span><span class="btn-title" id="menu-02">교과별 선택과목 안내</span><span class="btn-arrow">›</span></button>
-    <button class="nav-btn" data-menu="3" onclick="openDeptScreen()"><span class="btn-number">03</span><span class="btn-title" id="menu-03">학과별 안내</span><span class="btn-arrow">›</span></button>
+    <button class="nav-btn" data-menu="2" onclick="openDeptScreen('dept')"><span class="btn-number">02</span><span class="btn-title" id="menu-02">학과별 안내</span><span class="btn-arrow">›</span></button>
+    <button class="nav-btn" data-menu="3" onclick="openRecScreen()"><span class="btn-number">03</span><span class="btn-title" id="menu-03">권장 이수과목</span><span class="btn-arrow">›</span></button>
     <button class="nav-btn" data-menu="4" onclick="openBrochureScreen()"><span class="btn-number">04</span><span class="btn-title" id="menu-04">2026 교육과정 안내 브로셔</span><span class="btn-arrow">›</span></button>
     <button class="nav-btn" data-menu="5"><span class="btn-number">05</span><span class="btn-title" id="menu-05">2028 대학별 교과 이수 권장 과목</span><span class="btn-arrow">›</span></button>
     <button class="nav-btn" data-menu="6" onclick="openGuidebookScreen()"><span class="btn-number">06</span><span class="btn-title" id="menu-06">선택과목 안내서</span><span class="btn-arrow">›</span></button>
@@ -6003,9 +6024,9 @@
         <div class="pe-section-label">MENU · 메뉴 버튼 텍스트</div>
         <div class="pe-menu-item"><span class="pe-menu-num">01</span><input class="pe-menu-input" id="pe-menu-01" placeholder="학기별 개설과목 안내" /></div>
         <div class="pe-menu-sub-row"><span class="pe-menu-sub-label">소제목</span><input class="pe-menu-subtitle-input" id="pe-menu-01-sub" placeholder="화면 상단에 표시될 소제목 (선택)" /></div>
-        <div class="pe-menu-item"><span class="pe-menu-num">02</span><input class="pe-menu-input" id="pe-menu-02" placeholder="교과별 선택과목 안내" /></div>
+        <div class="pe-menu-item"><span class="pe-menu-num">02</span><input class="pe-menu-input" id="pe-menu-02" placeholder="학과별 안내" /></div>
         <div class="pe-menu-sub-row"><span class="pe-menu-sub-label">소제목</span><input class="pe-menu-subtitle-input" id="pe-menu-02-sub" placeholder="화면 상단에 표시될 소제목 (선택)" /></div>
-        <div class="pe-menu-item"><span class="pe-menu-num">03</span><input class="pe-menu-input" id="pe-menu-03" placeholder="학과별 안내" /></div>
+        <div class="pe-menu-item"><span class="pe-menu-num">03</span><input class="pe-menu-input" id="pe-menu-03" placeholder="권장 이수과목" /></div>
         <div class="pe-menu-sub-row"><span class="pe-menu-sub-label">소제목</span><input class="pe-menu-subtitle-input" id="pe-menu-03-sub" placeholder="화면 상단에 표시될 소제목 (선택)" /></div>
         <div class="pe-menu-item"><span class="pe-menu-num">04</span><input class="pe-menu-input" id="pe-menu-04" placeholder="2026 교육과정 안내 브로셔" /></div>
         <div class="pe-menu-sub-row"><span class="pe-menu-sub-label">소제목</span><input class="pe-menu-subtitle-input" id="pe-menu-04-sub" placeholder="화면 상단에 표시될 소제목 (선택)" /></div>
@@ -6734,17 +6755,36 @@
   <div class="dept-header">
     <button class="dept-back" onclick="closeDeptScreen()">◀ 뒤로</button>
     <div class="dept-header-info">
-      <div class="dept-header-label">DEPARTMENT GUIDE · 학과별 안내</div>
-      <div class="dept-header-title" id="menu-03-title">학과별 안내</div>
-      <div class="dept-header-subtitle" id="menu-03-subtitle"></div>
+      <div class="dept-header-label" id="dept-screen-label">DEPARTMENT GUIDE · 학과별 안내</div>
+      <div class="dept-header-title" id="dept-screen-title">학과별 안내</div>
+      <div class="dept-header-subtitle" id="dept-screen-subtitle"></div>
     </div>
     <button class="dd-edit-btn" id="suneung-edit-btn" onclick="openSuneungEditPw()" title="편집 모드" style="display:none">🔒 편집</button>
+    <button class="dd-edit-btn" id="rec-edit-btn" onclick="openRecEditPw()" title="PDF 자료 편집" style="display:none">🔒 편집</button>
   </div>
 
   <!-- 카테고리 탭 -->
   <div class="dept-cat-tabs" id="dept-cat-tabs">
-    <button class="dept-cat-tab active" data-cat="dept" onclick="switchDeptCategory('dept')"><span id="menu-03-tab">학과별 안내</span></button>
+    <button class="dept-cat-tab active" data-cat="dept" onclick="switchDeptCategory('dept')"><span>학과별 안내</span></button>
     <button class="dept-cat-tab" data-cat="suneung" onclick="switchDeptCategory('suneung')"><span id="menu-05-tab">2028 대학별 교과 이수 권장 과목</span></button>
+    <button class="dept-cat-tab" data-cat="rec" onclick="switchDeptCategory('rec')"><span id="rec-tab-label">권장 이수과목 자료</span></button>
+  </div>
+
+  <!-- 카테고리: 권장 이수과목 자료 (PDF 업로드·보기) -->
+  <div class="dept-cat-panel" id="dept-cat-panel-rec" style="display:none">
+    <div class="gb-edit-bar rec-edit-bar" id="rec-edit-bar" style="display:none">
+      <span class="gb-edit-bar-label">편집 모드</span>
+      <span class="gb-edit-bar-hint">자료 버튼 옆 작은 버튼: ◀▶ 순서 · ✎ 이름 · ✕ 삭제 (변경 즉시 저장)</span>
+      <button class="gb-edit-bar-exit" onclick="recRenameTab()">✎ 탭 이름 바꾸기</button>
+    </div>
+    <div class="gb-sub-row rec-sub-row">
+      <div class="gb-item-row rec-item-row" id="rec-item-row"></div>
+      <div class="gb-sub-actions">
+        <a class="gb-original-btn" id="rec-original-btn" href="#" target="_blank" rel="noopener" title="원본 PDF를 새 탭에서 열기">↗ 원본으로 보기</a>
+        <button class="gb-fullscreen-btn gb-sub-fs" id="rec-fs-btn" onclick="recFullscreen()" title="전체화면">⛶</button>
+      </div>
+    </div>
+    <div class="rec-viewer" id="rec-viewer"></div>
   </div>
 
   <!-- 카테고리: 2028년 수능 -->
@@ -7457,9 +7497,22 @@ function applyPageTexts() {
    신버전: 화면 번호와 같게 → 4번 = 브로셔, 9번 = 수강신청 안내
    저장된 이름·소제목·순서를 한 번만 맞바꾸고 menuSlotVer = 2로 표시합니다.
 ────────────────────────────── */
-const MENU_SLOT_VER = 2;
+const MENU_SLOT_VER = 3;
 function migrateMenuSlots(p) {
   if (!p || typeof p !== 'object' || p.menuSlotVer >= MENU_SLOT_VER) return false;
+  const ver = p.menuSlotVer || 1;
+  if (ver < 2) _migrateMenuV2(p);
+  if (ver < 3) {
+    /* v3: 학과별 안내 03 → 02 이동, 03은 '권장 이수과목'으로 새로 구성 */
+    p.menu02    = p.menu03 || '학과별 안내';
+    p.menu02sub = p.menu03sub || '';
+    p.menu03    = '권장 이수과목';
+    p.menu03sub = '';
+  }
+  p.menuSlotVer = MENU_SLOT_VER;
+  return true;
+}
+function _migrateMenuV2(p) {
   const swap = (a, b) => {
     const hasA = Object.prototype.hasOwnProperty.call(p, a);
     const hasB = Object.prototype.hasOwnProperty.call(p, b);
@@ -7472,8 +7525,6 @@ function migrateMenuSlots(p) {
   if (Array.isArray(p.menuOrder)) {
     p.menuOrder = p.menuOrder.map(n => n === 4 ? 9 : n === 9 ? 4 : n);
   }
-  p.menuSlotVer = MENU_SLOT_VER;
-  return true;
 }
 
 /* ──────────────────────────────
@@ -7482,8 +7533,8 @@ function migrateMenuSlots(p) {
 // 각 슬롯 번호(1~9)에 해당하는 고정 정보
 const MENU_META = {
   1: { label: '학기별 개설과목 안내',              fn: 'openSemesterScreen()' },
-  2: { label: '교과별 선택과목 안내',              fn: '(비활성)' },
-  3: { label: '학과별 안내',                       fn: 'openDeptScreen()' },   // 탭: 학과별 안내 / 05 내용
+  2: { label: '학과별 안내',                       fn: "openDeptScreen('dept')" },
+  3: { label: '권장 이수과목',                     fn: 'openRecScreen()' },    // 탭: 2028 대학별 교과 이수 권장 과목 / 권장 이수과목 자료(PDF)
   4: { label: '2026 교육과정 안내 브로셔',         fn: 'openBrochureScreen()' },
   5: { label: '2028 대학별 교과 이수 권장 과목',   fn: '(비활성 · 03 화면의 탭으로 이동)' },
   6: { label: '선택과목 안내서',                   fn: 'openGuidebookScreen()' },
@@ -7749,6 +7800,7 @@ function checkPw() {
     else if (pwTarget === 'deptEdit') enterDeptEdit();
     else if (pwTarget === 'enrollEdit') enterEnrollEdit();
     else if (pwTarget === 'suneungEdit') enterSuneungEdit();
+    else if (pwTarget === 'recEdit') enterRecEdit();
     else if (pwTarget === 'gbEdit') enterGbEdit();
     else if (pwTarget === 'brEdit') enterBrEdit();
     else if (pwTarget === 'semColEdit') openSemColEdit();
@@ -10167,12 +10219,34 @@ let currentDeptKey = '';   // localStorage 키 (학과명 기반)
 let deptEditMode   = false;
 let deptBlocks     = [];   // [{id, type, ...data}]
 
+/* 같은 화면을 두 가지 모드로 사용
+   - 'dept' (02 학과별 안내): 탭 없이 학과 계열 선택
+   - 'rec'  (03 권장 이수과목): 탭 [2028 대학별 교과 이수 권장 과목 | 권장 이수과목 자료(PDF)] */
+function _deptSetMode(mode) {
+  const scr = document.getElementById('dept-screen');
+  scr.classList.toggle('mode-dept', mode === 'dept');
+  scr.classList.toggle('mode-rec', mode === 'rec');
+  const slot = mode === 'dept' ? '02' : '03';
+  const navTitle = document.getElementById('menu-' + slot);
+  const p = (typeof pageTexts === 'object' && pageTexts) ? pageTexts : {};
+  document.getElementById('dept-screen-title').textContent =
+    (navTitle && navTitle.textContent.trim()) || (mode === 'dept' ? '학과별 안내' : '권장 이수과목');
+  document.getElementById('dept-screen-label').textContent =
+    mode === 'dept' ? 'DEPARTMENT GUIDE · 학과별 안내' : 'RECOMMENDED SUBJECTS · 권장 이수과목';
+  const sub = document.getElementById('dept-screen-subtitle');
+  const subTxt = p['menu' + slot + 'sub'] || '';
+  sub.textContent = subTxt; sub.style.display = subTxt ? '' : 'none';
+}
 function openDeptScreen(cat) {
-  switchDeptCategory(cat === 'suneung' ? 'suneung' : 'dept');
+  const mode = (cat === 'suneung' || cat === 'rec') ? 'rec' : 'dept';
+  _deptSetMode(mode);
+  switchDeptCategory(mode === 'dept' ? 'dept' : cat);
   document.getElementById('dept-screen').classList.add('open');
 }
+function openRecScreen() { openDeptScreen('suneung'); }
 function closeDeptScreen() {
   if (suneungEditMode) exitSuneungEdit();
+  if (recEditMode) exitRecEdit();
   closeSuneungFileView();
   document.getElementById('dept-screen').classList.remove('open');
 }
@@ -10190,10 +10264,14 @@ function switchDeptCategory(cat) {
   document.querySelectorAll('#dept-cat-tabs .dept-cat-tab').forEach(t =>
     t.classList.toggle('active', t.dataset.cat === cat));
   const isSn = cat === 'suneung';
-  document.getElementById('dept-cat-panel-dept').style.display = isSn ? 'none' : '';
+  const isRec = cat === 'rec';
+  document.getElementById('dept-cat-panel-dept').style.display = (cat === 'dept') ? '' : 'none';
   document.getElementById('dept-cat-panel-suneung').style.display = isSn ? '' : 'none';
+  document.getElementById('dept-cat-panel-rec').style.display = isRec ? '' : 'none';
   document.getElementById('suneung-edit-btn').style.display = isSn ? '' : 'none';
-  replayAnim(document.getElementById(isSn ? 'dept-cat-panel-suneung' : 'dept-cat-panel-dept'));
+  document.getElementById('rec-edit-btn').style.display = isRec ? '' : 'none';
+  replayAnim(document.getElementById('dept-cat-panel-' + cat));
+  if (isRec) { openRecPanel(); } else if (recEditMode) { exitRecEdit(); }
   if (isSn) {
     suneungEditMode = false;
     document.getElementById('suneung-edit-btn').classList.remove('active');
@@ -10204,6 +10282,224 @@ function switchDeptCategory(cat) {
     if (suneungEditMode) exitSuneungEdit();
     closeSuneungFileView();
   }
+}
+
+/* ══════════════════════════════════════
+   03 권장 이수과목 › '권장 이수과목 자료' 탭 (PDF 업로드·보기)
+   저장 형태 (cg_rec_pdf): { tabName: '탭 이름', items: [ { id, name, url } ] }
+   - PC: 브라우저 내장 PDF 보기(원본 화질)  / 휴대폰: 쪽 넘김 뷰어 + 원본으로 보기
+══════════════════════════════════════ */
+const REC_KEY = 'cg_rec_pdf';
+const REC_DEFAULT_TAB = '권장 이수과목 자료';
+let recData = { tabName: REC_DEFAULT_TAB, items: [] };
+let recLoaded = false;
+let recCurIdx = -1;
+let recEditMode = false;
+let _recToken = 0;
+
+async function openRecPanel() {
+  if (!recLoaded) {
+    recLoaded = true;
+    const v = document.getElementById('rec-viewer');
+    v.innerHTML = '<div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>자료 목록 불러오는 중...</span></div>';
+    try {
+      const d = await sbGet(REC_KEY);
+      if (d && typeof d === 'object') {
+        recData = { tabName: d.tabName || REC_DEFAULT_TAB, items: Array.isArray(d.items) ? d.items.filter(x => x && x.url) : [] };
+      }
+    } catch(_) {}
+    _recApplyTabName();
+  }
+  _recRenderChips();
+  if (recCurIdx >= 0 && recCurIdx < recData.items.length) {
+    if (!document.querySelector('#rec-viewer iframe, #rec-viewer .dept-pdf-viewer')) recSelect(recCurIdx);
+  } else if (recData.items.length) recSelect(0);
+  else _recShowEmpty();
+}
+
+function _recApplyTabName() {
+  const el = document.getElementById('rec-tab-label');
+  if (el) el.textContent = recData.tabName || REC_DEFAULT_TAB;
+}
+
+async function _recSave() {
+  try { await sbSet(REC_KEY, recData); return true; }
+  catch(e) { showDeptToast('⚠ 저장 실패: ' + (e && e.message ? e.message : '')); return false; }
+}
+
+function _recRenderChips() {
+  const row = document.getElementById('rec-item-row');
+  if (!row) return;
+  row.innerHTML = '';
+  recData.items.forEach((it, i) => {
+    const chip = document.createElement('div');
+    chip.className = 'gb-item-chip' + (i === recCurIdx ? ' active' : '');
+    chip.style.setProperty('--i', Math.min(i, 12));
+    const btn = document.createElement('button');
+    btn.type = 'button'; btn.className = 'gb-item-btn'; btn.title = it.name;
+    btn.innerHTML = '<span class="gb-item-icon">📄</span><span class="gb-item-name"></span>';
+    btn.querySelector('.gb-item-name').textContent = it.name;
+    btn.addEventListener('click', () => recSelect(i));
+    btn.addEventListener('mouseenter', () => { if (typeof gbHoverPrefetch === 'function') gbHoverPrefetch(it.url); });
+    chip.appendChild(btn);
+    if (recEditMode) {
+      const tools = document.createElement('span'); tools.className = 'gb-mini-tools';
+      if (i > 0) tools.appendChild(_gbMiniBtn('◀', '앞으로', () => recMove(i, -1)));
+      if (i < recData.items.length - 1) tools.appendChild(_gbMiniBtn('▶', '뒤로', () => recMove(i, 1)));
+      tools.appendChild(_gbMiniBtn('✎', '이름 바꾸기', () => recRename(i)));
+      tools.appendChild(_gbMiniBtn('✕', '자료 삭제', () => recDelete(i), true));
+      chip.appendChild(tools);
+    }
+    row.appendChild(chip);
+  });
+  if (recEditMode) {
+    const add = document.createElement('button');
+    add.type = 'button'; add.className = 'gb-item-add'; add.textContent = '＋ PDF 추가';
+    add.addEventListener('click', recTriggerAdd);
+    row.appendChild(add);
+  } else if (!recData.items.length) {
+    const hint = document.createElement('span');
+    hint.className = 'gb-item-empty'; hint.textContent = '등록된 PDF 자료가 없습니다';
+    row.appendChild(hint);
+  }
+  row.classList.remove('anim-in'); void row.offsetWidth; row.classList.add('anim-in');
+}
+
+function _recShowEmpty() {
+  _recToken++;
+  recCurIdx = -1;
+  document.getElementById('rec-viewer').innerHTML =
+    '<div class="gb-empty" style="display:flex"><div class="gb-empty-icon">📄</div><div class="gb-empty-text">PDF 자료가 없습니다.<br><span style="font-size:10px;opacity:0.6">관리자가 편집 모드에서 PDF를 업로드할 수 있습니다.</span></div></div>';
+  document.getElementById('rec-original-btn').classList.remove('visible');
+}
+
+async function recSelect(i) {
+  const it = recData.items[i]; if (!it) return;
+  recCurIdx = i;
+  _recRenderChips();
+  const token = ++_recToken;
+  const og = document.getElementById('rec-original-btn');
+  og.href = it.url; og.classList.add('visible');
+  const v = document.getElementById('rec-viewer');
+  v.innerHTML = '<div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>자료 여는 중...</span></div>';
+  if (gbUseNativeViewer()) {
+    try {
+      const blobUrl = await _gbGetBlobUrl(it.url);   // 선택과목 안내서와 같은 파일 기억 공간 사용
+      if (token !== _recToken) return;
+      const fr = document.createElement('iframe');
+      fr.className = 'rec-frame'; fr.title = it.name;
+      fr.src = blobUrl + '#page=1&view=Fit&zoom=page-fit&pagemode=none';
+      v.innerHTML = ''; v.appendChild(fr);
+      // 같은 탭의 다른 자료 미리 받기
+      recData.items.forEach(x => { if (x.url !== it.url) _gbGetBlobUrl(x.url).catch(() => {}); });
+      return;
+    } catch(e) { console.warn('브라우저 PDF 보기 실패 → 쪽 넘김 뷰어로 표시', e); }
+  }
+  if (token !== _recToken) return;
+  const vid = 'recpdf-' + token;
+  v.innerHTML = `
+    <div class="dept-pdf-viewer rec-pdf-viewer" id="${vid}">
+      <div class="dept-pdf-topbar">
+        <span class="dept-pdf-filename">📄 ${escHtml(it.name)}</span>
+        <span class="dept-pdf-pageinfo" id="${vid}-pi">로딩 중...</span>
+        <button class="dept-pdf-fs-btn" onclick="openPdfFs('${vid}','pdfv')" title="전체화면">⛶</button>
+      </div>
+      <div class="dept-pdf-stage" id="${vid}-stage">
+        <div class="dept-pdf-loading" id="${vid}-loading"><div class="dept-pdf-spinner"></div><span>PDF 불러오는 중</span></div>
+        <button class="dept-pdf-nav prev" id="${vid}-prev" onclick="pdfGo('${vid}',-1)" disabled>‹</button>
+        <div class="dept-pdf-canvas-wrap" id="${vid}-wrap"></div>
+        <button class="dept-pdf-nav next" id="${vid}-next" onclick="pdfGo('${vid}',1)" disabled>›</button>
+      </div>
+      <div class="dept-pdf-botbar" id="${vid}-dots"></div>
+    </div>`;
+  requestAnimationFrame(() => setTimeout(() => initPdfViewer(vid, it.url), 50));
+}
+
+function recFullscreen() {
+  const v = document.getElementById('rec-viewer');
+  const fr = v && v.querySelector('iframe');
+  if (fr) { const req = v.requestFullscreen || v.webkitRequestFullscreen; if (req) req.call(v); return; }
+  const pv = v && v.querySelector('.dept-pdf-viewer');
+  if (pv && typeof openPdfFs === 'function') openPdfFs(pv.id, 'pdfv');
+}
+
+/* ── 편집 ── */
+function openRecEditPw() {
+  if (recEditMode) { exitRecEdit(); return; }
+  pwTarget = 'recEdit';
+  pwBuffer = '';
+  updateDots();
+  document.getElementById('pw-error').textContent = '';
+  document.getElementById('pw-modal').classList.add('open');
+}
+function enterRecEdit() {
+  recEditMode = true;
+  const b = document.getElementById('rec-edit-btn');
+  b.classList.add('active'); b.textContent = '✕ 편집 종료';
+  document.getElementById('rec-edit-bar').style.display = '';
+  _recRenderChips();
+}
+function exitRecEdit() {
+  recEditMode = false;
+  const b = document.getElementById('rec-edit-btn');
+  if (b) { b.classList.remove('active'); b.textContent = '🔒 편집'; }
+  const bar = document.getElementById('rec-edit-bar'); if (bar) bar.style.display = 'none';
+  _recRenderChips();
+}
+async function recRenameTab() {
+  const name = (prompt('탭 이름', recData.tabName || REC_DEFAULT_TAB) || '').trim();
+  if (!name || name === recData.tabName) return;
+  recData.tabName = name; _recApplyTabName();
+  await _recSave();
+}
+function recTriggerAdd() {
+  const tmp = document.createElement('input');
+  tmp.type = 'file'; tmp.accept = 'application/pdf'; tmp.multiple = true;
+  tmp.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;';
+  tmp.addEventListener('change', async () => {
+    const files = Array.from(tmp.files || []); tmp.remove();
+    for (const f of files) await recAddFile(f);
+  });
+  document.body.appendChild(tmp); tmp.click();
+}
+async function recAddFile(file) {
+  if (!file) return;
+  const v = document.getElementById('rec-viewer');
+  v.innerHTML = '<div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>업로드 중... ' + escHtml(file.name) + '</span></div>';
+  try {
+    const url = await uploadToStorage(file);
+    recData.items.push({ id: 'rec_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6), name: file.name.replace(/\.pdf$/i, ''), url });
+    await _recSave();
+    await recSelect(recData.items.length - 1);
+    showDeptToast('✓ PDF가 추가되었습니다');
+  } catch(err) {
+    showDeptToast('⚠ 업로드 실패: ' + err.message);
+    if (recCurIdx >= 0) recSelect(recCurIdx); else _recShowEmpty();
+  }
+}
+async function recRename(i) {
+  const it = recData.items[i]; if (!it) return;
+  const name = (prompt('자료 이름 (버튼에 표시됩니다)', it.name) || '').trim();
+  if (!name || name === it.name) return;
+  it.name = name; await _recSave(); _recRenderChips();
+}
+async function recDelete(i) {
+  const it = recData.items[i]; if (!it) return;
+  if (!confirm('「' + it.name + '」을(를) 삭제할까요?\n(업로드된 파일도 함께 삭제됩니다)')) return;
+  if (typeof _gbForget === 'function') _gbForget(it.url);
+  try { await deleteFromStorage(it.url); } catch(_) {}
+  recData.items.splice(i, 1);
+  await _recSave();
+  if (!recData.items.length) { _recRenderChips(); _recShowEmpty(); }
+  else if (i === recCurIdx) await recSelect(Math.min(i, recData.items.length - 1));
+  else { if (i < recCurIdx) recCurIdx--; _recRenderChips(); }
+  showDeptToast('✓ 자료가 삭제되었습니다');
+}
+async function recMove(i, d) {
+  const j = i + d; if (j < 0 || j >= recData.items.length) return;
+  [recData.items[i], recData.items[j]] = [recData.items[j], recData.items[i]];
+  if (recCurIdx === i) recCurIdx = j; else if (recCurIdx === j) recCurIdx = i;
+  _recRenderChips(); await _recSave();
 }
 
 function openDeptDetail(name, icon) {
