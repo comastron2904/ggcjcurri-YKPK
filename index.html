@@ -5328,6 +5328,138 @@
     #dept-screen *, #dept-screen *::before, #dept-screen *::after,
     #subject-search-screen * { animation: none !important; transition-duration: 0.01ms !important; }
   }
+  /* ══════════════════════════════════════
+     입체 버튼 스타일 (메인 메뉴 · 모서리 버튼 · 3번 화면 버튼)
+     - 위쪽은 밝은 광택, 아래쪽은 두께감(바닥 그림자)
+     - 마우스 올리면 떠오르고, 누르면 눌려 들어감
+  ══════════════════════════════════════ */
+  :root {
+    --btn3d-face: linear-gradient(180deg, #ffffff 0%, #f6f9fd 55%, #edf3fa 100%);
+    --btn3d-edge: rgba(26,107,191,0.16);
+    --btn3d-drop: rgba(16,52,102,0.12);
+  }
+
+  /* ── 메인 메뉴 버튼 ── */
+  .nav-btn {
+    border-radius: 12px;
+    background: var(--btn3d-face);
+    border: 1px solid rgba(26,107,191,0.22);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.95),
+      inset 0 -2px 0 rgba(26,107,191,0.06),
+      0 4px 0 var(--btn3d-edge),
+      0 8px 18px var(--btn3d-drop);
+    transition: transform 0.28s cubic-bezier(0.22,1,0.36,1), box-shadow 0.28s ease,
+                border-color 0.25s ease, background 0.25s ease;
+    animation-fill-mode: backwards;   /* 등장 애니메이션이 끝난 뒤 hover 움직임이 막히지 않도록 */
+  }
+  .nav-btn:nth-child(9){animation-delay:.50s}
+  .nav-btn::before { border-radius: inherit; }
+  .nav-btn::after  { border-radius: 12px 0 0 12px; }
+  .nav-btn:hover {
+    transform: translateY(-3px);
+    background: linear-gradient(180deg, #ffffff 0%, #f9fbfe 100%);
+    border-color: rgba(26,107,191,0.45);
+    box-shadow:
+      inset 0 1px 0 #ffffff,
+      inset 0 -2px 0 rgba(26,107,191,0.06),
+      0 7px 0 rgba(26,107,191,0.20),
+      0 16px 28px rgba(16,52,102,0.16);
+  }
+  .nav-btn:active {
+    transform: translateY(3px);
+    transition-duration: 0.08s;
+    box-shadow:
+      inset 0 2px 4px rgba(16,52,102,0.10),
+      0 1px 0 var(--btn3d-edge),
+      0 3px 8px var(--btn3d-drop);
+  }
+  /* 번호: 살짝 볼록한 원형 배지 */
+  .btn-number {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 44px; height: 44px; border-radius: 50%;
+    font-size: 19px; opacity: 1;
+    background: radial-gradient(circle at 35% 30%, #ffffff 0%, #eaf2fb 60%, #dbe8f6 100%);
+    box-shadow:
+      inset 0 -2px 3px rgba(26,107,191,0.14),
+      inset 0 2px 2px rgba(255,255,255,0.9),
+      0 2px 4px rgba(16,52,102,0.12);
+    text-shadow: 0 1px 0 #ffffff;
+    transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s ease;
+    flex-shrink: 0;
+  }
+  .nav-btn:hover .btn-number { transform: scale(1.08) rotate(-4deg); }
+  /* 화살표: 작은 볼록 원 */
+  .btn-arrow {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 30px; height: 30px; border-radius: 50%;
+    background: linear-gradient(180deg, #ffffff, #eef3f9);
+    box-shadow: inset 0 1px 0 #ffffff, 0 2px 4px rgba(16,52,102,0.12);
+    line-height: 1; padding-bottom: 2px; box-sizing: border-box;
+  }
+  .nav-btn:hover .btn-arrow {
+    background: linear-gradient(180deg, #3d95e6, #1a6bbf);
+    color: #ffffff;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), 0 3px 8px rgba(26,107,191,0.35);
+  }
+  @media (max-width: 600px) {
+    .btn-number { min-width: 38px; height: 38px; font-size: 16px; }
+    .btn-arrow { width: 26px; height: 26px; }
+  }
+
+  /* ── 모서리 버튼 (나만의 교육과정 · ✏️ · 과목 관리) ── */
+  #mycurriculum-btn, #edit-page-btn, #admin-btn {
+    border-radius: 10px;
+    background: var(--btn3d-face);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.95),
+      0 3px 0 var(--btn3d-edge),
+      0 6px 14px var(--btn3d-drop);
+    transition: transform 0.25s cubic-bezier(0.22,1,0.36,1), box-shadow 0.25s ease,
+                border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+  }
+  #mycurriculum-btn:hover, #edit-page-btn:hover, #admin-btn:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(180deg, #ffffff, #f7faff);
+    box-shadow:
+      inset 0 1px 0 #ffffff,
+      0 5px 0 rgba(26,107,191,0.20),
+      0 12px 22px rgba(16,52,102,0.16);
+  }
+  #mycurriculum-btn:active, #edit-page-btn:active, #admin-btn:active {
+    transform: translateY(2px); transition-duration: 0.08s;
+    box-shadow: inset 0 2px 4px rgba(16,52,102,0.10), 0 1px 0 var(--btn3d-edge), 0 2px 6px var(--btn3d-drop);
+  }
+
+  /* ── 3번 화면: 계열 버튼 · 수능 카드 ── */
+  .dept-btn, .sn-card-btn {
+    border-radius: 14px;
+    background: var(--btn3d-face);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.95),
+      0 4px 0 rgba(14,138,122,0.14),
+      0 10px 20px var(--btn3d-drop);
+  }
+  .sn-card-btn { box-shadow: inset 0 1px 0 rgba(255,255,255,0.95), 0 4px 0 var(--btn3d-edge), 0 10px 20px var(--btn3d-drop); }
+  .dept-btn::before { border-radius: inherit; }
+  .dept-btn::after  { border-radius: 0 0 14px 14px; }
+  .dept-btn-search { background: linear-gradient(180deg, rgba(220,240,240,0.95), rgba(200,220,235,0.95)); }
+  .dept-btn:hover, .sn-card-btn:hover {
+    box-shadow:
+      inset 0 1px 0 #ffffff,
+      0 7px 0 rgba(14,138,122,0.18),
+      0 18px 30px rgba(16,52,102,0.16);
+  }
+  .sn-card-btn:hover { box-shadow: inset 0 1px 0 #ffffff, 0 7px 0 rgba(26,107,191,0.20), 0 18px 30px rgba(16,52,102,0.16); }
+  .dept-btn:active, .sn-card-btn:active {
+    transform: translateY(3px);
+    box-shadow: inset 0 2px 4px rgba(16,52,102,0.10), 0 1px 0 var(--btn3d-edge), 0 3px 8px var(--btn3d-drop);
+  }
+  .dept-btn-icon, .sn-card-icon { filter: drop-shadow(0 3px 3px rgba(16,52,102,0.18)); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nav-btn, .nav-btn *, #mycurriculum-btn, #edit-page-btn, #admin-btn { transition-duration: 0.01ms !important; animation: none !important; }
+  }
 </style>
 </head>
 <body>
