@@ -8352,11 +8352,11 @@ async function renderMediaPdfPage(vid) {
   viewerEl.innerHTML = '<div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>' + st.curPage + ' / ' + st.totalPages + ' 페이지</span></div>';
   try {
     const page     = await st.pdfDoc.getPage(st.curPage);
-    const dpr      = window.devicePixelRatio || 1;
+    let dpr = pdfRenderRatio();   // 고화질 렌더 배율 (화면 배율 × 오버샘플링)
     const vw       = (viewerEl.clientWidth || viewerEl.offsetWidth || 300) - 4;
     const viewport = page.getViewport({ scale: 1 });
     const scale    = Math.max(vw / viewport.width, 0.5);
-    const vp       = page.getViewport({ scale: scale * dpr });
+    const vp       = page.getViewport({ scale: scale * (dpr = pdfCapRatio(page, scale, dpr)) });
     const canvas   = document.createElement('canvas');
     canvas.className = 'gb-pdf-canvas';
     canvas.width  = vp.width;
@@ -8440,7 +8440,7 @@ async function pdfFsSync() {
   try {
     const page     = await pdfDoc.getPage(curPage);
     const vp0      = page.getViewport({ scale: 1 });
-    const dpr      = window.devicePixelRatio || 1;
+    let dpr = pdfRenderRatio();   // 고화질 렌더 배율 (화면 배율 × 오버샘플링)
     const isDesktop = window.innerWidth >= 768;
     const elW = viewerEl.clientWidth || viewerEl.offsetWidth || window.innerWidth;
     const elH = viewerEl.clientHeight || viewerEl.offsetHeight || window.innerHeight;
@@ -8453,7 +8453,7 @@ async function pdfFsSync() {
       baseScale = (elW - 16) / vp0.width;
     }
     baseScale = Math.max(baseScale, 0.3);
-    const vp       = page.getViewport({ scale: baseScale * dpr });
+    const vp       = page.getViewport({ scale: baseScale * (dpr = pdfCapRatio(page, baseScale, dpr)) });
     const canvas   = document.createElement('canvas');
     canvas.width   = vp.width;
     canvas.height  = vp.height;
@@ -10647,11 +10647,11 @@ async function initPdfViewer(vid, dataUrl) {
 
       const page   = await pdfDoc.getPage(p);
       const vp     = page.getViewport({ scale: 1 });
-      const dpr      = window.devicePixelRatio || 1;
+      let dpr = pdfRenderRatio();   // 고화질 렌더 배율 (화면 배율 × 오버샘플링)
       const safeSlotW = slotW || stageEl.offsetWidth || 300;
       const contentW = safeSlotW - 80;
       const scale    = Math.min(contentW / vp.width, 2.5);
-      const scaled   = page.getViewport({ scale: scale * dpr });
+      const scaled   = page.getViewport({ scale: scale * (dpr = pdfCapRatio(page, scale, dpr)) });
 
       const canvas = document.createElement('canvas');
       canvas.className = 'dept-pdf-canvas';
@@ -11529,6 +11529,26 @@ function closeSuneungFileView() {
 }
 
 /* ──────────────────────────────
+   PDF 고화질 렌더링 공통 설정
+   - 화면 배율(devicePixelRatio)보다 크게 그린 뒤 축소해서 보여줌(오버샘플링)
+     → 일반 모니터·프로젝터에서도 글자가 선명해짐
+   - 캔버스가 너무 커지면 기기가 멈출 수 있어 픽셀 수 상한을 둠
+────────────────────────────── */
+const PDF_MAX_PIXELS = (window.innerWidth < 768) ? 8e6 : 16e6;   // 캔버스 1장 최대 픽셀 수
+function pdfRenderRatio() {
+  const d = Math.max(window.devicePixelRatio || 1, 1);
+  return Math.min(d < 2 ? d * 2 : d * 1.5, 4);   // 1x→2, 1.5x→3, 2x→3, 3x→4
+}
+function pdfCapRatio(page, cssScale, ratio) {
+  try {
+    const v = page.getViewport({ scale: cssScale * ratio });
+    const px = v.width * v.height;
+    if (px > PDF_MAX_PIXELS) ratio = ratio * Math.sqrt(PDF_MAX_PIXELS / px);
+  } catch(_) {}
+  return Math.max(ratio, 1);
+}
+
+/* ──────────────────────────────
    XSS 방지
 ────────────────────────────── */
 function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -12032,7 +12052,7 @@ async function _brRenderPanel(viewerId, emptyId, pageNum) {
   try {
     const page     = await sp.pdfDoc.getPage(pageNum);
     const viewport = page.getViewport({ scale: 1 });
-    const dpr      = Math.min(window.devicePixelRatio || 1, 2); // 3x 레티나 과다 렌더 방지 (캔버스 크기 상한)
+    let dpr = pdfRenderRatio();   // 고화질 렌더 배율 (화면 배율 × 오버샘플링)
     const vElW     = viewer.clientWidth  || viewer.offsetWidth  || window.innerWidth;
     const vElH     = viewer.clientHeight || viewer.offsetHeight || window.innerHeight;
     const isDesktop = window.innerWidth >= 768;
@@ -12043,7 +12063,7 @@ async function _brRenderPanel(viewerId, emptyId, pageNum) {
       scale = Math.min((vElW - 16) / viewport.width, 3);
     }
     scale = Math.max(scale, 0.3);
-    const vp     = page.getViewport({ scale: scale * dpr });
+    const vp     = page.getViewport({ scale: scale * (dpr = pdfCapRatio(page, scale, dpr)) });
     const canvas = document.createElement('canvas');
     canvas.className = 'gb-pdf-canvas';
     canvas.width  = vp.width;
@@ -12091,7 +12111,7 @@ async function brFsRenderPage() {
   try {
     const page     = await sp.pdfDoc.getPage(sp.curPage);
     const viewport = page.getViewport({ scale: 1 });
-    const dpr      = window.devicePixelRatio || 1;
+    let dpr = pdfRenderRatio();   // 고화질 렌더 배율 (화면 배율 × 오버샘플링)
     const vElW     = viewer.clientWidth  || window.innerWidth;
     const vElH     = viewer.clientHeight || window.innerHeight;
     const isDesktop = window.innerWidth >= 768;
@@ -12102,7 +12122,7 @@ async function brFsRenderPage() {
       scale = Math.min((vElW - 16) / viewport.width, 3);
     }
     scale = Math.max(scale, 0.3);
-    const vp     = page.getViewport({ scale: scale * dpr });
+    const vp     = page.getViewport({ scale: scale * (dpr = pdfCapRatio(page, scale, dpr)) });
     const canvas = document.createElement('canvas');
     canvas.className = 'gb-pdf-canvas';
     canvas.width  = vp.width;
@@ -12521,14 +12541,14 @@ async function _gbRenderSinglePanel(viewerId, sp, pageNum) {
   viewer.innerHTML = '<div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>' + pageNum + ' / ' + sp.totalPages + ' 페이지</span></div>';
   try {
     const page     = await sp.pdfDoc.getPage(pageNum);
-    const dpr      = window.devicePixelRatio || 1;
+    let dpr = pdfRenderRatio();   // 고화질 렌더 배율 (화면 배율 × 오버샘플링)
     const vw       = (viewer.clientWidth || viewer.offsetWidth || 300) - 24;
     const vh       = (viewer.clientHeight || viewer.offsetHeight || 600) - 40;
     const viewport = page.getViewport({ scale: 1 });
     const scaleW   = vw / viewport.width;
     const scaleH   = vh > 0 ? vh / viewport.height : scaleW;
     const scale    = Math.min(scaleW, scaleH, 2);
-    const vp       = page.getViewport({ scale: scale * dpr });
+    const vp       = page.getViewport({ scale: scale * (dpr = pdfCapRatio(page, scale, dpr)) });
 
     const canvas = document.createElement('canvas');
     canvas.className = 'gb-pdf-canvas';
@@ -12676,7 +12696,7 @@ async function gbFsRenderPage() {
   try {
     const page = await sp.pdfDoc.getPage(sp.curPage);
     const viewport = page.getViewport({ scale: 1 });
-    const dpr = window.devicePixelRatio || 1;
+    let dpr = pdfRenderRatio();   // 고화질 렌더 배율 (화면 배율 × 오버샘플링)
     const isDesktop = window.innerWidth >= 768;
     const vElW = viewer.clientWidth || viewer.offsetWidth || window.innerWidth;
     const vElH = viewer.clientHeight || viewer.offsetHeight || window.innerHeight;
@@ -12689,7 +12709,7 @@ async function gbFsRenderPage() {
       baseScale = Math.min((vElW - 16) / viewport.width, 3);
     }
     baseScale = Math.max(baseScale, 0.3);
-    const vp = page.getViewport({ scale: baseScale * dpr });
+    const vp = page.getViewport({ scale: baseScale * (dpr = pdfCapRatio(page, baseScale, dpr)) });
     const canvas = document.createElement('canvas');
     canvas.className = 'gb-pdf-canvas';
     canvas.width = vp.width;
