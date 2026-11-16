@@ -5470,6 +5470,107 @@
     .enroll-fab-name { font-size: 13px; }
     .enroll-fab-hint { font-size: 10px; }
   }
+  /* ══════════════════════════════════════
+     선택과목 안내서(06): 카테고리 탭 + 자료 선택
+  ══════════════════════════════════════ */
+  .gb-cat-tabs {
+    flex-shrink: 0; display: flex; align-items: flex-end; gap: 6px;
+    padding: 14px 36px 0; overflow-x: auto; scrollbar-width: thin;
+    background: rgba(240,244,248,0.97);
+    border-bottom: 1px solid rgba(26,107,191,0.14);
+  }
+  .gb-cat-tab { display: flex; align-items: center; flex-shrink: 0; border-bottom: 3px solid transparent; margin-bottom: -1px; transition: border-color 0.3s; }
+  .gb-cat-tab.active { border-bottom-color: var(--gold); }
+  .gb-cat-tab-btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 11px 18px; background: transparent; border: none; cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif; font-size: 14px; font-weight: 700;
+    color: rgba(26,46,74,0.45); letter-spacing: 0.3px; white-space: nowrap;
+    transition: color 0.25s, background 0.25s;
+  }
+  .gb-cat-tab-btn:hover { color: var(--gold); background: rgba(26,107,191,0.05); }
+  .gb-cat-tab.active .gb-cat-tab-btn { color: var(--gold); }
+  .gb-cat-count {
+    min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; background: rgba(26,107,191,0.08); color: rgba(26,107,191,0.6);
+  }
+  .gb-cat-tab.active .gb-cat-count { background: var(--gold); color: #fff; }
+  .gb-cat-add, .gb-item-add {
+    flex-shrink: 0; padding: 8px 14px; margin: 0 0 6px 6px; cursor: pointer;
+    border: 1.5px dashed rgba(26,107,191,0.40); border-radius: 999px;
+    background: rgba(255,255,255,0.7); color: rgba(26,107,191,0.85);
+    font-family: 'Noto Sans KR', sans-serif; font-size: 12.5px; font-weight: 700;
+    transition: background 0.2s, border-color 0.2s, transform 0.15s;
+  }
+  .gb-cat-add:hover, .gb-item-add:hover { background: rgba(26,107,191,0.08); border-color: var(--gold); }
+  .gb-cat-add:active, .gb-item-add:active { transform: scale(0.96); }
+
+  .gb-item-row {
+    flex-shrink: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+    padding: 14px 36px; background: rgba(248,250,253,0.95);
+    border-bottom: 1px solid rgba(26,107,191,0.10);
+    max-height: 30vh; overflow-y: auto;
+  }
+  .gb-item-chip {
+    display: inline-flex; align-items: center; gap: 2px; max-width: 100%;
+    border-radius: 999px; background: linear-gradient(180deg, #ffffff, #f2f6fb);
+    border: 1px solid rgba(26,107,191,0.22);
+    box-shadow: inset 0 1px 0 #fff, 0 2px 0 rgba(26,107,191,0.12), 0 4px 10px rgba(16,52,102,0.08);
+    transition: transform 0.25s cubic-bezier(0.22,1,0.36,1), box-shadow 0.25s, border-color 0.2s, background 0.2s;
+  }
+  .gb-item-chip:hover { transform: translateY(-2px); border-color: rgba(26,107,191,0.45); box-shadow: inset 0 1px 0 #fff, 0 4px 0 rgba(26,107,191,0.16), 0 8px 16px rgba(16,52,102,0.12); }
+  .gb-item-chip:active { transform: translateY(1px); }
+  .gb-item-chip.active { background: linear-gradient(180deg, #3d95e6, #1a6bbf); border-color: #1a6bbf; box-shadow: inset 0 1px 0 rgba(255,255,255,0.35), 0 2px 0 #0e4a8a, 0 6px 14px rgba(26,107,191,0.30); }
+  .gb-item-btn {
+    display: inline-flex; align-items: center; gap: 7px; min-width: 0;
+    padding: 9px 16px; background: none; border: none; cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif; font-size: 13.5px; font-weight: 600; color: #1a2e4a;
+  }
+  .gb-item-chip.active .gb-item-btn { color: #fff; }
+  .gb-item-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 320px; }
+  .gb-item-icon { font-size: 14px; }
+  .gb-item-empty { font-size: 12.5px; color: rgba(26,46,74,0.45); letter-spacing: 0.3px; }
+  .gb-item-row.anim-in .gb-item-chip { animation: deptItemIn 0.4s cubic-bezier(0.22,1,0.36,1) backwards; animation-delay: calc(var(--i, 0) * 40ms); }
+
+  /* 편집용 작은 버튼 */
+  .gb-mini-tools { display: inline-flex; gap: 2px; padding-right: 6px; }
+  .gb-cat-tab .gb-mini-tools { padding: 0 6px 0 0; }
+  .gb-mini-btn {
+    width: 22px; height: 22px; border-radius: 50%; padding: 0; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 10px; line-height: 1; border: 1px solid rgba(26,107,191,0.25);
+    background: #fff; color: rgba(26,107,191,0.85);
+    transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.15s;
+  }
+  .gb-mini-btn:hover { background: var(--gold); color: #fff; border-color: var(--gold); transform: scale(1.1); }
+  .gb-mini-btn.danger { color: #d63030; border-color: rgba(214,48,48,0.35); }
+  .gb-mini-btn.danger:hover { background: #d63030; color: #fff; border-color: #d63030; }
+  .gb-item-chip.active .gb-mini-btn { background: rgba(255,255,255,0.92); }
+
+  .gb-edit-bar {
+    flex-shrink: 0; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    padding: 9px 36px; background: rgba(201,168,76,0.12);
+    border-bottom: 1px solid rgba(201,168,76,0.35);
+    font-family: 'Noto Sans KR', sans-serif;
+  }
+  .gb-edit-bar-label { font-size: 12px; font-weight: 800; color: #8a6a12; letter-spacing: 1px; }
+  .gb-edit-bar-hint { flex: 1; font-size: 11.5px; color: rgba(26,46,74,0.65); }
+  .gb-edit-bar-exit {
+    padding: 6px 14px; border-radius: 999px; cursor: pointer; font-size: 12px; font-weight: 700;
+    border: 1px solid rgba(26,46,74,0.25); background: #fff; color: #1a2e4a;
+  }
+  .gb-edit-bar-exit:hover { border-color: var(--gold); color: var(--gold); }
+
+  @media (max-width: 700px) {
+    .gb-cat-tabs { padding: 10px 12px 0; }
+    .gb-cat-tab-btn { padding: 10px 12px; font-size: 13px; }
+    .gb-item-row { padding: 10px 12px; gap: 8px; flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; }
+    .gb-item-chip { flex-shrink: 0; }
+    .gb-item-name { max-width: 200px; }
+    .gb-edit-bar { padding: 8px 12px; }
+    .gb-edit-bar-hint { flex-basis: 100%; order: 3; }
+  }
 </style>
 </head>
 <body>
@@ -6814,16 +6915,26 @@
     <button class="gb-back-btn" onclick="closeGuidebookScreen()">◀ 뒤로</button>
     <div class="gb-header-info">
       <div class="gb-header-label">GUIDEBOOK · 책자 안내</div>
-      <div class="gb-header-title" id="menu-06-title">선택과목 길라잡이 책자</div>
+      <div class="gb-header-title" id="menu-06-title">선택과목 안내서</div>
       <div class="gb-header-subtitle" id="menu-06-subtitle"></div>
     </div>
-    <button class="gb-edit-btn" id="gb-edit-btn" onclick="openGbEditPw()" title="PDF 업로드 편집">🔒 편집</button>
+    <button class="gb-edit-btn" id="gb-edit-btn" onclick="openGbEditPw()" title="카테고리·자료 편집">🔒 편집</button>
     <button class="gb-jump-trigger-btn" id="gb-jump-trigger-btn" onclick="toggleGbJumpPopup(event)" title="페이지 이동">↗ 쪽 이동</button>
     <a class="gb-download-btn" id="gb-download-btn" href="#" download title="PDF 다운로드">⬇ 다운로드</a>
     <button class="detail-home" onclick="closeGuidebookScreen()" title="메인화면으로">🏠</button>
   </div>
 
+  <!-- 편집 안내 바 (편집 모드에서만 표시) -->
+  <div class="gb-edit-bar" id="gb-edit-bar" style="display:none">
+    <span class="gb-edit-bar-label">편집 모드</span>
+    <span class="gb-edit-bar-hint">탭·자료 버튼 옆 작은 버튼: ◀▶ 순서 · ✎ 이름 · ⇄ 다른 카테고리로 · ✕ 삭제 (변경 즉시 저장)</span>
+  </div>
 
+  <!-- 1단계: 카테고리 탭 -->
+  <div class="gb-cat-tabs" id="gb-cat-tabs"></div>
+
+  <!-- 2단계: 카테고리 안의 자료 선택 -->
+  <div class="gb-item-row" id="gb-item-row"></div>
 
   <!-- 단일 PDF 스프레드 뷰 -->
   <div class="gb-panels">
@@ -6832,20 +6943,8 @@
     <div class="gb-panel-bar" style="flex-shrink:0;">
       <span class="gb-panel-label" style="flex-shrink:0;">GUIDEBOOK · 책자</span>
 
-      <!-- PDF 드롭다운 선택 -->
-      <div class="gb-dropdown-wrap" id="gb-dropdown-wrap">
-        <button class="gb-dropdown-btn" id="gb-dropdown-btn" onclick="toggleGbDropdown(event)">
-          <span id="gb-dropdown-label">PDF 선택...</span>
-          <span class="gb-dropdown-arrow" id="gb-dropdown-arrow">▾</span>
-        </button>
-        <div class="gb-dropdown-menu" id="gb-dropdown-menu">
-          <!-- JS로 동적 생성 -->
-          <div class="gb-dropdown-empty" id="gb-dropdown-empty">등록된 PDF가 없습니다</div>
-        </div>
-      </div>
-
-      <!-- 파일명 (숨겨진 레거시 참조용) -->
-      <span class="gb-panel-filename" id="gb-left-filename" style="display:none;">PDF 없음</span>
+      <!-- 현재 보고 있는 자료 이름 -->
+      <span class="gb-panel-filename" id="gb-left-filename">자료 없음</span>
 
       <button class="gb-fullscreen-btn" id="gb-left-fs-btn" onclick="openGbFullscreen('left')" title="전체화면">⛶</button>
 
@@ -11476,234 +11575,382 @@ function gbGetStep(curPage) {
   return 2;
 }
 
-/* ── 드롭다운 UI ── */
-function _gbRenderDropdown() {
-  const menu    = document.getElementById('gb-dropdown-menu');
-  const empty   = document.getElementById('gb-dropdown-empty');
-  const label   = document.getElementById('gb-dropdown-label');
-  if (!menu) return;
+/* ══════════════════════════════════════
+   카테고리 → 하위 자료 2단계 구조
+   저장 형태 (cg_gb_tree):
+     [ { id, name, items: [ { id, name, url } ] } ]
+   - 예전 형태(cg_gb_pdf_list 등 단일 목록)는 '전체 자료' 카테고리 하나로 자동 변환
+   - 저장할 때 cg_gb_pdf_list에도 전체 목록을 같이 기록(이전 버전 호환)
+══════════════════════════════════════ */
+const GB_KEY_TREE = 'cg_gb_tree';
+let gbTree   = [];
+let gbCatIdx = -1;   // 현재 카테고리 인덱스 (gbCurrentIdx는 카테고리 안의 자료 인덱스)
 
-  // 기존 아이템 제거 (empty 제외)
-  Array.from(menu.querySelectorAll('.gb-dropdown-item')).forEach(el => el.remove());
+function _gbCat() { return (gbCatIdx >= 0 && gbCatIdx < gbTree.length) ? gbTree[gbCatIdx] : null; }
+function _gbSyncFlat() { const c = _gbCat(); gbPdfList = c ? c.items : []; }
+function _gbNewId(prefix) { return prefix + '_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7); }
+function _gbStripExt(name) { return (name || '').replace(/\.pdf$/i, ''); }
 
-  if (gbPdfList.length === 0) {
-    if (empty) empty.style.display = '';
-    if (label) label.textContent = 'PDF 없음';
-    return;
-  }
-  if (empty) empty.style.display = 'none';
-
-  gbPdfList.forEach((item, idx) => {
-    const el = document.createElement('div');
-    el.className = 'gb-dropdown-item' + (idx === gbCurrentIdx ? ' active' : '');
-    el.innerHTML = '<span class="gb-dd-num">' + (idx + 1) + '</span><span class="gb-dd-name">📄 ' + _gbEsc(item.name) + '</span>';
-    el.addEventListener('click', function() { gbSelectPdf(idx); });
-    menu.appendChild(el);
-  });
-
-  const cur = gbCurrentIdx >= 0 && gbCurrentIdx < gbPdfList.length ? gbPdfList[gbCurrentIdx] : null;
-  if (label) label.textContent = cur ? '📄 ' + cur.name : 'PDF를 선택하세요';
+function _gbMiniBtn(label, title, fn, danger) {
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.className = 'gb-mini-btn' + (danger ? ' danger' : '');
+  b.textContent = label; b.title = title;
+  b.addEventListener('click', e => { e.stopPropagation(); fn(); });
+  return b;
 }
 
-function _gbEsc(str) {
-  return (str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
+/* ── 화면 그리기 ── */
+function _gbRenderNav() { _gbRenderCatTabs(); _gbRenderItemChips(); }
 
-function toggleGbDropdown(e) {
-  e && e.stopPropagation();
-  const wrap = document.getElementById('gb-dropdown-wrap');
+function _gbRenderCatTabs() {
+  const wrap = document.getElementById('gb-cat-tabs');
   if (!wrap) return;
-  wrap.classList.toggle('open');
+  wrap.innerHTML = '';
+  wrap.classList.toggle('editing', gbEditMode);
+  wrap.style.display = (gbTree.length || gbEditMode) ? '' : 'none';
+  gbTree.forEach((c, i) => {
+    const tab = document.createElement('div');
+    tab.className = 'gb-cat-tab' + (i === gbCatIdx ? ' active' : '');
+    const btn = document.createElement('button');
+    btn.type = 'button'; btn.className = 'gb-cat-tab-btn';
+    btn.innerHTML = '<span class="gb-cat-name"></span><span class="gb-cat-count">' + c.items.length + '</span>';
+    btn.querySelector('.gb-cat-name').textContent = c.name;
+    btn.addEventListener('click', () => gbSelectCategory(i));
+    tab.appendChild(btn);
+    if (gbEditMode) {
+      const tools = document.createElement('span'); tools.className = 'gb-mini-tools';
+      if (i > 0) tools.appendChild(_gbMiniBtn('◀', '앞으로', () => gbMoveCategory(i, -1)));
+      if (i < gbTree.length - 1) tools.appendChild(_gbMiniBtn('▶', '뒤로', () => gbMoveCategory(i, 1)));
+      tools.appendChild(_gbMiniBtn('✎', '이름 바꾸기', () => gbRenameCategory(i)));
+      tools.appendChild(_gbMiniBtn('✕', '카테고리 삭제', () => gbDeleteCategory(i), true));
+      tab.appendChild(tools);
+    }
+    wrap.appendChild(tab);
+  });
+  if (gbEditMode) {
+    const add = document.createElement('button');
+    add.type = 'button'; add.className = 'gb-cat-add';
+    add.textContent = '＋ 카테고리 추가';
+    add.addEventListener('click', gbAddCategory);
+    wrap.appendChild(add);
+  }
 }
 
-function closeGbDropdown() {
-  document.getElementById('gb-dropdown-wrap')?.classList.remove('open');
+function _gbRenderItemChips() {
+  const row = document.getElementById('gb-item-row');
+  if (!row) return;
+  row.innerHTML = '';
+  row.classList.toggle('editing', gbEditMode);
+  const c = _gbCat();
+  if (!c) { row.style.display = 'none'; return; }
+  row.style.display = '';
+  c.items.forEach((it, i) => {
+    const chip = document.createElement('div');
+    chip.className = 'gb-item-chip' + (i === gbCurrentIdx ? ' active' : '');
+    chip.style.setProperty('--i', Math.min(i, 12));
+    const btn = document.createElement('button');
+    btn.type = 'button'; btn.className = 'gb-item-btn';
+    btn.innerHTML = '<span class="gb-item-icon">📄</span><span class="gb-item-name"></span>';
+    btn.querySelector('.gb-item-name').textContent = it.name;
+    btn.title = it.name;
+    btn.addEventListener('click', () => gbSelectPdf(i));
+    chip.appendChild(btn);
+    if (gbEditMode) {
+      const tools = document.createElement('span'); tools.className = 'gb-mini-tools';
+      if (i > 0) tools.appendChild(_gbMiniBtn('◀', '앞으로', () => gbMoveItem(i, -1)));
+      if (i < c.items.length - 1) tools.appendChild(_gbMiniBtn('▶', '뒤로', () => gbMoveItem(i, 1)));
+      tools.appendChild(_gbMiniBtn('✎', '이름 바꾸기', () => gbRenameItem(i)));
+      if (gbTree.length > 1) tools.appendChild(_gbMiniBtn('⇄', '다른 카테고리로 옮기기', () => gbMoveItemToCat(i)));
+      tools.appendChild(_gbMiniBtn('✕', '자료 삭제', () => gbDeleteItem(i), true));
+      chip.appendChild(tools);
+    }
+    row.appendChild(chip);
+  });
+  if (gbEditMode) {
+    const add = document.createElement('button');
+    add.type = 'button'; add.className = 'gb-item-add';
+    add.textContent = '＋ PDF 추가';
+    add.addEventListener('click', triggerGbAddPdf);
+    row.appendChild(add);
+  } else if (c.items.length === 0) {
+    const hint = document.createElement('span');
+    hint.className = 'gb-item-empty';
+    hint.textContent = '이 카테고리에 등록된 자료가 없습니다';
+    row.appendChild(hint);
+  }
+  // 등장 애니메이션 다시 재생
+  row.classList.remove('anim-in'); void row.offsetWidth; row.classList.add('anim-in');
 }
 
-// 드롭다운 외부 클릭 시 닫기
-document.addEventListener('click', function(e) {
-  const wrap = document.getElementById('gb-dropdown-wrap');
-  if (wrap && !wrap.contains(e.target)) closeGbDropdown();
-});
+/* ── 자료가 없을 때 뷰어 비우기 ── */
+function _gbShowEmpty(msgHtml) {
+  gbSingle.pdfDoc = null; gbSingle.totalPages = 0; gbSingle.rendering = false;
+  const lv = document.getElementById('gb-left-viewer');
+  const empty = document.getElementById('gb-left-empty');
+  if (lv) {
+    lv.innerHTML = '';
+    if (empty) {
+      lv.appendChild(empty); empty.style.display = '';
+      const t = empty.querySelector('.gb-empty-text'); if (t) t.innerHTML = msgHtml;
+    }
+  }
+  const rv = document.getElementById('gb-right-viewer'); if (rv) rv.innerHTML = '';
+  document.getElementById('gb-spread-row')?.classList.remove('is-cover');
+  const nav = document.getElementById('gb-spread-nav'); if (nav) nav.style.display = 'none';
+  document.getElementById('gb-download-btn')?.classList.remove('visible');
+  document.getElementById('gb-jump-trigger-btn')?.classList.remove('visible');
+  const fn = document.getElementById('gb-left-filename'); if (fn) fn.textContent = '자료 없음';
+}
+const GB_EMPTY_NO_DATA = 'PDF가 없습니다.<br><span style="font-size:10px;opacity:0.6">관리자가 편집 모드에서 카테고리와 자료를 추가할 수 있습니다.</span>';
+const GB_EMPTY_NO_ITEM = '이 카테고리에 등록된 자료가 없습니다.';
 
-/* ── PDF 선택 ── */
+/* ── 선택 ── */
+async function gbSelectCategory(i) {
+  if (i < 0 || i >= gbTree.length) return;
+  gbCatIdx = i; _gbSyncFlat(); gbCurrentIdx = -1;
+  _gbRenderNav();
+  if (gbPdfList.length) await gbSelectPdf(0);
+  else _gbShowEmpty(GB_EMPTY_NO_ITEM);
+}
+
 async function gbSelectPdf(idx) {
-  closeGbDropdown();
   if (idx < 0 || idx >= gbPdfList.length) return;
   gbCurrentIdx = idx;
-  _gbRenderDropdown();
+  _gbRenderItemChips();
   const item = gbPdfList[idx];
   await renderGbPdf('left', item.url, item.name);
-  // 삭제 버튼 표시 갱신
-  _gbUpdateDeleteBtn();
 }
 
-function _gbUpdateDeleteBtn() {
-  const btn = document.getElementById('gb-delete-pdf-btn');
-  if (btn) btn.style.display = (gbEditMode && gbCurrentIdx >= 0) ? 'inline-flex' : 'none';
-}
+// 예전 드롭다운 함수 (호환용)
+function _gbRenderDropdown() { _gbRenderNav(); }
+function toggleGbDropdown() {}
+function closeGbDropdown() {}
+function _gbUpdateDeleteBtn() {}
 
 /* ── 화면 열기/닫기 ── */
 let _gbLoaded = false;
 function openGuidebookScreen() {
   document.getElementById('guidebook-screen').classList.add('open');
+  _gbResetEditUI();
   gbSingle.rendering = false;
   gbLoadSettings().then(async () => {
     if (!_gbLoaded) {
       _gbLoaded = true;
       await _gbLoadListFromStorage();
-    } else if (gbSingle.pdfDoc) {
-      gbRenderSpread();
+    } else {
+      _gbRenderNav();
+      if (gbSingle.pdfDoc) gbRenderSpread();
     }
   });
-  gbEditMode = false;
-  document.getElementById('gb-edit-btn').classList.remove('active');
-  document.getElementById('gb-left-upload-btn').style.display  = 'none';
-  const delBtn = document.getElementById('gb-delete-pdf-btn');
-  if (delBtn) delBtn.style.display = 'none';
-  const bar = document.getElementById('gb-settings-bar');
-  if (bar) bar.style.display = 'none';
 }
 
 function closeGuidebookScreen() {
+  if (gbEditMode) exitGbEdit();
   document.getElementById('guidebook-screen').classList.remove('open');
-  closeGbDropdown();
-  const bar = document.getElementById('gb-settings-bar');
-  if (bar) bar.style.display = 'none';
 }
 
-/* ── Supabase에서 목록 로드 ── */
+/* ── 불러오기 (예전 형태 자동 변환) ── */
 async function _gbLoadListFromStorage() {
-  // 로딩 표시
   const lv = document.getElementById('gb-left-viewer');
-  if (lv) lv.innerHTML = '<div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>PDF 목록 불러오는 중...</span></div>';
+  if (lv) lv.innerHTML = '<div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>자료 목록 불러오는 중...</span></div>';
 
-  try {
-    // 신규: 멀티 목록 키
-    const list = await sbGet(GB_KEY_LIST);
-    if (list && Array.isArray(list) && list.length > 0) {
-      gbPdfList = list;
-      _gbRenderDropdown();
-      // 첫 번째 PDF 자동 로드
-      gbCurrentIdx = 0;
-      _gbRenderDropdown();
-      await renderGbPdf('left', gbPdfList[0].url, gbPdfList[0].name);
-      return;
+  let tree = null;
+  try { tree = await sbGet(GB_KEY_TREE); } catch(_) {}
+
+  if (Array.isArray(tree)) {
+    gbTree = tree.filter(c => c && typeof c === 'object').map(c => ({
+      id: c.id || _gbNewId('cat'),
+      name: c.name || '이름 없음',
+      items: Array.isArray(c.items) ? c.items.filter(it => it && it.url) : []
+    }));
+  } else {
+    let flat = [];
+    try {
+      const list = await sbGet(GB_KEY_LIST);
+      if (Array.isArray(list)) flat = list.filter(it => it && it.url);
+    } catch(_) {}
+    if (!flat.length) {
+      for (const key of [GB_KEY_SINGLE, GB_KEY_LEFT]) {
+        try {
+          const st = await sbGet(key);
+          if (st && st.url) { flat = [{ id: 'legacy_' + key, name: st.name || 'PDF', url: st.url }]; break; }
+        } catch(_) {}
+      }
     }
-  } catch(_) {}
-
-  // 하위 호환: 기존 단일 키
-  try {
-    const stored = await sbGet(GB_KEY_SINGLE);
-    if (stored && stored.url) {
-      gbPdfList = [{ id: 'legacy_single', name: stored.name || 'PDF', url: stored.url }];
-      gbCurrentIdx = 0;
-      _gbRenderDropdown();
-      await renderGbPdf('left', stored.url, stored.name || 'PDF');
-      return;
-    }
-  } catch(_) {}
-
-  // 하위 호환: 이전 left 키
-  try {
-    const stored = await sbGet(GB_KEY_LEFT);
-    if (stored && stored.url) {
-      gbPdfList = [{ id: 'legacy_left', name: stored.name || 'PDF', url: stored.url }];
-      gbCurrentIdx = 0;
-      _gbRenderDropdown();
-      await renderGbPdf('left', stored.url, stored.name || 'PDF');
-      return;
-    }
-  } catch(_) {}
-
-  // PDF 없음
-  if (lv) {
-    const empty = document.getElementById('gb-left-empty');
-    lv.innerHTML = '';
-    if (empty) { lv.appendChild(empty); empty.style.display = ''; }
+    gbTree = flat.length ? [{ id: _gbNewId('cat'), name: '전체 자료', items: flat }] : [];
   }
-  _gbRenderDropdown();
+
+  if (!gbTree.length) {
+    gbCatIdx = -1; _gbSyncFlat(); gbCurrentIdx = -1;
+    _gbRenderNav(); _gbShowEmpty(GB_EMPTY_NO_DATA);
+    return;
+  }
+  const first = gbTree.findIndex(c => c.items.length > 0);
+  await gbSelectCategory(first >= 0 ? first : 0);
+}
+async function loadGbPdfFromStorage() { await _gbLoadListFromStorage(); }
+
+/* ── 저장 ── */
+async function _gbSaveTree() {
+  try { await sbSet(GB_KEY_TREE, gbTree); }
+  catch(e) { showDeptToast('⚠ 저장 실패: ' + (e && e.message ? e.message : '')); return false; }
+  try { await sbSet(GB_KEY_LIST, gbTree.flatMap(c => c.items)); } catch(_) {}
+  return true;
+}
+async function _gbSaveList() { return _gbSaveTree(); }
+
+/* ── 편집: 카테고리 ── */
+async function gbAddCategory() {
+  const name = (prompt('새 카테고리 이름을 입력하세요', '') || '').trim();
+  if (!name) return;
+  gbTree.push({ id: _gbNewId('cat'), name, items: [] });
+  await _gbSaveTree();
+  await gbSelectCategory(gbTree.length - 1);
+  showDeptToast('✓ 카테고리가 추가되었습니다');
 }
 
-/* ── PDF 저장 목록 업데이트 ── */
-async function _gbSaveList() {
-  try { await sbSet(GB_KEY_LIST, gbPdfList); } catch(_) {}
+async function gbRenameCategory(i) {
+  const c = gbTree[i]; if (!c) return;
+  const name = (prompt('카테고리 이름', c.name) || '').trim();
+  if (!name || name === c.name) return;
+  c.name = name;
+  await _gbSaveTree(); _gbRenderCatTabs();
 }
 
-/* ── 편집 모드: PDF 추가 ── */
-function triggerGbPdfInput(side) { triggerGbAddPdf(); } // 하위 호환
-function triggerGbAddPdf() {
+async function gbDeleteCategory(i) {
+  const c = gbTree[i]; if (!c) return;
+  const msg = c.items.length
+    ? '「' + c.name + '」 카테고리와 안의 자료 ' + c.items.length + '개를 모두 삭제할까요?\n(업로드된 파일도 함께 삭제됩니다)'
+    : '「' + c.name + '」 카테고리를 삭제할까요?';
+  if (!confirm(msg)) return;
+  for (const it of c.items) { try { await deleteFromStorage(it.url); } catch(_) {} }
+  gbTree.splice(i, 1);
+  await _gbSaveTree();
+  if (!gbTree.length) {
+    gbCatIdx = -1; _gbSyncFlat(); gbCurrentIdx = -1;
+    _gbRenderNav(); _gbShowEmpty(GB_EMPTY_NO_DATA);
+  } else if (i === gbCatIdx) {
+    await gbSelectCategory(Math.min(i, gbTree.length - 1));
+  } else {
+    if (i < gbCatIdx) gbCatIdx--;
+    _gbSyncFlat(); _gbRenderNav();
+  }
+  showDeptToast('✓ 카테고리가 삭제되었습니다');
+}
+
+async function gbMoveCategory(i, d) {
+  const j = i + d;
+  if (j < 0 || j >= gbTree.length) return;
+  [gbTree[i], gbTree[j]] = [gbTree[j], gbTree[i]];
+  if (gbCatIdx === i) gbCatIdx = j; else if (gbCatIdx === j) gbCatIdx = i;
+  _gbSyncFlat(); _gbRenderCatTabs();
+  await _gbSaveTree();
+}
+
+/* ── 편집: 자료 ── */
+function triggerGbPdfInput() { triggerGbAddPdf(); } // 호환
+async function triggerGbAddPdf() {
+  if (!_gbCat()) {
+    if (gbTree.length === 0) {
+      alert('먼저 카테고리를 추가하세요.');
+      await gbAddCategory();
+      if (!_gbCat()) return;
+    } else { await gbSelectCategory(0); }
+  }
   const prev = document.getElementById('gb-tmp-input-add');
   if (prev) prev.remove();
   const tmp = document.createElement('input');
-  tmp.type = 'file';
-  tmp.id   = 'gb-tmp-input-add';
-  tmp.accept = 'application/pdf';
+  tmp.type = 'file'; tmp.id = 'gb-tmp-input-add';
+  tmp.accept = 'application/pdf'; tmp.multiple = true;
   tmp.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;';
-  tmp.addEventListener('change', function() {
-    const file = tmp.files[0];
+  tmp.addEventListener('change', async function() {
+    const files = Array.from(tmp.files || []);
     tmp.remove();
-    if (file) handleGbAddPdfFile(file);
+    for (const f of files) await handleGbAddPdfFile(f);
   });
   document.body.appendChild(tmp);
   tmp.click();
 }
 
 async function handleGbAddPdfFile(file) {
-  if (!file) return;
+  const c = _gbCat();
+  if (!file || !c) return;
   const viewer = document.getElementById('gb-left-viewer');
   const empty  = document.getElementById('gb-left-empty');
   if (empty) empty.style.display = 'none';
-  if (viewer) viewer.innerHTML = '<div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>업로드 중...</span></div>';
+  if (viewer) viewer.innerHTML = '<div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>업로드 중... ' + _gbEsc(file.name) + '</span></div>';
   try {
     const url = await uploadToStorage(file);
-    const newItem = { id: 'gb_' + Date.now(), name: file.name, url };
-    gbPdfList.push(newItem);
-    await _gbSaveList();
-    gbCurrentIdx = gbPdfList.length - 1;
-    _gbRenderDropdown();
-    await renderGbPdf('left', url, file.name);
-    _gbUpdateDeleteBtn();
-    showDeptToast('✓ PDF가 추가되었습니다 (' + gbPdfList.length + '개)');
+    c.items.push({ id: _gbNewId('gb'), name: _gbStripExt(file.name), url });
+    await _gbSaveTree();
+    _gbSyncFlat();
+    _gbRenderCatTabs();
+    await gbSelectPdf(c.items.length - 1);
+    showDeptToast('✓ 「' + c.name + '」에 PDF가 추가되었습니다');
   } catch(err) {
-    if (viewer) viewer.innerHTML = '';
-    if (empty) empty.style.display = '';
     showDeptToast('⚠ 업로드 실패: ' + err.message);
+    if (gbCurrentIdx >= 0) await gbSelectPdf(gbCurrentIdx); else _gbShowEmpty(GB_EMPTY_NO_ITEM);
+  }
+}
+async function handleGbPdfFile(file) { await handleGbAddPdfFile(file); } // 호환
+
+async function gbRenameItem(i) {
+  const it = gbPdfList[i]; if (!it) return;
+  const name = (prompt('자료 이름 (버튼에 표시됩니다)', it.name) || '').trim();
+  if (!name || name === it.name) return;
+  it.name = name;
+  await _gbSaveTree(); _gbRenderItemChips();
+  if (i === gbCurrentIdx) {
+    const fn = document.getElementById('gb-left-filename'); if (fn) fn.textContent = '📄 ' + name;
   }
 }
 
-/* ── 편집 모드: 현재 PDF 삭제 ── */
-async function gbDeleteCurrentPdf() {
-  if (gbCurrentIdx < 0 || gbCurrentIdx >= gbPdfList.length) return;
-  const item = gbPdfList[gbCurrentIdx];
-  if (!confirm('「' + item.name + '」을(를) 삭제하시겠습니까?')) return;
-  try { await deleteFromStorage(item.url); } catch(_) {}
-  gbPdfList.splice(gbCurrentIdx, 1);
-  await _gbSaveList();
-  // 인덱스 조정
-  if (gbPdfList.length === 0) {
-    gbCurrentIdx = -1;
-    gbSingle.pdfDoc = null;
-    gbSingle.totalPages = 0;
-    const viewer = document.getElementById('gb-left-viewer');
-    const empty  = document.getElementById('gb-left-empty');
-    if (viewer) viewer.innerHTML = '';
-    if (empty)  { viewer.appendChild(empty); empty.style.display = ''; }
-    document.getElementById('gb-spread-nav').style.display = 'none';
-  } else {
-    gbCurrentIdx = Math.min(gbCurrentIdx, gbPdfList.length - 1);
-    await gbSelectPdf(gbCurrentIdx);
-  }
-  _gbRenderDropdown();
-  _gbUpdateDeleteBtn();
-  showDeptToast('✓ PDF가 삭제되었습니다');
+async function gbDeleteItem(i) {
+  const it = gbPdfList[i]; if (!it) return;
+  if (!confirm('「' + it.name + '」을(를) 삭제할까요?\n(업로드된 파일도 함께 삭제됩니다)')) return;
+  try { await deleteFromStorage(it.url); } catch(_) {}
+  gbPdfList.splice(i, 1);
+  await _gbSaveTree();
+  _gbRenderCatTabs();
+  if (!gbPdfList.length) { gbCurrentIdx = -1; _gbRenderItemChips(); _gbShowEmpty(GB_EMPTY_NO_ITEM); }
+  else if (i === gbCurrentIdx) await gbSelectPdf(Math.min(i, gbPdfList.length - 1));
+  else { if (i < gbCurrentIdx) gbCurrentIdx--; _gbRenderItemChips(); }
+  showDeptToast('✓ 자료가 삭제되었습니다');
+}
+async function gbDeleteCurrentPdf() { if (gbCurrentIdx >= 0) await gbDeleteItem(gbCurrentIdx); } // 호환
+
+async function gbMoveItem(i, d) {
+  const j = i + d;
+  if (j < 0 || j >= gbPdfList.length) return;
+  [gbPdfList[i], gbPdfList[j]] = [gbPdfList[j], gbPdfList[i]];
+  if (gbCurrentIdx === i) gbCurrentIdx = j; else if (gbCurrentIdx === j) gbCurrentIdx = i;
+  _gbRenderItemChips();
+  await _gbSaveTree();
 }
 
-// handleGbPdfFile 하위 호환
-async function handleGbPdfFile(file) { await handleGbAddPdfFile(file); }
+async function gbMoveItemToCat(i) {
+  const it = gbPdfList[i]; if (!it) return;
+  const others = gbTree.map((c, k) => ({ c, k })).filter(x => x.k !== gbCatIdx);
+  if (!others.length) return;
+  const menu = others.map((x, n) => (n + 1) + '. ' + x.c.name).join('\n');
+  const ans = prompt('「' + it.name + '」을(를) 어느 카테고리로 옮길까요? 번호를 입력하세요.\n\n' + menu, '1');
+  const n = parseInt(ans, 10);
+  if (!n || n < 1 || n > others.length) return;
+  const target = others[n - 1].c;
+  gbPdfList.splice(i, 1);
+  target.items.push(it);
+  await _gbSaveTree();
+  _gbRenderCatTabs();
+  if (!gbPdfList.length) { gbCurrentIdx = -1; _gbRenderItemChips(); _gbShowEmpty(GB_EMPTY_NO_ITEM); }
+  else if (i === gbCurrentIdx) await gbSelectPdf(Math.min(i, gbPdfList.length - 1));
+  else { if (i < gbCurrentIdx) gbCurrentIdx--; _gbRenderItemChips(); }
+  showDeptToast('✓ 「' + target.name + '」(으)로 옮겼습니다');
+}
 
-// loadGbPdfFromStorage 하위 호환
-async function loadGbPdfFromStorage(side) { await _gbLoadListFromStorage(); }
+function _gbEsc(str) {
+  return (str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
 
 /* ══════════════════════════════════════
    브로셔 화면 (메뉴 09) — 6번 길라잡이와 동일 구조
@@ -12109,6 +12356,7 @@ async function brJumpToPage() {
 })();
 
 function openGbEditPw() {
+  if (gbEditMode) { exitGbEdit(); return; }   // 편집 중이면 버튼이 '편집 종료'로 동작
   pwTarget = 'gbEdit';
   pwBuffer = '';
   updateDots();
@@ -12118,11 +12366,26 @@ function openGbEditPw() {
 
 function enterGbEdit() {
   gbEditMode = true;
-  document.getElementById('gb-edit-btn').classList.add('active');
-  document.getElementById('gb-left-upload-btn').style.display  = 'inline-flex';
-  _gbUpdateDeleteBtn();
-  // 스프레드 설정 패널 표시
-  _gbShowSettings();
+  const btn = document.getElementById('gb-edit-btn');
+  btn.classList.add('active'); btn.textContent = '✕ 편집 종료';
+  document.getElementById('gb-edit-bar').style.display = '';
+  _gbShowSettings();   // 표지·펼침 방향 설정
+  _gbRenderNav();
+}
+
+function exitGbEdit() {
+  _gbResetEditUI();
+  _gbRenderNav();
+}
+
+function _gbResetEditUI() {
+  gbEditMode = false;
+  const btn = document.getElementById('gb-edit-btn');
+  if (btn) { btn.classList.remove('active'); btn.textContent = '🔒 편집'; }
+  const eb = document.getElementById('gb-edit-bar'); if (eb) eb.style.display = 'none';
+  const bar = document.getElementById('gb-settings-bar'); if (bar) bar.style.display = 'none';
+  const up = document.getElementById('gb-left-upload-btn'); if (up) up.style.display = 'none';
+  const del = document.getElementById('gb-delete-pdf-btn'); if (del) del.style.display = 'none';
 }
 
 // 설정 패널 렌더링 (편집 모드 진입 시)
@@ -16641,7 +16904,6 @@ window.ugCheckMySubjects = ugCheckMySubjects;
     /* ── 작은 팝업 / 드롭다운 ── */
     { id: 'gb-jump-popup',         path: 'page-jump',         close: call('closeGbJumpPopup') },
     { id: 'br-jump-popup',         path: 'page-jump',         close: call('closeBrJumpPopup') },
-    { id: 'gb-dropdown-wrap',      path: 'list',              close: call('closeGbDropdown') },
     { id: 'sem-dropdown-menu',     path: 'select',            close: removeOpen('sem-dropdown-menu', 'sem-dropdown-arrow') },
     { id: 'grade-picker',          path: 'select',            close: call('closeGradePicker') },
     { id: 'sets-subj-picker',      path: 'select',            close: call('closeSubjPicker') },
