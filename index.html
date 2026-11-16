@@ -5651,6 +5651,21 @@
     .gb-sub-row { padding-right: 10px; }
     .gb-sub-actions .gb-original-btn { padding: 5px 10px; font-size: 11px; }
   }
+  /* 자료별 PDF 화면 겹치기: 선택한 것만 보이고 나머지는 숨겨 둠(바로 전환) */
+  .gb-native-wrap { position: relative; }
+  .gb-native-wrap iframe.gb-native-frame {
+    position: absolute; inset: 6px 8px 8px; width: calc(100% - 16px); height: calc(100% - 14px);
+    visibility: hidden; opacity: 0; transition: opacity 0.18s ease;
+  }
+  .gb-native-wrap iframe.gb-native-frame.active { visibility: visible; opacity: 1; z-index: 1; }
+  .gb-native-wrap:fullscreen iframe.gb-native-frame { inset: 0; width: 100%; height: 100%; }
+  .gb-native-loading {
+    position: absolute; inset: 0; z-index: 2; display: none;
+    flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+    font-size: 13px; color: rgba(26,46,74,0.6); background: rgba(240,244,248,0.55);
+    pointer-events: none;
+  }
+  .gb-native-loading.show { display: flex; }
 </style>
 </head>
 <body>
@@ -7086,7 +7101,8 @@
 
     <!-- PC: 브라우저 내장 PDF 보기 (원본 화질 · 확대/검색/인쇄 가능) -->
     <div class="gb-native-wrap" id="gb-native-wrap" style="display:none;">
-      <iframe id="gb-native-frame" title="선택과목 안내서 PDF"></iframe>
+      <div class="gb-native-loading" id="gb-native-loading"><div class="gb-pdf-spinner"></div><span>자료 여는 중...</span></div>
+      <!-- 자료별 PDF 화면(iframe)이 여기에 겹쳐 쌓이고, 선택한 것만 보임 -->
     </div>
 
     <!-- 하단 통합 네비게이션 -->
@@ -11767,6 +11783,7 @@ function _gbRenderCatTabs() {
     btn.innerHTML = '<span class="gb-cat-name"></span><span class="gb-cat-count">' + c.items.length + '</span>';
     btn.querySelector('.gb-cat-name').textContent = c.name;
     btn.addEventListener('click', () => gbSelectCategory(i));
+    btn.addEventListener('mouseenter', () => gbHoverPrefetch(c.items[0] && c.items[0].url));
     tab.appendChild(btn);
     if (gbEditMode) {
       const tools = document.createElement('span'); tools.className = 'gb-mini-tools';
@@ -11807,6 +11824,7 @@ function _gbRenderItemChips() {
     btn.querySelector('.gb-item-name').textContent = it.name;
     btn.title = it.name;
     btn.addEventListener('click', () => gbSelectPdf(i));
+    btn.addEventListener('mouseenter', () => gbHoverPrefetch(it.url));
     chip.appendChild(btn);
     if (gbEditMode) {
       const tools = document.createElement('span'); tools.className = 'gb-mini-tools';
@@ -11979,7 +11997,7 @@ async function gbDeleteCategory(i) {
     ? '「' + c.name + '」 카테고리와 안의 자료 ' + c.items.length + '개를 모두 삭제할까요?\n(업로드된 파일도 함께 삭제됩니다)'
     : '「' + c.name + '」 카테고리를 삭제할까요?';
   if (!confirm(msg)) return;
-  for (const it of c.items) { try { await deleteFromStorage(it.url); } catch(_) {} }
+  for (const it of c.items) { _gbForget(it.url); try { await deleteFromStorage(it.url); } catch(_) {} }
   gbTree.splice(i, 1);
   await _gbSaveTree();
   if (!gbTree.length) {
@@ -12061,9 +12079,15 @@ async function gbRenameItem(i) {
   }
 }
 
+function _gbForget(url) {
+  const f = _gbFrames.get(url); if (f) { f.remove(); _gbFrames.delete(url); }
+  const b = _gbBlobCache.get(url); if (b) { _gbBlobCache.delete(url); b.then(u => URL.revokeObjectURL(u)).catch(() => {}); }
+  const d = _gbDocCache.get(url); if (d) { _gbDocCache.delete(url); }
+}
 async function gbDeleteItem(i) {
   const it = gbPdfList[i]; if (!it) return;
   if (!confirm('「' + it.name + '」을(를) 삭제할까요?\n(업로드된 파일도 함께 삭제됩니다)')) return;
+  _gbForget(it.url);
   try { await deleteFromStorage(it.url); } catch(_) {}
   gbPdfList.splice(i, 1);
   await _gbSaveTree();
@@ -12606,13 +12630,50 @@ async function gbLoadSettings() {
    - PC(마우스 사용 + 브라우저에 PDF 보기 기능 있음): 브라우저 내장 PDF 보기로 원본 그대로 표시
    - 휴대폰·태블릿: 브라우저가 화면 안 PDF 표시를 지원하지 않아 기존 방식(그림으로 그리기) 사용
 ────────────────────────────── */
-let _gbNativeBlobUrl = null;
 let _gbRenderToken = 0;
 function gbUseNativeViewer() {
   const fine = window.matchMedia ? window.matchMedia('(pointer: fine)').matches : true;
   const pdfOk = ('pdfViewerEnabled' in navigator) ? navigator.pdfViewerEnabled : true;
   return window.innerWidth >= 768 && fine && pdfOk;
 }
+
+/* ══════════════════════════════════════
+   자료 전환 속도 개선
+   ① 파일 기억(캐시): 한 번 받은 PDF는 다시 받지 않음 (최대 GB_BLOB_MAX개)
+   ② 화면 유지: 최근 본 PDF 화면을 숨겨 두었다가 바로 다시 보여줌 (최대 GB_FRAME_MAX개)
+   ③ 미리 받기: 지금 자료를 연 뒤, 같은 카테고리 → 다른 카테고리 순으로 조용히 미리 받음
+   ④ 마우스를 올리면 그 자료부터 먼저 받기 시작
+══════════════════════════════════════ */
+const GB_BLOB_MAX  = 15;
+const GB_FRAME_MAX = 5;
+const _gbBlobCache = new Map();   // url → Promise<blobUrl>  (Map 순서 = 최근 사용 순)
+const _gbFrames    = new Map();   // url → iframe
+
+function _gbTouch(map, key) { const v = map.get(key); map.delete(key); map.set(key, v); }
+
+function _gbGetBlobUrl(url) {
+  if (_gbBlobCache.has(url)) { _gbTouch(_gbBlobCache, url); return _gbBlobCache.get(url); }
+  const pr = fetch(url)
+    .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.arrayBuffer(); })
+    // 'PDF 형식'으로 명시한 주소를 만들어야 저장소가 다운로드 방식으로 응답해도 화면 안에서 열림
+    .then(buf => URL.createObjectURL(new Blob([buf], { type: 'application/pdf' })))
+    .catch(e => { _gbBlobCache.delete(url); throw e; });
+  _gbBlobCache.set(url, pr);
+  // 오래된 것부터 정리 (화면에 떠 있는 것은 남김)
+  for (const [k, v] of _gbBlobCache) {
+    if (_gbBlobCache.size <= GB_BLOB_MAX) break;
+    if (_gbFrames.has(k) || k === url) continue;
+    _gbBlobCache.delete(k);
+    v.then(u => URL.revokeObjectURL(u)).catch(() => {});
+  }
+  return pr;
+}
+
+function _gbNativeLoading(on) {
+  const el = document.getElementById('gb-native-loading');
+  if (el) el.classList.toggle('show', !!on);
+}
+
 function _gbSetViewMode(native) {
   const wrap = document.getElementById('gb-native-wrap');
   const row  = document.getElementById('gb-spread-row');
@@ -12621,11 +12682,7 @@ function _gbSetViewMode(native) {
   if (row)  row.style.display  = native ? 'none' : '';
   if (native && nav) nav.style.display = 'none';
   document.getElementById('guidebook-screen')?.classList.toggle('gb-native-mode', !!native);
-  if (!native) {
-    const fr = document.getElementById('gb-native-frame');
-    if (fr) fr.removeAttribute('src');
-    if (_gbNativeBlobUrl) { URL.revokeObjectURL(_gbNativeBlobUrl); _gbNativeBlobUrl = null; }
-  }
+  if (!native) _gbNativeLoading(false);
 }
 function _gbSetDocLinks(url, filename) {
   const fnEl = document.getElementById('gb-left-filename');
@@ -12635,26 +12692,89 @@ function _gbSetDocLinks(url, filename) {
   const og = document.getElementById('gb-original-btn');
   if (og) { og.href = url; og.classList.add('visible'); }
 }
+
+function _gbActivateFrame(url) {
+  _gbFrames.forEach((fr, k) => fr.classList.toggle('active', k === url));
+}
+
 async function _gbShowNative(url, filename, token) {
-  // 파일을 받아 'PDF 형식'으로 명시한 주소를 만들어 넣음
-  // (저장소가 다운로드 방식으로 응답해도 화면 안에서 열리도록)
-  const res = await fetch(url);
-  if (!res.ok) throw new Error('HTTP ' + res.status);
-  const blob = new Blob([await res.arrayBuffer()], { type: 'application/pdf' });
-  if (token !== _gbRenderToken) return true;   // 그 사이 다른 자료를 선택함
-  if (_gbNativeBlobUrl) URL.revokeObjectURL(_gbNativeBlobUrl);
-  _gbNativeBlobUrl = URL.createObjectURL(blob);
   gbSingle.pdfDoc = null; gbSingle.totalPages = 0;
   _gbSetViewMode(true);
-  // 새 iframe으로 교체해야 이전 문서의 스크롤·확대 상태가 남지 않음
-  const old = document.getElementById('gb-native-frame');
-  const fr = document.createElement('iframe');
-  fr.id = 'gb-native-frame'; fr.title = filename;
-  fr.src = _gbNativeBlobUrl + '#page=1&view=Fit&zoom=page-fit&pagemode=none';   // 처음 열 때 한 쪽 전체가 보이도록
-  old.replaceWith(fr);
   _gbSetDocLinks(url, filename);
   document.getElementById('gb-jump-trigger-btn')?.classList.remove('visible');
+
+  // 이미 띄워 둔 화면이 있으면 즉시 전환
+  if (_gbFrames.has(url)) {
+    _gbTouch(_gbFrames, url);
+    _gbActivateFrame(url);
+    _gbNativeLoading(false);
+    _gbSchedulePrefetch();
+    return true;
+  }
+
+  _gbNativeLoading(true);
+  const blobUrl = await _gbGetBlobUrl(url);
+  if (token !== _gbRenderToken) return true;   // 그 사이 다른 자료를 선택함
+
+  const fr = document.createElement('iframe');
+  fr.className = 'gb-native-frame';
+  fr.title = filename;
+  fr.addEventListener('load', () => { if (fr.classList.contains('active')) _gbNativeLoading(false); }, { once: true });
+  fr.src = blobUrl + '#page=1&view=Fit&zoom=page-fit&pagemode=none';   // 처음 열 때 한 쪽 전체가 보이도록
+  document.getElementById('gb-native-wrap').appendChild(fr);
+  _gbFrames.set(url, fr);
+  _gbActivateFrame(url);
+  setTimeout(() => { if (fr.classList.contains('active')) _gbNativeLoading(false); }, 1500);
+
+  // 화면 개수 제한: 가장 오래 안 본 것부터 제거
+  for (const [k, f] of _gbFrames) {
+    if (_gbFrames.size <= GB_FRAME_MAX) break;
+    if (k === url) continue;
+    f.remove(); _gbFrames.delete(k);
+  }
+  _gbSchedulePrefetch();
   return true;
+}
+
+/* 미리 받기: 화면이 한가할 때 하나씩 */
+let _gbPrefetchTimer = null;
+function _gbSchedulePrefetch() {
+  if (!gbUseNativeViewer()) return;   // 휴대폰은 데이터 절약을 위해 미리 받지 않음
+  clearTimeout(_gbPrefetchTimer);
+  _gbPrefetchTimer = setTimeout(_gbPrefetchNext, 600);
+}
+function _gbPrefetchQueue() {
+  const cur = _gbCat();
+  const urls = [];
+  if (cur) cur.items.forEach(it => urls.push(it.url));
+  gbTree.forEach(c => { if (c !== cur) c.items.forEach(it => urls.push(it.url)); });
+  return urls.filter((u, i) => u && urls.indexOf(u) === i).slice(0, GB_BLOB_MAX - 1);
+}
+function _gbPrefetchNext() {
+  if (!document.getElementById('guidebook-screen')?.classList.contains('open')) return;
+  const next = _gbPrefetchQueue().find(u => !_gbBlobCache.has(u));
+  if (!next) return;
+  const run = () => _gbGetBlobUrl(next).catch(() => {}).finally(() => { _gbPrefetchTimer = setTimeout(_gbPrefetchNext, 150); });
+  (window.requestIdleCallback || (f => setTimeout(f, 50)))(run);
+}
+/* 마우스를 올리면 그 자료부터 받기 */
+function gbHoverPrefetch(url) {
+  if (url && gbUseNativeViewer() && !_gbBlobCache.has(url)) _gbGetBlobUrl(url).catch(() => {});
+}
+
+/* 휴대폰(그림 방식): 한 번 연 PDF 문서는 다시 해석하지 않도록 기억 (최대 4개) */
+const _gbDocCache = new Map();   // url → Promise<pdfDoc>
+function _gbGetPdfDoc(url) {
+  if (_gbDocCache.has(url)) { _gbTouch(_gbDocCache, url); return _gbDocCache.get(url); }
+  const pr = pdfjsLib.getDocument(url).promise.catch(e => { _gbDocCache.delete(url); throw e; });
+  _gbDocCache.set(url, pr);
+  for (const [k, v] of _gbDocCache) {
+    if (_gbDocCache.size <= 4) break;
+    if (k === url) continue;
+    _gbDocCache.delete(k);
+    v.then(d => { if (d !== gbSingle.pdfDoc) d.destroy(); }).catch(() => {});
+  }
+  return pr;
 }
 
 async function renderGbPdf(side, dataUrl, filename) {
@@ -12681,12 +12801,11 @@ async function renderGbPdf(side, dataUrl, filename) {
   if (viewer) viewer.innerHTML = '<div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>PDF 불러오는 중...</span></div>';
 
   try {
-    const loadingTask = pdfjsLib.getDocument(dataUrl);
-    const pdf = await loadingTask.promise;
+    const pdf = await _gbGetPdfDoc(dataUrl);   // 한 번 연 문서는 바로 재사용
+    if (token !== _gbRenderToken) return;
     gbSingle.pdfDoc     = pdf;
     gbSingle.totalPages = pdf.numPages;
     gbSingle.curPage    = 1;
-    if (token !== _gbRenderToken) return;
     if (fnEl) fnEl.textContent = '📄 ' + filename;
     const og = document.getElementById('gb-original-btn');
     if (og) { og.href = dataUrl; og.classList.add('visible'); }
