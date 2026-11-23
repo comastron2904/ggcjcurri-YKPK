@@ -5416,6 +5416,127 @@
     box-shadow: inset 0 2px 4px rgba(16,52,102,0.10), 0 1px 0 var(--btn3d-edge), 0 2px 6px var(--btn3d-drop);
   }
 
+  /* ══════════════════════════════════════
+     메인 화면 디자인 다듬기 (2026-11)
+     - 문구·편집 기능은 그대로, 모양만 덧입힘 (이 블록을 지우면 예전 모습으로 돌아감)
+  ══════════════════════════════════════ */
+  /* 1) 타이틀 영역: 부드러운 빛 번짐 + 은은한 점 무늬 + 아래쪽은 본문 색으로 자연스럽게 이어짐 */
+  #hero {
+    min-height: 50vh;
+    background:
+      radial-gradient(ellipse 60% 70% at 18% 20%, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0) 60%),
+      radial-gradient(ellipse 55% 65% at 85% 30%, rgba(120,180,240,0.45) 0%, rgba(120,180,240,0) 65%),
+      radial-gradient(ellipse 50% 60% at 60% 95%, rgba(14,138,122,0.12) 0%, rgba(14,138,122,0) 70%),
+      linear-gradient(165deg, #cfe2f7 0%, #e2eefa 48%, #c6dcf3 100%);
+  }
+  #hero::before {               /* 점 무늬 (가운데는 흐리게) */
+    content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    background-image: radial-gradient(rgba(26,107,191,0.16) 1px, transparent 1.2px);
+    background-size: 22px 22px;
+    -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 45%, transparent 30%, #000 85%);
+            mask-image: radial-gradient(ellipse 70% 60% at 50% 45%, transparent 30%, #000 85%);
+  }
+  #hero::after {                /* 아래쪽 경계 부드럽게 */
+    content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 90px; z-index: 2; pointer-events: none;
+    background: linear-gradient(180deg, rgba(240,244,248,0) 0%, #f0f4f8 100%);
+  }
+  .geo-circle { border-color: rgba(26,107,191,0.14); }
+  .geo-circle.c1 { box-shadow: inset 0 0 0 40px rgba(255,255,255,0.10); animation: heroFloat 14s ease-in-out infinite; }
+  .geo-circle.c2 { box-shadow: inset 0 0 0 26px rgba(255,255,255,0.12); animation: heroFloat 18s ease-in-out infinite reverse; }
+  .geo-line { opacity: 0.55; }
+  @keyframes heroFloat { 0%,100% { transform: translate(0,0); } 50% { transform: translate(-14px, 10px); } }
+
+  /* 학교 이름 배지: 반투명 알약 모양 + 작은 점 */
+  .year-badge {
+    position: relative;
+    border-radius: 999px;
+    padding: 7px 22px 7px 34px;
+    letter-spacing: 4px;
+    background: rgba(255,255,255,0.55);
+    border: 1px solid rgba(255,255,255,0.9);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.9) inset, 0 6px 18px rgba(16,52,102,0.10);
+    -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  }
+  .year-badge::before {
+    content: ''; position: absolute; left: 16px; top: 50%; width: 7px; height: 7px; margin-top: -3.5px;
+    border-radius: 50%; background: linear-gradient(180deg, #3d95e6, #1a6bbf);
+    box-shadow: 0 0 0 3px rgba(26,107,191,0.15);
+  }
+  /* 큰 제목: 글자 그림자를 부드럽게, 둘째 줄은 진한 파랑 */
+  .main-title {
+    letter-spacing: -1px;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.8), 0 10px 30px rgba(26,107,191,0.18);
+  }
+  .main-title span { color: #0f56a8; }
+  /* 부제 아래 짧은 강조선 */
+  .subtitle { position: relative; padding-bottom: 18px; }
+  .subtitle::after {
+    content: ''; position: absolute; left: 50%; bottom: 0; width: 46px; height: 3px; margin-left: -23px;
+    border-radius: 3px; background: linear-gradient(90deg, #1a6bbf, #0e8a7a);
+    opacity: 0.8;
+  }
+
+  /* 2) '메뉴 선택' 구분선: 가운데 알약 모양 이름표 */
+  .divider { padding: 6px 48px 14px; gap: 16px; background: transparent; }
+  .divider-line { background: linear-gradient(90deg, transparent, rgba(26,107,191,0.35), transparent); }
+  .divider-diamond { display: none; }
+  .divider-text {
+    padding: 6px 16px; border-radius: 999px;
+    font-size: 11px; font-weight: 700; letter-spacing: 3px; color: #1a6bbf;
+    background: linear-gradient(180deg, #ffffff, #eef4fb);
+    border: 1px solid rgba(26,107,191,0.18);
+    box-shadow: inset 0 1px 0 #ffffff, 0 2px 0 rgba(26,107,191,0.10), 0 4px 10px rgba(16,52,102,0.08);
+  }
+
+  /* 3) 메뉴 영역 */
+  #nav-section { background: transparent; padding-top: 4px; }
+  .section-label { font-size: 11px; letter-spacing: 3px; color: rgba(26,46,74,0.50); margin-bottom: 24px; }
+  .buttons-grid { gap: 16px; }
+  .nav-btn { padding: 20px 22px; gap: 16px; }
+
+  /* 번호: 둥근 사각 타일 (마우스 올리면 파랗게 채워짐) */
+  .btn-number {
+    display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+    width: 44px; height: 44px; min-width: 44px; border-radius: 12px;
+    font-family: 'Noto Sans KR', sans-serif; font-size: 16px; font-weight: 800; letter-spacing: 0;
+    color: #1a6bbf; opacity: 1;
+    background: linear-gradient(180deg, #eaf2fc 0%, #dbe8f8 100%);
+    box-shadow: inset 0 1px 0 #ffffff, inset 0 -2px 0 rgba(26,107,191,0.10);
+    transition: background 0.25s ease, color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+  }
+  .nav-btn:hover .btn-number {
+    color: #ffffff;
+    background: linear-gradient(180deg, #3d95e6 0%, #1a6bbf 100%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.35), 0 4px 10px rgba(26,107,191,0.30);
+    transform: rotate(-4deg);
+  }
+  .btn-title { font-size: 15.5px; color: #1a2e4a; letter-spacing: -0.2px; }
+  .btn-arrow { color: rgba(26,107,191,0.70); }
+  /* 마우스 올렸을 때 왼쪽 세로 색띠는 번호 타일과 겹쳐 보여서 숨김 */
+  .nav-btn::after { display: none; }
+
+  /* 4) 아래쪽 저작권 줄 */
+  .footer {
+    border-top: none; padding: 18px 22px 30px;
+    font-size: 11px; letter-spacing: 1.5px; color: rgba(26,46,74,0.42);
+  }
+  .footer::before {
+    content: ''; display: block; width: min(1100px, 100%); height: 1px; margin: 0 auto 18px;
+    background: linear-gradient(90deg, transparent, rgba(26,107,191,0.18), transparent);
+  }
+
+  @media (max-width: 600px) {
+    .divider { padding: 4px 20px 10px; }
+    .nav-btn { padding: 16px 16px; gap: 14px; }
+    .btn-number { width: 38px; height: 38px; min-width: 38px; border-radius: 10px; font-size: 14px; }
+    .btn-title { font-size: 14.5px; }
+    .year-badge { letter-spacing: 2px; padding: 6px 16px 6px 28px; font-size: 11px; }
+    .year-badge::before { left: 12px; }
+  }
+  @media (max-width: 900px), (prefers-reduced-motion: reduce) {
+    .geo-circle.c1, .geo-circle.c2 { animation: none; }   /* 휴대폰: 배터리 절약 */
+  }
+
   /* ── 우측 하단 편집 버튼(✏️ · 과목 관리): 평소엔 흐릿하게, 마우스를 가까이 대면 또렷하게 ── */
   #top-btn-group {
     opacity: 0.12; filter: grayscale(1);
