@@ -256,7 +256,8 @@
   #dept-screen > *:not(.screen-bg-layer),
   #subject-search-screen > *:not(.screen-bg-layer),
   #enroll-screen > *:not(.screen-bg-layer),
-  #guidebook-screen > *:not(.screen-bg-layer) {
+  #guidebook-screen > *:not(.screen-bg-layer),
+  #m05-screen > *:not(.screen-bg-layer) {
     position: relative; z-index: 1;
   }
 
@@ -5687,6 +5688,29 @@
     #dept-cat-panel-rec .rec-item-row { padding: 6px 12px; flex-wrap: nowrap; overflow-x: auto; }
     .rec-viewer { padding: 6px; }
   }
+  /* ══════════════════════════════════════
+     05 2028 모집단위별 반영과목 (PDF 업로드·보기)
+  ══════════════════════════════════════ */
+  #m05-screen {
+    position: fixed; inset: 0; background: #f0f4f8; z-index: 700;
+    display: flex; flex-direction: column;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+    overflow: hidden;
+  }
+  #m05-screen.open { opacity: 1; pointer-events: all; }
+  #m05-screen .gb-header { padding: 10px 20px; gap: 10px; }
+  #m05-screen .gb-header-label { margin-bottom: 2px; }
+  #m05-screen .gb-edit-btn { padding: 0 12px; height: 32px; }
+  #m05-screen .detail-home { width: 32px; height: 32px; font-size: 14px; }
+  #m05-screen .m05-item-row { flex: 1; min-width: 0; padding: 8px 20px; gap: 8px; background: none; border-bottom: none; max-height: 22vh; }
+  #m05-screen .gb-item-btn { padding: 6px 13px; font-size: 12.5px; }
+  #m05-screen .gb-item-add { padding: 6px 12px; margin: 0; font-size: 12px; }
+  #m05-screen .gb-edit-bar { padding: 6px 20px; }
+  #m05-screen .rec-viewer { flex: 1; min-height: 0; }
+  @media (max-width: 700px) {
+    #m05-screen .gb-header { padding: 8px 12px; }
+    #m05-screen .m05-item-row { padding: 6px 12px; flex-wrap: nowrap; overflow-x: auto; }
+  }
 </style>
 </head>
 <body>
@@ -5739,7 +5763,7 @@
     <button class="nav-btn" data-menu="2" onclick="openDeptScreen('dept')"><span class="btn-number">02</span><span class="btn-title" id="menu-02">학과별 안내</span><span class="btn-arrow">›</span></button>
     <button class="nav-btn" data-menu="3" onclick="openRecScreen()"><span class="btn-number">03</span><span class="btn-title" id="menu-03">권장 이수과목</span><span class="btn-arrow">›</span></button>
     <button class="nav-btn" data-menu="4" onclick="openBrochureScreen()"><span class="btn-number">04</span><span class="btn-title" id="menu-04">2026 교육과정 안내 브로셔</span><span class="btn-arrow">›</span></button>
-    <button class="nav-btn" data-menu="5"><span class="btn-number">05</span><span class="btn-title" id="menu-05">2028 대학별 교과 이수 권장 과목</span><span class="btn-arrow">›</span></button>
+    <button class="nav-btn" data-menu="5" id="nav-btn-05" onclick="openM05Screen()"><span class="btn-number">05</span><span class="btn-title" id="menu-05">2028 모집단위별 반영과목</span><span class="btn-arrow">›</span></button>
     <button class="nav-btn" data-menu="6" onclick="openGuidebookScreen()"><span class="btn-number">06</span><span class="btn-title" id="menu-06">선택과목 안내서</span><span class="btn-arrow">›</span></button>
     <button class="nav-btn" data-menu="7" id="nav-btn-07" onclick="openMenu07()"><span class="btn-number">07</span><span class="btn-title" id="menu-07">창조고 교과목 선택 도우미 (gemini)</span><span class="btn-arrow">›</span></button>
     <button class="nav-btn" data-menu="8" id="nav-btn-08" onclick="openMenu08()"><span class="btn-number">08</span><span class="btn-title" id="menu-08">2028 대입전형 시행계획</span><span class="btn-arrow">›</span></button>
@@ -6030,7 +6054,7 @@
         <div class="pe-menu-sub-row"><span class="pe-menu-sub-label">소제목</span><input class="pe-menu-subtitle-input" id="pe-menu-03-sub" placeholder="화면 상단에 표시될 소제목 (선택)" /></div>
         <div class="pe-menu-item"><span class="pe-menu-num">04</span><input class="pe-menu-input" id="pe-menu-04" placeholder="2026 교육과정 안내 브로셔" /></div>
         <div class="pe-menu-sub-row"><span class="pe-menu-sub-label">소제목</span><input class="pe-menu-subtitle-input" id="pe-menu-04-sub" placeholder="화면 상단에 표시될 소제목 (선택)" /></div>
-        <div class="pe-menu-item"><span class="pe-menu-num">05</span><input class="pe-menu-input" id="pe-menu-05" placeholder="2028 대학별 교과 이수 권장 과목" /></div>
+        <div class="pe-menu-item"><span class="pe-menu-num">05</span><input class="pe-menu-input" id="pe-menu-05" placeholder="2028 모집단위별 반영과목" /></div>
         <div class="pe-menu-sub-row"><span class="pe-menu-sub-label">소제목</span><input class="pe-menu-subtitle-input" id="pe-menu-05-sub" placeholder="화면 상단에 표시될 소제목 (선택)" /></div>
         <div class="pe-menu-item"><span class="pe-menu-num">06</span><input class="pe-menu-input" id="pe-menu-06" placeholder="선택과목 안내서" /></div>
         <div class="pe-menu-sub-row"><span class="pe-menu-sub-label">소제목</span><input class="pe-menu-subtitle-input" id="pe-menu-06-sub" placeholder="화면 상단에 표시될 소제목 (선택)" /></div>
@@ -6766,7 +6790,7 @@
   <!-- 카테고리 탭 -->
   <div class="dept-cat-tabs" id="dept-cat-tabs">
     <button class="dept-cat-tab active" data-cat="dept" onclick="switchDeptCategory('dept')"><span>학과별 안내</span></button>
-    <button class="dept-cat-tab" data-cat="suneung" onclick="switchDeptCategory('suneung')"><span id="menu-05-tab">2028 대학별 교과 이수 권장 과목</span></button>
+    <button class="dept-cat-tab" data-cat="suneung" onclick="switchDeptCategory('suneung')"><span id="suneung-tab-label">2028 대학별 교과 이수 권장 과목</span></button>
     <button class="dept-cat-tab" data-cat="rec" onclick="switchDeptCategory('rec')"><span id="rec-tab-label">권장 이수과목 자료</span></button>
   </div>
 
@@ -7320,7 +7344,7 @@ function savePage() { sbSetQ('cg_page', pageTexts); }
 const SUB_SCREEN_IDS = [
   'semester-screen','catsubj-screen','subject-detail',
   'dept-screen','subject-search-screen',
-  'enroll-screen','guidebook-screen','brochure-screen'
+  'enroll-screen','guidebook-screen','brochure-screen','m05-screen'
 ];
 
 let pendingBgFile = null;       // 업로드 대기 중인 File 객체
@@ -7416,6 +7440,11 @@ function applyPageTexts() {
       subEl.style.display = p[subKey] ? '' : 'none';
     }
   }
+  // 03 화면 '2028 대학별 교과 이수 권장 과목' 탭 이름 (05와 분리됨)
+  if (p.suneungTab) {
+    const snTab = document.getElementById('suneung-tab-label');
+    if (snTab) snTab.textContent = p.suneungTab;
+  }
   // 07 버튼 링크 유무에 따라 스타일 처리
   const btn07 = document.getElementById('nav-btn-07');
   if (btn07) {
@@ -7497,7 +7526,7 @@ function applyPageTexts() {
    신버전: 화면 번호와 같게 → 4번 = 브로셔, 9번 = 수강신청 안내
    저장된 이름·소제목·순서를 한 번만 맞바꾸고 menuSlotVer = 2로 표시합니다.
 ────────────────────────────── */
-const MENU_SLOT_VER = 3;
+const MENU_SLOT_VER = 4;
 function migrateMenuSlots(p) {
   if (!p || typeof p !== 'object' || p.menuSlotVer >= MENU_SLOT_VER) return false;
   const ver = p.menuSlotVer || 1;
@@ -7508,6 +7537,13 @@ function migrateMenuSlots(p) {
     p.menu02sub = p.menu03sub || '';
     p.menu03    = '권장 이수과목';
     p.menu03sub = '';
+  }
+  if (ver < 4) {
+    /* v4: 05는 독립 화면 '2028 모집단위별 반영과목'(PDF)으로 변경.
+       예전 05 이름은 03 화면의 탭 이름이었으므로 suneungTab으로 옮겨 보존 */
+    if (p.menu05 && !p.suneungTab) p.suneungTab = p.menu05;
+    p.menu05    = '2028 모집단위별 반영과목';
+    p.menu05sub = '';
   }
   p.menuSlotVer = MENU_SLOT_VER;
   return true;
@@ -7536,7 +7572,7 @@ const MENU_META = {
   2: { label: '학과별 안내',                       fn: "openDeptScreen('dept')" },
   3: { label: '권장 이수과목',                     fn: 'openRecScreen()' },    // 탭: 2028 대학별 교과 이수 권장 과목 / 권장 이수과목 자료(PDF)
   4: { label: '2026 교육과정 안내 브로셔',         fn: 'openBrochureScreen()' },
-  5: { label: '2028 대학별 교과 이수 권장 과목',   fn: '(비활성 · 03 화면의 탭으로 이동)' },
+  5: { label: '2028 모집단위별 반영과목',         fn: 'openM05Screen()' },
   6: { label: '선택과목 안내서',                   fn: 'openGuidebookScreen()' },
   7: { label: '창조고 교과목 선택 도우미 (gemini)',fn: 'openMenu07()' },
   8: { label: '2028 대입전형 시행계획',            fn: 'openMenu08()' },
@@ -7801,6 +7837,7 @@ function checkPw() {
     else if (pwTarget === 'enrollEdit') enterEnrollEdit();
     else if (pwTarget === 'suneungEdit') enterSuneungEdit();
     else if (pwTarget === 'recEdit') enterRecEdit();
+    else if (pwTarget === 'm05Edit') enterM05Edit();
     else if (pwTarget === 'gbEdit') enterGbEdit();
     else if (pwTarget === 'brEdit') enterBrEdit();
     else if (pwTarget === 'semColEdit') openSemColEdit();
@@ -10500,6 +10537,236 @@ async function recMove(i, d) {
   [recData.items[i], recData.items[j]] = [recData.items[j], recData.items[i]];
   if (recCurIdx === i) recCurIdx = j; else if (recCurIdx === j) recCurIdx = i;
   _recRenderChips(); await _recSave();
+}
+
+/* ══════════════════════════════════════
+   05 2028 모집단위별 반영과목 (PDF 업로드·보기)
+   저장 형태 (cg_m05_pdf): { items: [ { id, name, url } ] }
+   - 03 '권장 이수과목 자료' 탭과 같은 방식
+   - PC: 브라우저 내장 PDF 보기 / 휴대폰: 쪽 넘김 뷰어 + 원본으로 보기
+══════════════════════════════════════ */
+const M05_KEY = 'cg_m05_pdf';
+let m05Data = { items: [] };
+let m05Loaded = false;
+let m05CurIdx = -1;
+let m05EditMode = false;
+let _m05Token = 0;
+
+async function openM05Screen() {
+  const p = (typeof pageTexts === 'object' && pageTexts) ? pageTexts : {};
+  const nav = document.getElementById('menu-05');
+  document.getElementById('menu-05-title').textContent =
+    p.menu05 || (nav && nav.textContent.trim()) || '2028 모집단위별 반영과목';
+  const sub = document.getElementById('menu-05-subtitle');
+  sub.textContent = p.menu05sub || ''; sub.style.display = p.menu05sub ? '' : 'none';
+  if (m05EditMode) exitM05Edit();
+  document.getElementById('m05-screen').classList.add('open');
+  if (!m05Loaded) {
+    m05Loaded = true;
+    document.getElementById('m05-viewer').innerHTML =
+      '<div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>자료 목록 불러오는 중...</span></div>';
+    try {
+      const d = await sbGet(M05_KEY);
+      if (d && typeof d === 'object' && Array.isArray(d.items)) {
+        m05Data = { items: d.items.filter(x => x && x.url) };
+      }
+    } catch(_) {}
+  }
+  _m05RenderChips();
+  if (m05CurIdx >= 0 && m05CurIdx < m05Data.items.length) {
+    if (!document.querySelector('#m05-viewer iframe, #m05-viewer .dept-pdf-viewer')) m05Select(m05CurIdx);
+  } else if (m05Data.items.length) m05Select(0);
+  else _m05ShowEmpty();
+}
+function closeM05Screen() {
+  if (m05EditMode) exitM05Edit();
+  document.getElementById('m05-screen').classList.remove('open');
+}
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  const scr = document.getElementById('m05-screen');
+  if (!scr || !scr.classList.contains('open')) return;
+  const pdfFs = document.getElementById('pdf-fs-overlay');
+  const pw = document.getElementById('pw-modal');
+  if ((pdfFs && pdfFs.classList.contains('open')) || (pw && pw.classList.contains('open'))) return;
+  if (document.fullscreenElement) return;
+  closeM05Screen();
+});
+
+async function _m05Save() {
+  try { await sbSet(M05_KEY, m05Data); return true; }
+  catch(e) { showDeptToast('⚠ 저장 실패: ' + (e && e.message ? e.message : '')); return false; }
+}
+
+function _m05RenderChips() {
+  const row = document.getElementById('m05-item-row');
+  if (!row) return;
+  row.innerHTML = '';
+  m05Data.items.forEach((it, i) => {
+    const chip = document.createElement('div');
+    chip.className = 'gb-item-chip' + (i === m05CurIdx ? ' active' : '');
+    chip.style.setProperty('--i', Math.min(i, 12));
+    const btn = document.createElement('button');
+    btn.type = 'button'; btn.className = 'gb-item-btn'; btn.title = it.name;
+    btn.innerHTML = '<span class="gb-item-icon">📄</span><span class="gb-item-name"></span>';
+    btn.querySelector('.gb-item-name').textContent = it.name;
+    btn.addEventListener('click', () => m05Select(i));
+    btn.addEventListener('mouseenter', () => { if (typeof gbHoverPrefetch === 'function') gbHoverPrefetch(it.url); });
+    chip.appendChild(btn);
+    if (m05EditMode) {
+      const tools = document.createElement('span'); tools.className = 'gb-mini-tools';
+      if (i > 0) tools.appendChild(_gbMiniBtn('◀', '앞으로', () => m05Move(i, -1)));
+      if (i < m05Data.items.length - 1) tools.appendChild(_gbMiniBtn('▶', '뒤로', () => m05Move(i, 1)));
+      tools.appendChild(_gbMiniBtn('✎', '이름 바꾸기', () => m05Rename(i)));
+      tools.appendChild(_gbMiniBtn('✕', '자료 삭제', () => m05Delete(i), true));
+      chip.appendChild(tools);
+    }
+    row.appendChild(chip);
+  });
+  if (m05EditMode) {
+    const add = document.createElement('button');
+    add.type = 'button'; add.className = 'gb-item-add'; add.textContent = '＋ PDF 추가';
+    add.addEventListener('click', m05TriggerAdd);
+    row.appendChild(add);
+  } else if (!m05Data.items.length) {
+    const hint = document.createElement('span');
+    hint.className = 'gb-item-empty'; hint.textContent = '등록된 PDF 자료가 없습니다';
+    row.appendChild(hint);
+  }
+  row.classList.remove('anim-in'); void row.offsetWidth; row.classList.add('anim-in');
+}
+
+function _m05ShowEmpty() {
+  _m05Token++;
+  m05CurIdx = -1;
+  document.getElementById('m05-viewer').innerHTML =
+    '<div class="gb-empty" style="display:flex"><div class="gb-empty-icon">📄</div><div class="gb-empty-text">PDF 자료가 없습니다.<br><span style="font-size:10px;opacity:0.6">오른쪽 위 🔒 편집 → ＋ PDF 추가로 업로드할 수 있습니다.</span></div></div>';
+  document.getElementById('m05-original-btn').classList.remove('visible');
+}
+
+async function m05Select(i) {
+  const it = m05Data.items[i]; if (!it) return;
+  m05CurIdx = i;
+  _m05RenderChips();
+  const token = ++_m05Token;
+  const og = document.getElementById('m05-original-btn');
+  og.href = it.url; og.classList.add('visible');
+  const v = document.getElementById('m05-viewer');
+  v.innerHTML = '<div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>자료 여는 중...</span></div>';
+  if (gbUseNativeViewer()) {
+    try {
+      const blobUrl = await _gbGetBlobUrl(it.url);
+      if (token !== _m05Token) return;
+      const fr = document.createElement('iframe');
+      fr.className = 'rec-frame'; fr.title = it.name;
+      fr.src = blobUrl + '#page=1&view=Fit&zoom=page-fit&pagemode=none';
+      v.innerHTML = ''; v.appendChild(fr);
+      m05Data.items.forEach(x => { if (x.url !== it.url) _gbGetBlobUrl(x.url).catch(() => {}); });
+      return;
+    } catch(e) { console.warn('브라우저 PDF 보기 실패 → 쪽 넘김 뷰어로 표시', e); }
+  }
+  if (token !== _m05Token) return;
+  const vid = 'm05pdf-' + token;
+  v.innerHTML = `
+    <div class="dept-pdf-viewer rec-pdf-viewer" id="${vid}">
+      <div class="dept-pdf-topbar">
+        <span class="dept-pdf-filename">📄 ${escHtml(it.name)}</span>
+        <span class="dept-pdf-pageinfo" id="${vid}-pi">로딩 중...</span>
+        <button class="dept-pdf-fs-btn" onclick="openPdfFs('${vid}','pdfv')" title="전체화면">⛶</button>
+      </div>
+      <div class="dept-pdf-stage" id="${vid}-stage">
+        <div class="dept-pdf-loading" id="${vid}-loading"><div class="dept-pdf-spinner"></div><span>PDF 불러오는 중</span></div>
+        <button class="dept-pdf-nav prev" id="${vid}-prev" onclick="pdfGo('${vid}',-1)" disabled>‹</button>
+        <div class="dept-pdf-canvas-wrap" id="${vid}-wrap"></div>
+        <button class="dept-pdf-nav next" id="${vid}-next" onclick="pdfGo('${vid}',1)" disabled>›</button>
+      </div>
+      <div class="dept-pdf-botbar" id="${vid}-dots"></div>
+    </div>`;
+  requestAnimationFrame(() => setTimeout(() => initPdfViewer(vid, it.url), 50));
+}
+
+function m05Fullscreen() {
+  const v = document.getElementById('m05-viewer');
+  const fr = v && v.querySelector('iframe');
+  if (fr) { const req = v.requestFullscreen || v.webkitRequestFullscreen; if (req) req.call(v); return; }
+  const pv = v && v.querySelector('.dept-pdf-viewer');
+  if (pv && typeof openPdfFs === 'function') openPdfFs(pv.id, 'pdfv');
+}
+
+/* ── 편집 ── */
+function openM05EditPw() {
+  if (m05EditMode) { exitM05Edit(); return; }
+  pwTarget = 'm05Edit';
+  pwBuffer = '';
+  updateDots();
+  document.getElementById('pw-error').textContent = '';
+  document.getElementById('pw-modal').classList.add('open');
+}
+function enterM05Edit() {
+  m05EditMode = true;
+  const b = document.getElementById('m05-edit-btn');
+  b.classList.add('active'); b.textContent = '✕ 편집 종료';
+  document.getElementById('m05-edit-bar').style.display = '';
+  _m05RenderChips();
+}
+function exitM05Edit() {
+  m05EditMode = false;
+  const b = document.getElementById('m05-edit-btn');
+  if (b) { b.classList.remove('active'); b.textContent = '🔒 편집'; }
+  const bar = document.getElementById('m05-edit-bar'); if (bar) bar.style.display = 'none';
+  _m05RenderChips();
+}
+function m05TriggerAdd() {
+  const tmp = document.createElement('input');
+  tmp.type = 'file'; tmp.accept = 'application/pdf'; tmp.multiple = true;
+  tmp.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;';
+  tmp.addEventListener('change', async () => {
+    const files = Array.from(tmp.files || []); tmp.remove();
+    for (const f of files) await m05AddFile(f);
+  });
+  document.body.appendChild(tmp); tmp.click();
+}
+async function m05AddFile(file) {
+  if (!file) return;
+  if (!/\.pdf$/i.test(file.name) && file.type !== 'application/pdf') {
+    showDeptToast('⚠ PDF 파일만 올릴 수 있습니다'); return;
+  }
+  const v = document.getElementById('m05-viewer');
+  v.innerHTML = '<div class="gb-pdf-loading"><div class="gb-pdf-spinner"></div><span>업로드 중... ' + escHtml(file.name) + '</span></div>';
+  try {
+    const url = await uploadToStorage(file);
+    m05Data.items.push({ id: 'm05_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6), name: file.name.replace(/\.pdf$/i, ''), url });
+    await _m05Save();
+    await m05Select(m05Data.items.length - 1);
+    showDeptToast('✓ PDF가 추가되었습니다');
+  } catch(err) {
+    showDeptToast('⚠ 업로드 실패: ' + err.message);
+    if (m05CurIdx >= 0) m05Select(m05CurIdx); else _m05ShowEmpty();
+  }
+}
+async function m05Rename(i) {
+  const it = m05Data.items[i]; if (!it) return;
+  const name = (prompt('자료 이름 (버튼에 표시됩니다)', it.name) || '').trim();
+  if (!name || name === it.name) return;
+  it.name = name; await _m05Save(); _m05RenderChips();
+}
+async function m05Delete(i) {
+  const it = m05Data.items[i]; if (!it) return;
+  if (!confirm('「' + it.name + '」을(를) 삭제할까요?\n(업로드된 파일도 함께 삭제됩니다)')) return;
+  if (typeof _gbForget === 'function') _gbForget(it.url);
+  try { await deleteFromStorage(it.url); } catch(_) {}
+  m05Data.items.splice(i, 1);
+  await _m05Save();
+  if (!m05Data.items.length) { _m05RenderChips(); _m05ShowEmpty(); }
+  else if (i === m05CurIdx) await m05Select(Math.min(i, m05Data.items.length - 1));
+  else { if (i < m05CurIdx) m05CurIdx--; _m05RenderChips(); }
+  showDeptToast('✓ 자료가 삭제되었습니다');
+}
+async function m05Move(i, d) {
+  const j = i + d; if (j < 0 || j >= m05Data.items.length) return;
+  [m05Data.items[i], m05Data.items[j]] = [m05Data.items[j], m05Data.items[i]];
+  if (m05CurIdx === i) m05CurIdx = j; else if (m05CurIdx === j) m05CurIdx = i;
+  _m05RenderChips(); await _m05Save();
 }
 
 function openDeptDetail(name, icon) {
@@ -13524,6 +13791,35 @@ window.addEventListener('resize', function() {
   }, 120);
 });
 </script>
+
+<!-- ═══════════════════════════════════════
+     05 2028 모집단위별 반영과목 (PDF 업로드·보기)
+═══════════════════════════════════════ -->
+<div id="m05-screen">
+  <div class="screen-bg-layer" id="bg-m05-screen"></div>
+  <div class="gb-header">
+    <button class="gb-back-btn" onclick="closeM05Screen()">◀ 뒤로</button>
+    <div class="gb-header-info">
+      <div class="gb-header-label">ADMISSION SUBJECTS · 모집단위별 반영과목</div>
+      <div class="gb-header-title" id="menu-05-title">2028 모집단위별 반영과목</div>
+      <div class="gb-header-subtitle" id="menu-05-subtitle" style="display:none"></div>
+    </div>
+    <button class="gb-edit-btn" id="m05-edit-btn" onclick="openM05EditPw()" title="PDF 자료 편집">🔒 편집</button>
+    <button class="detail-home" onclick="closeM05Screen()" title="메인화면으로">🏠</button>
+  </div>
+  <div class="gb-edit-bar" id="m05-edit-bar" style="display:none">
+    <span class="gb-edit-bar-label">편집 모드</span>
+    <span class="gb-edit-bar-hint">＋ PDF 추가로 업로드 · 자료 버튼 옆 ◀▶ 순서 · ✎ 이름 · ✕ 삭제 (변경 즉시 저장)</span>
+  </div>
+  <div class="gb-sub-row">
+    <div class="gb-item-row m05-item-row" id="m05-item-row"></div>
+    <div class="gb-sub-actions">
+      <a class="gb-original-btn" id="m05-original-btn" href="#" target="_blank" rel="noopener" title="원본 PDF를 새 탭에서 열기">↗ 원본으로 보기</a>
+      <button class="gb-fullscreen-btn gb-sub-fs" onclick="m05Fullscreen()" title="전체화면">⛶</button>
+    </div>
+  </div>
+  <div class="rec-viewer" id="m05-viewer"></div>
+</div>
 
 <!-- ═══════════════════════════════════════
      브로셔 PDF 화면 (메뉴 09)
