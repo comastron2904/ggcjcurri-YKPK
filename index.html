@@ -5416,6 +5416,23 @@
     box-shadow: inset 0 2px 4px rgba(16,52,102,0.10), 0 1px 0 var(--btn3d-edge), 0 2px 6px var(--btn3d-drop);
   }
 
+  /* ── 우측 하단 편집 버튼(✏️ · 과목 관리): 평소엔 흐릿하게, 마우스를 가까이 대면 또렷하게 ── */
+  #top-btn-group {
+    opacity: 0.12; filter: grayscale(1);
+    transition: opacity 0.35s ease, filter 0.35s ease;
+  }
+  #top-btn-group #edit-page-btn, #top-btn-group #admin-btn { box-shadow: none; }
+  #top-btn-group:hover, #top-btn-group:focus-within {
+    opacity: 1; filter: none;
+  }
+  #top-btn-group:hover #edit-page-btn, #top-btn-group:hover #admin-btn,
+  #top-btn-group:focus-within #edit-page-btn, #top-btn-group:focus-within #admin-btn {
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.95),
+      0 3px 0 var(--btn3d-edge),
+      0 6px 14px var(--btn3d-drop);
+  }
+
   /* ── 3번 화면: 계열 버튼 · 수능 카드 ── */
   .dept-btn, .sn-card-btn {
     border-radius: 14px;
