@@ -5436,14 +5436,26 @@
     -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 45%, transparent 30%, #000 85%);
             mask-image: radial-gradient(ellipse 70% 60% at 50% 45%, transparent 30%, #000 85%);
   }
-  #hero::after {                /* 아래쪽 경계 부드럽게 */
-    content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 90px; z-index: 2; pointer-events: none;
+  #hero::after {                /* 아래쪽 경계만 살짝 이어지게 (그림을 가리지 않도록 얕게) */
+    content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 36px; z-index: 2; pointer-events: none;
     background: linear-gradient(180deg, rgba(240,244,248,0) 0%, #f0f4f8 100%);
   }
   .geo-circle { border-color: rgba(26,107,191,0.14); }
-  .geo-circle.c1 { box-shadow: inset 0 0 0 40px rgba(255,255,255,0.10); animation: heroFloat 14s ease-in-out infinite; }
-  .geo-circle.c2 { box-shadow: inset 0 0 0 26px rgba(255,255,255,0.12); animation: heroFloat 18s ease-in-out infinite reverse; }
+  .geo-circle.c1 { animation: heroFloat 14s ease-in-out infinite; }
+  .geo-circle.c2 { animation: heroFloat 18s ease-in-out infinite reverse; }
   .geo-line { opacity: 0.55; }
+  /* 배경 그림이 있을 때: 그림 위를 덮던 흰 막·점무늬·장식선을 걷어내 선명하게 */
+  #hero:has(#hero-bg.active) #hero-overlay { background: none; }
+  #hero:has(#hero-bg.active)::before { display: none; }
+  #hero:has(#hero-bg.active) .geo-circle,
+  #hero:has(#hero-bg.active) .geo-line { opacity: 0.35; }
+  /* 글자는 그림 위에서도 또렷하게: 얇은 흰 테두리 빛 */
+  #hero:has(#hero-bg.active) .main-title {
+    text-shadow: 0 0 2px rgba(255,255,255,0.95), 0 0 14px rgba(255,255,255,0.85), 0 4px 18px rgba(255,255,255,0.6);
+  }
+  #hero:has(#hero-bg.active) .subtitle {
+    color: rgba(10,26,48,0.85); text-shadow: 0 0 2px #fff, 0 0 10px rgba(255,255,255,0.9);
+  }
   @keyframes heroFloat { 0%,100% { transform: translate(0,0); } 50% { transform: translate(-14px, 10px); } }
 
   /* 학교 이름 배지: 반투명 알약 모양 + 작은 점 */
@@ -5455,7 +5467,7 @@
     background: rgba(255,255,255,0.55);
     border: 1px solid rgba(255,255,255,0.9);
     box-shadow: 0 1px 0 rgba(255,255,255,0.9) inset, 0 6px 18px rgba(16,52,102,0.10);
-    -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+    background: rgba(255,255,255,0.80);
   }
   .year-badge::before {
     content: ''; position: absolute; left: 16px; top: 50%; width: 7px; height: 7px; margin-top: -3.5px;
@@ -5477,16 +5489,16 @@
   }
 
   /* 2) '메뉴 선택' 구분선: 가운데 알약 모양 이름표 */
-  .divider { padding: 6px 48px 14px; gap: 16px; background: transparent; }
-  .divider-line { background: linear-gradient(90deg, transparent, rgba(26,107,191,0.35), transparent); }
-  .divider-diamond { display: none; }
-  .divider-text {
-    padding: 6px 16px; border-radius: 999px;
-    font-size: 11px; font-weight: 700; letter-spacing: 3px; color: #1a6bbf;
-    background: linear-gradient(180deg, #ffffff, #eef4fb);
-    border: 1px solid rgba(26,107,191,0.18);
-    box-shadow: inset 0 1px 0 #ffffff, 0 2px 0 rgba(26,107,191,0.10), 0 4px 10px rgba(16,52,102,0.08);
+  /* 2) '메뉴 선택' 구분선: 예전 구성(선 · 마름모 · 글자) 그대로, 색과 굵기만 지금 분위기에 맞춤 */
+  .divider { padding: 8px 48px 14px; gap: 12px; background: transparent; max-width: 1180px; margin: 0 auto; }
+  .divider-line { height: 1px; background: linear-gradient(90deg, rgba(26,107,191,0) 0%, rgba(26,107,191,0.35) 100%); }
+  .divider-line:last-child { background: linear-gradient(90deg, rgba(26,107,191,0.35) 0%, rgba(26,107,191,0) 100%); }
+  .divider-diamond {
+    width: 6px; height: 6px; border-radius: 1px;
+    background: linear-gradient(135deg, #3d95e6, #0e8a7a);
+    box-shadow: 0 0 0 3px rgba(26,107,191,0.10);
   }
+  .divider-text { font-size: 11px; font-weight: 700; letter-spacing: 4px; color: #1a6bbf; padding: 0 4px; }
 
   /* 3) 메뉴 영역 */
   #nav-section { background: transparent; padding-top: 4px; }
@@ -5494,26 +5506,15 @@
   .buttons-grid { gap: 16px; }
   .nav-btn { padding: 20px 22px; gap: 16px; }
 
-  /* 번호: 둥근 사각 타일 (마우스 올리면 파랗게 채워짐) */
+  /* 번호: 배경 없이 숫자만 (산세리프 · 파랑), 마우스 올리면 진하게 */
   .btn-number {
-    display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
-    width: 44px; height: 44px; min-width: 44px; border-radius: 12px;
-    font-family: 'Noto Sans KR', sans-serif; font-size: 16px; font-weight: 800; letter-spacing: 0;
-    color: #1a6bbf; opacity: 1;
-    background: linear-gradient(180deg, #eaf2fc 0%, #dbe8f8 100%);
-    box-shadow: inset 0 1px 0 #ffffff, inset 0 -2px 0 rgba(26,107,191,0.10);
-    transition: background 0.25s ease, color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+    font-family: 'Noto Sans KR', sans-serif; font-size: 20px; font-weight: 800; letter-spacing: -0.5px;
+    color: #1a6bbf; opacity: 0.55; min-width: 30px;
+    transition: opacity 0.25s ease, color 0.25s ease;
   }
-  .nav-btn:hover .btn-number {
-    color: #ffffff;
-    background: linear-gradient(180deg, #3d95e6 0%, #1a6bbf 100%);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.35), 0 4px 10px rgba(26,107,191,0.30);
-    transform: rotate(-4deg);
-  }
+  .nav-btn:hover .btn-number { opacity: 1; }
   .btn-title { font-size: 15.5px; color: #1a2e4a; letter-spacing: -0.2px; }
   .btn-arrow { color: rgba(26,107,191,0.70); }
-  /* 마우스 올렸을 때 왼쪽 세로 색띠는 번호 타일과 겹쳐 보여서 숨김 */
-  .nav-btn::after { display: none; }
 
   /* 4) 아래쪽 저작권 줄 */
   .footer {
@@ -5528,7 +5529,7 @@
   @media (max-width: 600px) {
     .divider { padding: 4px 20px 10px; }
     .nav-btn { padding: 16px 16px; gap: 14px; }
-    .btn-number { width: 38px; height: 38px; min-width: 38px; border-radius: 10px; font-size: 14px; }
+    .btn-number { font-size: 18px; min-width: 26px; }
     .btn-title { font-size: 14.5px; }
     .year-badge { letter-spacing: 2px; padding: 6px 16px 6px 28px; font-size: 11px; }
     .year-badge::before { left: 12px; }
