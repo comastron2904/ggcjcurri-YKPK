@@ -8,7 +8,7 @@
   document.addEventListener('touchstart', function(){}, {passive: true});
 </script>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>2026 경기창조고 교육과정 박람회</title>
 <link rel="manifest" href="/manifest.json" />
 <link rel="apple-touch-icon" href="/icon-192.png" />
@@ -1407,9 +1407,9 @@
       display: flex !important;
       flex-direction: column !important;
       flex-shrink: 0 !important;
-      width: 90px !important;
-      min-width: 90px !important;
-      max-width: 90px !important;
+      width: var(--sem-head-w, 90px) !important;
+      min-width: var(--sem-head-w, 90px) !important;
+      max-width: var(--sem-head-w, 90px) !important;
       box-sizing: border-box !important;
       position: static !important;
       border-right: 1px solid rgba(26,107,191,0.12) !important;
@@ -5865,6 +5865,96 @@
     #m05-screen .gb-header { padding: 8px 12px; }
     #m05-screen .m05-item-row { padding: 6px 12px; flex-wrap: nowrap; overflow-x: auto; }
   }
+
+  /* ══════════════════════════════════════
+     모바일 최적화 (2026-11)
+  ══════════════════════════════════════ */
+  /* ── 아이폰 홈 화면 앱(상태표시줄 겹침)·노치 대응: 화면 위·아래 안전 여백 ── */
+  #semester-screen, #catsubj-screen, #dept-screen, #subject-search-screen, #dept-detail-panel,
+  #guidebook-screen, #brochure-screen, #iframe-screen, #mycurriculum-screen, #m05-screen,
+  #subject-detail, #pdf-fs-overlay, #gb-fs-overlay {
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  #hero { padding-top: env(safe-area-inset-top, 0px); }
+  #mycurriculum-btn { top: calc(20px + env(safe-area-inset-top, 0px)); }
+  #enroll-fab { bottom: calc(24px + env(safe-area-inset-bottom, 0px)); }
+
+  /* 휴대폰 세로(768px 이하) + 휴대폰 가로(높이 500px 이하 터치 화면) 공통 */
+  @media (max-width: 768px), (max-height: 500px) and (pointer: coarse) {
+    /* ── 관리자용 편집 버튼: 휴대폰에서는 숨김 (편집은 PC에서) ── */
+    #suneung-edit-btn, #dd-edit-btn, #enroll-edit-btn, #gb-edit-btn, #m05-edit-btn, #br-edit-btn,
+    .btn-sem-col-edit[onclick^="openSemColEditPw"], .btn-sem-add {
+      display: none !important;
+    }
+
+    /* ── 입력칸 글자 16px: 아이폰에서 입력칸을 누를 때 화면이 확대되는 현상 방지 ── */
+    input[type="text"], input[type="password"], input[type="search"], input[type="email"],
+    input[type="tel"], input[type="number"], input:not([type]), select, textarea {
+      font-size: 16px !important;
+    }
+
+    /* ── 메인: 학교 이름 배지·부제가 어색하게 줄바꿈되지 않도록 ── */
+    .year-badge {
+      max-width: calc(100vw - 40px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      font-size: 10.5px; letter-spacing: 1.5px; padding: 6px 14px 6px 26px;
+    }
+    .year-badge::before { left: 11px; width: 6px; height: 6px; margin-top: -3px; }
+    .subtitle { font-size: 11px; letter-spacing: 2px; line-height: 1.7; padding: 0 12px 16px; }
+    #hero-content { padding: 64px 16px 36px; }
+
+    /* ── 수강신청 안내 버튼: 작게, 아이콘만 ── */
+    #enroll-fab {
+      width: 52px; height: 52px; left: 14px;
+      bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    }
+    #enroll-fab .enroll-fab-label { display: none !important; }
+    .enroll-fab-icon { font-size: 24px; }
+    #enroll-fab::after { top: 5px; left: 11px; right: 11px; height: 18px; }
+    /* 맨 아래 메뉴가 버튼에 가리지 않도록 여백 */
+    #nav-section { padding-bottom: 84px !important; }
+
+    /* ── '나만의 교육과정' 버튼: 화면에 고정하지 않고 제목 영역과 함께 위로 지나가게 (메뉴를 가리지 않도록) ── */
+    #mycurriculum-btn { position: absolute; }
+
+    /* ── 화면 위쪽 머리 줄: 영문 꼬리표 숨겨 공간 확보 ── */
+    .iframe-title-label { display: none; }
+
+    /* ── 손가락으로 누르기 쉽게: 작은 버튼 최소 36px ── */
+    .gb-sub-fs, .gb-fullscreen-btn, .dept-pdf-fs-btn, .media-pdf-fs-btn {
+      min-width: 36px !important; min-height: 36px !important; font-size: 15px;
+    }
+    .gb-sub-actions .gb-original-btn { min-height: 34px; display: inline-flex; align-items: center; }
+    .gb-item-btn { min-height: 36px; }
+    .dept-pdf-nav { min-width: 40px; }
+
+    /* ── 01 학기별 개설과목: 왼쪽 '학기 · 일반/진로/융합' 열은 옆으로 밀어도 고정 ── */
+    #sem-scroll-outer .sem-col-header-cell:first-child,
+    #sem-scroll-outer .sem-row-head {
+      position: sticky !important; left: 0; z-index: 3;
+      background: #eaf2fb !important;
+      box-shadow: 4px 0 8px -6px rgba(16,52,102,0.25);
+    }
+  }
+  /* ── 휴대폰 가로(높이가 낮은 화면): 머리 줄을 얇게, 창은 위에서부터 스크롤 ── */
+  @media (max-height: 500px) and (pointer: coarse) {
+    #admin-btn, #edit-page-btn, #top-btn-group { display: none !important; }
+    .sem-header, .dept-header, .gb-header, .iframe-header { padding-top: 6px !important; padding-bottom: 6px !important; min-height: 0 !important; }
+    .sem-header-label, .dept-header-label, .gb-header-label, .sem-header-subtitle,
+    .dept-header-subtitle, .gb-header-subtitle { display: none !important; }
+    .sem-header-title, .dept-header-title, .gb-header-title { font-size: 17px !important; }
+    .sem-back, .dept-back, .gb-back-btn { padding: 6px 12px !important; font-size: 12px !important; }
+    .modal-backdrop { align-items: flex-start; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 10px 0; }
+    .modal-box { padding: 22px 24px 20px; margin: auto; }
+    #hero { min-height: 0; }
+    #hero-content { padding: 54px 16px 28px; }
+  }
+  @media (max-width: 600px) {
+    /* 01: 좁아진 왼쪽 열 글자 크기 */
+    #sem-scroll-outer .sem-row-head-label { padding: 8px 2px !important; }
+    #sem-scroll-outer .sem-subtype-zone { font-size: 9px; letter-spacing: 0.5px; }
+    #sem-scroll-outer .sem-col-header-cell:first-child { font-size: 11px; letter-spacing: 1px; }
+  }
 </style>
 </head>
 <body>
@@ -10134,9 +10224,12 @@ function resetMobileStyles() {
    subtype별 6개 이상 열: 260px, 미만: 140px, 학기명 열: 72px
 ────────────────────────────────────────────── */
 function applyMobileColWidths(maxReq, maxSS, maxKns, maxFor, maxMus, threshold) {
-  const COL_NARROW = 200;
-  const COL_WIDE   = 320; // 2열(.wide) 그리드가 뭉개지지 않도록 충분히 확보
-  const COL_HEAD   = 90;
+  // 휴대폰(600px 이하)은 칸을 좁혀 한 화면에 더 많이 보이게, 폴드·태블릿은 기존 폭
+  const isPhone    = window.innerWidth <= 600;
+  const COL_NARROW = isPhone ? 158 : 200;
+  const COL_WIDE   = isPhone ? 268 : 320; // 2열(.wide) 그리드가 뭉개지지 않도록 충분히 확보
+  const COL_HEAD   = isPhone ? 64  : 90;
+  document.documentElement.style.setProperty('--sem-head-w', COL_HEAD + 'px');
 
   // subtype별 max 기준으로 wide 판단: 어떤 subtype이라도 6개 이상이면 WIDE
   function isWideBySubtype(typeFilter) {
