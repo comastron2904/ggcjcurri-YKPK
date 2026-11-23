@@ -5798,7 +5798,7 @@
     <button class="nav-btn" data-menu="5" id="nav-btn-05" onclick="openM05Screen()"><span class="btn-number">05</span><span class="btn-title" id="menu-05">2028 모집단위별 반영과목</span><span class="btn-arrow">›</span></button>
     <button class="nav-btn" data-menu="6" onclick="openGuidebookScreen()"><span class="btn-number">06</span><span class="btn-title" id="menu-06">선택과목 안내서</span><span class="btn-arrow">›</span></button>
     <button class="nav-btn" data-menu="7" id="nav-btn-07" onclick="openMenu07()"><span class="btn-number">07</span><span class="btn-title" id="menu-07">창조고 교과목 선택 도우미 (gemini)</span><span class="btn-arrow">›</span></button>
-    <button class="nav-btn" data-menu="8" id="nav-btn-08" onclick="openMenu08()"><span class="btn-number">08</span><span class="btn-title" id="menu-08">2028 대입전형 시행계획</span><span class="btn-arrow">›</span></button>
+    <button class="nav-btn" data-menu="8" id="nav-btn-08" onclick="openMenu08()"><span class="btn-number">08</span><span class="btn-title" id="menu-08">2028 대학별 안내</span><span class="btn-arrow">›</span></button>
     <button class="nav-btn" data-menu="9" id="nav-btn-09" onclick="openGuidebookScreen('09')"><span class="btn-number">09</span><span class="btn-title" id="menu-09">2028 시행계획</span><span class="btn-arrow">›</span></button>
   </div>
 </section>
@@ -6096,7 +6096,7 @@
           <span class="pe-menu-num" style="font-size:10px;color:rgba(201,168,76,0.35);letter-spacing:1px">URL</span>
           <input class="pe-menu-input" id="pe-menu-07-url" placeholder="https://example.com (비워두면 비활성)" style="font-size:12px;color:rgba(255,255,255,0.55);" />
         </div>
-        <div class="pe-menu-item" style="margin-top:10px"><span class="pe-menu-num">08</span><input class="pe-menu-input" id="pe-menu-08" placeholder="2028 대입전형 시행계획" /></div>
+        <div class="pe-menu-item" style="margin-top:10px"><span class="pe-menu-num">08</span><input class="pe-menu-input" id="pe-menu-08" placeholder="2028 대학별 안내" /></div>
         <div class="pe-menu-sub-row"><span class="pe-menu-sub-label">소제목</span><input class="pe-menu-subtitle-input" id="pe-menu-08-sub" placeholder="화면 상단에 표시될 소제목 (선택)" /></div>
         <div class="pe-menu-item" style="margin-top:6px">
           <span class="pe-menu-num" style="font-size:10px;color:rgba(201,168,76,0.35);letter-spacing:1px">URL</span>
@@ -7545,7 +7545,7 @@ function applyPageTexts() {
    신버전: 화면 번호와 같게 → 4번 = 브로셔, 9번 = 수강신청 안내
    저장된 이름·소제목·순서를 한 번만 맞바꾸고 menuSlotVer = 2로 표시합니다.
 ────────────────────────────── */
-const MENU_SLOT_VER = 5;
+const MENU_SLOT_VER = 6;
 function migrateMenuSlots(p) {
   if (!p || typeof p !== 'object' || p.menuSlotVer >= MENU_SLOT_VER) return false;
   const ver = p.menuSlotVer || 1;
@@ -7571,6 +7571,10 @@ function migrateMenuSlots(p) {
     if (p.menu09sub && !p.enrollSub) p.enrollSub = p.menu09sub;
     p.menu09    = '2028 시행계획';
     p.menu09sub = '';
+  }
+  if (ver < 6) {
+    /* v6: 08 이름을 '2028 대학별 안내'로 변경 (저장된 예전 이름도 바꿈) */
+    p.menu08 = '2028 대학별 안내';
   }
   p.menuSlotVer = MENU_SLOT_VER;
   return true;
@@ -7602,7 +7606,7 @@ const MENU_META = {
   5: { label: '2028 모집단위별 반영과목',         fn: 'openM05Screen()' },
   6: { label: '선택과목 안내서',                   fn: 'openGuidebookScreen()' },
   7: { label: '창조고 교과목 선택 도우미 (gemini)',fn: 'openMenu07()' },
-  8: { label: '2028 대입전형 시행계획',            fn: 'openMenu08()' },
+  8: { label: '2028 대학별 안내',                  fn: 'openMenu08()' },
   9: { label: '2028 시행계획',                     fn: "openGuidebookScreen('09')" },   // 06과 같은 구조
 };
 
